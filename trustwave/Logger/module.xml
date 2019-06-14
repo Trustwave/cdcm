@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Logger>
+  <version>1</version>
+  <Project>
+    <name>Credentialed_Scanner</name>
+    <level>7</level>
+    <severity_levels>
+    <debug value="1"/>
+        <info value="2"/>
+        <warning value="4"/>
+        <error value="8"/>
+    </severity_levels>
+    <modules>
+        <module name="agent" id="1" level="7" enable="true"/>
+     </modules>
+    <supported_sinks>
+      <sink name="file">
+        <id>1</id>
+        <name>/tmp/Au_%N.log</name>
+        <filter>debug</filter>
+        <enable>true</enable>
+      </sink>
+
+    </supported_sinks>
+  </Project> 
+</Logger>
+

@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+bld.SAMBA_SUBSYSTEM('tw-registry-client',  
+    source='registry_client.cpp',
+    deps='  registry_common registry ')

@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+   
+bld.SAMBA_SUBSYSTEM('registry-actions',
+	includes='../../../misc/ ../../../', 
+    source='query_value.cpp',
+    deps='tw-misc tw-registry-client')

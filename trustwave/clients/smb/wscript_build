@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+bld.SAMBA_SUBSYSTEM('tw-smb-client',  
+    source='smb_downloader_client.cpp',
+    deps='smbclient-raw smbclient ')

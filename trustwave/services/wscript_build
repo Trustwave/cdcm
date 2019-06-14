@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+bld.RECURSE('smb')
+bld.RECURSE('registry')
+bld.RECURSE('local')

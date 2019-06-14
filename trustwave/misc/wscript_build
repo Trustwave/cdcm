@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+bld.RECURSE('Logger')
+   
+bld.SAMBA_SUBSYSTEM('tw-misc',  
+    source='credentials.cpp session.cpp',
+    deps='samba-credentials ')

@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+   
+bld.SAMBA_SUBSYSTEM('local-actions',
+	includes='../../../misc/ ../../../', 
+    source='start_session.cpp  file_version.cpp get_remote_file_version.cpp',
+    deps='tw-misc ')
