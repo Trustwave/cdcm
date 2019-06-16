@@ -1,0 +1,24 @@
+diff --git a/Makefile b/Makefile
+index e3fb43a..8dbac55 100644
+--- a/Makefile
++++ b/Makefile
+@@ -65,6 +65,7 @@ LIBNAME = libpe
+ SRC_DIRS = $(srcdir) $(srcdir)/libfuzzy $(srcdir)/libudis86
+ 
+ libpe_BUILDDIR = $(CURDIR)/build
++staticlib_OUTPUTDIR= ../../../../lib/
+ libpe_SRCS_FILTER = $(wildcard ${dir}/*.c)
+ libpe_SRCS = $(foreach dir, ${SRC_DIRS}, ${libpe_SRCS_FILTER})
+ libpe_OBJS = $(addprefix ${libpe_BUILDDIR}/, $(addsuffix .o, $(basename ${libpe_SRCS})))
+@@ -73,7 +74,10 @@ libpe_OBJS = $(addprefix ${libpe_BUILDDIR}/, $(addsuffix .o, $(basename ${libpe_
+ 
+ .PHONY : libpe install strip-binaries install-strip uninstall clean
+ 
+-all: libpe
++all: libpe libpe_static
++libpe_static:
++	$(CHK_DIR_EXISTS) $(dir $(staticlib_OUTPUTDIR)) || $(MKDIR) $(dir $(staticlib_OUTPUTDIR))  
++	ar rcs  $(staticlib_OUTPUTDIR)/libpe.a $(libpe_OBJS)
+ 
+ libpe: CPPFLAGS += -D_GNU_SOURCE
+ ifeq ($(PLATFORM_OS), CYGWIN)
