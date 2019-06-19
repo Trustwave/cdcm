@@ -107,4 +107,53 @@ index 771eb1fa0f7..79c61ea960b 100644
 +bld.RECURSE('trustwave')
  
  bld.RECURSE('testsuite/headers')
+diff --git a/third_party/waf/waflib/extras/boost.py b/third_party/waf/waflib/extras/boost.py
+index c2aaaa9..24e43e0 100644
+--- a/third_party/waf/waflib/extras/boost.py
++++ b/third_party/waf/waflib/extras/boost.py
+@@ -58,12 +58,14 @@ BOOST_LIBS = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/sw/lib', '/lib']
+ BOOST_INCLUDES = ['/usr/include', '/usr/local/include', '/opt/local/include', '/sw/include']
+ BOOST_VERSION_FILE = 'boost/version.hpp'
+ BOOST_VERSION_CODE = '''
++#undef uint_t
+ #include <iostream>
+ #include <boost/version.hpp>
+ int main() { std::cout << BOOST_LIB_VERSION << ":" << BOOST_VERSION << std::endl; }
+ '''
+
+ BOOST_ERROR_CODE = '''
++#undef uint_t
+ #include <boost/system/error_code.hpp>
+ int main() { boost::system::error_code c; }
+ '''
+@@ -84,11 +86,13 @@ int main() {
+ '''
+
+ BOOST_THREAD_CODE = '''
++#undef uint_t
+ #include <boost/thread.hpp>
+ int main() { boost::thread t; }
+ '''
+
+ BOOST_LOG_CODE = '''
++#undef uint_t
+ #include <boost/log/trivial.hpp>
+ #include <boost/log/utility/setup/console.hpp>
+ #include <boost/log/utility/setup/common_attributes.hpp>
+@@ -261,7 +265,7 @@ def boost_get_libs(self, *k, **kw):
+        files = sorted(files, key=lambda f: (len(f.name), f.name), reverse=True)
+        toolset = self.boost_get_toolset(kw.get('toolset', ''))
+        toolset_pat = '(-%s[0-9]{0,3})' % toolset
+-       version = '-%s' % self.env.BOOST_VERSION
++       version = ''#'-%s' % self.env.BOOST_VERSION
+
+        def find_lib(re_lib, files):
+                for file in files:
+@@ -273,7 +277,9 @@ def boost_get_libs(self, *k, **kw):
+        def format_lib_name(name):
+                if name.startswith('lib') and self.env.CC_NAME != 'msvc':
+                        name = name[3:]
+-               return name[:name.rfind('.')]
++
++               Logs.pprint('CYAN', 'formatted: %s' % name[:name.rfind('.')])
  
