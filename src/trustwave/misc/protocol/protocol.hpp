@@ -7,8 +7,8 @@
 
 #ifndef TRUSTWAVE_MISC_PROTOCOL_PROTOCOL_HPP_
 #define TRUSTWAVE_MISC_PROTOCOL_PROTOCOL_HPP_
-#include "json/include/tao/json/contrib/traits.hpp"
-#include "json/include/tao/json.hpp"
+#include "3rdparty/json/include/tao/json/contrib/traits.hpp"
+#include "3rdparty/json/include/tao/json.hpp"
 #include "msg_types.hpp"
 
 namespace tao {
