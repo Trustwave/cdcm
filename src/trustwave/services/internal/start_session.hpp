@@ -1,6 +1,6 @@
 //=====================================================================================================================
 // Trustwave ltd. @{SRCH}
-//														credentials.hpp
+//														start_session.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
@@ -10,29 +10,33 @@
 // -----------
 // Revision: 01.00
 // By      : Assaf Cohen
-// Date    : 29 Apr 2019
+// Date    : 20 May 2019
 // Comments:
 
-#ifndef TRUSTWAVE_MISC_CREDENTIALS_HPP_
-#define TRUSTWAVE_MISC_CREDENTIALS_HPP_
+#ifndef TRUSTWAVE_SERVICES_LOCAL_ACTIONS_GET_SESSION_HPP_
+#define TRUSTWAVE_SERVICES_LOCAL_ACTIONS_GET_SESSION_HPP_
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include <string>
-struct cli_credentials;
+#include "../../misc/action.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
-class credentials
+
+class Start_Session: public Action_Base
 {
+    static Dispatcher<Action_Base>::Registrator m_registrator;
+
 public:
-    credentials(const std::string& domain, const std::string& username, const std::string& password,
-                    const std::string workstation);
-    cli_credentials *creds() const;
-private:
-    struct cli_credentials *creds_;
+    Start_Session() :
+                    Action_Base("start_session", "start_session")
+    {
+    }
+
+    virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
 };
+
 }
 
-#endif /* TRUSTWAVE_MISC_CREDENTIALS_HPP_ */
+#endif /* TRUSTWAVE_SERVICES_LOCAL_ACTIONS_GET_SESSION_HPP_ */

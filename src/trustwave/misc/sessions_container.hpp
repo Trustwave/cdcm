@@ -1,12 +1,23 @@
-/*
- * sessions_container.hpp
- *
- *  Created on: Apr 29, 2019
- *      Author: root
- */
+//=====================================================================================================================
+// Trustwave ltd. @{SRCH}
+//														sessions_container.hpp
+//
+//---------------------------------------------------------------------------------------------------------------------
+// DESCRIPTION: @{HDES}
+// -----------
+//---------------------------------------------------------------------------------------------------------------------
+// CHANGES LOG: @{HREV}
+// -----------
+// Revision: 01.00
+// By      : Assaf Cohen
+// Date    : 19 Apr 2019
+// Comments:
 
 #ifndef TRUSTWAVE_MISC_SESSIONS_CONTAINER_HPP_
 #define TRUSTWAVE_MISC_SESSIONS_CONTAINER_HPP_
+//=====================================================================================================================
+//                          						Include files
+//=====================================================================================================================
 #include "session.hpp"
 #include <boost/multi_index_container.hpp>
 #include <string>
@@ -22,6 +33,9 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <iostream>
+//=====================================================================================================================
+//                          						namespaces
+//=====================================================================================================================
 namespace trustwave {
 //can't really avoid this singleton
 
@@ -37,24 +51,25 @@ public:
     sessions_container(sessions_container &&) = delete;
     sessions_container & operator=(sessions_container &&) = delete;
 
-
-    struct element{
-            mutable time_t first;
-            session second;
-            const boost::uuids::uuid & s_id() const
-            {
-                return second.id();
-            }
-            const std::string & s_remote() const
-            {
-                return second.remote();
-            }
-        };
+    struct element
+    {
+        mutable time_t first;
+        session second;
+        const boost::uuids::uuid & s_id() const
+        {
+            return second.id();
+        }
+        const std::string & s_remote() const
+        {
+            return second.remote();
+        }
+    };
     void insert_session(session s)
     {
         element e;
-        e.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());;
-        e.second= s;
+        e.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        ;
+        e.second = s;
         sessions_.insert(e);
     }
 private:
@@ -68,26 +83,19 @@ private:
     {
     };
     struct last_time
-        {
-        };
+    {
+    };
 
-    typedef boost::multi_index::multi_index_container<
-                    element,
+    typedef boost::multi_index::multi_index_container<element,
                     boost::multi_index::indexed_by<
-                        boost::multi_index::ordered_unique<
-                            boost::multi_index::tag<id>,
-                            boost::multi_index::const_mem_fun<element, const boost::uuids::uuid &, &element::s_id>
-                        >,
-                        boost::multi_index::ordered_non_unique<
-                            boost::multi_index::tag<last_time>,
-                            boost::multi_index::member<element,  time_t, &element::first>
-                                                >,
-                        boost::multi_index::ordered_unique<
-                            boost::multi_index::tag<remote>,
-                            boost::multi_index::const_mem_fun<element, const std::string &, &element::s_remote>
-                        >
-                    >
-    > sessions;
+                                    boost::multi_index::ordered_unique<boost::multi_index::tag<id>,
+                                                    boost::multi_index::const_mem_fun<element,
+                                                                    const boost::uuids::uuid &, &element::s_id> >,
+                                    boost::multi_index::ordered_non_unique<boost::multi_index::tag<last_time>,
+                                                    boost::multi_index::member<element, time_t, &element::first> >,
+                                    boost::multi_index::ordered_unique<boost::multi_index::tag<remote>,
+                                                    boost::multi_index::const_mem_fun<element, const std::string &,
+                                                                    &element::s_remote> > > > sessions;
 
     sessions sessions_;
     session return_replaced(sessions::const_iterator s)
@@ -111,12 +119,12 @@ public:
         else {
 
             typedef boost::multi_index::index<sessions, last_time>::type element_by_time;
-                    element_by_time& time_index = sessions_.get<last_time>();
-                    auto it2 = sessions_.project<last_time>(s);
-                    auto n = *s;
-                    n.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-                    time_index.replace(it2, n);
-                    return s->second;
+            element_by_time& time_index = sessions_.get<last_time>();
+            auto it2 = sessions_.project<last_time>(s);
+            auto n = *s;
+            n.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            time_index.replace(it2, n);
+            return s->second;
         }
 //  //  boost::multi_index::get<remote>(sessions_).find(dst);
 //  return  sessions_.get<remote>().find(dst);

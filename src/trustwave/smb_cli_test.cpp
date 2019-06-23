@@ -8,7 +8,6 @@
 //                              Include Files.
 //===========================================================================
 //#include "misc/Logger/include/Logger.h"
-
 #include <iostream>
 #include <string>
 #include "misc/session.hpp"
@@ -56,11 +55,13 @@ int main(int argc, const char **argv)
     //session_cont_test();
     //return 0;
     auto act_id1 = boost::uuids::random_generator()();
-    std::string get_session_m = R"(
+    std::string get_session_m =
+                    R"(
        { 
             "H":
             {
-                "session_id" : ")" + std::string("N/A") + R"(" 
+                "session_id" : ")" + std::string("N/A")
+                                    + R"(" 
             },
             "msgs":
                 [
@@ -68,7 +69,9 @@ int main(int argc, const char **argv)
                     {
                         "start_session" :
                         {
-                            "id": ")" + boost::uuids::to_string(act_id1) + R"(",
+                            "id": ")"
+                                    + boost::uuids::to_string(act_id1)
+                                    + R"(",
                             "remote":"%{host}",
                             "domain":"%{domain}",
                             "username":"%{username}",
@@ -83,7 +86,7 @@ int main(int argc, const char **argv)
        )";
 
     const auto t1 = from_string(get_session_m);
-    AU_LOG_DEBUG("msg: %s",to_string(t1,2).c_str());
+    AU_LOG_DEBUG("msg: %s", to_string(t1, 2).c_str());
     auto a1 = t1.as<trustwave::msg>();
     auto res = std::make_shared<trustwave::result_msg>();
     trustwave::res_msg res1;
@@ -92,7 +95,7 @@ int main(int argc, const char **argv)
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(aa->name());
 
         act1->act(a1.hdr, aa, res);
-        AU_LOG_INFO("Done %s",res1.msgs[0]->res().c_str());
+        AU_LOG_INFO("Done %s", res1.msgs[0]->res().c_str());
     }
 
     auto act_id2 = boost::uuids::to_string(boost::uuids::random_generator()());
@@ -100,32 +103,40 @@ int main(int argc, const char **argv)
     auto act_id4 = boost::uuids::to_string(boost::uuids::random_generator()());
     auto act_id5 = boost::uuids::to_string(boost::uuids::random_generator()());
     auto new_session_id = res1.msgs[0]->res();
-    std::string name = R"(
+    std::string name =
+                    R"(
       {      
         "H":
             {
-                "session_id" : ")" + new_session_id + R"("
+                "session_id" : ")" + new_session_id
+                                    + R"("
             },
         "msgs":
             [
                 {
                         "get_file" :
                         {
-                            "id": ")" + act_id2 + R"(",
+                            "id": ")"
+                                    + act_id2
+                                    + R"(",
                             "param":"ADMIN$/winhlp32.exe"
                         }
                 },
                 {
                         "get_remote_file_version" :
                         {
-                            "id": ")" + act_id3 + R"(",
+                            "id": ")"
+                                    + act_id3
+                                    + R"(",
                             "param":"ADMIN$/winhlp32.exe"
                         }
                 },
                 {
                         "query_value" :
                         {
-                            "id": ")" + act_id4 + R"(",
+                            "id": ")"
+                                    + act_id4
+                                    + R"(",
                             "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion",
                             "value":"ProductID"
                         }
@@ -133,19 +144,19 @@ int main(int argc, const char **argv)
             ]
     })";
     const auto t = from_string(name);
-    AU_LOG_DEBUG("msg: %s",to_string(t,2).c_str());
+    AU_LOG_DEBUG("msg: %s", to_string(t, 2).c_str());
     auto a = t.as<trustwave::msg>();
     trustwave::res_msg res2;
-    res2.hdr=a.hdr;
+    res2.hdr = a.hdr;
 
     for (auto aa : a.msgs) {
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(aa->name());
         auto res3 = std::make_shared<trustwave::result_msg>();
-           res2.msgs.push_back(res3);
+        res2.msgs.push_back(res3);
         act1->act(a.hdr, aa, res3);
-        AU_LOG_INFO("Done %s",res2.msgs[0]->res().c_str());
+        AU_LOG_INFO("Done %s", res2.msgs[0]->res().c_str());
     }
     const tao::json::value v1 = res2;
-    AU_LOG_INFO("Done %s",to_string(v1,2).c_str());
+    AU_LOG_INFO("Done %s", to_string(v1, 2).c_str());
     return 0;
 }

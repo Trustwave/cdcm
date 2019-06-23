@@ -1,9 +1,17 @@
-/*
- * credentials.cpp
- *
- *  Created on: Apr 29, 2019
- *      Author: root
- */
+//=====================================================================================================================
+// Trustwave ltd. @{SRCH}
+//														credentials.cpp
+//
+//---------------------------------------------------------------------------------------------------------------------
+// DESCRIPTION: @{HDES}
+// -----------
+//---------------------------------------------------------------------------------------------------------------------
+// CHANGES LOG: @{HREV}
+// -----------
+// Revision: 01.00
+// By      : Assaf Cohen
+// Date    : 29 Apr 2019
+// Comments:
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +23,8 @@ extern "C" {
 
 #include "credentials.hpp"
 using namespace trustwave;
-credentials::credentials(const std::string& domain, const std::string& username, const std::string& password, const std::string workstation)
+credentials::credentials(const std::string& domain, const std::string& username, const std::string& password,
+                const std::string workstation)
 {
     creds_ = ::cli_credentials_init(NULL);
     cli_credentials_set_domain(creds_, domain.c_str(), CRED_SPECIFIED);

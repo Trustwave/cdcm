@@ -1,14 +1,25 @@
-/*
- * registry_client.cpp
- *
- *  Created on: Apr 22, 2019
- *      Author: root
- */
-
+//=====================================================================================================================
+// Trustwave ltd. @{SRCH}
+//														registry_client.cpp
+//
+//---------------------------------------------------------------------------------------------------------------------
+// DESCRIPTION: @{HDES}
+// -----------
+//---------------------------------------------------------------------------------------------------------------------
+// CHANGES LOG: @{HREV}
+// -----------
+// Revision: 01.00
+// By      : Assaf Cohen
+// Date    : 29 Apr 2019
+// Comments:
+//=====================================================================================================================
+//                          						Include files
+//=====================================================================================================================
 #include "registry_client.hpp"
 #include "../../misc/session.hpp"
 #include "registry_value.hpp"
 #include "../../authenticated_scan_server.hpp"
+
 using namespace trustwave;
 registry_client::registry_client() :
                 ctx_(nullptr), ev_ctx_(nullptr)
@@ -16,7 +27,7 @@ registry_client::registry_client() :
     const char *remote = NULL;
     ctx_ = talloc_zero(NULL, struct regshell_context);
     ev_ctx_ = s4_event_context_init(ctx_);
-    data_blob_=data_blob_talloc_zero(nullptr,1024*1024);
+    data_blob_ = data_blob_talloc_zero(nullptr, 1024 * 1024);
 
 }
 registry_client::~registry_client()
@@ -24,7 +35,7 @@ registry_client::~registry_client()
     data_blob_clear_free(&data_blob_);
 
 }
-bool registry_client::connect(const session& sess,loadparm_context* lp_ctx)
+bool registry_client::connect(const session& sess, loadparm_context* lp_ctx)
 {
     ctx_->registry = reg_common_open_remote(sess.remote().c_str(), ev_ctx_, lp_ctx, sess.creds());
     if (ctx_->registry != nullptr) {
@@ -74,7 +85,8 @@ result registry_client::key_get_value_by_name(const char *name, registry_value& 
 //    }
 //    result get_predefined_key(struct registry_context *ctx, uint32_t hkey, struct registry_key **key);
 
-result registry_client::key_get_value_by_index(TALLOC_CTX *mem_ctx, const struct registry_key *key, uint32_t idx, const char **name, registry_value& rv)
+result registry_client::key_get_value_by_index(TALLOC_CTX *mem_ctx, const struct registry_key *key, uint32_t idx,
+                const char **name, registry_value& rv)
 {
     uint32_t type;
     data_blob_clear(&data_blob_);

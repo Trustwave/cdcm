@@ -1,23 +1,38 @@
-/*
- * dispatcher.hpp
- *
- *  Created on: May 16, 2019
- *      Author: root
- */
-
+//=====================================================================================================================
+// Trustwave ltd. @{SRCH}
+//														dispatcher.hpp
+//
+//---------------------------------------------------------------------------------------------------------------------
+// DESCRIPTION: @{HDES}
+// -----------
+//---------------------------------------------------------------------------------------------------------------------
+// CHANGES LOG: @{HREV}
+// -----------
+// Revision: 01.00
+// By      : Assaf Cohen
+// Date    : 16 May 2019
+// Comments:
 #ifndef TRUSTWAVE_MISC_DISPATCHER_HPP_
 #define TRUSTWAVE_MISC_DISPATCHER_HPP_
+//=====================================================================================================================
+//                          						Include files
+//=====================================================================================================================
 #include <map>
 #include <string>
 #include <memory>
 #include <iostream>
+//=====================================================================================================================
+//                          						namespaces
+//=====================================================================================================================
 namespace trustwave {
 template<typename T>
 class Dispatcher
 {
 protected:
 public:
-    Dispatcher(){}
+    Dispatcher()
+    {
+    }
     Dispatcher(const Dispatcher&) = delete;
     Dispatcher& operator=(const Dispatcher &) = delete;
     Dispatcher(Dispatcher &&) = delete;
@@ -50,9 +65,9 @@ public:
             d.register1(t);
         }
         Registrator(T *t, Dispatcher * d)
-            {
-                d->register1(t);
-            }
+        {
+            d->register1(t);
+        }
     };
 protected:
     Ts_Map map_;

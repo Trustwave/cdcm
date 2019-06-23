@@ -1,22 +1,34 @@
-/*
- * action.hpp
- *
- *  Created on: May 14, 2019
- *      Author: root
- */
+//=====================================================================================================================
+// Trustwave ltd. @{SRCH}
+//														action.hpp
+//
+//---------------------------------------------------------------------------------------------------------------------
+// DESCRIPTION: @{HDES}
+// -----------
+//---------------------------------------------------------------------------------------------------------------------
+// CHANGES LOG: @{HREV}
+// -----------
+// Revision: 01.00
+// By      : Assaf Cohen
+// Date    : 14 May 2019
+// Comments:
 
 #ifndef TRUSTWAVE_MISC_ACTION_HPP_
 #define TRUSTWAVE_MISC_ACTION_HPP_
 
-//===================================================================
-//                          Include files
-//===================================================================
+//=====================================================================================================================
+//                          						Include files
+//=====================================================================================================================
 #include <boost/core/noncopyable.hpp>  // for noncopyable
 #include <string>                      // for string
 #include "dispatcher.hpp"
+
+//=====================================================================================================================
+//                          						namespaces
+//=====================================================================================================================
 namespace trustwave {
 
-struct  header;
+struct header;
 struct action_msg;
 struct result_msg;
 class Action_Base: public boost::noncopyable
@@ -39,7 +51,7 @@ public:
         return command_;
     }
 
-    virtual int act(const header& header ,std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) = 0;
+    virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) = 0;
 
 private:
     const std::string name_;

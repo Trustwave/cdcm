@@ -1,9 +1,17 @@
-/*
- * session.hpp
- *
- *  Created on: Apr 29, 2019
- *      Author: root
- */
+//=====================================================================================================================
+// Trustwave ltd. @{SRCH}
+//														session.hpp
+//
+//---------------------------------------------------------------------------------------------------------------------
+// DESCRIPTION: @{HDES}
+// -----------
+//---------------------------------------------------------------------------------------------------------------------
+// CHANGES LOG: @{HREV}
+// -----------
+// Revision: 01.00
+// By      : Assaf Cohen
+// Date    : 19 Apr 2019
+// Comments:
 
 #ifndef TRUSTWAVE_MISC_SESSION_HPP_
 #define TRUSTWAVE_MISC_SESSION_HPP_
@@ -12,24 +20,26 @@
 #include "credentials.hpp"                 // for credentials
 struct cli_credentials;
 
-namespace trustwave{
+namespace trustwave {
 
-class session{
+class session
+{
 public:
     session();
-    session(const std::string& remote,const credentials& creds);
+    session(const std::string& remote, const credentials& creds);
     const boost::uuids::uuid& id() const;
     std::string idstr() const;
 
     const std::string& remote() const;
-    cli_credentials* creds()const;
-    explicit operator bool() const {
-       return uuid_.is_nil();
-     }
+    cli_credentials* creds() const;
+    explicit operator bool() const
+    {
+        return uuid_.is_nil();
+    }
 private:
     boost::uuids::uuid uuid_;
     std::string remote_;
-    credentials  creds_;
+    credentials creds_;
 };
 }
 
