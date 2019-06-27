@@ -51,9 +51,9 @@ int main(int argc, const char **argv)
     AU_LOG_INFO("HI");
     AU_LOG_ERROR("HI");
     AU_LOG_WARNING("HI");
-
+    trustwave::authenticated_scan_server::instance().run();
     //session_cont_test();
-    //return 0;
+   return 0;
     auto act_id1 = boost::uuids::random_generator()();
     std::string get_session_m =
                     R"(

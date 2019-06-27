@@ -34,8 +34,8 @@ struct result_msg;
 class Action_Base: public boost::noncopyable
 {
 public:
-    Action_Base(const std::string &name, const std::string &command) :
-                    name_(name), command_(command)
+    Action_Base(const std::string &name, const std::string &command,bool sj = false) :
+                    name_(name), command_(command),short_job_(sj)
     {
     }
 
@@ -50,12 +50,17 @@ public:
     {
         return command_;
     }
+    const bool short_job() const
+      {
+          return short_job_;
+      }
 
     virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) = 0;
 
 private:
     const std::string name_;
     const std::string command_;
+    const bool short_job_;
 };
 }
 #endif /* TRUSTWAVE_MISC_ACTION_HPP_ */

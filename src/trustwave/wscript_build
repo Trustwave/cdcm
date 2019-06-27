@@ -3,10 +3,11 @@
 bld.RECURSE('clients')
 bld.RECURSE('misc')  
 bld.RECURSE('services')  
+bld.RECURSE('tests')  
 
 bld.SAMBA_BINARY('my_smb',
     includes='clients/registry/ misc/ misc/protocol',  
-    source='smb_cli_test.cpp ',
-    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -lstdc++fs -lssl -lcrypto -lboost_system -lboost_log -lboost_thread',
+    source='smb_cli_test.cpp message_broker.cpp message_worker.cpp zmq_message.cpp zmq_helpers.cpp ',
+    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_system -lboost_log -lboost_thread',
     deps='tw-misc smb-actions registry-actions local-actions tw-logger')
     

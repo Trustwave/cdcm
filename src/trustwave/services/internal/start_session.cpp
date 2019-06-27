@@ -26,6 +26,7 @@ using namespace trustwave;
 int Start_Session::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
 
+    std::cout<<"In start session"<<std::endl;
     auto gsact = std::dynamic_pointer_cast<local_start_session_msg>(action);
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
     trustwave::session s(gsact->remote, creds);

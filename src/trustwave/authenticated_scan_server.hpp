@@ -22,6 +22,13 @@
 #include "misc/dispatcher.hpp"
 #include "misc/action.hpp"
 #include "misc/Logger/include/Logger.h"
+#include "message_broker.hpp"
+#include "message_worker.hpp"
+#include "zmq_message.hpp"
+#include "zmq_helpers.hpp"
+#include <thread>
+#include <zmq.hpp>
+
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
@@ -51,6 +58,22 @@ struct authenticated_scan_server
     {
         return logger_ptr.get();
     }
+    void run()
+    {
+        zmq::context_t ctx(1);
+        std::thread t3(message_broker::th_func, std::ref(ctx));
+        std::vector<std::thread> tp;
+        for (unsigned int i = 0; i < /*std::thread::hardware_concurrency() - 2*/1; ++i)        //context+broker
+                        {
+            tp.push_back(std::move(std::thread(message_worker::th_func, std::ref(ctx), "inproc://broker")));
+
+        }
+
+        t3.join();
+        if (zmq_helpers::interrupted)
+            printf("W: interrupt received, shutting down...\n");
+
+    }
 private:
     authenticated_scan_server() :
                     logger_ptr(nullptr)
@@ -66,7 +89,11 @@ private:
             //return -1;
         }
         ::trustwave::LoggerSource::instance()->set_source(::trustwave::logger::agent);
+        zmq_helpers::version_assert(4, 0);
+        zmq_helpers::catch_signals();
+
     }
+
 };
 
 }
