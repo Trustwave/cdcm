@@ -95,9 +95,9 @@ void message_broker::service_dispatch(std::unique_ptr<zmsg>&& msg)
                 wrk = next;
         }
 
-        auto msg = std::move(m_requests.front());
+        auto front_msg = std::move(m_requests.front());
         m_requests.pop_front();
-        worker_send(*wrk, (char*) MDPW_REQUEST, "", std::move(msg));
+        worker_send(*wrk, MDPW_REQUEST, std::string(""), std::move(front_msg));
         m_waiting.erase(*wrk);
     }
 }
@@ -142,7 +142,7 @@ void message_broker::worker_delete(worker *&wrk, int disconnect)
 {
     assert(wrk);
     if (disconnect) {
-        worker_send(wrk, (char*) MDPW_DISCONNECT, "", NULL);
+        worker_send(wrk, MDPW_DISCONNECT, "", NULL);
     }
 
     m_waiting.erase(wrk);
@@ -158,7 +158,7 @@ void message_broker::worker_process(std::string sender, std::unique_ptr<zmsg>&& 
 {
     assert(msg && msg->parts() >= 1);     //  At least, command
 
-    std::string command = (char *) msg->pop_front().c_str();
+    std::string command = reinterpret_cast<const char *>(msg->pop_front().c_str());
     bool worker_ready = m_workers.count(sender) > 0;
     worker *wrk = worker_require(sender);
 
@@ -213,7 +213,7 @@ void message_broker::worker_process(std::string sender, std::unique_ptr<zmsg>&& 
 //  Send message to worker
 //  If pointer to message is provided, sends that message
 
-void message_broker::worker_send(worker *worker, char *command, std::string option, std::unique_ptr<zmsg> _msg)
+void message_broker::worker_send(worker *worker_ptr, const char *command, std::string option, std::unique_ptr<zmsg> _msg)
 {
     std::unique_ptr<zmsg> msg(_msg ? new zmsg(*_msg) : new zmsg());
 
@@ -224,7 +224,7 @@ void message_broker::worker_send(worker *worker, char *command, std::string opti
     msg->push_front(command);
     msg->push_front(MDPW_WORKER);
     //  Stack routing envelope to start of message
-    msg->wrap(worker->m_identity.c_str(), "");
+    msg->wrap(worker_ptr->m_identity.c_str(), "");
 
     zmq_helpers::console("I: sending %s to worker", mdps_commands[(int) *command]);
     msg->dump();
@@ -234,12 +234,12 @@ void message_broker::worker_send(worker *worker, char *command, std::string opti
 //  ---------------------------------------------------------------------
 //  This worker is now waiting for work
 
-void message_broker::worker_waiting(worker *worker)
+void message_broker::worker_waiting(worker *worker_ptr)
 {
-    assert(worker);
+    assert(worker_ptr);
     //  Queue to broker and service waiting lists
-    m_waiting.insert(worker);
-    worker->m_expiry = zmq_helpers::clock() + HEARTBEAT_EXPIRY;
+    m_waiting.insert(worker_ptr);
+    worker_ptr->m_expiry = zmq_helpers::clock() + HEARTBEAT_EXPIRY;
     // Attempt to process outstanding requests
     service_dispatch(0);
 }
@@ -309,10 +309,10 @@ void message_broker::start_brokering()
                 zmq_helpers::console("I: received message:");
                 msg->dump();
 
-                std::string sender = std::string((char*) msg->pop_front().c_str());
+                std::string sender = std::string(reinterpret_cast<const char*>( msg->pop_front().c_str()));
                 //     std::cout << "sbrok, sender: " << sender << std::endl;
                 msg->pop_front(); //empty message
-                std::string header = std::string((char*) msg->pop_front().c_str());
+                std::string header = std::string(reinterpret_cast<const char*>( msg->pop_front().c_str()));
 
                 //   std::cout << "sbrok, header: " << header << std::endl;
                 //   std::cout << "msg size: " << msg->parts() << std::endl;
@@ -336,9 +336,9 @@ void message_broker::start_brokering()
                 zmq_helpers::console("I: received message:");
                 msg->dump();
 
-                std::string sender = std::string((char*) msg->pop_front().c_str());
+                std::string sender = std::string(reinterpret_cast<const char*>(msg->pop_front().c_str()));
                 msg->pop_front(); //empty message
-                std::string header = std::string((char*) msg->pop_front().c_str());
+                std::string header = std::string(reinterpret_cast<const char*>(msg->pop_front().c_str()));
 
                 /*std::cout << "sbrok, sender: "<< sender << std::endl;
                  std::cout << "sbrok, header: "<< header << std::endl;
@@ -361,7 +361,7 @@ void message_broker::start_brokering()
         if (now >= heartbeat_at) {
             purge_workers();
             for (std::set<worker*>::iterator it = m_waiting.begin(); it != m_waiting.end() && (*it) != 0; it++) {
-                worker_send(*it, (char*) MDPW_HEARTBEAT, "", NULL);
+                worker_send(*it, const_cast<char*>( MDPW_HEARTBEAT), "", NULL);
             }
             heartbeat_at += HEARTBEAT_INTERVAL;
             now = zmq_helpers::clock();
@@ -372,6 +372,7 @@ void message_broker::start_brokering()
 
 void message_broker::th_func(zmq::context_t &ctx)
 {
+    //thread_local auto source = ::trustwave::logger::broker;
     message_broker brk(ctx);
     brk.bind_internal("inproc://broker");
     brk.bind_external("tcp://*:5555");

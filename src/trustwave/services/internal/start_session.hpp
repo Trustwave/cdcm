@@ -33,7 +33,6 @@ public:
                     Action_Base("start_session", "start_session")
     {
     }
-
     virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
 };
 

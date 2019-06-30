@@ -21,8 +21,8 @@
 //=====================================================================================================================
 #include <boost/core/noncopyable.hpp>  // for noncopyable
 #include <string>                      // for string
+#include <memory>
 #include "dispatcher.hpp"
-
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
@@ -34,8 +34,8 @@ struct result_msg;
 class Action_Base: public boost::noncopyable
 {
 public:
-    Action_Base(const std::string &name, const std::string &command,bool sj = false) :
-                    name_(name), command_(command),short_job_(sj)
+    Action_Base(const std::string &name, const std::string &command, bool sj = false) :
+                    name_(name), command_(command), short_job_(sj)
     {
     }
 
@@ -51,11 +51,10 @@ public:
         return command_;
     }
     const bool short_job() const
-      {
-          return short_job_;
-      }
-
-    virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) = 0;
+    {
+        return short_job_;
+    }
+    virtual int act(const header& header, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
 
 private:
     const std::string name_;

@@ -30,7 +30,7 @@
 #include <map>
 #include <stdio.h>
 #include <mutex>
-
+#include <thread>
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
@@ -73,31 +73,6 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", ::trustwave::logger::severity_
 
 namespace detail {
 
-//===========================================================================
-// @{FUNH}
-//						read_error_from_system_win32()
-//
-//---------------------------------------------------------------------------
-// Description:  This function returns a pointer to a string that describes 
-// the calling thread's last-error code value. works only on windows. 
-//===========================================================================
-void read_error_from_system_win32(std::string &system_msg) {
-#ifdef WIN32
-	char* pAlocErrorMessage = nullptr;
-	unsigned int nSystemCode = GetLastError();
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
-		nullptr,
-		nSystemCode,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-		(LPTSTR)&pAlocErrorMessage,
-		0,
-		nullptr);
-	if (pAlocErrorMessage != NULL) {
-		system_msg = std::string(" (") + std::string(pAlocErrorMessage) + std::string(") ");
-		LocalFree(pAlocErrorMessage);
-	}
-#endif
-}
 //===========================================================================
 // @{FUNH}
 //							read_error_from_errno()
@@ -158,7 +133,6 @@ public:
 //	-----------------
 private:
     bool register_sinks(::trustwave::LoggerConfiguration conf);
-	void add_vs_debug_output_sink(const ::trustwave::sink_conf &s);
 	void add_file_sink(const ::trustwave::sink_conf &s);
     bool internal_init(const std::string &conf_path);
 
@@ -194,28 +168,7 @@ Logger::~Logger() {
     logging::core::get()->flush();
     logging::core::get()->remove_all_sinks();
 }
-//===========================================================================
-// @{FUNH}
-//							add_vs_debug_output_sink()
-//
-//---------------------------------------------------------------------------
-// Description: Add DebugView sink to the logger
-//===========================================================================
-void Logger::add_vs_debug_output_sink(const ::trustwave::sink_conf &s) {
-#ifdef _WIN32
-    boost::shared_ptr<boost::log::sinks::debug_output_backend> backend = boost::make_shared<boost::log::sinks::debug_output_backend>();
 
-    typedef sinks::synchronous_sink<sinks::debug_output_backend> sink_t;
-    boost::shared_ptr<sink_t> sink(new sink_t(backend));
-
-	sink->set_formatter(
-		expr::format("%1%\n")
-            % expr::message
-    );
-	sink->set_filter(severity >= s.filter);
-    logging::core::get()->add_sink(sink);
-#endif
-}
 //===========================================================================
 // @{FUNH}
 //								add_file_sink()
@@ -258,9 +211,6 @@ bool Logger::register_sinks(::trustwave::LoggerConfiguration conf) {
 		switch (v.id) {
             case ::trustwave::logger::sinks::file: 
 				add_file_sink(v);
-                break;
-            case ::trustwave::logger::sinks::output_debug_string:
-                add_vs_debug_output_sink(v);
                 break;
             case ::trustwave::logger::sinks::event_log:
                 break;
@@ -357,32 +307,32 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
                        const trustwave::logger::sources source,
                        const char *format_msg,
                        ...) {
-	//
-	//	unsupported source will fail to log.
-	//	------------------------------------
-	if ((supported_sources_ & source) == false) {
-        return;
-    }
-	//
-	//	unsupported severity_levels will fail to log.
-	//	---------------------------------------------
-	if ((supported_default_severity_ & severity) == false) {
-        return;
-    }
-	//
-	//	severity_levels should be enabled in the source.
-	//	------------------------------------------------
-	if ((source_level_[source] & severity) == false) {
-        return;
-    }
+
+
+
+//	//
+//	//	unsupported source will fail to log.
+//	//	------------------------------------
+//	if ((supported_sources_ & source) == false) {
+//        return;
+//    }
+//	//
+//	//	unsupported severity_levels will fail to log.
+//	//	---------------------------------------------
+//	if ((supported_default_severity_ & severity) == false) {
+//        return;
+//    }
+//	//
+//	//	severity_levels should be enabled in the source.
+//	//	------------------------------------------------
+//	if ((source_level_[source] & severity) == false) {
+//        return;
+//    }
 
     //
     //	Collect more info as asked about the error.
     //	-------------------------------------------
 	std::string system_msg("");
-    if ((collect & ::trustwave::logger::COLLECT_FROM_SYSTEM) != 0) {
-		read_error_from_system_win32(system_msg);
-    }
 
     std::string errno_msg("");
     if ((collect & ::trustwave::logger::COLLECT_FROM_ERNO) != 0) {
@@ -423,7 +373,7 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
     //  End using variable argument list
     //	--------------------------------
     va_end(printf_args);
-
+    std::cout<<"SDFSDFSDFSDFSDFSDFS";
     BOOST_LOG_SEV(lg_, severity)
     << " [" << std::setw(6) << std::left<< ::trustwave::logger::severity_levelsArray[severity]<<  "] "
 	<< "[" << path_to_filename(file_name) << ":" << line_number << " " << function_name <<"()"/*<< std::setw(9) << std::left*/ << "] "

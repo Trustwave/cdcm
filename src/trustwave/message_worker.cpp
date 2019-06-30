@@ -53,17 +53,17 @@ message_worker::~message_worker()
 //  ---------------------------------------------------------------------
 //  Send message to broker
 //  If no _msg is provided, creates one internally
-void message_worker::send_to_broker(char *command, std::string option, zmsg *_msg)
+void message_worker::send_to_broker(const char *command, std::string option, zmsg *_msg)
 {
     zmsg *msg = _msg ? new zmsg(*_msg) : new zmsg();
 
     //  Stack protocol envelope to start of message
     if (option.length() != 0) {
-        msg->push_front((char*) option.c_str());
+        msg->push_front(option.c_str());
     }
     msg->push_front(command);
-    msg->push_front((char*) MDPW_WORKER);
-    msg->push_front((char*) "");
+    msg->push_front(MDPW_WORKER);
+    msg->push_front( "");
 
     zmq_helpers::console("I: sending %s to broker", mdps_commands[(int) *command]);
     msg->dump();
@@ -84,7 +84,7 @@ void message_worker::connect_to_broker()
     zmq_helpers::console("I: connecting to broker at %s...", m_broker.c_str());
 
     //  Register service with broker
-    send_to_broker((char*) MDPW_READY, "", NULL);
+    send_to_broker(MDPW_READY, "", NULL);
 
     //  If liveness hits zero, queue is considered disconnected
     m_liveness = HEARTBEAT_LIVENESS;
@@ -121,7 +121,7 @@ message_worker::recv(zmsg *&reply_p)
         reply->dump();
         reply->wrap(m_reply_to.c_str(), "");
         m_reply_to = "";
-        send_to_broker((char*) MDPW_REPLY, "", reply);
+        send_to_broker(MDPW_REPLY, "", reply);
         ++replied_;
         delete reply_p;
         reply_p = 0;
@@ -142,13 +142,13 @@ message_worker::recv(zmsg *&reply_p)
             assert(msg->parts() >= 3);
 
             std::basic_string<unsigned char> empty = msg->pop_front();
-            assert(empty.compare((unsigned char * )"") == 0);
+            assert(empty.compare(reinterpret_cast<const unsigned char * >("")) == 0);
 
             std::basic_string<unsigned char> header = msg->pop_front();
             zmq_helpers::console("I: input message (%s)", header.c_str());
-            assert(header.compare((unsigned char * )MDPW_WORKER) == 0);
+            assert(header.compare(reinterpret_cast<const unsigned char * >(MDPW_WORKER)) == 0);
 
-            std::string command = (char*) msg->pop_front().c_str();
+            std::string command = reinterpret_cast<const char * >( msg->pop_front().c_str());
             if (command.compare(MDPW_REQUEST) == 0) {
                 //  We should pop and save as many addresses as there are
                 //  up to a null part, but for now, just save one...
@@ -174,7 +174,7 @@ message_worker::recv(zmsg *&reply_p)
         }
         //  Send HEARTBEAT if it's time
         if (zmq_helpers::clock() >= m_heartbeat_at) {
-            send_to_broker((char*) MDPW_HEARTBEAT, "", NULL);
+            send_to_broker( MDPW_HEARTBEAT, "", NULL);
             m_heartbeat_at += m_heartbeat;
         }
     }
@@ -184,14 +184,14 @@ message_worker::recv(zmsg *&reply_p)
 }
 
 
-void message_worker::th_func(zmq::context_t &ctx, const std::string& ep)
-    {
-    using namespace tao::json;
 
-        message_worker session(ctx, ep);
+void message_worker::th_func()
+    {
+
+    using namespace tao::json;
         zmsg *reply = nullptr;
         while (1) {
-            zmsg *request = session.recv(reply);
+            zmsg *request = recv(reply);
             if (request == 0) {
                 break;              //  Worker was interrupted
             }
@@ -202,19 +202,23 @@ void message_worker::th_func(zmq::context_t &ctx, const std::string& ep)
                     auto a1 = t1.as<trustwave::msg>();
                     auto res = std::make_shared<trustwave::result_msg>();
                     trustwave::res_msg res1;
+                    res1.hdr=a1.hdr;
                     res1.msgs.push_back(res);
                     printf("msgs size is %zu", a1.msgs.size());
                     for (auto aa : a1.msgs) {
-                        printf("Looking for %s", aa->name().c_str());
+                        std::cerr<<"Looking "<<aa->name()<<std::endl;
                         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(aa->name());
-
+                        std::cerr<<"Calling "<<aa->name()<<std::endl;
                         act1->act(a1.hdr, aa, res);
-                        //AU_LOG_INFO("Done %s", res1.msgs[0]->res().c_str());
-                        printf("Done %s", res1.msgs[0]->res().c_str());
+                        std::cerr<<aa->name()<<" Done"<<std::endl;
+                        AU_LOG_INFO("Done %s", res1.msgs[0]->res().c_str());
+                        AU_LOG_DEBUG("Done %s", res1.msgs[0]->res().c_str());
                     }
                     const tao::json::value v1 = res1;
+                    auto sssss = to_string(v1, 2);
+                    std::cerr<<" XXXXX "<<sssss<<" XXXXX "<<std::endl;
                     reply = new zmsg;
-            reply->append(to_string(v1, 2).c_str());        //  Echo is complex... :-)
+            reply->append(sssss.c_str());        //  Echo is complex... :-)
         }
 
     }

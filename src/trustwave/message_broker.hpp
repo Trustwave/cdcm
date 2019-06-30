@@ -84,7 +84,7 @@ private:
     //  ---------------------------------------------------------------------
     //  Send message to worker
     //  If pointer to message is provided, sends that message
-    void worker_send(worker *worker, char *command, std::string option, std::unique_ptr<zmsg> _msg);
+    void worker_send(worker *worker, const char *command, std::string option, std::unique_ptr<zmsg> _msg);
     //  ---------------------------------------------------------------------
     //  This worker is now waiting for work
     void worker_waiting(worker *worker);

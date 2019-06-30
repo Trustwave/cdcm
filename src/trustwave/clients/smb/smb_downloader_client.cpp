@@ -70,7 +70,7 @@ static void smbc_auth_fn(const char * pServer, const char * pShare, char * pWork
                 char * pUsername, int maxLenUsername, char * pPassword, int maxLenPassword)
 {
     session sess = authenticated_scan_server::instance().sessions.get_session_by_dest(pServer);
-    AU_LOG_DEBUG("server is %s ", pServer);
+  //  AU_LOG_DEBUG("server is %s ", pServer);
     static int krb5_set = 1;
     const char* wg = "WORKGROUP";
     if (!sess.id().is_nil()) {

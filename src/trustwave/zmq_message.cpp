@@ -99,7 +99,7 @@
           zmq::message_t message;
           ustring data = m_part_data[part_nbr];
           if (data.size() == 33 && data [0] == '@') {
-             unsigned char * uuidbin = decode_uuid ((char *) data.c_str());
+             unsigned char * uuidbin = decode_uuid (const_cast<char *>(reinterpret_cast<const char*>( data.c_str())));
              message.rebuild(17);
              memcpy(message.data(), uuidbin, 17);
              delete uuidbin;
@@ -125,7 +125,7 @@
       if (m_part_data.size() > 0) {
          m_part_data.erase(m_part_data.end()-1);
       }
-      push_back((char*)body);
+      push_back(body);
    }
 
    void
@@ -144,19 +144,19 @@
    char * zmsg::body ()
    {
        if (m_part_data.size())
-           return ((char *) m_part_data [m_part_data.size() - 1].c_str());
+           return (const_cast<char *>(reinterpret_cast<const char*>(m_part_data [m_part_data.size() - 1].c_str())));
        else
-           return 0;
+           return nullptr;
    }
 
    // zmsg_push
    void zmsg::push_front(const char *part) {
-      m_part_data.insert(m_part_data.begin(), (unsigned char*)part);
+      m_part_data.insert(m_part_data.begin(), reinterpret_cast<const unsigned char*>(part));
    }
 
    // zmsg_append
    void zmsg::push_back(const char *part) {
-      m_part_data.push_back((unsigned char*)part);
+      m_part_data.push_back(reinterpret_cast<const unsigned char*>(part));
    }
 
    //  --------------------------------------------------------------------------
@@ -233,12 +233,12 @@
    void zmsg::append (const char *part)
    {
        assert (part);
-       push_back((char*)part);
+       push_back(const_cast<char*>(part));
    }
 
    char *zmsg::address() {
       if (m_part_data.size()>0) {
-         return (char*)m_part_data[0].c_str();
+         return reinterpret_cast<char*>(const_cast<unsigned char *>(m_part_data[0].c_str()));
       } else {
          return 0;
       }
@@ -255,7 +255,7 @@
       if (m_part_data.size() == 0) {
          return NULL;
       }
-      std::string addr = (char*)pop_front().c_str();
+      std::string addr = reinterpret_cast<const char*>(pop_front().c_str());
       if (address() && *address() == 0) {
          pop_front();
       }

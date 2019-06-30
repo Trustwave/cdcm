@@ -30,18 +30,18 @@ class message_worker
 {
 public:
 
-    ~message_worker();
-    static void th_func(zmq::context_t &ctx, const std::string& ep);
-    private:
     //  ---------------------------------------------------------------------
     //  Constructor
     message_worker(zmq::context_t &ctx, std::string broker);
+    ~message_worker();
+    void th_func();
+    private:
     //  ---------------------------------------------------------------------
     //  Destructor
     //  ---------------------------------------------------------------------
     //  Send message to broker
     //  If no _msg is provided, creates one internally
-    void send_to_broker(char *command, std::string option, zmsg *_msg);
+    void send_to_broker(const char *command, std::string option, zmsg *_msg);
     //  ---------------------------------------------------------------------
     //  Connect or reconnect to broker
     void connect_to_broker();

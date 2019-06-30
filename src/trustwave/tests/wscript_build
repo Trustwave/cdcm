@@ -4,5 +4,5 @@ bld.SAMBA_BINARY('test_cli',
     includes='clients/registry/ misc/ ../ misc/protocol',  
     source='mdclient2.cpp ../zmq_message.cpp ../zmq_helpers.cpp',
     ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_system -lboost_log -lboost_thread',
-    deps='tw-misc smb-actions registry-actions local-actions tw-logger')
+    deps='')
     

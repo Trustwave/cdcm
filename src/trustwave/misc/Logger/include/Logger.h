@@ -32,7 +32,8 @@
 //===========================================================================
 //				Macros that should help while calling the logs.
 //===========================================================================
-#define AGENT_LOG       __FILE__, __FUNCTION__, __LINE__, ::trustwave::logger::agent
+#define WORKER_LOG       __FILE__, __FUNCTION__, __LINE__, ::trustwave::logger::worker
+#define BROKER_LOG       __FILE__, __FUNCTION__, __LINE__, ::trustwave::logger::broker
 #define ERR_LOG         __FILE__, __FUNCTION__, __LINE__
 
 namespace trustwave {
@@ -55,8 +56,9 @@ SmartEnum(severity_levels)
 //};
 
 #define sources_LIST(m)           \
-      m(sources, agent,     1<<0) \
-      m(sources, tester,    1<<1)
+      m(sources, broker,     1<<0) \
+      m(sources, worker,     1<<1) \
+      m(sources, tester,    1<<2)
 SmartEnum(sources)
 
 //enum sources {
@@ -94,7 +96,7 @@ SmartEnum(sinks)
 //};
 
 constexpr unsigned long all_severity_levels     = debug|info | warning | error;
-constexpr unsigned long all_sources             = agent;
+constexpr unsigned long all_sources             = broker|worker;
 constexpr unsigned long all_collect_from_system = COLLECT_FROM_NONE | COLLECT_FROM_SYSTEM | COLLECT_FROM_ERNO;
 constexpr unsigned long all_sinks               = file | event_log | output_debug_string;
 } //namespace logger

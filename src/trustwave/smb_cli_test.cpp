@@ -48,10 +48,11 @@ void session_cont_test()
 
 int main(int argc, const char **argv)
 {
+    auto& dd  = trustwave::authenticated_scan_server::instance();
     AU_LOG_INFO("HI");
     AU_LOG_ERROR("HI");
     AU_LOG_WARNING("HI");
-    trustwave::authenticated_scan_server::instance().run();
+    dd.run();
     //session_cont_test();
    return 0;
     auto act_id1 = boost::uuids::random_generator()();

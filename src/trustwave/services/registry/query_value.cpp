@@ -30,18 +30,19 @@ using namespace trustwave;
 
 int Query_Value_Action::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
+    res->id(action->id());
     session sess = authenticated_scan_server::instance().sessions.get_session_by_id(header.session_id);
     if (sess.id().is_nil()) {
         return -1;
+        res->res("Session Not Found ERROR");
     }
-    res->id(action->id());
 
     auto qvact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
 
     trustwave::registry_client rc;
     struct loadparm_context *lp_ctx = ::loadparm_init_global(false);
     if (!rc.connect(sess, lp_ctx)) {
-
+        res->res("Failed to connect");
         return -1;
     }
     rc.open_key(qvact->key_.c_str());

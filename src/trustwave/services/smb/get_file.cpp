@@ -28,8 +28,10 @@ using namespace trustwave;
 
 int SMB_Action::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
+    res->id(action->id());
     session sess = authenticated_scan_server::instance().sessions.get_session_by_id(header.session_id);
     if (sess.id().is_nil()) {
+        res->res("Session Not Found ERROR");
         return -1;
     }
 
@@ -38,8 +40,8 @@ int SMB_Action::act(const header& header, std::shared_ptr<action_msg> action, st
     base.append(sess.remote()).append("/").append(smb_action->param);
     std::string tmp_name("/tmp/" + header.session_id + "-" + action->id());
     trustwave::smb_downloader_client rc;
-    res->id(action->id());
     if (!rc.download(sess, base.c_str(), "", false, true, tmp_name.c_str())) {
+        res->res("Download Failed");
         return -1;
     }
 

@@ -24,6 +24,7 @@ int Get_Remote_File_Version::act(const header& header, std::shared_ptr<action_ms
     res->id(action->id());
     auto spact_msg = std::dynamic_pointer_cast<single_param_action_msg>(action); //the real
     if (!spact_msg) {
+        res->res("Malformed message");
         return -1;
         //fixme assaf add handling
     }
