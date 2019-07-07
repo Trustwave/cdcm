@@ -52,18 +52,10 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/sources/severity_logger.hpp>
-
 #include "../../misc/Logger/conf/LoggerConfiguration.h"
-//===========================================================================
-//							per OS includes
-//===========================================================================
-#ifdef _WIN32
-#include <windows.h>
-#else
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
-#endif
 //===========================================================================
 //						Define the attribute keywords
 //===========================================================================
@@ -241,11 +233,11 @@ bool Logger::internal_init(const std::string &conf_path) {
         return false;
     }
     //
-    //	set supported sevirities.
+    //	set supported severities.
     //	-------------------------
     supported_default_severity_ = supported_severity;
     //
-    //	sets all sources sevirty level to 0.
+    //	sets all sources severity level to 0.
     //	------------------------------------
     memset(&source_level_, 0, sizeof(source_level_));
     //
@@ -255,7 +247,7 @@ bool Logger::internal_init(const std::string &conf_path) {
     for(const auto &v : conf.get_modules()) {
         if (false == v.enable) continue;
         supported_sources_ |= v.id;
-        source_level_[v.id] = v.level;
+        source_level_[v.id] = v.severity;
     }
     //
     //	register supported sinks.
@@ -309,25 +301,25 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
                        ...) {
 
 
-
-//	//
-//	//	unsupported source will fail to log.
-//	//	------------------------------------
-//	if ((supported_sources_ & source) == false) {
-//        return;
-//    }
-//	//
-//	//	unsupported severity_levels will fail to log.
-//	//	---------------------------------------------
-//	if ((supported_default_severity_ & severity) == false) {
-//        return;
-//    }
-//	//
-//	//	severity_levels should be enabled in the source.
-//	//	------------------------------------------------
-//	if ((source_level_[source] & severity) == false) {
-//        return;
-//    }
+    std::cerr << "Source is: "<<source<<std::endl;
+	//
+	//	unsupported source will fail to log.
+	//	------------------------------------
+	if ((supported_sources_ & source) == false) {
+        return;
+    }
+	//
+	//	unsupported severity_levels will fail to log.
+	//	---------------------------------------------
+	if ((supported_default_severity_ & severity) == false) {
+        return;
+    }
+	//
+	//	severity_levels should be enabled in the source.
+	//	------------------------------------------------
+	if ((source_level_[source] & severity) == false) {
+        return;
+    }
 
     //
     //	Collect more info as asked about the error.
@@ -373,10 +365,9 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
     //  End using variable argument list
     //	--------------------------------
     va_end(printf_args);
-    std::cout<<"SDFSDFSDFSDFSDFSDFS";
     BOOST_LOG_SEV(lg_, severity)
     << " [" << std::setw(6) << std::left<< ::trustwave::logger::severity_levelsArray[severity]<<  "] "
-	<< "[" << path_to_filename(file_name) << ":" << line_number << " " << function_name <<"()"/*<< std::setw(9) << std::left*/ << "] "
+	<< "[" << path_to_filename(file_name) << ":" << line_number << " " << function_name <<"()" << "] "
 		<< message
 		<< errno_msg
 		<< system_msg;
@@ -403,7 +394,7 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
 // Description:
 //===========================================================================
 trustwave::LoggerSource* trustwave::LoggerSource::instance() {
-    static LoggerSource instance_;
+    static thread_local LoggerSource instance_;
     return &instance_;
 }
 //===========================================================================

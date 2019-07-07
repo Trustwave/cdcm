@@ -91,7 +91,24 @@ struct reg_action_query_value_msg: public action_msg
     std::string value_;
 
 };
+struct reg_action_enum_key_msg: public action_msg
+{
+    reg_action_enum_key_msg() :
+                    action_msg("enumerate")
+    {
+    }
+    std::string key_;
 
+};
+struct reg_action_key_exists_msg: public action_msg
+{
+    reg_action_key_exists_msg() :
+                    action_msg("key_exists")
+    {
+    }
+    std::string key_;
+
+};
 struct local_start_session_msg: public action_msg
 {
 
@@ -104,6 +121,16 @@ struct local_start_session_msg: public action_msg
     std::string username;
     std::string password;
     std::string workstation;
+};
+
+struct local_close_session_msg: public action_msg
+{
+
+    local_close_session_msg() :
+                    action_msg("close_session")
+    {
+    }
+
 };
 
 struct single_param_action_msg: public action_msg

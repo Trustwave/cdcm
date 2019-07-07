@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
 // -----------
-// Subscriber Pattern implimentation
+// Subscriber Pattern implementation
 //---------------------------------------------------------------------------
 // CHANGES LOG: @{HREV}
 // -----------
@@ -25,7 +25,7 @@
 namespace trustwave {
 namespace Patterns {
 //===========================================================================
-//								Forword declaration.
+//								Forward declaration.
 //===========================================================================
 class Publisher;
 //===========================================================================
@@ -94,6 +94,6 @@ private:
 };
 
 } // Patterns
-} // MSC
+} // trustwave
 
 #endif // COMMON_OBSERVER_H

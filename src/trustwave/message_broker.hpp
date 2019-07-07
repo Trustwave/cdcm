@@ -23,11 +23,6 @@
 #include <string>
 #include <memory>
 
-//  We'd normally pull these from config data
-
-#define HEARTBEAT_LIVENESS  3       //  3-5 is reasonable
-#define HEARTBEAT_INTERVAL  6000    //  msecs
-#define HEARTBEAT_EXPIRY    HEARTBEAT_INTERVAL * HEARTBEAT_LIVENESS
 namespace zmq {
 class context_t;
 class socket_t;
@@ -50,7 +45,7 @@ class message_broker
     };
 
 public:
-    static void th_func(zmq::context_t &ctx);    //  ---------------------------------------------------------------------
+    static void th_func(zmq::context_t &ctx);  //  ---------------------------------------------------------------------
     //  Destructor for broker object
     ~message_broker();
 private:

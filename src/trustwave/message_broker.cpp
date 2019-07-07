@@ -23,6 +23,7 @@
 #include "zmq_message.hpp"
 #include "misc/protocol/protocol.hpp"
 #include "authenticated_scan_server.hpp"
+using namespace trustwave;
 message_broker::message_broker(zmq::context_t& ctx) :
                 m_context(ctx), m_internal_socket(new zmq::socket_t(m_context, ZMQ_ROUTER)), m_external_socket(
                                 new zmq::socket_t(m_context, ZMQ_ROUTER))
@@ -190,7 +191,8 @@ void message_broker::worker_process(std::string sender, std::unique_ptr<zmsg>&& 
         else {
             if (command.compare(MDPW_HEARTBEAT) == 0) {
                 if (worker_ready) {
-                    wrk->m_expiry = zmq_helpers::clock() + HEARTBEAT_EXPIRY;
+                    wrk->m_expiry = zmq_helpers::clock()
+                                    + authenticated_scan_server::instance().settings.heartbeat_expiry_;
                 }
                 else {
                     worker_delete(wrk, 1);
@@ -213,7 +215,8 @@ void message_broker::worker_process(std::string sender, std::unique_ptr<zmsg>&& 
 //  Send message to worker
 //  If pointer to message is provided, sends that message
 
-void message_broker::worker_send(worker *worker_ptr, const char *command, std::string option, std::unique_ptr<zmsg> _msg)
+void message_broker::worker_send(worker *worker_ptr, const char *command, std::string option,
+                std::unique_ptr<zmsg> _msg)
 {
     std::unique_ptr<zmsg> msg(_msg ? new zmsg(*_msg) : new zmsg());
 
@@ -239,7 +242,7 @@ void message_broker::worker_waiting(worker *worker_ptr)
     assert(worker_ptr);
     //  Queue to broker and service waiting lists
     m_waiting.insert(worker_ptr);
-    worker_ptr->m_expiry = zmq_helpers::clock() + HEARTBEAT_EXPIRY;
+    worker_ptr->m_expiry = zmq_helpers::clock() + authenticated_scan_server::instance().settings.heartbeat_expiry_;
     // Attempt to process outstanding requests
     service_dispatch(0);
 }
@@ -271,7 +274,28 @@ void message_broker::client_process(std::string sender, std::unique_ptr<zmsg> ms
         printf("Looking for %s", aa->name().c_str());
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(aa->name());
         if (act1->short_job()) {
-            service_internal(aa->name(), std::move(msg));
+            auto res = std::make_shared<trustwave::result_msg>();
+            trustwave::res_msg res1;
+            res1.hdr = a1.hdr;
+            res1.msgs.push_back(res);
+            if (-1 == act1->act(a1.hdr, aa, res)) {
+                std::cerr<<aa->name()<<" ERROR"<<std::endl;
+                //fixme assaf and????
+            }
+            const tao::json::value v1 = res1;
+            auto sssss = to_string(v1, 2);
+            zmsg* reply = new zmsg;
+            std::cerr << " XXXXX " << sssss << " XXXXX " << std::endl;
+            reply->dump();
+            reply->body_set(sssss.c_str());
+            std::string client = msg->unwrap();
+            //      reply->wrap(client.c_str(), "");
+            reply->wrap(MDPC_CLIENT, client.c_str());
+            reply->wrap(sender.c_str(), "");
+            reply->dump();
+            reply->send(*m_external_socket);
+            replied_++;
+
         }
         else {
             trustwave::msg tm;
@@ -291,7 +315,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr<zmsg> ms
 void message_broker::start_brokering()
 {
     int64_t now = zmq_helpers::clock();
-    int64_t heartbeat_at = now + HEARTBEAT_INTERVAL;
+    int64_t heartbeat_at = now + authenticated_scan_server::instance().settings.heartbeat_interval_;
     zmq::pollitem_t items[] = { { m_internal_socket->operator void *(), 0, ZMQ_POLLIN, 0 }, {
                     m_external_socket->operator void *(), 0, ZMQ_POLLIN, 0 } };
     while (!zmq_helpers::interrupted) {
@@ -309,10 +333,10 @@ void message_broker::start_brokering()
                 zmq_helpers::console("I: received message:");
                 msg->dump();
 
-                std::string sender = std::string(reinterpret_cast<const char*>( msg->pop_front().c_str()));
+                std::string sender = std::string(reinterpret_cast<const char*>(msg->pop_front().c_str()));
                 //     std::cout << "sbrok, sender: " << sender << std::endl;
                 msg->pop_front(); //empty message
-                std::string header = std::string(reinterpret_cast<const char*>( msg->pop_front().c_str()));
+                std::string header = std::string(reinterpret_cast<const char*>(msg->pop_front().c_str()));
 
                 //   std::cout << "sbrok, header: " << header << std::endl;
                 //   std::cout << "msg size: " << msg->parts() << std::endl;
@@ -363,7 +387,7 @@ void message_broker::start_brokering()
             for (std::set<worker*>::iterator it = m_waiting.begin(); it != m_waiting.end() && (*it) != 0; it++) {
                 worker_send(*it, const_cast<char*>( MDPW_HEARTBEAT), "", NULL);
             }
-            heartbeat_at += HEARTBEAT_INTERVAL;
+            heartbeat_at += authenticated_scan_server::instance().settings.heartbeat_interval_;
             now = zmq_helpers::clock();
         }
     }

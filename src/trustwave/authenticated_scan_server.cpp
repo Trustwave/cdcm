@@ -13,7 +13,7 @@
 // Date    : 30 Jun 2019
 // Comments: 
 #include "authenticated_scan_server.hpp"
-thread_local auto log_source = ::trustwave::logger::broker;
+
 using namespace trustwave;
 authenticated_scan_server::authenticated_scan_server() :
                 logger_ptr(nullptr)
@@ -23,11 +23,11 @@ authenticated_scan_server::authenticated_scan_server() :
     //  configuration path.
     //  -------------------
     const std::string root_conf("/home/ascohen/dev/samba_fresh/samba/trustwave");
+    settings.load(root_conf + "/cdcm_settings.json");
     if (!Initialize(logger_ptr, root_conf, ::trustwave::logger::broker)) {
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }
-    // ::trustwave::LoggerSource::instance()->set_source(::trustwave::logger::broker);
     zmq_helpers::version_assert(4, 0);
     zmq_helpers::catch_signals();
 

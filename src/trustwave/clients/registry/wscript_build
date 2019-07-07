@@ -2,3 +2,12 @@
 bld.SAMBA_SUBSYSTEM('tw-registry-client',  
     source='registry_client.cpp',
     deps='  registry_common registry ')
+  
+bld.SAMBA_BINARY('tw-registry-client-test',  
+source='test.cpp',
+deps='tw-registry-client tw-misc util_reg')
+'''
+bld.SAMBA_BINARY('tw-registry-client-test2',  
+source='test2.cpp',
+deps='tw-registry-client tw-misc util_reg')
+'''    

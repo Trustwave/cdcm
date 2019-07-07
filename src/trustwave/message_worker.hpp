@@ -17,8 +17,6 @@
 #define MESSAGE_WORKER_HPP_
 #include <memory>
 #include <string>
-//  Reliability parameters
-#define HEARTBEAT_LIVENESS  3       //  3-5 is reasonable
 namespace zmq {
 class context_t;
 class socket_t;
@@ -35,7 +33,7 @@ public:
     message_worker(zmq::context_t &ctx, std::string broker);
     ~message_worker();
     void th_func();
-    private:
+private:
     //  ---------------------------------------------------------------------
     //  Destructor
     //  ---------------------------------------------------------------------

@@ -58,7 +58,10 @@ template<>
 struct traits<std::shared_ptr<trustwave::action_msg> > : binding::factory<
                 TAO_JSON_FACTORY_BIND1( trustwave::smb_get_file_msg ),
                 TAO_JSON_FACTORY_BIND1(trustwave::reg_action_query_value_msg ),
+                TAO_JSON_FACTORY_BIND1(trustwave::reg_action_key_exists_msg ),
+                TAO_JSON_FACTORY_BIND1(trustwave::reg_action_enum_key_msg ),
                 TAO_JSON_FACTORY_BIND1(trustwave::local_start_session_msg ),
+                TAO_JSON_FACTORY_BIND1(trustwave::local_close_session_msg ),
                 TAO_JSON_FACTORY_BIND1(trustwave::get_remote_file_version_msg )>
 {
 };
@@ -92,12 +95,36 @@ TAO_JSON_BIND_REQUIRED( "workstation", &trustwave::local_start_session_msg::work
 {
     TAO_JSON_DEFAULT_KEY( "start_session" );
 };
+
+template<>
+struct traits<trustwave::local_close_session_msg> : binding::object<binding::inherit<traits<trustwave::action_msg> >>
+{
+    TAO_JSON_DEFAULT_KEY( "close_session" );
+};
+
 template<>
 struct traits<trustwave::reg_action_query_value_msg> : binding::object<binding::inherit<traits<trustwave::action_msg> >,
 TAO_JSON_BIND_REQUIRED( "key", &trustwave::reg_action_query_value_msg::key_ ),
 TAO_JSON_BIND_REQUIRED( "value", &trustwave::reg_action_query_value_msg::value_ ) >
 {
-    TAO_JSON_DEFAULT_KEY( "query_value" );};
+    TAO_JSON_DEFAULT_KEY( "query_value" );
+};
+
+
+template<>
+struct traits<trustwave::reg_action_enum_key_msg> : binding::object<binding::inherit<traits<trustwave::action_msg> >,
+TAO_JSON_BIND_REQUIRED( "key", &trustwave::reg_action_enum_key_msg::key_ )>
+{
+    TAO_JSON_DEFAULT_KEY( "enumerate" );
+};
+
+template<>
+struct traits<trustwave::reg_action_key_exists_msg> : binding::object<binding::inherit<traits<trustwave::action_msg> >,
+TAO_JSON_BIND_REQUIRED( "key", &trustwave::reg_action_key_exists_msg::key_ )>
+{
+    TAO_JSON_DEFAULT_KEY( "key_exists" );
+};
+
 }
 }
 

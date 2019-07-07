@@ -66,9 +66,12 @@ public:
     };
     void insert_session(session s)
     {
+        auto f = sessions_.get<remote>().find(s.remote());
+        if (f != sessions_.get<remote>().end()) {
+            sessions_.get<remote>().erase(f);
+        }
         element e;
         e.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        ;
         e.second = s;
         sessions_.insert(e);
     }
@@ -77,9 +80,6 @@ private:
     {
     };
     struct remote
-    {
-    };
-    struct service_type
     {
     };
     struct last_time
@@ -117,7 +117,6 @@ public:
             return session();
         }
         else {
-
             typedef boost::multi_index::index<sessions, last_time>::type element_by_time;
             element_by_time& time_index = sessions_.get<last_time>();
             auto it2 = sessions_.project<last_time>(s);
@@ -146,12 +145,30 @@ public:
         }
 
     }
+    bool remove_by_id(const std::string ids)
+    {
+        boost::uuids::uuid uuid_id;
+                try {
+                    uuid_id = boost::uuids::string_generator()(ids);
+                } catch (std::runtime_error& ex) {
+                    return false;
+                }
+                auto s = sessions_.get<id>().find(uuid_id);
+                if (s == sessions_.get<id>().end()) {
+                    return false;
+                }
+                else {
+                    sessions_.get<id>().erase(s);
+                    return true;
+                }
+
+    }
     void dump_by_time() const
     {
-//        std::cerr << std::endl;
-//        for (const auto s : sessions_.get<last_time>()) {
-//            std::cerr << s.second.remote() << " " << s.first << std::endl;
-//        }
+        std::cerr << std::endl;
+        for (const auto s : sessions_.get<last_time>()) {
+            std::cerr << s.second.remote() << " " << s.second.idstr() << " " << s.first << std::endl;
+        }
     }
 };
 }

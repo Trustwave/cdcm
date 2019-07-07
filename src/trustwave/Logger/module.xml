@@ -3,7 +3,7 @@
   <version>1</version>
   <Project>
     <name>Credentialed_Scanner</name>
-    <level>1</level>
+    <level>15</level>
     <severity_levels>
     <debug value="1"/>
         <info value="2"/>
@@ -11,8 +11,8 @@
         <error value="8"/>
     </severity_levels>
     <modules>
-        <module name="broker" id="1" level="1" enable="true"/>
-        <module name="worker" id="2" level="1" enable="true"/>
+        <module name="broker" id="1" level="15" enable="true"/>
+        <module name="worker" id="2" level="15" enable="true"/>
      </modules>
     <supported_sinks>
       <sink name="file">

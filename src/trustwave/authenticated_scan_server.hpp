@@ -26,6 +26,7 @@
 #include "message_worker.hpp"
 #include "zmq_message.hpp"
 #include "zmq_helpers.hpp"
+#include "settings.hpp"
 #include <thread>
 #include <zmq.hpp>
 
@@ -34,17 +35,13 @@
 //=====================================================================================================================
 namespace trustwave {
 
-struct config
-{
-    size_t session_idle_time = 10;
-
-};
 struct authenticated_scan_server
 {
     std::unique_ptr<::trustwave::ILogger> logger_ptr;
     Dispatcher<Action_Base> prv_dispatcher;
     Dispatcher<Action_Base> public_dispatcher;
     sessions_container sessions;
+    cdcm_settings settings;
     authenticated_scan_server(const authenticated_scan_server&) = delete;
     authenticated_scan_server& operator=(const authenticated_scan_server &) = delete;
     authenticated_scan_server(authenticated_scan_server &&) = delete;

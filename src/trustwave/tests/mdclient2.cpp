@@ -108,13 +108,11 @@ static void fc(int c)
                 [
    
                     {
-                            "query_value" :
+                            "close_session" :
                             {
                                 "id": ")"
                                         + act_id4
-                                        + R"(",
-                                "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion",
-                                "value":"ProductID"
+                                        + R"("
                             }
                     }
                 ]

@@ -49,6 +49,7 @@ void session_cont_test()
 int main(int argc, const char **argv)
 {
     auto& dd  = trustwave::authenticated_scan_server::instance();
+    AU_LOG_DEBUG("HI");
     AU_LOG_INFO("HI");
     AU_LOG_ERROR("HI");
     AU_LOG_WARNING("HI");

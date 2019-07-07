@@ -98,7 +98,7 @@ bool trustwave::LoggerConfiguration::load(const std::string &file_name) {
                         module m;
                         m.name = v.second.get("<xmlattr>.name", "None");
                         m.id = v.second.get("<xmlattr>.id", 0);
-                        m.level = v.second.get("<xmlattr>.level", default_level_);
+                        m.severity = v.second.get("<xmlattr>.level", default_level_);
                         m.enable = v.second.get("<xmlattr>.enable", false);
                         modules_.push_back(m);
                     }

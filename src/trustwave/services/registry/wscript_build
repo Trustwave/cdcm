@@ -2,5 +2,5 @@
    
 bld.SAMBA_SUBSYSTEM('registry-actions',
 	includes='../../../misc/ ../../../', 
-    source='query_value.cpp',
+    source='query_value.cpp enumerate_key.cpp key_exists.cpp value_exists.cpp',
     deps='tw-misc tw-registry-client')

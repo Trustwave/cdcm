@@ -34,7 +34,7 @@ namespace trustwave {
 struct module {
     std::string name;		
     unsigned long id;		// FIXME: remove id
-    unsigned long level; 	// FIXME: rename to severity
+    unsigned long severity;
     bool enable;
 };
 //===========================================================================
