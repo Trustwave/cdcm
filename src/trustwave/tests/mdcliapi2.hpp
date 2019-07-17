@@ -16,11 +16,12 @@
 #ifndef __MDCLIAPI_HPP_INCLUDED__
 #define __MDCLIAPI_HPP_INCLUDED__
 #include <zmq.hpp>
-#include "../zmq_message.hpp"
-#include "../mdp.hpp"
-#include "../zmq_helpers.hpp"
 #include <iostream>
 #include <memory>
+
+#include "../common/zmq/mdp.hpp"
+#include "../common/zmq/zmq_helpers.hpp"
+#include "../common/zmq/zmq_message.hpp"
 
 //  Structure of our class
 //  We access these properties only via class methods

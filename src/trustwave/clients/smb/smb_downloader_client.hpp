@@ -15,6 +15,7 @@
 
 #ifndef TRUSTWAVE_CLIENTS_SMB_SMB_DOWNLOADER_CLIENT_HPP_
 #define TRUSTWAVE_CLIENTS_SMB_SMB_DOWNLOADER_CLIENT_HPP_
+
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
@@ -27,8 +28,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
+#undef uint_t
 #include <string>
+#include "../../common/client.hpp"
 static constexpr uint16_t SMB_MAXPATHLEN = MAXPATHLEN;
 static constexpr uint16_t RESUME_CHECK_SIZE = 512;
 static constexpr uint16_t RESUME_DOWNLOAD_OFFSET = 1024;
@@ -39,7 +41,7 @@ static constexpr uint16_t SMB_DEFAULT_BLOCKSIZE = 64000;
 //=====================================================================================================================
 namespace trustwave {
 class session;
-class smb_downloader_client
+class smb_downloader_client:public cdcm_client
 {
 public:
     smb_downloader_client()
@@ -48,7 +50,7 @@ public:
     ~smb_downloader_client()
     {
     }
-    bool download(const session& sess, const char *base, const char *name, bool resume, bool toplevel,
+    bool download( const char *base, const char *name, bool resume, bool toplevel,
                     const char *outfile);
 private:
     SMBCCTX* create_smbctx();

@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+bld.RECURSE('Logger')
+bld.RECURSE('sessions_cache')
+bld.RECURSE('singleton_runner')
+bld.RECURSE('zmq')
+
+bld.SAMBA_SUBSYSTEM('tw-common',  
+    source='credentials.cpp session.cpp',
+    deps='samba-credentials tw-sessions-cache')

@@ -17,9 +17,10 @@
 //=====================================================================================================================
 #include "../internal/file_version.hpp"
 
-#include "../../authenticated_scan_server.hpp"
-#include "protocol/msg_types.hpp"
 #include <boost/filesystem.hpp>
+
+#include "../../common/protocol/msg_types.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================

@@ -16,8 +16,9 @@
 //                                                  Include files
 //=====================================================================================================================
 #include "value_exists.hpp"
-#include "../../authenticated_scan_server.hpp"
-#include "protocol/msg_types.hpp"
+#include "../../common/protocol/msg_types.hpp"
+#include "../../common/session.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../clients/registry/registry_client.hpp"
 #include "../clients/registry/registry_value.hpp"
 //=====================================================================================================================
@@ -29,37 +30,50 @@ int Value_Exists_Action::act(const header& header, std::shared_ptr<action_msg> a
 {
 
     res->id(action->id());
-    session sess = authenticated_scan_server::instance().sessions.get_session_by_id(header.session_id);
-    if (sess.id().is_nil()) {
+    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::id>(header.session_id);
+    if (sess->id().is_nil()) {
         res->res("Session Not Found ERROR");
         return -1;
     }
 
     auto veact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
+    if (!veact) {
+        res->res("Error");
+        return -1;
+    }
+    auto c = std::dynamic_pointer_cast<trustwave::registry_client>(sess->get_client<trustwave::registry_client>(0));
 
-    trustwave::registry_client rc;
+    if (!c) {
+
+        c = std::make_shared<trustwave::registry_client>();
+        if (!c) {
+            res->res("Error");
+            return -1;
+        }
+
+    }
+
     struct loadparm_context *lp_ctx = ::loadparm_init_global(false);
-    if (!rc.connect(sess, lp_ctx)) {
+    if (!c->connect(*sess, lp_ctx)) {
         std::cerr << "Failed to connect!!!" << std::endl;
         res->res("Failed to connect");
         return -1;
     }
-    if (!std::get<0>(rc.open_key(veact->key_.c_str()))) {
+    if (!std::get<0>(c->open_key(veact->key_.c_str()))) {
         std::cerr << "Failed to open key!!!" << std::endl;
         res->res("Key doesn't exist");
         return -1;
     }
     trustwave::registry_value rv;
-    if (!std::get<0>(rc.key_get_value_by_name(veact->value_.c_str(), rv))) {
-            std::cerr << "Failed to Get value!!!" << std::endl;
-            res->res("False");
-        }
-    else{
-    res->res("True");
-    std::cerr << "value Exists!!!" << std::endl;
+    if (!std::get<0>(c->key_get_value_by_name(veact->value_.c_str(), rv))) {
+        std::cerr << "Failed to Get value!!!" << std::endl;
+        res->res("False");
     }
-        return 0;
-
+    else {
+        res->res("True");
+        std::cerr << "value Exists!!!" << std::endl;
+    }
+    return 0;
 
 }
 

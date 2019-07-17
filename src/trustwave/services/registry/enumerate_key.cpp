@@ -18,10 +18,11 @@
 //=====================================================================================================================
 #include "enumerate_key.hpp"
 
-#include "../../authenticated_scan_server.hpp"
-#include "protocol/msg_types.hpp"
 #include "../../3rdparty/json/include/tao/json.hpp"
 #include "../../3rdparty/json/include/tao/json/contrib/traits.hpp"
+#include "../../common/protocol/msg_types.hpp"
+#include "../../common/session.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../clients/registry/registry_client.hpp"
 #include "../clients/registry/registry_value.hpp"
 //=====================================================================================================================
@@ -60,29 +61,51 @@ int Enumerate_Key_Action::act(const header& header, std::shared_ptr<action_msg> 
 {
 
     res->id(action->id());
-    authenticated_scan_server::instance().sessions.dump_by_time();
+ //   authenticated_scan_server::instance().sessions.dump_by_time();
     std::cerr << "About to look for " << header.session_id << std::endl;
-    session sess = authenticated_scan_server::instance().sessions.get_session_by_id(header.session_id);
-    if (sess.id().is_nil()) {
+    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::id>(header.session_id);
+    if (sess->id().is_nil()) {
         res->res("Session Not Found ERROR");
         return -1;
     }
 
     auto ekact = std::dynamic_pointer_cast<reg_action_enum_key_msg>(action);
+    if (!ekact) {
+        res->res("Bad message");
+        return -1;
+    }
+    bool client_owend_by_me=false;
+    auto c = std::dynamic_pointer_cast<trustwave::registry_client>(sess->get_client<trustwave::registry_client>(0));
+    if (!c){
 
-    trustwave::registry_client rc;
+        c = std::make_shared<trustwave::registry_client>();
+        if (!c) {
+            res->res("Error");
+            return -1;
+        }
+        client_owend_by_me = true;
+
+    }
     struct loadparm_context *lp_ctx = ::loadparm_init_global(false);
-    if (!rc.connect(sess, lp_ctx)) {
+    if (!c->connect(*sess, lp_ctx)) {
         std::cerr << "Failed to connect!!!" << std::endl;
         res->res("Failed to connect");
+        if(!client_owend_by_me)
+        {
+            sess->client_done(0);
+        }
         return -1;
     }
     trustwave::enum_key ek;
-    rc.enumerate_key(ekact->key_, ek);
+    c->enumerate_key(ekact->key_, ek);
 
     const tao::json::value v1 = ek;
 
     res->res(to_string(v1, 2));
+    if(!client_owend_by_me)
+            {
+                sess->client_done(0);
+            }
     return 0;
 
 }

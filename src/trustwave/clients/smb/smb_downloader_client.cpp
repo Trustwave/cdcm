@@ -16,7 +16,7 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include "../smb/smb_downloader_client.hpp"
+#include "smb_downloader_client.hpp"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,8 +28,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#include "../../authenticated_scan_server.hpp"
+#undef uint_t
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
+#include "../../common/session.hpp"
 /**@ingroup callback
  * Authentication callback function type (traditional method)
  *
@@ -69,16 +70,16 @@ using namespace trustwave;
 static void smbc_auth_fn(const char * pServer, const char * pShare, char * pWorkgroup, int maxLenWorkgroup,
                 char * pUsername, int maxLenUsername, char * pPassword, int maxLenPassword)
 {
-    session sess = authenticated_scan_server::instance().sessions.get_session_by_dest(pServer);
+    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::remote>(std::string(pServer));
   //  AU_LOG_DEBUG("server is %s ", pServer);
     static int krb5_set = 1;
     const char* wg = "WORKGROUP";
-    if (!sess.id().is_nil()) {
+    if (!sess->id().is_nil()) {
 
         AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
         strncpy(pWorkgroup, wg, maxLenWorkgroup - 1);
-        strncpy(pUsername, cli_credentials_get_username(sess.creds()), maxLenUsername - 1);
-        strncpy(pPassword, cli_credentials_get_password(sess.creds()), maxLenPassword - 1);
+        strncpy(pUsername, cli_credentials_get_username(sess->creds()), maxLenUsername - 1);
+        strncpy(pPassword, cli_credentials_get_password(sess->creds()), maxLenPassword - 1);
         return;
     }
 
@@ -153,7 +154,7 @@ bool smb_downloader_client::connect(const char *path)
     return true;
 }
 
-bool smb_downloader_client::download(const session& sess, const char *base, const char *name, bool resume,
+bool smb_downloader_client::download( const char *base, const char *name, bool resume,
                 bool toplevel, const char *outfile)
 {
     char path[SMB_MAXPATHLEN];

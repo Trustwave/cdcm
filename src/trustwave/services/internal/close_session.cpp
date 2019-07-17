@@ -17,9 +17,9 @@
 //                                                  Include files
 //=====================================================================================================================
 #include "../internal/close_session.hpp"
-#include "../../authenticated_scan_server.hpp"
-#include "sessions_container.hpp"
-#include "protocol/msg_types.hpp"
+#include "../../common/protocol/msg_types.hpp"
+#include "../../common/sessions_cache/inproc_sessions_cache.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 
 using namespace trustwave;
 
@@ -28,7 +28,7 @@ int Close_Session::act(const header& header, std::shared_ptr<action_msg> action,
     std::cout<<"In Close_Session"<<std::endl;
 
 
-    authenticated_scan_server::instance().sessions.remove_by_id(header.session_id);
+    authenticated_scan_server::instance().sessions->remove_by_id(header.session_id);
     res->id(action->id());
     res->res("session closed");
     return 0;

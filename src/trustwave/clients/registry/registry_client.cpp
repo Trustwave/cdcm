@@ -16,17 +16,19 @@
 //                          						Include files
 //=====================================================================================================================
 #include "registry_client.hpp"
-#include "../../misc/session.hpp"
 #include "registry_value.hpp"
-#include "../../authenticated_scan_server.hpp"
 #include "../libcli/registry/util_reg.h"
 #include "lib/util/time.h"
 #include <ctime>
+
+#include "../../common/session.hpp"
+
 using namespace trustwave;
 registry_client::registry_client() :
                 ctx_(nullptr), ev_ctx_(nullptr)
 {
     ctx_ = talloc_zero(NULL, struct regshell_context);
+
     ev_ctx_ = s4_event_context_init(ctx_);
     data_blob_ = data_blob_talloc_zero(nullptr, 1024 * 1024);//fixme assaf move to conf
 
@@ -34,6 +36,7 @@ registry_client::registry_client() :
 registry_client::~registry_client()
 {
     data_blob_clear_free(&data_blob_);
+    TALLOC_FREE(ev_ctx_);
     TALLOC_FREE(ctx_);
 
 }
@@ -122,8 +125,6 @@ result registry_client::enumerate_key(const std::string& key, enum_key& ek)
     NTTIME lm;
     auto status = open_key(key.c_str());
     key_info ki;
-    NTSTATUS nt_status;
-    WERROR werr;
 
     if (std::get<0>(status)) {
 

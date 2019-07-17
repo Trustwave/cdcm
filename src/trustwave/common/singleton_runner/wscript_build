@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+   
+bld.SAMBA_SUBSYSTEM('tw-singleton-runner',
+	includes='.. ../..',  
+    source='settings.cpp authenticated_scan_server.cpp',
+    deps='tw-zmq')

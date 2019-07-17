@@ -17,10 +17,11 @@
 //                          						Include files
 //=====================================================================================================================
 #include "../internal/start_session.hpp"
-#include "../../authenticated_scan_server.hpp"
-#include "sessions_container.hpp"
-#include "protocol/msg_types.hpp"
+#include <boost/smart_ptr/make_shared.hpp>
 
+#include "../../common/protocol/msg_types.hpp"
+#include "../../common/sessions_cache/inproc_sessions_cache.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 
 int Start_Session::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
@@ -28,10 +29,10 @@ int Start_Session::act(const header& header, std::shared_ptr<action_msg> action,
     std::cout<<"In start session"<<std::endl;
     auto gsact = std::dynamic_pointer_cast<local_start_session_msg>(action);
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
-    trustwave::session s(gsact->remote, creds);
-    authenticated_scan_server::instance().sessions.insert_session(s);
+    auto s=boost::make_shared<trustwave::session>(gsact->remote, creds);
+    authenticated_scan_server::instance().sessions->add(s);
     res->id(action->id());
-    res->res(s.idstr());
+    res->res(s->idstr());
     return 0;
 
 }

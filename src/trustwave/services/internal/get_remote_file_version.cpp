@@ -15,8 +15,8 @@
 
 #include "../internal/get_remote_file_version.hpp"
 
-#include "../../authenticated_scan_server.hpp"
-#include "protocol/msg_types.hpp"
+#include "../../common/protocol/msg_types.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 int Get_Remote_File_Version::act(const header& header, std::shared_ptr<action_msg> action,
                 std::shared_ptr<result_msg> res)

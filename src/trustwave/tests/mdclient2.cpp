@@ -26,7 +26,59 @@
 #include <boost/uuid/uuid.hpp>         // streaming operators etc.
 #include <boost/uuid/random_generator.hpp>         // streaming operators etc.
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
-#include "../misc/protocol/protocol.hpp"
+#include <functional>
+#include <vector>
+
+#include "../common/protocol/protocol.hpp"
+std::vector<std::function<std::string(std::string)>> msgs1 ={
+[&](std::string id) ->std::string {return
+                    R"(
+{      
+"H":
+    {
+        "session_id" : ")"
+                    + id
+                    + R"("
+    },
+"msgs":
+    [
+
+        {
+                "enumerate" :
+                {
+                    "id": ")"
+                    + boost::uuids::to_string(boost::uuids::random_generator()())
+                    + R"(",
+                    "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
+                    
+                }
+        }
+    ]
+})";},
+[&](std::string id) ->std::string {return
+                    R"(
+{      
+"H":
+    {
+        "session_id" : ")"
+                    + id
+                    + R"("
+    },
+"msgs":
+    [
+
+        {
+                "key_exists" :
+                {
+                    "id": ")"
+                    + boost::uuids::to_string(boost::uuids::random_generator()())
+                    + R"(",
+                    "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
+                    
+                }
+        }
+    ]
+})";}};
 /*
  *                  {
  "get_file" :
@@ -47,13 +99,23 @@
  }
  },
  */
+static void enumf( std::string msg)
+{
+    mdcli session("tcp://127.0.0.1:5555", 1);
 
+    zmsg *reply = session.send_and_recv(msg);
+    if (reply) {
+        std::cout << reply->body() << std::endl;
+        delete reply;
+    }
 
+}
 static void fc(int c)
 {
     mdcli session("tcp://127.0.0.1:5555", 1);
     auto act_id1 = boost::uuids::random_generator()();
-    std::string get_session_m =R"(
+    std::string get_session_m =
+                    R"(
           { 
                "H":
                {
@@ -90,12 +152,21 @@ static void fc(int c)
         printf("msg: %s", to_string(t1, 2).c_str());
 
         auto a1 = t1.as<trustwave::res_msg>();
-
         auto act_id4 = boost::uuids::to_string(boost::uuids::random_generator()());
         auto new_session_id = a1.msgs[0]->res();
         delete reply;
         reply = nullptr;
-        std::string actions=
+
+        std::vector<std::thread> tp;
+        for (unsigned int i = 0; i < 20; ++i)        //context+broker
+                        {
+            tp.push_back(std::move(std::thread(enumf, msgs1[i % msgs1.size()](new_session_id))));
+
+        }
+        for (unsigned int i = 0; i < tp.size(); i++) {
+            tp.at(i).join();
+        }
+        std::string actions =
                         R"(
           {      
             "H":
@@ -108,11 +179,13 @@ static void fc(int c)
                 [
    
                     {
-                            "close_session" :
+                            "enumerate" :
                             {
                                 "id": ")"
                                         + act_id4
-                                        + R"("
+                                        + R"(",
+                                "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
+                                
                             }
                     }
                 ]
@@ -120,9 +193,48 @@ static void fc(int c)
         printf("Request is:\n%s\n", actions.c_str());
 
         zmsg *reply = session.send_and_recv(actions);
-        if(reply)
-        {
+        if (reply) {
             std::cout << reply->body() << std::endl;
+            auto act_id1 = boost::uuids::to_string(boost::uuids::random_generator()());
+            auto new_session_id = a1.msgs[0]->res();
+            delete reply;
+            reply = nullptr;
+            std::string actions =
+                            R"(
+                          {      
+                            "H":
+                                {
+                                    "session_id" : ")"
+                                            + new_session_id
+                                            + R"("
+                                },
+                            "msgs":
+                                [
+                   
+                                    {
+                                            "key_exists" :
+                                            {
+                                                "id": ")"
+                                            + act_id1
+                                            + R"(",
+                                                "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
+                                                
+                                            }
+                                    }
+                                ]
+                        })";
+            printf("Request is:\n%s\n", actions.c_str());
+
+            zmsg *reply = session.send_and_recv(actions);
+            if (reply) {
+                std::cout << reply->body() << std::endl;
+
+            }
+            else {
+                printf("Break\n");
+
+            }
+
         }
         else {
             printf("Break\n");

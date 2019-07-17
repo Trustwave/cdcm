@@ -1,6 +1,6 @@
 #!/usr/bin/env python
    
 bld.SAMBA_SUBSYSTEM('smb-actions',
-	includes='../../../misc/ ../../../', 
+	includes='../../../common/ ../../../', 
     source='get_file.cpp',
-    deps='tw-misc tw-smb-client')
+    deps='tw-common tw-smb-client')

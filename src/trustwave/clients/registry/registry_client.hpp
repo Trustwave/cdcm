@@ -15,6 +15,7 @@
 
 #ifndef TRUSTWAVE_REGISTRY_CLIENT_HPP_
 #define TRUSTWAVE_REGISTRY_CLIENT_HPP_
+
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
@@ -35,8 +36,10 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#undef uint_t
 #include <string>
 #include <tuple>
+#include "../../common/client.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
@@ -54,7 +57,7 @@ struct regshell_context
 };
 using result = std::tuple<bool,WERROR>;
 
-class registry_client
+class registry_client: public cdcm_client
 {
     struct key_info
     {
