@@ -89,7 +89,6 @@ public:
     }
 private:
     mutable time_t expiration_time_;
-    mutable size_t last_worker_;
     shared_mem_session session_;
 
 };
@@ -139,7 +138,7 @@ public:
 public:
     static boost::shared_ptr <shared_mem_sessions_cache> get_or_create(const std::string &name, const size_t size);
 public:
-    bool add(sp_session_t spUC);
+    bool add(sp_session_t);
     template<typename Tag>
     sp_session_t get_session_by(const std::string &kv)
     {
@@ -155,6 +154,22 @@ public:
         }
         return this->update <Tag>(s);
     }
+    template<typename Tag>
+        bool touch_by(const std::string &kv)
+        {
+            auto& idx = map_->get <Tag>();
+            decltype(idx.find(String{})) s;
+            {
+                ReadLock auto_lock(lock_);
+                s = idx.find(String(kv.c_str(), char_allocator(segment_->get_segment_manager())));
+            }
+            if (s == idx.end()){
+                printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
+                return false;
+            }
+            this->update <Tag>(s);
+            return true;
+        }
     bool remove_by_id(const std::string &id);
     bool clean();
     void flush_all_entries();

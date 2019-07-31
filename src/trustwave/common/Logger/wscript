@@ -49,5 +49,5 @@ def configure(conf):
     conf.ADD_NAMED_CPPFLAGS('-DBOOST_LOG_DYN_LINK=1')
     conf.check_boost(lib='system log filesystem regex ')
     conf.ADD_NAMED_CPPFLAGS('-std=c++1z -Wno-comment', testflags=True)
-    conf.ADD_NAMED_CPPFLAGS('-lpe -L/home/ascohen/dev/sambarpc/waf_conv/samba2/samba/trustwave/3rdparty/libpe -L/usr/lib/ -lstdc++fs ', testflags=True)
+    conf.ADD_NAMED_CPPFLAGS('-lpe -L/home/ascohen/dev/sambarpc/waf_conv/samba2/samba/trustwave/3rdparty/libpe -L/usr/lib/ -lboost_filesystem -lstdc++fs ', testflags=True)
     print(conf.env['CXXFLAGS'])

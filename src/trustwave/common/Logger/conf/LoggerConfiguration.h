@@ -45,6 +45,7 @@ struct module {
 // Description    : represent sink.
 //===========================================================================
 struct sink_conf {
+    std::string path;
     std::string name;
     bool enable;
     unsigned long id;	  // FIXME: remove id

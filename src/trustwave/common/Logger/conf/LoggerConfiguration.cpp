@@ -27,6 +27,7 @@
 #include <functional>
 #include <boost/foreach.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "../../../common/Logger/include/Logger.h"
@@ -119,6 +120,7 @@ bool trustwave::LoggerConfiguration::load(const std::string &file_name) {
 	BOOST_FOREACH(ptree::value_type const&v, pt.get_child("Logger.Project.supported_sinks")) {
                     if (v.first == "sink") {
                         sink_conf s;
+                        s.path = v.second.get<std::string>("path");
                         s.name = v.second.get<std::string>("name");
                         s.id = v.second.get<unsigned long>("id");
                         try {

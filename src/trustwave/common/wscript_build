@@ -4,6 +4,10 @@ bld.RECURSE('sessions_cache')
 bld.RECURSE('singleton_runner')
 bld.RECURSE('zmq')
 
-bld.SAMBA_SUBSYSTEM('tw-common',  
-    source='credentials.cpp session.cpp',
-    deps='samba-credentials tw-sessions-cache')
+bld.SAMBA_SUBSYSTEM('tw-credentials',  
+    source='credentials.cpp',
+    deps='samba-credentials')
+
+bld.SAMBA_SUBSYSTEM('tw-session',  
+    source='session.cpp',
+    deps='tw-sessions-cache tw-credentials')

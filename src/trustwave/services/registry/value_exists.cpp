@@ -30,14 +30,17 @@ int Value_Exists_Action::act(const header& header, std::shared_ptr<action_msg> a
 {
 
     res->id(action->id());
+    AU_LOG_DEBUG("About to look for  %s", header.session_id.c_str());
     auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::id>(header.session_id);
     if (sess->id().is_nil()) {
+        AU_LOG_DEBUG("Session %s Not Found ERROR", header.session_id.c_str());
         res->res("Session Not Found ERROR");
         return -1;
     }
 
     auto veact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
     if (!veact) {
+        AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error");
         return -1;
     }
@@ -47,6 +50,7 @@ int Value_Exists_Action::act(const header& header, std::shared_ptr<action_msg> a
 
         c = std::make_shared<trustwave::registry_client>();
         if (!c) {
+            AU_LOG_ERROR("Failed dynamic cast");
             res->res("Error");
             return -1;
         }
@@ -55,23 +59,22 @@ int Value_Exists_Action::act(const header& header, std::shared_ptr<action_msg> a
 
     struct loadparm_context *lp_ctx = ::loadparm_init_global(false);
     if (!c->connect(*sess, lp_ctx)) {
-        std::cerr << "Failed to connect!!!" << std::endl;
+        AU_LOG_DEBUG("Failed connecting to ",sess->remote().c_str());
         res->res("Failed to connect");
         return -1;
     }
     if (!std::get<0>(c->open_key(veact->key_.c_str()))) {
-        std::cerr << "Failed to open key!!!" << std::endl;
+        AU_LOG_DEBUG("Failed opening  %s",veact->key_.c_str());
         res->res("Key doesn't exist");
         return -1;
     }
     trustwave::registry_value rv;
     if (!std::get<0>(c->key_get_value_by_name(veact->value_.c_str(), rv))) {
-        std::cerr << "Failed to Get value!!!" << std::endl;
+        AU_LOG_DEBUG("Failed getting value %s",veact->value_.c_str());
         res->res("False");
     }
     else {
         res->res("True");
-        std::cerr << "value Exists!!!" << std::endl;
     }
     return 0;
 

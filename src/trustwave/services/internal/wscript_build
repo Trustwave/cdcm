@@ -3,4 +3,4 @@
 bld.SAMBA_SUBSYSTEM('local-actions',
 	includes='../../../common/ ../../../', 
     source='start_session.cpp close_session.cpp file_version.cpp get_remote_file_version.cpp',
-    deps='tw-common ')
+    deps='tw-session ')

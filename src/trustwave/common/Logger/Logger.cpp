@@ -172,8 +172,12 @@ Logger::~Logger() {
 // Description: Add file sink to the logger
 //===========================================================================
 void Logger::add_file_sink(const ::trustwave::sink_conf &s) {
+    auto fname = std::string(s.path+s.name+
+                            ::trustwave::logger::sourcesArray[::trustwave::LoggerSource::instance()->get_source()] +
+                                            std::string(::trustwave::LoggerSource::instance()->get_source_id())+".log.%N");
 	boost::shared_ptr< sinks::synchronous_sink< sinks::text_file_backend > > sink =
-		logging::add_file_log(keywords::file_name = s.name.c_str(),
+		logging::add_file_log(keywords::file_name = fname.c_str(),
+
 			keywords::rotation_size = 100 * 1024 * 1024,
 			keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
 			keywords::open_mode = (std::ios::out | std::ios::app),
@@ -409,15 +413,13 @@ trustwave::LoggerSource* trustwave::LoggerSource::instance() {
 //---------------------------------------------------------------------------
 // Description: 
 //===========================================================================
-bool trustwave::Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf, ::trustwave::logger::sources source) {
+bool trustwave::Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf) {
 
     logger = std::make_unique<detail::Logger>();
-
     if (false == logger->init(root_conf)) {
         std::cout << "failed to initialize the logger!!!" << std::endl;
         return false;
     }
-    LoggerSource::instance()->set_source(source);
 
     return true;
 }

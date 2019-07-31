@@ -78,6 +78,6 @@ def configure(conf):
     conf.ADD_NAMED_CPPFLAGS('-D__STDC_WANT_LIB_EXT1__=1')
     conf.ADD_NAMED_CPPFLAGS('-DBOOST_LOG_DYN_LINK=1')
     conf.check_boost(lib='system filesystem regex ')
-    conf.ADD_NAMED_CPPFLAGS('-std=c++1z -Wno-comment -lboost_system ', testflags=True)
+    conf.ADD_NAMED_CPPFLAGS('-std=c++1z -Wno-comment -lboost_system -lboost_filesystem', testflags=True)
     conf.ADD_NAMED_CPPFLAGS('-L/home/ascohen/dev/sambarpc/waf_conv/samba2/samba/trustwave/lib/ -L/usr/lib/ -lpe.a -lpthread -lzmq -lpeversion  -lstdc++fs ', testflags=True)
     print(conf.env['CXXFLAGS'])

@@ -22,8 +22,7 @@
 using namespace trustwave;
 
 session::session() :
-                uuid_(boost::uuids::nil_uuid()), creds_(std::string(), std::string(), std::string(), std::string()),
-                clients_{std::make_pair(nullptr,false),std::make_pair(nullptr,false)}
+                uuid_(boost::uuids::nil_uuid()), creds_(std::string(), std::string(), std::string(), std::string())
 {
 
 }

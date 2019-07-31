@@ -5,7 +5,7 @@ bld.SAMBA_SUBSYSTEM('tw-registry-client',
 
 bld.SAMBA_BINARY('tw-registry-client-test',  
 source='test.cpp',
-deps='tw-registry-client tw-common util_reg smbclient smbclient-raw samba-util')
+deps='tw-registry-client tw-credentials tw-session util_reg smbclient smbclient-raw samba-util')
 '''
 bld.SAMBA_BINARY('tw-registry-client-test2',  
 source='test2.cpp',

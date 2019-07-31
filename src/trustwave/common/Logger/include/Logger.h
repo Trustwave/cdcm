@@ -172,9 +172,9 @@ public:
     {
         return source_;
     }
-    const std::string_view get_source_id() const
+    const std::string get_source_id() const
     {
-        static const thread_local std::string str_id = std::to_string(source_id_);
+        static const thread_local std::string str_id = source_id_ == 0?std::string():std::to_string(source_id_);
         return str_id;
     }
 
@@ -182,9 +182,6 @@ private:
     LoggerSource() :
                     source_(trustwave::logger::tester), source_id_(0)
     {
-        /*if (trustwave::logger::worker == source_) {
-            source_id_ += ++g_id;
-        }*/
     }
 
 private:
@@ -193,6 +190,6 @@ private:
     size_t source_id_;
 };
 
-bool Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf, ::trustwave::logger::sources source);
-} // namespace MSC
+bool Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf);
+}
 #endif //COMMON_LOGGER_H

@@ -47,6 +47,6 @@ struct session_converter {
     static shared_mem_session convert(const sp_session_t &uc, const void_allocator &va);
 };
 
-} // namespacetrustwave
+} // namespace trustwave
 
 #endif /* TRUSTWAVE_COMMON_SESSIONS_CACHE_SHARED_MEM_CONVERTERS_HPP_ */

@@ -3,5 +3,13 @@
 bld.SAMBA_BINARY('cdcm_broker',
     includes='clients/registry/ common/ common/protocol',  
     source='cdcm_broker.cpp message_broker.cpp ',
-    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_system -lboost_log -lboost_thread',
-    deps='tw-common smb-actions registry-actions local-actions tw-logger tw-sessions-cache tw-zmq tw-singleton-runner')
+    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_system -lboost_filesystem -lboost_log -lboost_thread',
+    deps='smb-actions registry-actions local-actions tw-logger tw-sessions-cache tw-zmq tw-singleton-runner')
+
+    
+bld.SAMBA_BINARY('worker_container_test',
+    includes='',  
+    source='worker_container.cpp ',
+    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_system -lboost_filesystem -lboost_log -lboost_thread',
+    deps='')
+    

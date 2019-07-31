@@ -52,7 +52,7 @@ struct authenticated_scan_server
         return logger_ptr.get();
     }
     template <int T>
-    int run_as();
+    int run_as(size_t instance_id=0);
 private:
 #undef uint_t
     authenticated_scan_server();

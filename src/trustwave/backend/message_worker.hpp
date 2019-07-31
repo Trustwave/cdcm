@@ -32,7 +32,7 @@ public:
     //  Constructor
     message_worker(zmq::context_t &ctx);
     ~message_worker();
-    static int main_func(size_t);
+    static int main_func();
     //  ---------------------------------------------------------------------
     //  Connect or reconnect to broker
     void connect_to_broker();

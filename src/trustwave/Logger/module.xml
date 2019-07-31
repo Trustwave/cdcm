@@ -17,7 +17,8 @@
     <supported_sinks>
       <sink name="file">
         <id>1</id>
-        <name>/tmp/Au_%N.log</name>
+        <path>/tmp/</path>
+        <name>cdcm</name>
         <filter>debug</filter>
         <enable>true</enable>
       </sink>

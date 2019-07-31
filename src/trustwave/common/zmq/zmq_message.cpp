@@ -264,6 +264,7 @@
    }
 
    void zmsg::dump() {
+
       std::cerr << "--------------------------------------" << std::endl;
       for (unsigned int part_nbr = 0; part_nbr < m_part_data.size(); part_nbr++) {
           ustring data = m_part_data [part_nbr];
@@ -286,4 +287,28 @@
       }
    }
 
+   std::string zmsg::to_str() {
+       std::stringstream ss;
+         ss << "--------------------------------------" << std::endl;
+         for (unsigned int part_nbr = 0; part_nbr < m_part_data.size(); part_nbr++) {
+             ustring data = m_part_data [part_nbr];
+
+             // Dump the message as text or binary
+             int is_text = 1;
+             for (unsigned int char_nbr = 0; char_nbr < data.size(); char_nbr++)
+                 if (data [char_nbr] < 32 || data [char_nbr] > 127)
+                     is_text = 0;
+
+             ss << "[" << std::setw(3) << std::setfill('0') << (int) data.size() << "] ";
+             for (unsigned int char_nbr = 0; char_nbr < data.size(); char_nbr++) {
+                 if (is_text) {
+                     ss << (char) data [char_nbr];
+                 } else {
+                     ss << std::hex << std::setw(2) << std::setfill('0') << (short int) data [char_nbr];
+                 }
+             }
+             ss << std::endl;
+         }
+         return ss.str();
+      }
 

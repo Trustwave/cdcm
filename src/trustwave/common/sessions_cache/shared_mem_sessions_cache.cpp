@@ -14,7 +14,6 @@
 // Comments: 
 
 #include "../../common/sessions_cache/shared_mem_sessions_cache.hpp"
-
 #include <iostream>
 #include <boost/interprocess/managed_shared_memory.hpp>           // for interpro...
 #include <boost/smart_ptr/make_shared.hpp>
@@ -27,11 +26,11 @@ boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_
                 const size_t size)
 {
     const std::string absolute_name(name);
-    printf("Creating Shared Mem Digest User Identities Cache ( %s ) size ( %zu )", absolute_name.c_str(), size);
+    printf("Creating Shared Mem Sessions Cache ( %s ) size ( %zu )", absolute_name.c_str(), size);
     boost::shared_ptr <shared_mem_sessions_cache> cache = boost::shared_ptr <shared_mem_sessions_cache>(
                     new shared_mem_sessions_cache(absolute_name, size, 30));
     if (false == cache->construct()){
-        printf("Failed Shared Mem Digest User Identities Cache name ( %s ) size ( %zu )", absolute_name.c_str(), size);
+        printf("Failed Shared Mem Sessions Cache name ( %s ) size ( %zu )", absolute_name.c_str(), size);
         return boost::shared_ptr <shared_mem_sessions_cache>();
     }
 
@@ -59,7 +58,7 @@ shared_mem_sessions_cache::shared_mem_sessions_cache(const std::string &name, co
 
 shared_mem_sessions_cache::~shared_mem_sessions_cache()
 {
-    printf("Shared memory Digest User Identities cache Destructed\n");
+    printf("Shared memory Sessions cache Destructed\n");
     /*WriteLock auto_lock(lock_);
     segment_->get_segment_manager()->destroy_ptr(map_);*/
 }
@@ -103,17 +102,17 @@ bool shared_mem_sessions_cache::add(const sp_session_t sp_session)
         }
         auto it = map_->insert(shared_mem_session_element(sp_session, session_idle_timeout_, va));
         if (!it.second){
-            printf("No need to insert duplicated Digest User Identity ( ID: %s ) to cache",
+            printf("No need to insert duplicated Session ( ID: %s ) to cache",
                             sp_session->idstr().c_str());
             return true;
         }
         std::cerr << *it.first;
     } catch (...){
-        printf("Cannot allocate Digest User Identity for cache");
+        printf("Cannot allocate Session for cache");
         return false;
     }
 
-    printf("Digest User Identity ( ID: %s ) added \n", sp_session->idstr().c_str());
+    printf("Session ( ID: %s ) added \n", sp_session->idstr().c_str());
     return true;
 }
 
@@ -134,7 +133,7 @@ bool shared_mem_sessions_cache::remove_by_id(const std::string &ids)
 
 bool shared_mem_sessions_cache::clean()
 {
-    time_t now = time(nullptr);
+    time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     auto& exp_idx = map_->get <expiration>();
     decltype(exp_idx.find(String{})) till_now;
     {

@@ -2,7 +2,7 @@
 
 bld.SAMBA_BINARY('cdcm_worker',
     includes='clients/registry/ common/ common/protocol',  
-    source='cdcm_worker_process.cpp message_worker.cpp',
-    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_system -lboost_log -lboost_thread',
-    deps='tw-common smb-actions registry-actions local-actions tw-logger tw-sessions-cache tw-zmq tw-singleton-runner')
+    source='cdcm_worker_process.cpp message_worker.cpp ',
+    ldflags='-L/home/ascohen/dev/samba_fresh/samba/trustwave/lib/ -lpe_pev -L/usr/lib/ -Wno-cast-qual -lstdc++fs -lssl -lcrypto -lzmq -lboost_filesystem -lboost_system -lboost_log -lboost_thread',
+    deps='tw-session smb-actions registry-actions local-actions tw-logger tw-sessions-cache tw-zmq tw-singleton-runner')
     

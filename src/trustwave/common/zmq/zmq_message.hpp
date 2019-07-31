@@ -75,6 +75,7 @@ public:
     char *address();
     void wrap(const char *address, const char *delim);
     std::string unwrap();
+    std::string to_str();
     void dump();
 private:
     std::vector<ustring> m_part_data;

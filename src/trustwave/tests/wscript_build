@@ -11,7 +11,7 @@ bld.SAMBA_BINARY('shmem_cleaner',
     includes='clients/registry/ common/ ../ common/protocol',  
     source='shared_mem_tests_cleaner.cpp',
     ldflags='',
-    deps='tw-common')
+    deps='tw-credentials tw-session')
     
 
     
@@ -19,12 +19,12 @@ bld.SAMBA_BINARY('shmem_user',
     includes='clients/registry/ common/ ../ common/protocol',  
     source='shared_mem_tests_user.cpp',
     ldflags='',
-    deps='tw-common')
+    deps='tw-credentials tw-session')
     
 
 bld.SAMBA_BINARY('shmem_inserter',
     includes='clients/registry/ common/ ../ common/protocol',  
     source='shared_mem_tests_inserter.cpp',
     ldflags='',
-    deps='tw-common')
+    deps='tw-credentials tw-session')
     

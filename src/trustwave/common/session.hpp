@@ -33,27 +33,27 @@ public:
     session(const std::string& remote, const credentials& creds);
     const boost::uuids::uuid& id() const;
     std::string idstr() const;
-    template<typename T>
-    std::shared_ptr<cdcm_client> get_client(size_t c)
-    {
-        if (!clients_[c].first) {
-            clients_[c].first.reset(new T);
-            clients_[c].second = false;
-        }
-        if (!clients_[c].second) {
-            clients_[c].second = true;
-            return clients_[c].first;
-        }
-        return nullptr;
-    }
+
     const std::string& remote() const;
     cli_credentials* creds() const;
 
+    template<typename T>
+        std::shared_ptr<cdcm_client> get_client(size_t c)
+        {
+            if (!clients_[c].first) {
+                clients_[c].first.reset(new T);
+                clients_[c].second = false;
+            }
+            if (!clients_[c].second) {
+                clients_[c].second = true;
+                return clients_[c].first;
+            }
+            return nullptr;
+        }
     void client_done(size_t c)
-    {
-        clients_[c].second = false;
-    }
-
+        {
+            clients_[c].second = false;
+        }
     explicit operator bool() const
     {
         return uuid_.is_nil();

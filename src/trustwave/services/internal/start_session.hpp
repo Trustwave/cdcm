@@ -30,7 +30,7 @@ class Start_Session: public Action_Base
 
 public:
     Start_Session() :
-                    Action_Base("start_session", "start_session")
+                    Action_Base("start_session", "start_session",true)
     {
     }
     virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);

@@ -146,9 +146,7 @@ zmq_helpers::version_assert (int want_major, int want_minor)
 int64_t
 zmq_helpers::clock (void)
 {
-    struct timeval tv;
-    gettimeofday (&tv, NULL);
-    return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+    return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 }
 
 //  Sleep for a number of milliseconds
@@ -164,7 +162,7 @@ zmq_helpers::sleep (int msecs)
 void
 zmq_helpers::console (const char *format, ...)
 {
-    time_t curtime = time (NULL);
+    time_t curtime = clock();
     struct tm *loctime = localtime (&curtime);
     char *formatted = new char[20];
     strftime (formatted, 20, "%y-%m-%d %H:%M:%S ", loctime);

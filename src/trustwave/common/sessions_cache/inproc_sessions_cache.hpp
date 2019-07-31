@@ -1,6 +1,6 @@
 //=====================================================================================================================
 // Trustwave ltd. @{SRCH}
-//														sessions_container.hpp
+//														in_sessions_container.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
@@ -33,30 +33,30 @@
 #include <boost/uuid/string_generator.hpp>
 #include <iostream>
 #include <mutex>
-
+#include "shared_mem_sessions_cache.hpp"
 #include "../../common/session.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
-//can't really avoid this singleton
-
-class sessions_container
+template<typename Session_T>
+class inproc_in_sessions_cache
 {
 private:
 public:
-    sessions_container()
+    inproc_in_sessions_cache()
     {
+        out_sessions_ = shared_mem_in_sessions_cache::get_or_create("sessions",1024*1024*10);
     }
-    sessions_container(const sessions_container&) = delete;
-    sessions_container& operator=(const sessions_container &) = delete;
-    sessions_container(sessions_container &&) = delete;
-    sessions_container & operator=(sessions_container &&) = delete;
+    inproc_in_sessions_cache(const inproc_in_sessions_cache&) = delete;
+    inproc_in_sessions_cache& operator=(const inproc_in_sessions_cache &) = delete;
+    inproc_in_sessions_cache(inproc_in_sessions_cache &&) = delete;
+    inproc_in_sessions_cache & operator=(inproc_in_sessions_cache &&) = delete;
 
     struct element
     {
         mutable time_t first;
-        session second;
+        Session_T second;
         const boost::uuids::uuid & s_id() const
         {
             return second.id();
@@ -66,18 +66,17 @@ public:
             return second.remote();
         }
     };
-    void insert_session(session s)
+    void insert_session(Session_T s)
     {
-        auto f = sessions_.get<remote>().find(s.remote());
-        if (f != sessions_.get<remote>().end()) {
-            sessions_.get<remote>().erase(f);
+        auto f = in_sessions_.get<remote>().find(s.remote());
+        if (f != in_sessions_.get<remote>().end()) {
+            in_sessions_.get<remote>().erase(f);
         }
         element e;
         e.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         e.second = s;
-        sessions_.insert(e);
+        in_sessions_.insert(e);
     }
-private:
     struct id
     {
     };
@@ -87,6 +86,7 @@ private:
     struct last_time
     {
     };
+private:
 
     typedef boost::multi_index::multi_index_container<element,
                     boost::multi_index::indexed_by<
@@ -99,13 +99,14 @@ private:
                                                     boost::multi_index::const_mem_fun<element, const std::string &,
                                                                     &element::s_remote> > > > sessions;
 
-    sessions sessions_;
+    sessions in_sessions_;
+    shared_mem_sessions_cache out_sessions_;
     std::mutex lock_;
     session return_replaced(sessions::const_iterator s)
     {
         typedef boost::multi_index::index<sessions, last_time>::type element_by_time;
-        element_by_time& time_index = sessions_.get<last_time>();
-        auto it2 = sessions_.project<last_time>(s);
+        element_by_time& time_index = in_sessions_.get<last_time>();
+        auto it2 = in_sessions_.project<last_time>(s);
         auto n = *s;
         n.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         lock_.lock();
@@ -117,14 +118,14 @@ private:
 public:
     session get_session_by_dest(const std::string dst)
     {
-        auto s = sessions_.get<remote>().find(dst);
-        if (s == sessions_.get<remote>().end()) {
+        auto s = in_sessions_.get<remote>().find(dst);
+        if (s == in_sessions_.get<remote>().end()) {
             return session();
         }
         else {
             typedef boost::multi_index::index<sessions, last_time>::type element_by_time;
-            element_by_time& time_index = sessions_.get<last_time>();
-            auto it2 = sessions_.project<last_time>(s);
+            element_by_time& time_index = in_sessions_.get<last_time>();
+            auto it2 = in_sessions_.project<last_time>(s);
             auto n = *s;
             n.first = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             lock_.lock();
@@ -142,8 +143,8 @@ public:
         } catch (std::runtime_error& ex) {
             return session();
         }
-        auto s = sessions_.get<id>().find(uuid_id);
-        if (s == sessions_.get<id>().end()) {
+        auto s = in_sessions_.get<id>().find(uuid_id);
+        if (s == in_sessions_.get<id>().end()) {
             return session();
         }
         else {
@@ -159,13 +160,13 @@ public:
         } catch (std::runtime_error& ex) {
             return false;
         }
-        auto s = sessions_.get<id>().find(uuid_id);
-        if (s == sessions_.get<id>().end()) {
+        auto s = in_sessions_.get<id>().find(uuid_id);
+        if (s == in_sessions_.get<id>().end()) {
             return false;
         }
         else {
             lock_.lock();
-            sessions_.get<id>().erase(s);
+            in_sessions_.get<id>().erase(s);
             lock_.unlock();
             return true;
         }
@@ -174,7 +175,7 @@ public:
     void dump_by_time() const
     {
         std::cerr << std::endl;
-        for (const auto s : sessions_.get<last_time>()) {
+        for (const auto s : in_sessions_.get<last_time>()) {
             std::cerr << s.second.remote() << " " << s.second.idstr() << " " << s.first << std::endl;
         }
     }

@@ -18,7 +18,6 @@
 //=====================================================================================================================
 #include "../internal/close_session.hpp"
 #include "../../common/protocol/msg_types.hpp"
-#include "../../common/sessions_cache/inproc_sessions_cache.hpp"
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 
 using namespace trustwave;

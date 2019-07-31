@@ -16,7 +16,7 @@
 #ifndef MESSAGE_BROKER_HPP_
 #define MESSAGE_BROKER_HPP_
 
-//#include <zmq.hpp>
+#include "worker_container.hpp"
 #include <map>
 #include <set>
 #include <deque>
@@ -34,13 +34,14 @@ class message_broker
     //  This defines one worker, idle or active
     struct worker
     {
-        std::string m_identity;   //  Address of worker
-        int64_t m_expiry;         //  Expires at unless heartbeat
+        std::string identity_;   //  Address of worker
+        std::string last_worked_session_;   //
+        int64_t expiry_;         //  Expires at unless heartbeat
 
         worker(std::string identity, int64_t expiry = 0)
         {
-            m_identity = identity;
-            m_expiry = expiry;
+            identity_ = identity;
+            expiry_ = expiry;
         }
     };
 
@@ -50,7 +51,7 @@ public:
     ~message_broker();
 private:
     //  Get and process messages forever or until interrupted
-    void start_brokering();
+    void broker_loop();
     //  ---------------------------------------------------------------------
     //  Bind broker to endpoint, can call this multiple times
     //  We use a socket for clients and a socket for  workers.
@@ -64,36 +65,35 @@ private:
     void purge_workers();
     //  ---------------------------------------------------------------------
     //  Dispatch requests to waiting workers as possible
-    void service_dispatch(std::unique_ptr<zmsg>&& msg);
-    void service_internal(std::string service_name, std::unique_ptr<zmsg>&& msg);
+    void service_dispatch(std::unique_ptr<zmsg>&& msg,const std::string& id=std::string());
+   // void service_internal(std::string service_name, std::unique_ptr<zmsg>&& msg);
     //  ---------------------------------------------------------------------
     //  Creates worker if necessary
-    worker *
+    trustwave::sp_worker_t
     worker_require(std::string identity);
     //  ---------------------------------------------------------------------
     //  Deletes worker from all data structures, and destroys worker
-    void worker_delete(worker *&wrk, int disconnect);
+    void worker_delete(trustwave::sp_worker_t wrk, bool send_disconnect);
     //  ---------------------------------------------------------------------
     //  Process message sent to us by a worker
     void worker_process(std::string sender, std::unique_ptr<zmsg>&& msg);
     //  ---------------------------------------------------------------------
     //  Send message to worker
     //  If pointer to message is provided, sends that message
-    void worker_send(worker *worker, const char *command, std::string option, std::unique_ptr<zmsg> _msg);
+    void worker_send(trustwave::sp_worker_t worker, const char *command, std::string option, std::unique_ptr<zmsg> _msg);
     //  ---------------------------------------------------------------------
     //  This worker is now waiting for work
-    void worker_waiting(worker *worker);
+    void worker_waiting(trustwave::sp_worker_t worker_ptr);
     //  ---------------------------------------------------------------------
     //  Process a request coming from a client
     void client_process(std::string sender, std::unique_ptr<zmsg> msg);
 
 private:
-    zmq::context_t&                     context_;           //  0MQ context
-    std::unique_ptr<zmq::socket_t>      internal_socket_;   //  Socket for workers
-    std::unique_ptr<zmq::socket_t>      external_socket_;   //  Socket for clients
-    std::map<std::string, worker*>      workers_;           //  Hash of known workers
-    std::set<worker*>                   waiting_;           //  List of waiting workers
-    std::deque<std::unique_ptr<zmsg>>   requests_;          //  List of client requests
+    zmq::context_t&                     context_;               //  0MQ context
+    std::unique_ptr<zmq::socket_t>      internal_socket_;       //  Socket for workers
+    std::unique_ptr<zmq::socket_t>      external_socket_;       //  Socket for clients
+    trustwave::worker_container         workers_;
+    std::deque<std::pair<std::unique_ptr<zmsg>,std::string>>   requests_;              //  List of client requests
     size_t                              replied_;
 };
 

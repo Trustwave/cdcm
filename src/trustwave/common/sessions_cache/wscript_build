@@ -2,5 +2,5 @@
    
 bld.SAMBA_SUBSYSTEM('tw-sessions-cache',
 	includes='..',  
-    source='shared_mem_converters.cpp shared_mem_sessions_cache.cpp shared_mem_session.cpp',
+    source='shared_mem_converters.cpp shared_mem_sessions_cache.cpp shared_mem_session.cpp ',
     deps='')
