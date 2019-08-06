@@ -14,99 +14,16 @@
 // Comments: 
 
 #include "zmq_helpers.hpp"
+#include <bits/types/struct_timespec.h>  // for timespec
+#include <signal.h>                      // for sigaction, sigemptyset, SIGINT
+#include <stdarg.h>                      // for va_end, va_list, va_start
+#include <stdio.h>                       // for printf, vprintf
+#include <time.h>                        // for localtime, nanosleep, strftime
+#include <zmq.h>                         // for zmq_version, ZMQ_IDENTITY
+#include <iomanip>                       // for operator<<, setfill, setw
+#include <iostream>                      // for basic_ostream::operator<<
+#include <zmq.hpp>                       // for socket_t
 
-#include <zmq.hpp>
-
-#include <iostream>
-#include <iomanip>
-#include <time.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <signal.h>
-#include <sys/time.h>
-#include <unistd.h>
-//  Receive 0MQ string from socket and convert into string
-std::string
-zmq_helpers::recv (zmq::socket_t & socket) {
-
-    zmq::message_t message;
-    socket.recv(&message);
-
-    return std::string(static_cast<char*>(message.data()), message.size());
-}
-
-//  Convert string to 0MQ string and send to socket
-bool
-zmq_helpers::send (zmq::socket_t & socket, const std::string & string) {
-
-    zmq::message_t message(string.size());
-    memcpy (message.data(), string.data(), string.size());
-
-    bool rc = socket.send (message);
-    return (rc);
-}
-
-//  Sends string as 0MQ string, as multipart non-terminal
-bool
-zmq_helpers::sendmore (zmq::socket_t & socket, const std::string & string) {
-
-    zmq::message_t message(string.size());
-    memcpy (message.data(), string.data(), string.size());
-
-    bool rc = socket.send (message, ZMQ_SNDMORE);
-    return (rc);
-}
-
-//  Receives all message parts from socket, prints neatly
-//
-void
-zmq_helpers::dump (zmq::socket_t & socket)
-{
-    std::cout << "----------------------------------------" << std::endl;
-
-    while (1) {
-        //  Process all parts of the message
-        zmq::message_t message;
-        socket.recv(&message);
-
-        //  Dump the message as text or binary
-        int size = message.size();
-        std::string data(static_cast<char*>(message.data()), size);
-
-        bool is_text = true;
-
-        int char_nbr;
-        unsigned char byte;
-        for (char_nbr = 0; char_nbr < size; char_nbr++) {
-            byte = data [char_nbr];
-            if (byte < 32 || byte > 127)
-                is_text = false;
-        }
-        std::cout << "[" << std::setfill('0') << std::setw(3) << size << "]";
-        for (char_nbr = 0; char_nbr < size; char_nbr++) {
-            if (is_text)
-                std::cout << (char)data [char_nbr];
-            else
-                std::cout << std::setfill('0') << std::setw(2)
-                   << std::hex << (unsigned int) data [char_nbr];
-        }
-        std::cout << std::endl;
-
-        int more = 0;           //  Multipart detection
-        size_t more_size = sizeof (more);
-        socket.getsockopt (ZMQ_RCVMORE, &more, &more_size);
-        if (!more)
-            break;              //  Last message part
-    }
-}
-
-
-//  Set simple random printable identity on socket
-//  Caution:
-//    DO NOT call this version of s_set_id from multiple threads on MS Windows
-//    since s_set_id will call rand() on MS Windows. rand(), however, is not
-//    reentrant or thread-safe. See issue #521.
 std::string
 zmq_helpers::set_id (zmq::socket_t & socket)
 {
@@ -116,16 +33,6 @@ zmq_helpers::set_id (zmq::socket_t & socket)
        << std::setw(4) << std::setfill('0') << within (0x10000);
     socket.setsockopt(ZMQ_IDENTITY, ss.str().c_str(), ss.str().length());
     return ss.str();
-}
-
-//  Report 0MQ version number
-//
-void
-zmq_helpers::version (void)
-{
-    int major, minor, patch;
-    zmq_version (&major, &minor, &patch);
-    std::cout << "Current 0MQ version is " << major << "." << minor << "." << patch << std::endl;
 }
 
 void
@@ -143,7 +50,7 @@ zmq_helpers::version_assert (int want_major, int want_minor)
 }
 
 //  Return current system clock as milliseconds
-int64_t
+std::time_t
 zmq_helpers::clock (void)
 {
     return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

@@ -19,23 +19,23 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include "../../common/action.hpp"
+#include "registry_action.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
 
-class Query_Value_Action: public Action_Base
+class Query_Value_Action: public Registry_Action
 {
     static Dispatcher<Action_Base>::Registrator m_registrator;
 
 public:
     Query_Value_Action() :
-                    Action_Base("query_value", "query_value")
+        Registry_Action("query_value", "query_value")
     {
     }
 
-    virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
+    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
 };
 
 }

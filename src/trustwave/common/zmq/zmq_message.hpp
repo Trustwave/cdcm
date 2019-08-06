@@ -16,11 +16,11 @@
 #ifndef ZMQ_MESSAGE_HPP_
 #define ZMQ_MESSAGE_HPP_
 
-#include <vector>
-#include <string>
-namespace zmq{
-class socket_t;
-}
+#include <stddef.h>  // for size_t
+#include <memory>    // for unique_ptr
+#include <string>    // for string, basic_string
+#include <vector>    // for vector
+namespace zmq { class socket_t; }
 class zmsg
 {
 public:
@@ -59,14 +59,14 @@ public:
     //  Formats 17-byte UUID as 33-char string starting with '@'
     //  Lets us print UUIDs as C strings and use them as addresses
     //
-    static char *
+    static std::unique_ptr<char[]>
     encode_uuid(unsigned char *data);
 
     // --------------------------------------------------------------------------
     // Formats 17-byte UUID as 33-char string starting with '@'
     // Lets us print UUIDs as C strings and use them as addresses
     //
-    static unsigned char *
+    static std::unique_ptr<char[]>
     decode_uuid(char *uuidstr);
     // zmsg_pop
     ustring pop_front();
@@ -75,7 +75,7 @@ public:
     char *address();
     void wrap(const char *address, const char *delim);
     std::string unwrap();
-    std::string to_str();
+    std::string to_str(bool with_header = true,    bool with_body = true,    bool full = true);
     void dump();
 private:
     std::vector<ustring> m_part_data;

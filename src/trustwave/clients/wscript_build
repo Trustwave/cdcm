@@ -2,3 +2,12 @@
 
 bld.RECURSE('registry')
 bld.RECURSE('smb')
+'''
+bld.SAMBA_LIBRARY('tw-credentialslib',  
+    source='',
+    deps='tw-credentials',
+    ldflags='',
+    public_headers='./credentials.hpp',    
+    vnum='0.0.1',
+    pc_files='tw-credentialslib.pc')
+'''

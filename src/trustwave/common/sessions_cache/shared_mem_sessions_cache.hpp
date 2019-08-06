@@ -15,6 +15,8 @@
 
 #ifndef TRUSTWAVE_COMMON_SESSIONS_CACHE_SHARED_MEM_SESSIONS_CACHE_HPP_
 #define TRUSTWAVE_COMMON_SESSIONS_CACHE_SHARED_MEM_SESSIONS_CACHE_HPP_
+#include "shared_mem_converters.hpp"
+#include "shared_mem_session.hpp"
 #include <boost/interprocess/interprocess_fwd.hpp>           // for interpro...
 #include <boost/interprocess/sync/named_sharable_mutex.hpp>  // for named_sh...
 #include <boost/interprocess/sync/scoped_lock.hpp>           // for scoped_lock
@@ -30,8 +32,6 @@
 #include <chrono>
 #include <type_traits>
 
-#include "../../common/sessions_cache/shared_mem_converters.hpp"
-#include "../../common/sessions_cache/shared_mem_session.hpp"
 namespace trustwave {
 //===================================================================
 //                      Forward declarations
@@ -155,21 +155,21 @@ public:
         return this->update <Tag>(s);
     }
     template<typename Tag>
-        bool touch_by(const std::string &kv)
+    bool touch_by(const std::string &kv)
+    {
+        auto& idx = map_->get <Tag>();
+        decltype(idx.find(String{})) s;
         {
-            auto& idx = map_->get <Tag>();
-            decltype(idx.find(String{})) s;
-            {
-                ReadLock auto_lock(lock_);
-                s = idx.find(String(kv.c_str(), char_allocator(segment_->get_segment_manager())));
-            }
-            if (s == idx.end()){
-                printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
-                return false;
-            }
-            this->update <Tag>(s);
-            return true;
+            ReadLock auto_lock(lock_);
+            s = idx.find(String(kv.c_str(), char_allocator(segment_->get_segment_manager())));
         }
+        if (s == idx.end()){
+            printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
+            return false;
+        }
+        this->update <Tag>(s);
+        return true;
+    }
     bool remove_by_id(const std::string &id);
     bool clean();
     void flush_all_entries();

@@ -16,11 +16,12 @@
 #ifndef TRUSTWAVE_MISC__HPP_
 #define TRUSTWAVE_MISC__HPP_
 
+#include "../../common/credentials.hpp"
+
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/string.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 
-#include "../../common/credentials.hpp"
 namespace trustwave {
 
 //Typedefs of allocators and containers

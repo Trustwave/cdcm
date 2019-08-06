@@ -16,17 +16,9 @@
 //===================================================================
 //                          Include files
 //===================================================================
-#include "../../common/sessions_cache/shared_mem_converters.hpp"
-
-#include <boost/interprocess/allocators/allocator.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/containers/string.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/serialization/set.hpp>
-
-#include "../../common/session.hpp"
-#include "../../common/sessions_cache/shared_mem_session.hpp"
+#include "shared_mem_converters.hpp"
+#include "shared_mem_session.hpp"
+#include "../session.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +27,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#include <boost/make_shared.hpp>
 
 trustwave::sp_session_t trustwave::session_converter::convert(const shared_mem_session &sm)
 {

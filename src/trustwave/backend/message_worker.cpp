@@ -15,13 +15,14 @@
 
 //  ---------------------------------------------------------------------
 //  Constructor
-#include "backend/message_worker.hpp"
+#include "message_worker.hpp"
 
 #include <zmq.hpp>
 #include <iostream>
 #include <thread>
 
 #include "../common/client.hpp"
+#include "../../common/session.hpp"
 #include "../common/Logger/include/Logger.h"
 #include "../common/protocol/protocol.hpp"
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
@@ -62,10 +63,9 @@ void message_worker::send_to_broker(const char *command, std::string option, zms
     msg->push_front(MDPW_WORKER);
     msg->push_front("");
     std::string cmd = command;
-if(cmd.compare(MDPW_REPLY) == 0)
-{
-    std::cerr<<"sending reply "<<msg->body()<<std::endl;
-}
+    if (cmd.compare(MDPW_REPLY) == 0){
+        std::cerr << "sending reply " << msg->body() << std::endl;
+    }
     AU_LOG_DEBUG("I: sending %s to broker", mdps_commands[(int ) *command]);
     AU_LOG_DEBUG("I: body: %s", msg->body());
     msg->send(*worker_);
@@ -153,7 +153,8 @@ message_worker::recv(zmsg *&reply_p)
         }
         else if (--liveness_ == 0){
             AU_LOG_DEBUG("W: disconnected from broker - retrying...");
-            zmq_helpers::sleep(reconnect_);//fixme assaf
+            //sleep is allowed because there is absolutely nothing to do till reconnect time
+            zmq_helpers::sleep(reconnect_);
             connect_to_broker();
         }
         //  Send HEARTBEAT if it's time
@@ -166,10 +167,10 @@ message_worker::recv(zmsg *&reply_p)
         AU_LOG_DEBUG("W: interrupt received, killing worker...\n");
     return NULL;
 }
-int message_worker::main_func()
+int message_worker::worker_loop()
 {
 
-    AU_LOG_INFO("worker %s starting",     LoggerSource::instance()->get_source_id());
+    AU_LOG_INFO("worker %s starting", LoggerSource::instance()->get_source_id());
 
     zmq_helpers::version_assert(4, 0);
     zmq_helpers::catch_signals();
@@ -184,31 +185,39 @@ int message_worker::main_func()
             break;              //  Worker was interrupted
         }
         std::string mstr(request->body());
-        const auto t1 = from_string(mstr);
-        AU_LOG_DEBUG("msg: %s", to_string(t1, 2).c_str());
-        auto a1 = t1.as <trustwave::msg>();
-        auto res = std::make_shared <trustwave::result_msg>();
-        trustwave::res_msg res1;
-        res1.hdr = a1.hdr;
-        res1.msgs.push_back(res);
-        AU_LOG_DEBUG("actions count is %zu", a1.msgs.size());
-        for (auto aa : a1.msgs){
-            AU_LOG_DEBUG("Looking for %s", aa->name());
+        const auto req_body = from_string(mstr);
+        AU_LOG_DEBUG("msg: %s", to_string(req_body, 2).c_str());
+        auto request_body = req_body.as <trustwave::msg>();
+        auto result_message = std::make_shared <trustwave::result_msg>();
+        trustwave::res_msg res;
+        res.hdr = request_body.hdr;
+        res.msgs.push_back(result_message);
+        AU_LOG_DEBUG("actions count is %zu", request_body.msgs.size());
+        for (auto action_message : request_body.msgs){
+            AU_LOG_DEBUG("Looking for %s", action_message->name());
 
-            auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(aa->name());
-            if (-1 == act1->act(a1.hdr, aa, res)){
-                AU_LOG_DEBUG("action %s returned with an error", aa->name());
+            auto action = trustwave::authenticated_scan_server::instance().public_dispatcher.find(
+                            action_message->name());
+            if (!action){
+                AU_LOG_ERROR("action %s not found", action_message->name());
             }
-            AU_LOG_DEBUG("Done %s", res1.msgs[0]->res().c_str());
+            result_message->id(action_message->id());
+            if (-1
+                            == action->act(
+                                            trustwave::authenticated_scan_server::instance().get_session(
+                                                            request_body.hdr.session_id), action_message,
+                                            result_message)){
+                AU_LOG_DEBUG("action %s returned with an error", action_message->name());
+            }
+            AU_LOG_DEBUG("Done %s", res.msgs[0]->res().c_str());
         }
-        const tao::json::value v1 = res1;
-        auto sssss = to_string(v1, 2);
-        reply = new zmsg;
-        reply->append(sssss.c_str());        //  Echo is complex... :-)
+        const tao::json::value v1 = res;
+        auto reply_body_str = to_string(v1, 2);
+        reply = new zmsg; //will be deleted in recv
+        reply->append(reply_body_str.c_str());        //  Echo is complex... :-)
     }
     if (zmq_helpers::interrupted){
         AU_LOG_DEBUG("W: interrupt received, shutting down...\n");
     }
     return 0;
 }
-

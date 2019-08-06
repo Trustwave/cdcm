@@ -19,17 +19,18 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
+#include "../common/dispatcher.hpp"
 #include <boost/core/noncopyable.hpp>  // for noncopyable
 #include <string>                      // for string
 #include <memory>
+#include <boost/shared_ptr.hpp>
 
-#include "../common/dispatcher.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
 
-struct header;
+struct session;
 struct action_msg;
 struct result_msg;
 class Action_Base: public boost::noncopyable
@@ -55,7 +56,7 @@ public:
     {
         return short_job_;
     }
-    virtual int act(const header& header, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
+    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
 
 private:
     const std::string name_;

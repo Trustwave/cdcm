@@ -13,14 +13,14 @@
 // Date    : 15 Jul 2019
 // Comments: 
 
-#include "../../common/sessions_cache/shared_mem_sessions_cache.hpp"
-#include <iostream>
+#include "shared_mem_sessions_cache.hpp"
+#include "../session.hpp"
+
 #include <boost/interprocess/managed_shared_memory.hpp>           // for interpro...
 #include <boost/smart_ptr/make_shared.hpp>
-
 #include <boost/multi_index_container.hpp>           // for interpro...
+#include <iostream>
 
-#include "../../common/session.hpp"
 using namespace trustwave;
 boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_create(const std::string &name,
                 const size_t size)

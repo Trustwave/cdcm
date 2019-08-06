@@ -34,7 +34,7 @@ public:
     {
     }
 
-    virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
+    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
 };
 
 }

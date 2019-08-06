@@ -21,7 +21,7 @@
 #include <iomanip>
 #include <string>
 
-#include "../clients/smb/smb_downloader_client.hpp"
+#include "clients/smb/smb_downloader_client.hpp"
 #include "get_file.hpp"
 
 #include "../../common/protocol/msg_types.hpp"
@@ -29,11 +29,10 @@
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 
-int SMB_Action::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int SMB_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
-    res->id(action->id());
-    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::id>(header.session_id);
-    if (sess->id().is_nil()) {
+
+    if (!sess || (sess && sess->id().is_nil())) {
         res->res("Session Not Found ERROR");
         return -1;
     }
@@ -41,7 +40,7 @@ int SMB_Action::act(const header& header, std::shared_ptr<action_msg> action, st
     auto smb_action = std::dynamic_pointer_cast<smb_get_file_msg>(action);
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
-    std::string tmp_name("/tmp/" + header.session_id + "-" + action->id());
+    std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
     trustwave::smb_downloader_client rc;
     if (!rc.download(base.c_str(), "", false, true, tmp_name.c_str())) {
         res->res("Download Failed");

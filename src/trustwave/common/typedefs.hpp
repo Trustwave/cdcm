@@ -1,6 +1,6 @@
 //===========================================================================
 // Trustwave ltd. @{SRCH}
-//								worker_container.cpp
+//								typedefs.hpp
 //
 //---------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
@@ -10,19 +10,19 @@
 // -----------
 // Revision: 01.00
 // By      : Assaf Cohen
-// Date    : 18 Jul 2019
+// Date    : 5 Aug 2019
 // Comments: 
 
-#include "worker_container.hpp"
-using namespace trustwave;
+#ifndef TRUSTWAVE_COMMON_TYPEDEFS_HPP_
+#define TRUSTWAVE_COMMON_TYPEDEFS_HPP_
 
-int main(int argc, char **argv)
+namespace trustwave{
+
+struct process_type
 {
-    worker_container c(2323);
-    auto w=std::make_shared<worker>("XXX",2);
-    w->idle_ = true;
-    c.insert(w);
-    c.is_idle("XXX");
-
-    return 0;
+    struct     broker;
+    struct     worker;
+};
 }
+
+#endif /* TRUSTWAVE_COMMON_TYPEDEFS_HPP_ */

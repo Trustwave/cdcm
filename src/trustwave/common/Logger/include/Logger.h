@@ -119,7 +119,7 @@ public:
 
     virtual void log_event(const logger::severity_levels severity, long collect, const char *file_name,
                     const char *function_name, long line_number, const trustwave::logger::sources source,
-                    const std::string_view source_id,
+               //     const std::string_view source_id,
                     const char *format_msg, ...) = 0;
 };
 //===========================================================================

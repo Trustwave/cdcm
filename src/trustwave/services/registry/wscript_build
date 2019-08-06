@@ -1,6 +1,6 @@
 #!/usr/bin/env python
    
 bld.SAMBA_SUBSYSTEM('registry-actions',
-	includes='../../../common/ ../../../', 
-    source='query_value.cpp enumerate_key.cpp key_exists.cpp value_exists.cpp',
-    deps='tw-session tw-registry-client')
+	includes='.. ../../../common/ ../../../', 
+    source='registry_action.cpp query_value.cpp enumerate_key.cpp key_exists.cpp value_exists.cpp',
+    deps='tw-sessionslib tw-registry-client')

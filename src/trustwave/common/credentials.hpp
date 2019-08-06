@@ -37,6 +37,8 @@ public:
                     const std::string workstation);
 
 private:
+    cli_credentials *create_creds(const char* domain, const char* username, const char* password,
+                    const char* workstation) const;
     struct cli_credentials *creds_;
 };
 }

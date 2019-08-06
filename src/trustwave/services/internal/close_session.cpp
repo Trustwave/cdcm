@@ -16,19 +16,23 @@
 //=====================================================================================================================
 //                                                  Include files
 //=====================================================================================================================
-#include "../internal/close_session.hpp"
+#include "close_session.hpp"
+#include "../../common/session.hpp"
 #include "../../common/protocol/msg_types.hpp"
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 
 using namespace trustwave;
 
-int Close_Session::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     std::cout<<"In Close_Session"<<std::endl;
 
+    if (!sess || (sess && sess->id().is_nil())) {
+         res->res("Session Not Found ERROR");
+         return -1;
+     }
 
-    authenticated_scan_server::instance().sessions->remove_by_id(header.session_id);
-    res->id(action->id());
+    authenticated_scan_server::instance().sessions->remove_by_id(sess->idstr());
     res->res("session closed");
     return 0;
 

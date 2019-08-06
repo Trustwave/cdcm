@@ -15,6 +15,7 @@
 
 #ifndef MESSAGE_WORKER_HPP_
 #define MESSAGE_WORKER_HPP_
+#include <boost/shared_ptr.hpp>
 #include <memory>
 #include <string>
 namespace zmq {
@@ -24,6 +25,9 @@ class socket_t;
 class zmsg;
 //  Structure of our class
 //  We access these properties only via class methods
+namespace trustwave{
+class session;
+class header;
 class message_worker
 {
 public:
@@ -32,7 +36,7 @@ public:
     //  Constructor
     message_worker(zmq::context_t &ctx);
     ~message_worker();
-    static int main_func();
+    static int worker_loop();
     //  ---------------------------------------------------------------------
     //  Connect or reconnect to broker
     void connect_to_broker();
@@ -47,7 +51,6 @@ private:
     //  Send message to broker
     //  If no _msg is provided, creates one internally
     void send_to_broker(const char *command, std::string option, zmsg *_msg);
-
     zmq::context_t& context_;
     std::string broker_;
     std::unique_ptr<zmq::socket_t> worker_;     //  Socket to broker
@@ -62,5 +65,5 @@ private:
     std::string reply_to_;
     size_t replied_;
 };
-
+}
 #endif /* MESSAGE_WORKER_HPP_ */

@@ -119,7 +119,7 @@ public:
                            const char *function_name,
                            long line_number,
                            const trustwave::logger::sources source,
-                           const std::string_view source_id,
+//                           const std::string_view source_id,
                            const char* format_msg,
                            ...) override;
 
@@ -304,7 +304,7 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
                        const char *function_name,
                        long line_number,
                        const trustwave::logger::sources source,
-                       const std::string_view source_id,
+//                       const std::string_view source_id,
                        const char *format_msg,
                        ...) {
 	//
@@ -372,7 +372,7 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
     va_end(printf_args);
     BOOST_LOG_SEV(lg_, severity)
     << " [" << std::setw(7) << std::left<< ::trustwave::logger::severity_levelsArray[severity]<<  "] "
-    << " [" << std::left<< ::trustwave::logger::sourcesArray[source] <<source_id<<"] "
+//    << " [" << std::left<< ::trustwave::logger::sourcesArray[source] <<source_id<<"] "
 	<< "[" << path_to_filename(file_name) << ":" << line_number << " " << function_name <<"()" << "] "
 		<< message
 		<< errno_msg

@@ -13,19 +13,16 @@
 // Date    : 26 Jun 2019
 // Comments: 
 
-//  ---------------------------------------------------------------------
-//  Constructor for broker object
-#include "frontend/message_broker.hpp"
-
-#include <zmq.hpp>
-#include<iostream>
-
+#include "message_broker.hpp"
 #include "../common/client.hpp"
+#include "../common/session.hpp"
 #include "../common/protocol/protocol.hpp"
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../common/zmq/mdp.hpp"
 #include "../common/zmq/zmq_helpers.hpp"
 #include "../common/zmq/zmq_message.hpp"
+#include <zmq.hpp>
+
 
 using namespace trustwave;
 message_broker::message_broker(zmq::context_t& ctx) :
@@ -102,13 +99,6 @@ void message_broker::service_dispatch(std::unique_ptr <zmsg>&& msg, const std::s
         auto wrk = workers_.get_by_last_worked_session(requests_.front().second);
         if (!wrk || (wrk && !wrk->idle_)){
             AU_LOG_DEBUG("Not found last worked on session %s",id.c_str());
-//            auto wrk_it = p.first;
-//            auto next = wrk_it;
-//            for (++next; next != p.second; ++next){
-//                if ((*next)->expiry_ > (*wrk_it)->expiry_)
-//                    wrk_it = next;
-//            }
-//            wrk = *wrk_it;
             wrk = workers_.get_next_worker();
         }
         else
@@ -175,7 +165,6 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg>&&
     else{
         if (command.compare(MDPW_REPLY) == 0){
             if (worker_ready){
-                std::cerr<<"got reply"<<std::endl;
                 //  Remove & save client return envelope and insert the
                 //  protocol header and service name, then rewrap envelope.
                 std::string client = msg->unwrap();
@@ -186,7 +175,6 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg>&&
                 worker_waiting(wrk);
             }
             else{
-                std::cerr<<"got reply Deleting"<<std::endl;
                 worker_delete(wrk, 1);
             }
         }
@@ -268,31 +256,28 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> m
      */
     using namespace tao::json;
     std::string mstr(msg->body());
-    const auto t1 = from_string(mstr);
-//    //     AU_LOG_DEBUG("msg: %s", to_string(t1, 2).c_str());
-//    AU_LOG_DEBUG("msg: %s", to_string(t1, 2).c_str());
-    auto a1 = t1.as <trustwave::msg>();
-    if (a1.hdr.session_id != std::string("N/A")){
+    const auto req_body_as_json = from_string(mstr);
+    auto recieved_msg = req_body_as_json.as <trustwave::msg>();
+    if (recieved_msg.hdr.session_id != std::string("N/A")){
         trustwave::authenticated_scan_server::instance().sessions->touch_by <shared_mem_sessions_cache::id>(
-                        a1.hdr.session_id);
+                        recieved_msg.hdr.session_id);
     }
-    for (auto aa : a1.msgs){
-        AU_LOG_DEBUG("Looking for %s", aa->name().c_str());
-        auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(aa->name());
+    for (auto action_message : recieved_msg.msgs){
+        AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
+        auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
         if (act1->short_job()){
             auto res = std::make_shared <trustwave::result_msg>();
-            trustwave::res_msg res1;
-            res1.hdr = a1.hdr;
-            res1.msgs.push_back(res);
-            if (-1 == act1->act(a1.hdr, aa, res)){
-                AU_LOG_DEBUG("action %s returned with an error", aa->name());
+            trustwave::res_msg result_message;
+            result_message.hdr = recieved_msg.hdr;
+            result_message.msgs.push_back(res);
+            if (-1 == act1->act(trustwave::authenticated_scan_server::instance().get_session(recieved_msg.hdr.session_id), action_message, res)){
+                AU_LOG_DEBUG("action %s returned with an error", action_message->name());
             }
-            const tao::json::value v1 = res1;
-            auto sssss = to_string(v1, 2);
+            const tao::json::value res_as_json = result_message;
+            auto res_body = to_string(res_as_json, 2);
             zmsg* reply = new zmsg;
-            reply->body_set(sssss.c_str());
+            reply->body_set(res_body.c_str());
             std::string client = msg->unwrap();
-            //      reply->wrap(client.c_str(), "");
             reply->wrap(MDPC_CLIENT, client.c_str());
             reply->wrap(sender.c_str(), "");
             AU_LOG_DEBUG("sending to client :\n %s", msg->to_str().c_str());
@@ -302,13 +287,13 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> m
         }
         else{
             trustwave::msg tm;
-            tm.hdr = a1.hdr;
-            tm.msgs.push_back(aa);
+            tm.hdr = recieved_msg.hdr;
+            tm.msgs.push_back(action_message);
             value v(tm);
             auto m = std::make_unique <zmsg>();
             m->body_set(to_string(v, 2).c_str());
             m->wrap(sender.c_str(), "");
-            service_dispatch(std::move(m), a1.hdr.session_id);
+            service_dispatch(std::move(m), recieved_msg.hdr.session_id);
         }
     }
 }

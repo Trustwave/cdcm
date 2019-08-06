@@ -1,6 +1,6 @@
 //===========================================================================
 // Trustwave ltd. @{SRCH}
-//								value_exists.hpp
+//								registry_action.hpp
 //
 //---------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
@@ -10,32 +10,33 @@
 // -----------
 // Revision: 01.00
 // By      : Assaf Cohen
-// Date    : 7 Jul 2019
+// Date    : 5 Aug 2019
 // Comments: 
 
-#ifndef TRUSTWAVE_SERVICES_REGISTRY_VALUE_EXISTS_HPP_
-#define TRUSTWAVE_SERVICES_REGISTRY_VALUE_EXISTS_HPP_
-
+#ifndef TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_
+#define TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_
 //=====================================================================================================================
 //                                                  Include files
 //=====================================================================================================================
-#include "registry_action.hpp"
+#include "../../common/action.hpp"
+#include <boost/shared_ptr.hpp>
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
 namespace trustwave {
-
-class Value_Exists_Action: public Registry_Action
+class registry_client;
+class session;
+class Registry_Action: public Action_Base
 {
-    static Dispatcher<Action_Base>::Registrator m_registrator;
 
 public:
-    Value_Exists_Action() :
-        Registry_Action("value_exists", "value_exists")
+    Registry_Action(const std::string &name, const std::string &command) :
+                    Action_Base(name, command)
     {
     }
 
-    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
+    std::shared_ptr<registry_client> client(boost::shared_ptr<session>,
+                    std::shared_ptr <result_msg> res);
 };
 }
-#endif /* TRUSTWAVE_SERVICES_REGISTRY_VALUE_EXISTS_HPP_ */
+#endif /* TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_ */

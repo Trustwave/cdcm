@@ -17,11 +17,12 @@
 #define MESSAGE_BROKER_HPP_
 
 #include "worker_container.hpp"
-#include <map>
-#include <set>
-#include <deque>
-#include <string>
-#include <memory>
+#include <bits/stdint-intn.h>    // for int64_t
+#include <stddef.h>              // for size_t
+#include <deque>                 // for deque
+#include <memory>                // for unique_ptr
+#include <string>                // for string
+#include <utility>               // for pair
 
 namespace zmq {
 class context_t;
@@ -29,11 +30,12 @@ class socket_t;
 }
 class zmsg;
 //  This defines a single broker
-class message_broker
-{
+namespace trustwave {
+class session;
+class header;
+class message_broker {
     //  This defines one worker, idle or active
-    struct worker
-    {
+    struct worker {
         std::string identity_;   //  Address of worker
         std::string last_worked_session_;   //
         int64_t expiry_;         //  Expires at unless heartbeat
@@ -65,8 +67,8 @@ private:
     void purge_workers();
     //  ---------------------------------------------------------------------
     //  Dispatch requests to waiting workers as possible
-    void service_dispatch(std::unique_ptr<zmsg>&& msg,const std::string& id=std::string());
-   // void service_internal(std::string service_name, std::unique_ptr<zmsg>&& msg);
+    void service_dispatch(std::unique_ptr <zmsg>&& msg, const std::string& id = std::string());
+    // void service_internal(std::string service_name, std::unique_ptr<zmsg>&& msg);
     //  ---------------------------------------------------------------------
     //  Creates worker if necessary
     trustwave::sp_worker_t
@@ -76,25 +78,26 @@ private:
     void worker_delete(trustwave::sp_worker_t wrk, bool send_disconnect);
     //  ---------------------------------------------------------------------
     //  Process message sent to us by a worker
-    void worker_process(std::string sender, std::unique_ptr<zmsg>&& msg);
+    void worker_process(std::string sender, std::unique_ptr <zmsg>&& msg);
     //  ---------------------------------------------------------------------
     //  Send message to worker
     //  If pointer to message is provided, sends that message
-    void worker_send(trustwave::sp_worker_t worker, const char *command, std::string option, std::unique_ptr<zmsg> _msg);
+    void worker_send(trustwave::sp_worker_t worker, const char *command, std::string option,
+                    std::unique_ptr <zmsg> _msg);
     //  ---------------------------------------------------------------------
     //  This worker is now waiting for work
     void worker_waiting(trustwave::sp_worker_t worker_ptr);
     //  ---------------------------------------------------------------------
     //  Process a request coming from a client
-    void client_process(std::string sender, std::unique_ptr<zmsg> msg);
+    void client_process(std::string sender, std::unique_ptr <zmsg> msg);
 
 private:
-    zmq::context_t&                     context_;               //  0MQ context
-    std::unique_ptr<zmq::socket_t>      internal_socket_;       //  Socket for workers
-    std::unique_ptr<zmq::socket_t>      external_socket_;       //  Socket for clients
-    trustwave::worker_container         workers_;
-    std::deque<std::pair<std::unique_ptr<zmsg>,std::string>>   requests_;              //  List of client requests
-    size_t                              replied_;
+    zmq::context_t& context_;               //  0MQ context
+    std::unique_ptr <zmq::socket_t> internal_socket_;       //  Socket for workers
+    std::unique_ptr <zmq::socket_t> external_socket_;       //  Socket for clients
+    trustwave::worker_container workers_;
+    std::deque <std::pair <std::unique_ptr <zmsg>, std::string>> requests_;              //  List of client requests
+    size_t replied_;
 };
-
+}
 #endif /* MESSAGE_BROKER_HPP_ */

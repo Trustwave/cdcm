@@ -13,7 +13,7 @@
 // Date    : 19 Apr 2019
 // Comments:
 
-#include "../common/session.hpp"
+#include "session.hpp"
 
 #include <boost/uuid/nil_generator.hpp>     // for nil_uuid
 #include <boost/uuid/random_generator.hpp>  // for random_generator

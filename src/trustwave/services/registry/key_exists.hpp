@@ -19,23 +19,23 @@
 //=====================================================================================================================
 //                                                  Include files
 //=====================================================================================================================
-#include "../../common/action.hpp"
+#include "registry_action.hpp"
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
 namespace trustwave {
 
-class Key_Exists_Action: public Action_Base
+class Key_Exists_Action: public Registry_Action
 {
     static Dispatcher<Action_Base>::Registrator m_registrator;
 
 public:
     Key_Exists_Action() :
-                    Action_Base("key_exists", "key_exists")
+        Registry_Action("key_exists", "key_exists")
     {
     }
 
-    virtual int act(const header& header, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
+    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
 };
 
 }

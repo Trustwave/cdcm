@@ -18,11 +18,12 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include "../common/action.hpp"
-#include "dispatcher.hpp"
-#include "Logger/include/Logger.h"
-#include "sessions_cache/shared_mem_sessions_cache.hpp"
 #include "settings.hpp"
+#include "../action.hpp"
+#include "../typedefs.hpp"
+#include "../dispatcher.hpp"
+#include "../Logger/include/Logger.h"
+#include "../sessions_cache/shared_mem_sessions_cache.hpp"
 
 //=====================================================================================================================
 //                          						namespaces
@@ -30,12 +31,11 @@
 
 namespace trustwave {
 
-struct authenticated_scan_server
-{
-    std::unique_ptr<ILogger> logger_ptr;
-    Dispatcher<Action_Base> prv_dispatcher;
-    Dispatcher<Action_Base> public_dispatcher;
-    boost::shared_ptr<shared_mem_sessions_cache> sessions;
+struct authenticated_scan_server {
+    std::unique_ptr <ILogger> logger_ptr;
+    Dispatcher <Action_Base> prv_dispatcher;
+    Dispatcher <Action_Base> public_dispatcher;
+    boost::shared_ptr <shared_mem_sessions_cache> sessions;
     cdcm_settings settings;
     authenticated_scan_server(const authenticated_scan_server&) = delete;
     authenticated_scan_server& operator=(const authenticated_scan_server &) = delete;
@@ -51,8 +51,9 @@ struct authenticated_scan_server
     {
         return logger_ptr.get();
     }
-    template <int T>
-    int run_as(size_t instance_id=0);
+    template<typename T>
+    int run_as(size_t instance_id = 0);
+    boost::shared_ptr <session> get_session(const std::string& session_id);
 private:
 #undef uint_t
     authenticated_scan_server();

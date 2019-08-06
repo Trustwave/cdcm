@@ -14,10 +14,10 @@
 // Comments: 
 
 
-#include "common/singleton_runner/settings.hpp"
-
+#include "settings.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+
 namespace pt = boost::property_tree;
 void cdcm_settings::load(const std::string &filename)
 {

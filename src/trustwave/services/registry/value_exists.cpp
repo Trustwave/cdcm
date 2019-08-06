@@ -19,42 +19,30 @@
 #include "../../common/protocol/msg_types.hpp"
 #include "../../common/session.hpp"
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../clients/registry/registry_client.hpp"
-#include "../clients/registry/registry_value.hpp"
+#include "../../clients/registry/registry_client.hpp"
+#include "../../clients/registry/registry_value.hpp"
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
 using namespace trustwave;
 
-int Value_Exists_Action::act(const header& header, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
 
-    res->id(action->id());
-    AU_LOG_DEBUG("About to look for  %s", header.session_id.c_str());
-    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::id>(header.session_id);
-    if (sess->id().is_nil()) {
-        AU_LOG_DEBUG("Session %s Not Found ERROR", header.session_id.c_str());
+    if (!sess || (sess && sess->id().is_nil())){
         res->res("Session Not Found ERROR");
         return -1;
     }
+    auto c = client(sess, res);
 
+    if (!c){
+        return -1;
+    }
     auto veact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
     if (!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error");
         return -1;
-    }
-    auto c = std::dynamic_pointer_cast<trustwave::registry_client>(sess->get_client<trustwave::registry_client>(0));
-
-    if (!c) {
-
-        c = std::make_shared<trustwave::registry_client>();
-        if (!c) {
-            AU_LOG_ERROR("Failed dynamic cast");
-            res->res("Error");
-            return -1;
-        }
-
     }
 
     struct loadparm_context *lp_ctx = ::loadparm_init_global(false);

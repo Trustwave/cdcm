@@ -15,17 +15,23 @@
 
 #ifndef TRUSTWAVE_FRONTEND_WORKER_CONTAINER_HPP_
 #define TRUSTWAVE_FRONTEND_WORKER_CONTAINER_HPP_
-#include <boost/multi_index_container.hpp>           // for interpro...
-#include <boost/multi_index/ordered_index.hpp>           //
-#include <boost/multi_index/ranked_index.hpp>           //
-#include <boost/multi_index/mem_fun.hpp>                      // for multi_index
-#include <boost/multi_index/member.hpp>                      // for multi_index
-#include <boost/multi_index/tag.hpp>
-#include <boost/multi_index/identity.hpp>
-#include <boost/shared_ptr.hpp>
-#include <string>                                            // for string
-#include <chrono>
-#include <tuple>
+#include <bits/stdint-intn.h>                                // for int64_t
+#include <bits/stdint-uintn.h>                               // for uint32_t
+#include <boost/multi_index/detail/bidir_node_iterator.hpp>  // for bidir_node_iterator, operator==
+#include <boost/multi_index/detail/ord_index_impl.hpp>       // for ordered_index
+#include <boost/multi_index/identity.hpp>                    // for identity
+#include <boost/multi_index/identity_fwd.hpp>                // for multi_index
+#include <boost/multi_index/indexed_by.hpp>                  // for indexed_by
+#include <boost/multi_index/member.hpp>                      // for member
+#include <boost/multi_index/ordered_index.hpp>               // for ordered_non_unique, ordered_unique
+#include <boost/multi_index/tag.hpp>                         // for tag
+#include <boost/multi_index_container.hpp>                   // for multi_index_container<>::index<>::type, multi_in...
+#include <boost/operators.hpp>                               // for operator!=
+#include <chrono>                                            // for system_clock, chrono
+#include <functional>                                        // for greater
+#include <memory>                                            // for __shared_ptr_access, shared_ptr
+#include <string>                                            // for string, operator<, operator!=
+#include <tuple>                                             // for make_tuple, get, tuple
 namespace bmi = boost::multi_index;
 namespace chr = std::chrono;
 
@@ -95,7 +101,6 @@ public:
 
     bool erase(std::string& identity)
     {
-
         auto& id_idx = cont_.get <id>();
         auto s = id_idx.find(identity);
         if (s == id_idx.end()){
@@ -116,12 +121,12 @@ public:
 
         return !is_idle(identity);
     }
-    bool set_idle(const std::string& identity)
-    { //fixme assaf find nicer way
+    bool modify_idle(const std::string& identity,bool modify_to)
+    {
         auto& idle_idx = cont_.get <idle_id>();
-        auto it2 = idle_idx.find(std::make_tuple(identity, false));
+        auto it2 = idle_idx.find(std::make_tuple(identity, !modify_to));
         if (it2 != idle_idx.end())
-            return idle_idx.modify(it2, [this](sp_worker_t x){x->idle_=true;});
+            return idle_idx.modify(it2, [this,modify_to](sp_worker_t x){x->idle_=modify_to;});
         else{
             auto& id_idx = cont_.get <id>();
             auto s = id_idx.find(identity);
@@ -131,19 +136,13 @@ public:
         }
         return true;
     }
+    bool set_idle(const std::string& identity)
+    {
+        return modify_idle(identity,true);
+    }
     bool set_busy(const std::string& identity)
     {
-        //fixme assaf find nicer way
-        auto& idle_idx = cont_.get <idle_id>();
-        auto it2 = idle_idx.find(std::make_tuple(identity, true));
-        if (it2 != idle_idx.end())
-            return idle_idx.modify(it2, [this](sp_worker_t x){x->idle_=false;});
-        auto& id_idx = cont_.get <id>();
-        auto s = id_idx.find(identity);
-        if (s == id_idx.end()){
-            return false;
-        }
-        return true;
+        return modify_idle(identity,false);
     }
     bool update_last_worked(const std::string& identity, const std::string& sess_id)
     {
@@ -216,7 +215,8 @@ private:
                                     bmi::ordered_unique <bmi::tag <id>,
                                                     bmi::member <worker, std::string, &worker::identity_> >,
                                     bmi::ordered_non_unique <bmi::tag <expiration>,
-                                                    bmi::member <worker, int64_t, &worker::expiry_>,std::greater<int64_t> >,
+                                                    bmi::member <worker, int64_t, &worker::expiry_>,
+                                                    std::greater <int64_t> >,
                                     bmi::ordered_non_unique <bmi::tag <idle>, bmi::member <worker, bool, &worker::idle_> >,
                                     bmi::ordered_unique <bmi::tag <idle_id>, bmi::identity <worker>, idle_ids_compare>,
                                     bmi::ordered_non_unique <bmi::tag <session>,

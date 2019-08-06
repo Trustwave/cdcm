@@ -15,7 +15,7 @@
 #include "../common/zmq/zmq_helpers.hpp"
 #include "frontend/message_broker.hpp"
 template<>
-int trustwave::authenticated_scan_server::run_as <::trustwave::logger::broker>(size_t)
+int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::broker>(size_t)
 {
 
     zmq::context_t ctx(1);
@@ -55,5 +55,5 @@ int main(int argc, const char **argv)
     zmq_helpers::version_assert(4, 0);
     zmq_helpers::catch_signals();
 
-    return trustwave::authenticated_scan_server::instance().run_as <::trustwave::logger::broker>();
+    return trustwave::authenticated_scan_server::instance().run_as <::trustwave::process_type::broker>();
 }
