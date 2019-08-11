@@ -45,7 +45,7 @@ cli_credentials *credentials::creds() const
 cli_credentials *credentials::create_creds(const char* domain, const char* username, const char* password,
                 const char* workstation) const
 {
-    auto ret = ::cli_credentials_init(NULL);
+    auto ret = ::cli_credentials_init(nullptr);
     cli_credentials_set_domain(ret, domain, CRED_SPECIFIED);
     cli_credentials_set_username(ret, username, CRED_SPECIFIED);
     cli_credentials_set_password(ret, password, CRED_SPECIFIED);

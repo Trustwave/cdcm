@@ -63,7 +63,7 @@ zmq_helpers::sleep (int msecs)
     struct timespec t;
     t.tv_sec = msecs / 1000;
     t.tv_nsec = (msecs % 1000) * 1000000;
-    nanosleep (&t, NULL);
+    nanosleep (&t, nullptr);
 }
 
 void
@@ -102,6 +102,6 @@ void zmq_helpers::catch_signals ()
     action.sa_handler = signal_handler;
     action.sa_flags = 0;
     sigemptyset (&action.sa_mask);
-    sigaction (SIGINT, &action, NULL);
-    sigaction (SIGTERM, &action, NULL);
+    sigaction (SIGINT, &action, nullptr);
+    sigaction (SIGTERM, &action, nullptr);
 }

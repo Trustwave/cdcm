@@ -31,7 +31,7 @@
 #define MDPW_DISCONNECT     "\005"
 
 static char *mdps_commands [] = {
-    NULL, const_cast<char*>("READY"), const_cast<char*>("REQUEST"), const_cast<char*>("REPLY"), const_cast<char*>("HEARTBEAT"), const_cast<char*>("DISCONNECT")
+    nullptr, const_cast<char*>("READY"), const_cast<char*>("REQUEST"), const_cast<char*>("REPLY"), const_cast<char*>("HEARTBEAT"), const_cast<char*>("DISCONNECT")
 };
 
 

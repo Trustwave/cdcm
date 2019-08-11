@@ -138,7 +138,7 @@ void message_broker::worker_delete(trustwave::sp_worker_t wrk, bool send_disconn
 {
     assert(wrk);
     if (send_disconnect){
-        worker_send(wrk, MDPW_DISCONNECT, "", NULL);
+        worker_send(wrk, MDPW_DISCONNECT, "", nullptr);
     }
     workers_.erase(wrk->identity_);
 }
@@ -232,7 +232,7 @@ void message_broker::worker_waiting(trustwave::sp_worker_t worker_ptr)
     workers_.set_idle(worker_ptr->identity_);
     workers_.update_expiration(worker_ptr->identity_);
     // Attempt to process outstanding requests
-    service_dispatch(0);
+    service_dispatch(nullptr);
 }
 
 //  ---------------------------------------------------------------------
@@ -362,7 +362,7 @@ void message_broker::broker_loop()
             purge_workers();
             auto s = workers_.idle_workers();
             for (auto it = s.first; it != s.second; it++){
-                worker_send(*it, const_cast <char*>( MDPW_HEARTBEAT), "", NULL);
+                worker_send(*it, const_cast <char*>( MDPW_HEARTBEAT), "", nullptr);
             }
 
             heartbeat_at += authenticated_scan_server::instance().settings.heartbeat_interval_;

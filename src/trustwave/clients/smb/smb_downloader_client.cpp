@@ -103,7 +103,7 @@ SMBCCTX* smb_downloader_client::create_smbctx()
 
     if (smbc_init_context(ctx) == nullptr) {
         smbc_free_context(ctx, 1);
-        return NULL;
+        return nullptr;
     }
 
     return ctx;

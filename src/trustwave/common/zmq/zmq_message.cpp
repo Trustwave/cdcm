@@ -260,7 +260,7 @@ char *zmsg::address()
         return reinterpret_cast <char*>(const_cast <unsigned char *>(m_part_data[0].c_str()));
     }
     else{
-        return 0;
+        return nullptr;
     }
 }
 
@@ -275,7 +275,7 @@ void zmsg::wrap(const char *address, const char *delim)
 std::string zmsg::unwrap()
 {
     if (m_part_data.size() == 0){
-        return NULL;
+        return nullptr;
     }
     std::string addr = reinterpret_cast <const char*>(pop_front().c_str());
     if (address() && *address() == 0){
