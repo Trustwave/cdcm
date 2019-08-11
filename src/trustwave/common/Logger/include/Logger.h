@@ -179,15 +179,14 @@ public:
     }
 
 private:
-    LoggerSource() :
-                    source_(trustwave::logger::tester), source_id_(0)
+    LoggerSource()  
     {
     }
 
 private:
     static size_t g_id;
-    trustwave::logger::sources source_;
-    size_t source_id_;
+    trustwave::logger::sources source_{trustwave::logger::tester};
+    size_t source_id_{0};
 };
 
 bool Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf);

@@ -22,7 +22,7 @@ class registry_value
 {
 public:
     registry_value() :
-                    type_(0), value_()
+                     value_()
     {
     }
     registry_value(uint32_t type, const char* value,const char* name) :
@@ -54,7 +54,7 @@ public:
         name_ = name;
     }
 //private:
-    uint32_t type_;
+    uint32_t type_{0};
     std::string value_;
     std::string name_;
 };

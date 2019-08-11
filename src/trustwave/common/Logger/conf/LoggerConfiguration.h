@@ -66,9 +66,9 @@ using sinks_conf = std::vector<sink_conf>;
 class LoggerConfiguration {
 public:
     LoggerConfiguration() :
-            version_(0),
-            project_name_(""),
-            default_level_(0) {
+            
+            project_name_("")
+            {
     }
 	//
 	//	read configuration.
@@ -86,9 +86,9 @@ public:
 //	members.
 //	--------
 private:
-    int version_;
+    int version_{0};
     std::string project_name_;
-    unsigned long default_level_;
+    unsigned long default_level_{0};
     sinks_conf sinks_conf_ ;
     modules modules_;
 };

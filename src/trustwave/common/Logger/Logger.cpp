@@ -130,11 +130,11 @@ private:
 private:
 //    static Syslog_Client *logger_;
     boost::log::sources::severity_logger_mt<::trustwave::logger::severity_levels> lg_;
-    unsigned long supported_sources_;
-    unsigned long supported_default_severity_;
+    unsigned long supported_sources_{0};
+    unsigned long supported_default_severity_{0};
     unsigned long source_level_[::trustwave::logger::tester+1];
     std::mutex initialize_mutex_;
-    bool initialiezed_;
+    bool initialiezed_{false};
 };
 //===========================================================================
 // @{FUNH}
@@ -143,10 +143,8 @@ private:
 //---------------------------------------------------------------------------
 // Description: Constructor
 //===========================================================================
-Logger::Logger() :
-        supported_sources_(0),
-        supported_default_severity_(0),
-        initialiezed_(false) {
+Logger::Logger() 
+        {
 }
 //===========================================================================
 // @{FUNH}
