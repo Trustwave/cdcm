@@ -106,7 +106,7 @@ bool zmsg::recv(zmq::socket_t & socket)
 
         }
         else{
-            m_part_data.push_back(ustring((unsigned char*) message.data(), message.size()));
+            m_part_data.emplace_back((unsigned char*) message.data(), message.size());
         }
         if (!message.more()){
             break;
@@ -180,7 +180,7 @@ void zmsg::push_front(const char *part)
 // zmsg_append
 void zmsg::push_back(const char *part)
 {
-    m_part_data.push_back(reinterpret_cast <const unsigned char*>(part));
+    m_part_data.emplace_back(reinterpret_cast <const unsigned char*>(part));
 }
 
 //  --------------------------------------------------------------------------

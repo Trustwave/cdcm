@@ -91,7 +91,7 @@ void message_broker::service_dispatch(std::unique_ptr <zmsg> &&msg, const std::s
      *
      */
     if (msg){                    //  Queue message if any
-        requests_.push_back(std::make_pair(std::move(msg), id));
+        requests_.emplace_back(std::move(msg), id);
     }
     purge_workers();
     auto p = workers_.idle_workers();
