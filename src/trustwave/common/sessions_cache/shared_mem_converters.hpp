@@ -30,7 +30,7 @@ class credentials;
 //                          namespaces
 //===================================================================
 namespace trustwave {
-typedef boost::shared_ptr <session> sp_session_t;
+using sp_session_t = boost::shared_ptr<session>;
 /////////////////////////////////////////////////////////////////////
 //
 // Class        :   UC_Converter

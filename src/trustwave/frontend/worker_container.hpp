@@ -52,7 +52,7 @@ struct worker {
     {
     }
 };
-typedef std::shared_ptr <worker> sp_worker_t;
+using sp_worker_t = std::shared_ptr<worker>;
 class worker_container {
 public:
     //Tags

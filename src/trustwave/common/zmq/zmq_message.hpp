@@ -24,7 +24,7 @@ namespace zmq { class socket_t; }
 class zmsg
 {
 public:
-    typedef std::basic_string<unsigned char> ustring;
+    using ustring = std::basic_string<unsigned char>;
 
     zmsg();
     //  --------------------------------------------------------------------------

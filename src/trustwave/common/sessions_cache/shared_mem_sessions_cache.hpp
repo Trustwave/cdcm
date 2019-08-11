@@ -43,9 +43,9 @@ namespace bip = boost::interprocess;
 namespace bmi = boost::multi_index;
 namespace chr = std::chrono;
 
-typedef boost::shared_ptr <session> sp_session_t;
-typedef bip::managed_shared_memory::allocator <void>::type void_allocator;
-typedef bip::managed_shared_memory::allocator <char>::type char_allocator;
+using sp_session_t = boost::shared_ptr<session>;
+using void_allocator = bip::managed_shared_memory::allocator<void>::type;
+using char_allocator = bip::managed_shared_memory::allocator<char>::type;
 typedef bip::basic_string <char, std::char_traits <char>, char_allocator> String;
 
 std::ostream &operator<<(std::ostream &os, const shared_mem_session_element&);
@@ -100,8 +100,8 @@ public:
 private:
     struct expiration;
     friend std::ostream &::trustwave::operator<<(std::ostream &os, const trustwave::shared_mem_sessions_cache&cache);
-    typedef bip::sharable_lock <bip::named_sharable_mutex> ReadLock;
-    typedef bip::scoped_lock <bip::named_sharable_mutex> WriteLock;
+    using ReadLock = bip::sharable_lock<bip::named_sharable_mutex>;
+    using WriteLock = bip::scoped_lock<bip::named_sharable_mutex>;
 
     typedef bmi::multi_index_container <shared_mem_session_element,
                     bmi::indexed_by <

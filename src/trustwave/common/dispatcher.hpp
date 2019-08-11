@@ -38,7 +38,7 @@ public:
     Dispatcher & operator=(Dispatcher &&) = delete;
 
 public:
-    typedef std::shared_ptr<T> T_Ptr;
+    using T_Ptr = std::shared_ptr<T>;
     typedef std::map<std::string, T_Ptr> Ts_Map;
 
     virtual ~Dispatcher()
