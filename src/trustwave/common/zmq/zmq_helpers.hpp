@@ -17,8 +17,8 @@
 #define ZMQ_HELPERS_HPP_
 
 #include <chrono>  // for time_t
+#include <cstdlib>             // for RAND_MAX
 #include <string>               // for string
-#include <stdlib.h>             // for RAND_MAX
 namespace zmq { class socket_t; }
 
 struct zmq_helpers{

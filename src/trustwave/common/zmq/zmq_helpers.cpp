@@ -15,13 +15,13 @@
 
 #include "zmq_helpers.hpp"
 #include <bits/types/struct_timespec.h>  // for timespec
-#include <signal.h>                      // for sigaction, sigemptyset, SIGINT
-#include <stdarg.h>                      // for va_end, va_list, va_start
-#include <stdio.h>                       // for printf, vprintf
-#include <time.h>                        // for localtime, nanosleep, strftime
-#include <zmq.h>                         // for zmq_version, ZMQ_IDENTITY
+#include <csignal>                      // for sigaction, sigemptyset, SIGINT
+#include <cstdarg>                      // for va_end, va_list, va_start
+#include <cstdio>                       // for printf, vprintf
+#include <ctime>                        // for localtime, nanosleep, strftime
 #include <iomanip>                       // for operator<<, setfill, setw
 #include <iostream>                      // for basic_ostream::operator<<
+#include <zmq.h>                         // for zmq_version, ZMQ_IDENTITY
 #include <zmq.hpp>                       // for socket_t
 
 std::string

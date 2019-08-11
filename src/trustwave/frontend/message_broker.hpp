@@ -18,7 +18,7 @@
 
 #include "worker_container.hpp"
 #include <bits/stdint-intn.h>    // for int64_t
-#include <stddef.h>              // for size_t
+#include <cstddef>              // for size_t
 #include <deque>                 // for deque
 #include <memory>                // for unique_ptr
 #include <string>                // for string

@@ -25,37 +25,33 @@
 //===========================================================================
 #include "../../common/Logger/include/Logger.h"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
-#include <stdio.h>
-#include <mutex>
-#include <thread>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
-#include <boost/log/sinks/text_file_backend.hpp>
-#include <boost/log/sinks/debug_output_backend.hpp>
 #include <boost/log/sinks.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/make_shared_object.hpp>
+#include <boost/log/sinks/debug_output_backend.hpp>
 #include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/sinks/text_ostream_backend.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/log/support/date_time.hpp>
 #include <boost/log/sources/severity_logger.hpp>
-#include <unistd.h>
-#include <sys/types.h>
+#include <boost/log/support/date_time.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/smart_ptr/make_shared_object.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <mutex>
 #include <pwd.h>
+#include <string>
+#include <sys/types.h>
+#include <thread>
+#include <unistd.h>
 
 #include "../../common/Logger/conf/LoggerConfiguration.h"
 //===========================================================================

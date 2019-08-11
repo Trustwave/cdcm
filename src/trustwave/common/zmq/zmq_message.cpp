@@ -13,16 +13,16 @@
 // Date    : 26 Jun 2019
 // Comments: 
 #include "zmq_message.hpp"
-#include <assert.h>            // for assert
-#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
-#include <stdarg.h>            // for va_end, va_list, va_start
-#include <stdio.h>             // for vsnprintf
-#include <string.h>            // for memcpy, size_t, strlen, NULL
-#include <zmq.h>               // for ZMQ_SNDMORE
 #include <algorithm>           // for copy
+#include <cassert>            // for assert
+#include <cstdarg>            // for va_end, va_list, va_start
+#include <cstdio>             // for vsnprintf
+#include <cstring>            // for memcpy, size_t, strlen, NULL
+#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
 #include <functional>          // for function
 #include <iomanip>             // for operator<<, setfill, setw
 #include <iostream>            // for operator<<, basic_ostream, basic_ostre...
+#include <zmq.h>               // for ZMQ_SNDMORE
 #include <zmq.hpp>             // for message_t, error_t, socket_t
 namespace {
 template<class InputIt, class Size, class UnaryFunction>

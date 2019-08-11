@@ -16,7 +16,7 @@
 #ifndef ZMQ_MESSAGE_HPP_
 #define ZMQ_MESSAGE_HPP_
 
-#include <stddef.h>  // for size_t
+#include <cstddef>  // for size_t
 #include <memory>    // for unique_ptr
 #include <string>    // for string, basic_string
 #include <vector>    // for vector

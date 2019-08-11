@@ -15,8 +15,8 @@
 
 #ifndef TRUSTWAVE_COMMON_SINGLETON_RUNNER_SETTINGS_HPP_
 #define TRUSTWAVE_COMMON_SINGLETON_RUNNER_SETTINGS_HPP_
+#include <cstdint>
 #include <string>
-#include <stdint.h>
 
 struct cdcm_settings
 {
