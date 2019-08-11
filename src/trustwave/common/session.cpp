@@ -18,6 +18,7 @@
 #include <boost/uuid/nil_generator.hpp>     // for nil_uuid
 #include <boost/uuid/random_generator.hpp>  // for random_generator
 #include <boost/uuid/uuid_io.hpp>           // for to_string
+#include <utility>
 
 using namespace trustwave;
 
@@ -27,8 +28,8 @@ session::session() :
 
 }
 
-session::session(const std::string& remote, const credentials& creds) :
-                uuid_(boost::uuids::random_generator()()), remote_(remote), creds_(creds)
+session::session(std::string  remote, const credentials& creds) :
+                uuid_(boost::uuids::random_generator()()), remote_(std::move(remote)), creds_(creds)
 {
 
 }

@@ -21,9 +21,10 @@
 //=====================================================================================================================
 #include "../common/dispatcher.hpp"
 #include <boost/core/noncopyable.hpp>  // for noncopyable
-#include <string>                      // for string
-#include <memory>
 #include <boost/shared_ptr.hpp>
+#include <memory>
+#include <string>                      // for string
+#include <utility>
 
 //=====================================================================================================================
 //                          						namespaces
@@ -36,8 +37,8 @@ struct result_msg;
 class Action_Base: public boost::noncopyable
 {
 public:
-    Action_Base(const std::string &name, const std::string &command, bool sj = false) :
-                    name_(name), command_(command), short_job_(sj)
+    Action_Base(std::string name, std::string command, bool sj = false) :
+                    name_(std::move(name)), command_(std::move(command)), short_job_(sj)
     {
     }
 

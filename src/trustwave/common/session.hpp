@@ -29,7 +29,7 @@ class cdcm_client;
 class session {
 public:
     session();
-    session(const std::string& remote, const credentials& creds);
+    session(std::string  remote, const credentials& creds);
     const boost::uuids::uuid& id() const;
     std::string idstr() const;
 

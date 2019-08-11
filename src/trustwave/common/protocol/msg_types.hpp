@@ -15,9 +15,10 @@
 
 #ifndef TRUSTWAVE_COMMON_PROTOCOL_MSG_TYPES_HPP_
 #define TRUSTWAVE_COMMON_PROTOCOL_MSG_TYPES_HPP_
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 namespace trustwave {
 //todo assaf fix encapsulation
 class result_msg
@@ -53,8 +54,8 @@ public:
 class action_msg
 {
 protected:
-    action_msg(const std::string& name) :
-                    name_(name)
+    action_msg(std::string  name) :
+                    name_(std::move(std::move(std::move(std::move(name)))))
     {
     }
 public:

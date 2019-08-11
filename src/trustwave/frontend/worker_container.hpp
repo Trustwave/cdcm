@@ -32,6 +32,7 @@
 #include <memory>                                            // for __shared_ptr_access, shared_ptr
 #include <string>                                            // for string, operator<, operator!=
 #include <tuple>                                             // for make_tuple, get, tuple
+#include <utility>
 namespace bmi = boost::multi_index;
 namespace chr = std::chrono;
 
@@ -47,7 +48,7 @@ struct worker {
     bool idle_;
 
     worker(std::string identity, int64_t expiry = 0) :
-                    identity_(identity), expiry_(expiry), last_worked_session_("N/A"), idle_(true)
+                    identity_(std::move(identity)), expiry_(expiry), last_worked_session_("N/A"), idle_(true)
     {
     }
 };
