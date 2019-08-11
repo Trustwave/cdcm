@@ -43,8 +43,7 @@ public:
     }
 
     virtual ~Action_Base()
-    {
-    }
+    = default;
     const std::string &name() const
     {
         return name_;

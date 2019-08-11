@@ -31,8 +31,7 @@ class Dispatcher
 protected:
 public:
     Dispatcher()
-    {
-    }
+    = default;
     Dispatcher(const Dispatcher&) = delete;
     Dispatcher& operator=(const Dispatcher &) = delete;
     Dispatcher(Dispatcher &&) = delete;
@@ -43,8 +42,7 @@ public:
     typedef std::map<std::string, T_Ptr> Ts_Map;
 
     virtual ~Dispatcher()
-    {
-    }
+    = default;
     void register1(T *t)
     {
         map_[t->command()] = std::shared_ptr<T>(t);

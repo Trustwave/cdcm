@@ -36,8 +36,7 @@ InputIt for_each_n(InputIt first, Size n, UnaryFunction f)
 }
 
 zmsg::zmsg()
-{
-}
+= default;
 
 //  --------------------------------------------------------------------------
 //  Constructor, sets initial body

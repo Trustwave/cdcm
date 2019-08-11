@@ -18,9 +18,9 @@
 namespace trustwave{
 class cdcm_client{
 public:
-    virtual ~cdcm_client(){}
+    virtual ~cdcm_client()= default;
 protected:
-    cdcm_client(){}
+    cdcm_client()= default;
 };
 
 }

@@ -45,11 +45,9 @@ class smb_downloader_client:public cdcm_client
 {
 public:
     smb_downloader_client()
-    {
-    }
+    = default;
     ~smb_downloader_client() override
-    {
-    }
+    = default;
     bool download( const char *base, const char *name, bool resume, bool toplevel,
                     const char *outfile);
 private:

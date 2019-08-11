@@ -112,8 +112,7 @@ class ILogger
 {
 public:
     virtual ~ILogger()
-    {
-    }
+    = default;
 
     virtual bool init(const std::string &conf_path) = 0;
 
@@ -135,15 +134,13 @@ class Logger final
 {
 public:
     ~Logger()
-    {
-    }
+    = default;
 
     static ILogger* instance();
 
 private:
     Logger()
-    {
-    }
+    = default;
 };
 //===========================================================================
 // @{CSEH}
@@ -156,8 +153,7 @@ class LoggerSource
 {
 public:
     ~LoggerSource()
-    {
-    }
+    = default;
 
     static LoggerSource* instance();
 
@@ -180,8 +176,7 @@ public:
 
 private:
     LoggerSource()  
-    {
-    }
+    = default;
 
 private:
     static size_t g_id;
