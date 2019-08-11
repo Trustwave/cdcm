@@ -276,7 +276,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
             result_message.msgs.push_back(res);
             if (-1 == act1->act(trustwave::authenticated_scan_server::instance().get_session(
                                                             recieved_msg.hdr.session_id), action_message, res)){
-                AU_LOG_DEBUG("action %s returned with an error", action_message->name());
+                AU_LOG_DEBUG("action %s returned with an error", action_message->name().c_str());
             }
             const tao::json::value res_as_json = result_message;
             auto res_body = to_string(res_as_json, 2);
@@ -321,7 +321,7 @@ void message_broker::handle_message(zmq::socket_t &socket, std::string expected_
             process_func(sender, std::move(msg));
         }
         else{
-            AU_LOG_ERROR("invalid message: expected %s", expected_origin);
+            AU_LOG_ERROR("invalid message: expected %s", expected_origin.c_str());
         }
     }
 
