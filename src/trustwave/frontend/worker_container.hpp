@@ -217,7 +217,7 @@ private:
                                                     bmi::member <worker, std::string, &worker::identity_> >,
                                     bmi::ordered_non_unique <bmi::tag <expiration>,
                                                     bmi::member <worker, int64_t, &worker::expiry_>,
-                                                    std::greater <int64_t> >,
+                                                    std::greater <> >,
                                     bmi::ordered_non_unique <bmi::tag <idle>, bmi::member <worker, bool, &worker::idle_> >,
                                     bmi::ordered_unique <bmi::tag <idle_id>, bmi::identity <worker>, idle_ids_compare>,
                                     bmi::ordered_non_unique <bmi::tag <session>,
