@@ -89,7 +89,8 @@ private:
     void worker_waiting(trustwave::sp_worker_t worker_ptr);
     //  ---------------------------------------------------------------------
     //  Process a request coming from a client
-    void client_process(std::string sender, std::unique_ptr <zmsg> msg);
+    void client_process(std::string sender, std::unique_ptr <zmsg>&& msg);
+    void handle_message(zmq::socket_t &,std::string,std::function<void(std::string,std::unique_ptr <zmsg> && )>);
 
 private:
     zmq::context_t& context_;               //  0MQ context

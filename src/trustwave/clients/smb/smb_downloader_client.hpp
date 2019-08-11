@@ -47,7 +47,7 @@ public:
     smb_downloader_client()
     {
     }
-    ~smb_downloader_client()
+    ~smb_downloader_client() override
     {
     }
     bool download( const char *base, const char *name, bool resume, bool toplevel,

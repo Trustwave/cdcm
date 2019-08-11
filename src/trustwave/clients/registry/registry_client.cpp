@@ -40,9 +40,10 @@ registry_client::~registry_client()
     TALLOC_FREE(ctx_);
 
 }
-bool registry_client::connect(const session& sess, loadparm_context* lp_ctx)
+bool registry_client::connect(const session& sess)
 {
-    ctx_->registry = reg_common_open_remote(sess.remote().c_str(), ev_ctx_, lp_ctx, sess.creds());
+
+    ctx_->registry = reg_common_open_remote(sess.remote().c_str(), ev_ctx_, ::loadparm_init_global(false), sess.creds());
     if (ctx_->registry != nullptr) {
         WERROR err;
         err = reg_get_predefined_key(ctx_->registry, reg_predefined_keys[2].handle, &ctx_->current);

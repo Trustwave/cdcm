@@ -18,7 +18,7 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include "settings.hpp"
+#include "../../common/singleton_runner/settings.hpp"
 #include "../action.hpp"
 #include "../typedefs.hpp"
 #include "../dispatcher.hpp"
@@ -61,6 +61,6 @@ private:
 };
 
 }
-#include "log_macros.hpp"
+#include "../../common/singleton_runner/log_macros.hpp"
 
 #endif /* TRUSTWAVE_COMMON_SINGLETON_RUNNER_AUTHENTICATED_SCAN_SERVER_HPP_ */

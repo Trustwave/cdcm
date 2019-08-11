@@ -103,17 +103,17 @@ class Logger : public ::trustwave::ILogger {
 public:
     Logger();
 
-    ~Logger();
+    ~Logger() override;
 
 	//
 	//	Logger API.
 	//	-----------
-	virtual bool init(const std::string &conf_path) override;
+	bool init(const std::string &conf_path) override;
 
 	//
 	//	Logger API.
 	//	-----------
-	virtual void log_event(const ::trustwave::logger::severity_levels severity,
+	void log_event(const ::trustwave::logger::severity_levels severity,
                            long collect,
                            const char *file_name,
                            const char *function_name,

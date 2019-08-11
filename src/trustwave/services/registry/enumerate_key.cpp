@@ -76,8 +76,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
         res->res("Bad message");
         return -1;
     }
-       struct loadparm_context *lp_ctx = ::loadparm_init_global(false);
-    if (!c->connect(*sess, lp_ctx)){
+    if (!c->connect(*sess)){
         AU_LOG_DEBUG("Failed connecting to ", sess->remote().c_str());
         res->res("Failed to connect");
         return -1;

@@ -3,4 +3,4 @@
 bld.SAMBA_SUBSYSTEM('smb-actions',
 	includes='../../../common/ ../../../', 
     source='get_file.cpp',
-    deps='tw-sessionslib tw-smb-client')
+    deps='tw-session tw-smb-client')

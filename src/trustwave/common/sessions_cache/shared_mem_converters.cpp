@@ -46,8 +46,10 @@ trustwave::sp_session_t trustwave::session_converter::convert(const shared_mem_s
 trustwave::shared_mem_session trustwave::session_converter::convert(const sp_session_t &session, const void_allocator &va)
 {
     shared_mem_session rv(va);
-    rv.uuid_ = String(session->idstr().c_str(), session->idstr().length(), va);
-    rv.remote_ = String(session->remote().c_str(), session->remote().length(), va);
+    auto idstr = session->idstr();
+    rv.uuid_ = String(idstr.c_str(), idstr.length(), va);
+    auto remote = session->remote();
+    rv.remote_ = String(remote.c_str(), remote.length(), va);
     struct cli_credentials* c = session->creds();
 
     std::string val(cli_credentials_get_domain(c));

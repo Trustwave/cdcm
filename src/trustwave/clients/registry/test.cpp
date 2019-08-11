@@ -110,7 +110,7 @@ static void fc(int i)
         creds1 = std::make_unique<trustwave::credentials>("WORKGROUP", "%{username}", "%{password}", "SSS");
         s = std::make_unique<trustwave::session>("%{host}", *creds1);
     }
-    if (!rc.connect(*s, lp_ctx)) {
+    if (!rc.connect(*s)) {
         std::cerr << "Failed to connect!!!" << std::endl;
         talloc_free(trustwave::mem_ctx);
         return;

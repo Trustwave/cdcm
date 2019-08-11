@@ -22,7 +22,7 @@
 #include <thread>
 
 #include "../common/client.hpp"
-#include "../../common/session.hpp"
+#include "../common/session.hpp"
 #include "../common/Logger/include/Logger.h"
 #include "../common/protocol/protocol.hpp"
 #include "../common/singleton_runner/authenticated_scan_server.hpp"

@@ -159,7 +159,7 @@ static void fc(int c)
         reply = nullptr;
 
         std::vector<std::thread> tp;
-        for (unsigned int i = 0; i < 1; ++i)        //context+broker
+        for (unsigned int i = 0; i < 2; ++i)        //context+broker
                         {
             tp.push_back(std::move(std::thread(enumf, msgs1[i % msgs1.size()](new_session_id))));
 

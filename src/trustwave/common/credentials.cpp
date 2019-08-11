@@ -31,7 +31,8 @@ credentials::credentials(const std::string& domain, const std::string& username,
 credentials::~credentials()
 {
     if (creds_){
-        talloc_free(creds_);
+        // talloc_free(creds_);
+                // fixme assaf how to delete allocated memory
 
     }
 }
@@ -56,7 +57,8 @@ void credentials::creds(const std::string& domain, const std::string& username, 
                 const std::string workstation)
 {
     if (creds_){
-        talloc_free(creds_);
+       // talloc_free(creds_);
+        // fixme assaf how to delete allocated memory
     }
     creds_ = create_creds(domain.c_str(), username.c_str(), password.c_str(), workstation.c_str());
 }

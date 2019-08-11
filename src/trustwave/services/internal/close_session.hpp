@@ -33,7 +33,7 @@ public:
                     Action_Base("close_session", "close_session",true)
     {
     }
-    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>);
+    int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
 };
 
 }

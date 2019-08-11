@@ -22,10 +22,10 @@
 #include "../common/zmq/zmq_helpers.hpp"
 #include "../common/zmq/zmq_message.hpp"
 #include <zmq.hpp>
-
+#include <functional>
 
 using namespace trustwave;
-message_broker::message_broker(zmq::context_t& ctx) :
+message_broker::message_broker(zmq::context_t &ctx) :
                 context_(ctx), internal_socket_(new zmq::socket_t(context_, ZMQ_ROUTER)), external_socket_(
                                 new zmq::socket_t(context_, ZMQ_ROUTER)), workers_(
                                 authenticated_scan_server::instance().settings.heartbeat_expiry_), replied_(0)
@@ -79,7 +79,7 @@ void message_broker::purge_workers()
 //  ---------------------------------------------------------------------
 //  Dispatch requests to waiting workers as possible
 
-void message_broker::service_dispatch(std::unique_ptr <zmsg>&& msg, const std::string& id)
+void message_broker::service_dispatch(std::unique_ptr <zmsg> &&msg, const std::string &id)
 {
 
     /*
@@ -98,18 +98,17 @@ void message_broker::service_dispatch(std::unique_ptr <zmsg>&& msg, const std::s
     while (p.first != p.second && !requests_.empty()){
         auto wrk = workers_.get_by_last_worked_session(requests_.front().second);
         if (!wrk || (wrk && !wrk->idle_)){
-            AU_LOG_DEBUG("Not found last worked on session %s",id.c_str());
+            AU_LOG_DEBUG("Not found last worked on session %s", id.c_str());
             wrk = workers_.get_next_worker();
         }
-        else
-        {
-            AU_LOG_DEBUG("Found last session %s",wrk->identity_.c_str());
+        else{
+            AU_LOG_DEBUG("Found last session %s", wrk->identity_.c_str());
         }
         auto front_msg = std::move(requests_.front());
         requests_.pop_front();
         worker_send(wrk, MDPW_REQUEST, std::string(""), std::move(front_msg.first));
         workers_.set_busy(wrk->identity_);
-        workers_.update_last_worked(wrk->identity_,id);
+        workers_.update_last_worked(wrk->identity_, id);
     }
 }
 
@@ -147,11 +146,11 @@ void message_broker::worker_delete(trustwave::sp_worker_t wrk, bool send_disconn
 //  ---------------------------------------------------------------------
 //  Process message sent to us by a worker
 
-void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg>&& msg)
+void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &&msg)
 {
     assert(msg && msg->parts() >= 1);     //  At least, command
 
-    std::string command = reinterpret_cast <const char *>(msg->pop_front().c_str());
+    std::string command = reinterpret_cast <const char*>(msg->pop_front().c_str());
     bool worker_ready = workers_.exists(sender);
     auto wrk = worker_require(sender);
     if (command.compare(MDPW_READY) == 0){
@@ -239,7 +238,7 @@ void message_broker::worker_waiting(trustwave::sp_worker_t worker_ptr)
 //  ---------------------------------------------------------------------
 //  Process a request coming from a client
 
-void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> msg)
+void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &&msg)
 {
     assert(msg && msg->parts() >= 2);     //  Service name + body
 
@@ -256,8 +255,8 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> m
      */
     using namespace tao::json;
     std::string mstr(msg->body());
-    const auto req_body_as_json = from_string(mstr);
-    auto recieved_msg = req_body_as_json.as <trustwave::msg>();
+    const auto req_body_as_jsom = from_string(mstr);
+    auto recieved_msg = req_body_as_jsom.as <trustwave::msg>();
     if (recieved_msg.hdr.session_id != std::string("N/A")){
         trustwave::authenticated_scan_server::instance().sessions->touch_by <shared_mem_sessions_cache::id>(
                         recieved_msg.hdr.session_id);
@@ -265,22 +264,28 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> m
     for (auto action_message : recieved_msg.msgs){
         AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
+        if(!act1)
+        {
+            AU_LOG_ERROR("%s not found! ignoring all message", action_message->name().c_str());
+            break;
+        }
         if (act1->short_job()){
-            auto res = std::make_shared <trustwave::result_msg>();
             trustwave::res_msg result_message;
             result_message.hdr = recieved_msg.hdr;
+            auto res = std::make_shared <trustwave::result_msg>();
             result_message.msgs.push_back(res);
-            if (-1 == act1->act(trustwave::authenticated_scan_server::instance().get_session(recieved_msg.hdr.session_id), action_message, res)){
+            if (-1 == act1->act(trustwave::authenticated_scan_server::instance().get_session(
+                                                            recieved_msg.hdr.session_id), action_message, res)){
                 AU_LOG_DEBUG("action %s returned with an error", action_message->name());
             }
             const tao::json::value res_as_json = result_message;
             auto res_body = to_string(res_as_json, 2);
-            zmsg* reply = new zmsg;
+            zmsg *reply = new zmsg;
             reply->body_set(res_body.c_str());
             std::string client = msg->unwrap();
             reply->wrap(MDPC_CLIENT, client.c_str());
             reply->wrap(sender.c_str(), "");
-            AU_LOG_DEBUG("sending to client :\n %s", msg->to_str().c_str());
+            AU_LOG_DEBUG("sending to client :\n %s", msg->to_str(false,false,false).c_str());
             reply->send(*external_socket_);
             replied_++;
 
@@ -298,6 +303,30 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> m
     }
 }
 
+void message_broker::handle_message(zmq::socket_t &socket, std::string expected_origin,
+                std::function <void(std::string, std::unique_ptr <zmsg>&&)> process_func)
+{
+
+    std::unique_ptr <zmsg> msg = std::make_unique <zmsg>(socket);
+    if (msg->parts() == 0){
+        AU_LOG_ERROR("empty message");
+    }
+    else{
+
+        std::string sender = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
+        msg->pop_front(); //empty message
+        AU_LOG_DEBUG("received message from [ %s ]: %s", sender.c_str(), msg->to_str(false, true, false).c_str());
+        std::string header = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
+        if (header.compare(expected_origin) == 0){
+            process_func(sender, std::move(msg));
+        }
+        else{
+            AU_LOG_ERROR("invalid message: expected %s", expected_origin);
+        }
+    }
+
+}
+
 //  Get and process messages forever or until interrupted
 void message_broker::broker_loop()
 {
@@ -312,48 +341,18 @@ void message_broker::broker_loop()
         zmq::poll(items, 2, static_cast <long>(timeout));
         //  Process next input message, if any
         if (items[0].revents & ZMQ_POLLIN){
-            std::unique_ptr <zmsg> msg = std::make_unique <zmsg>(*internal_socket_);
-            if (msg->parts() == 0){
-                AU_LOG_ERROR("empty message");
-            }
-            else{
-                AU_LOG_DEBUG("received message: %s",msg->to_str().c_str());
 
+            handle_message(*internal_socket_, std::string(MDPW_WORKER),
+                            std::bind(&message_broker::worker_process, this, std::placeholders::_1,
+                                            std::placeholders::_2));
 
-                std::string sender = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
-                msg->pop_front(); //empty message
-                std::string header = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
-
-                msg->dump();
-                if (header.compare(MDPW_WORKER) == 0){
-                    worker_process(sender, std::move(msg));
-                }
-                else{
-                    AU_LOG_ERROR("invalid message: expected MDPW_WORKER");
-                }
-            }
         }
         if (items[1].revents & ZMQ_POLLIN){
-            std::unique_ptr <zmsg> msg = std::make_unique <zmsg>(*external_socket_);
-            if (msg->parts() == 0){
-                AU_LOG_ERROR("empty message:");
-            }
-            else{
-                AU_LOG_DEBUG("received message: %s",msg->body());
 
+            handle_message(*external_socket_, std::string(MDPC_CLIENT),
+                            std::bind(&message_broker::client_process, this, std::placeholders::_1,
+                                            std::placeholders::_2));
 
-                std::string sender = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
-                msg->pop_front(); //empty message
-                std::string header = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
-
-                if (header.compare(MDPC_CLIENT) == 0){ //fixme assaf should be generic
-                    client_process(sender, std::move(msg));
-                }
-
-                else{
-                    AU_LOG_ERROR("invalid message: expected MDPC_CLIENT got %s", header.c_str());
-                }
-            }
         }
 
         //  Disconnect and delete any expired workers

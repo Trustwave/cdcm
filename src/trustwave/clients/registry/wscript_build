@@ -1,11 +1,17 @@
 #!/usr/bin/env python
+'''
 bld.SAMBA_SUBSYSTEM('tw-registry-client',  
     source='registry_client.cpp',
     deps='  registry_common registry samba-util ')
-
+'''
+bld.SAMBA_LIBRARY('tw-registry-client',
+	source='registry_client.cpp',
+	deps='  registry_common registry samba-util tw-credentials tw-session',
+	private_library=True
+	)
 bld.SAMBA_BINARY('tw-registry-client-test',  
 source='test.cpp',
-deps='tw-registry-client tw-credentialslib tw-sessionslib util_reg smbclient smbclient-raw samba-util')
+deps='tw-registry-client tw-session tw-credentials util_reg smbclient smbclient-raw samba-util')
 '''
 bld.SAMBA_BINARY('tw-registry-client-test2',  
 source='test2.cpp',
