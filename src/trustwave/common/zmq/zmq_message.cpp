@@ -289,22 +289,20 @@ void zmsg::dump()
 {
 
     std::cerr << "--------------------------------------" << std::endl;
-    for (unsigned int part_nbr = 0; part_nbr < m_part_data.size(); part_nbr++){
-        ustring data = m_part_data[part_nbr];
-
+    for (auto data : m_part_data){
         // Dump the message as text or binary
         int is_text = 1;
-        for (unsigned int char_nbr = 0; char_nbr < data.size(); char_nbr++)
-            if (data[char_nbr] < 32 || data[char_nbr] > 127)
+        for (unsigned char char_nbr : data)
+            if (char_nbr < 32 || char_nbr > 127)
                 is_text = 0;
 
         std::cerr << "[" << std::setw(3) << std::setfill('0') << data.size() << "] ";
-        for (unsigned int char_nbr = 0; char_nbr < data.size(); char_nbr++){
+        for (unsigned char char_nbr : data){
             if (is_text){
-                std::cerr << (char) data[char_nbr];
+                std::cerr << (char) char_nbr;
             }
             else{
-                std::cerr << std::hex << std::setw(2) << std::setfill(' ') << (unsigned short int) data[char_nbr];
+                std::cerr << std::hex << std::setw(2) << std::setfill(' ') << (unsigned short int) char_nbr;
             }
         }
         std::cerr << std::endl;
@@ -318,8 +316,8 @@ std::string zmsg::to_str(bool with_header, bool with_body, bool full)
     }
     auto check_is_text = [](const ustring& data)->bool
     {
-        for (unsigned int char_nbr = 0; char_nbr < data.size(); char_nbr++)
-        if (data[char_nbr] < 32 || data[char_nbr] > 127){
+        for (unsigned char char_nbr : data)
+        if (char_nbr < 32 || char_nbr > 127){
             return false;
         }
         return true;

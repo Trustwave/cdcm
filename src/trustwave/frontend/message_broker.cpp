@@ -70,9 +70,9 @@ void message_broker::purge_workers()
             toCull.push_back(*wrk);
     }
 
-    for (auto wrk = toCull.begin(); wrk != toCull.end(); ++wrk){
-        AU_LOG_DEBUG("deleting expired worker: %s", (*wrk)->identity_.c_str());
-        worker_delete(*wrk, 0);
+    for (auto & wrk : toCull){
+        AU_LOG_DEBUG("deleting expired worker: %s", wrk->identity_.c_str());
+        worker_delete(wrk, 0);
     }
 }
 
