@@ -34,7 +34,7 @@ version_assert (int want_major, int want_minor);
 //  Return current system clock as milliseconds
 
 static std::time_t
-clock (void);
+clock ();
 
 //  Sleep for a number of milliseconds
 static void

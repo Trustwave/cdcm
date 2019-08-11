@@ -51,7 +51,7 @@ zmq_helpers::version_assert (int want_major, int want_minor)
 
 //  Return current system clock as milliseconds
 std::time_t
-zmq_helpers::clock (void)
+zmq_helpers::clock ()
 {
     return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 }
