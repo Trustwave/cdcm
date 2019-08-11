@@ -51,7 +51,7 @@ public:
     }
     T_Ptr find(const std::string &t_name) const
     {
-        typename Ts_Map::const_iterator it = map_.find(t_name);
+        auto it = map_.find(t_name);
 
         if (it == map_.end()) {
             return std::shared_ptr<T>();
