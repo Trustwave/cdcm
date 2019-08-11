@@ -90,10 +90,10 @@ zmq_helpers::console (const char *format, ...)
 //  your main loop if s_interrupted is ever 1. Works especially well with
 //  zmq_poll.
 
-bool zmq_helpers::interrupted = 0;
+bool zmq_helpers::interrupted = false;
 void zmq_helpers::signal_handler (int signal_value)
 {
-    interrupted = 1;
+    interrupted = true;
 }
 
 void zmq_helpers::catch_signals ()

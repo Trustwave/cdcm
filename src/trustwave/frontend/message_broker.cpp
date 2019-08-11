@@ -72,7 +72,7 @@ void message_broker::purge_workers()
 
     for (auto & wrk : toCull){
         AU_LOG_DEBUG("deleting expired worker: %s", wrk->identity_.c_str());
-        worker_delete(wrk, 0);
+        worker_delete(wrk, false);
     }
 }
 
@@ -155,7 +155,7 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
     auto wrk = worker_require(sender);
     if (command.compare(MDPW_READY) == 0){
         if (worker_ready){              //  Not first command in session
-            worker_delete(wrk, 1);
+            worker_delete(wrk, true);
         }
         else{
             worker_waiting(wrk);
@@ -174,7 +174,7 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
                 worker_waiting(wrk);
             }
             else{
-                worker_delete(wrk, 1);
+                worker_delete(wrk, true);
             }
         }
         else{
@@ -183,12 +183,12 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
                     workers_.update_expiration(sender);
                 }
                 else{
-                    worker_delete(wrk, 1);
+                    worker_delete(wrk, true);
                 }
             }
             else{
                 if (command.compare(MDPW_DISCONNECT) == 0){
-                    worker_delete(wrk, 0);
+                    worker_delete(wrk, false);
                 }
                 else{
                     AU_LOG_ERROR("invalid input message (%d)", (int ) *command.c_str());

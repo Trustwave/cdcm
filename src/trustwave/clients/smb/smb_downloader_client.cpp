@@ -113,7 +113,7 @@ bool smb_downloader_client::connect(const char *path)
     ctx_ = create_smbctx();
     if (smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
-        return 1;
+        return true;
     }
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
 

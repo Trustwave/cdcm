@@ -91,7 +91,7 @@ void zmsg::set_part(size_t part_nbr, unsigned char *data)
 bool zmsg::recv(zmq::socket_t & socket)
 {
     clear();
-    while (1){
+    while (true){
         zmq::message_t message(0);
         try{
             if (!socket.recv(&message, 0)){
