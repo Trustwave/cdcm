@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.9.0)
+project(cdcm)
+
+include_directories(../..)
+
+set(SOURCE_FILES 
+	start_session.cpp 
+	close_session.cpp 
+	file_version.cpp 
+	get_remote_file_version.cpp
+)
+
+add_library(tw-internal-actions OBJECT ${SOURCE_FILES})
+target_compile_definitions(tw-internal-actions PUBLIC OBJ)
+target_link_libraries(tw-internal-actions ${CMAKE_SOURCE_DIR}/lib/libpe_pev.a crypto )
