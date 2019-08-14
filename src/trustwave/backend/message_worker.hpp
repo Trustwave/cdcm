@@ -17,6 +17,7 @@
 #define MESSAGE_WORKER_HPP_
 #include <boost/shared_ptr.hpp>
 #include <memory>
+#include <chrono>
 #include <string>
 namespace zmq {
 class context_t;
@@ -55,10 +56,10 @@ private:
     std::string broker_;
     std::unique_ptr<zmq::socket_t> worker_;     //  Socket to broker
     //  Heartbeat management
-    int64_t heartbeat_at_;      //  When to send HEARTBEAT
+    std::chrono::time_point<std::chrono::system_clock> heartbeat_at_;      //  When to send HEARTBEAT
     size_t liveness_;            //  How many attempts left
-    int heartbeat_;              //  Heartbeat delay, msecs
-    int reconnect_;              //  Reconnect delay, msecs
+    std::chrono::milliseconds heartbeat_;              //  Heartbeat delay, msecs
+    std::chrono::milliseconds reconnect_;              //  Reconnect delay, msecs
     //  Internal state
     bool expect_reply_;           //  Zero only at start
     //  Return address, if any

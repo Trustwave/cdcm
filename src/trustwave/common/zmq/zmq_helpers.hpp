@@ -33,12 +33,12 @@ static void
 version_assert (int want_major, int want_minor);
 //  Return current system clock as milliseconds
 
-static std::time_t
+static std::chrono::time_point<std::chrono::system_clock>
 clock ();
 
 //  Sleep for a number of milliseconds
 static void
-sleep (int msecs);
+sleep (std::chrono::milliseconds);
 
 static void
 console (const char *format, ...);

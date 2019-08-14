@@ -15,7 +15,6 @@
 
 #ifndef TRUSTWAVE_FRONTEND_WORKER_CONTAINER_HPP_
 #define TRUSTWAVE_FRONTEND_WORKER_CONTAINER_HPP_
-#include <bits/stdint-intn.h>                                // for int64_t
 #include <bits/stdint-uintn.h>                               // for uint32_t
 #include <boost/multi_index/detail/bidir_node_iterator.hpp>  // for bidir_node_iterator, operator==
 #include <boost/multi_index/detail/ord_index_impl.hpp>       // for ordered_index
@@ -33,6 +32,7 @@
 #include <string>                                            // for string, operator<, operator!=
 #include <tuple>                                             // for make_tuple, get, tuple
 #include <utility>
+#include<iostream>
 namespace bmi = boost::multi_index;
 namespace chr = std::chrono;
 
@@ -43,12 +43,12 @@ namespace trustwave {
 //  This defines one worker, idle or active
 struct worker {
     std::string identity_;   //  Address of worker
-    int64_t expiry_;         //  Expires at unless heartbeat
+    std::chrono::time_point<chr::system_clock> expiry_;         //  Expires at unless heartbeat
     std::string last_worked_session_;   //
     bool idle_;
 
-    worker(std::string identity, int64_t expiry = 0) :
-                    identity_(std::move(identity)), expiry_(expiry), last_worked_session_("N/A"), idle_(true)
+    worker(std::string identity) :
+                    identity_(std::move(identity)), expiry_(), last_worked_session_("N/A"), idle_(true)
     {
     }
 };
@@ -96,7 +96,7 @@ public:
     }
     void insert(sp_worker_t w)
     {
-        w->expiry_ = chr::system_clock::to_time_t(chr::system_clock::now()) + heartbeat_expiry_;
+        w->expiry_ = chr::system_clock::now() + heartbeat_expiry_;
         cont_.insert(w);
     }
 
@@ -161,8 +161,21 @@ public:
     {
         auto it2 = cont_.project <expiration>(cont_.get <id>().find(identity));
         return cont_.get <expiration>().modify(it2,
-                        [this](sp_worker_t x){x->expiry_ =chr::system_clock::to_time_t(chr::system_clock::now())+heartbeat_expiry_;});
+                        [this](sp_worker_t x){x->expiry_ =chr::system_clock::now()+heartbeat_expiry_;});
 
+    }
+    void dump()
+    {
+        auto& id_idx = cont_.get <expiration>();
+        for(auto w:id_idx)
+        {
+
+            std::cerr << w->identity_ << std::endl;
+            std::cerr << w->last_worked_session_ << std::endl;
+            std::cerr << w->idle_ << std::endl;
+            std::cerr << std::chrono::duration_cast<std::chrono::milliseconds>(w->expiry_-chr::system_clock::now()).count() << std::endl<< std::endl;
+
+        }
     }
 private:
     struct idle_ids_compare {
@@ -216,7 +229,7 @@ private:
                                     bmi::ordered_unique <bmi::tag <id>,
                                                     bmi::member <worker, std::string, &worker::identity_> >,
                                     bmi::ordered_non_unique <bmi::tag <expiration>,
-                                                    bmi::member <worker, int64_t, &worker::expiry_>,
+                                                    bmi::member <worker, std::chrono::time_point<chr::system_clock> , &worker::expiry_>,
                                                     std::greater <> >,
                                     bmi::ordered_non_unique <bmi::tag <idle>, bmi::member <worker, bool, &worker::idle_> >,
                                     bmi::ordered_unique <bmi::tag <idle_id>, bmi::identity <worker>, idle_ids_compare>,
@@ -224,7 +237,7 @@ private:
                                                     bmi::member <worker, std::string, &worker::last_worked_session_> > > > workers_t;
 
     workers_t cont_;
-    uint32_t heartbeat_expiry_;
+    std::chrono::milliseconds heartbeat_expiry_;
 };
 }
 

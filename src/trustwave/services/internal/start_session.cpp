@@ -30,6 +30,7 @@ int Start_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
     auto s=boost::make_shared<trustwave::session>(gsact->remote, creds);
     authenticated_scan_server::instance().sessions->add(s);
+    res->id(gsact->id());
     res->res(s->idstr());
     return 0;
 

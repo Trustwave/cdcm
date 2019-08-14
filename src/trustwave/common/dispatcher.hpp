@@ -60,6 +60,7 @@ public:
     {
         Registrator(T *t, Dispatcher & d)
         {
+            std::cerr<<t->name()<<std::endl;
             d.register1(t);
         }
         Registrator(T *t, Dispatcher * d)

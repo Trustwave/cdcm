@@ -50,26 +50,26 @@ zmq_helpers::version_assert (int want_major, int want_minor)
 }
 
 //  Return current system clock as milliseconds
-std::time_t
+std::chrono::time_point<std::chrono::system_clock>
 zmq_helpers::clock ()
 {
-    return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    return std::chrono::system_clock::now();
 }
 
 //  Sleep for a number of milliseconds
 void
-zmq_helpers::sleep (int msecs)
+zmq_helpers::sleep (std::chrono::milliseconds msecs)
 {
     struct timespec t;
-    t.tv_sec = msecs / 1000;
-    t.tv_nsec = (msecs % 1000) * 1000000;
-    nanosleep (&t, nullptr);
+        t.tv_sec =  std::chrono::duration_cast<std::chrono::seconds>(msecs).count();
+        t.tv_nsec = (msecs.count()% 1000) ;
+        nanosleep (&t, nullptr);
 }
 
 void
 zmq_helpers::console (const char *format, ...)
 {
-    time_t curtime = clock();
+    time_t curtime =  std::chrono::system_clock::to_time_t(clock());
     struct tm *loctime = localtime (&curtime);
     char *formatted = new char[20];
     strftime (formatted, 20, "%y-%m-%d %H:%M:%S ", loctime);

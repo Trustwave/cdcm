@@ -32,7 +32,7 @@
 
 using namespace trustwave;
 message_worker::message_worker(zmq::context_t &ctx) :
-                context_(ctx), heartbeat_at_(-1), liveness_(
+                context_(ctx), heartbeat_at_(), liveness_(
                                 authenticated_scan_server::instance().settings.heartbeat_liveness_), heartbeat_(
                                 authenticated_scan_server::instance().settings.heartbeat_interval_), reconnect_(
                                 authenticated_scan_server::instance().settings.reconnect_), expect_reply_(false), replied_(
@@ -115,7 +115,7 @@ message_worker::recv(zmsg *&reply_p)
 
     while (!zmq_helpers::interrupted){
         zmq::pollitem_t items[] = { { worker_->operator void *(), 0, ZMQ_POLLIN, 0 } };
-        zmq::poll(items, 1, heartbeat_);
+        zmq::poll(items, 1, heartbeat_*1000);
 
         if (items[0].revents & ZMQ_POLLIN){
             zmsg *msg = new zmsg(*worker_);
@@ -169,9 +169,7 @@ message_worker::recv(zmsg *&reply_p)
 }
 int message_worker::worker_loop()
 {
-
-    AU_LOG_INFO("worker %s starting", LoggerSource::instance()->get_source_id());
-
+    AU_LOG_INFO("worker %s starting", LoggerSource::instance()->get_source_id().c_str());
     zmq_helpers::version_assert(4, 0);
     zmq_helpers::catch_signals();
     zmq::context_t ctx(1);
@@ -194,12 +192,12 @@ int message_worker::worker_loop()
         res.msgs.push_back(result_message);
         AU_LOG_DEBUG("actions count is %zu", request_body.msgs.size());
         for (auto action_message : request_body.msgs){
-            AU_LOG_DEBUG("Looking for %s", action_message->name());
+            AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
 
             auto action = trustwave::authenticated_scan_server::instance().public_dispatcher.find(
                             action_message->name());
             if (!action){
-                AU_LOG_ERROR("action %s not found", action_message->name());
+                AU_LOG_ERROR("action %s not found", action_message->name().c_str());
             }
             result_message->id(action_message->id());
             if (-1
@@ -207,7 +205,7 @@ int message_worker::worker_loop()
                                             trustwave::authenticated_scan_server::instance().get_session(
                                                             request_body.hdr.session_id), action_message,
                                             result_message)){
-                AU_LOG_DEBUG("action %s returned with an error", action_message->name());
+                AU_LOG_DEBUG("action %s returned with an error", action_message->name().c_str());
             }
             AU_LOG_DEBUG("Done %s", res.msgs[0]->res().c_str());
         }

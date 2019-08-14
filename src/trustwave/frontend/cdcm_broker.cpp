@@ -21,7 +21,6 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
     zmq::context_t ctx(1);
     boost::asio::io_service ios;
     namespace bp = boost::process;
-    std::vector <char> buf(4096);
     const std::string root_conf("/home/ascohen/dev/samba_fresh/samba/trustwave");
     LoggerSource::instance()->set_source(::trustwave::logger::broker);
     if (!Initialize(logger_ptr, root_conf)) {
@@ -31,7 +30,7 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
     std::thread broker_thread(message_broker::th_func, std::ref(ctx));
 
     std::vector <bp::child> v;
-    for (size_t i = 1; i <= 2; ++i){
+    for (size_t i = 1; i <= 1; ++i){
 
         v.emplace_back(bp::child("/home/ascohen/dev/samba_fresh/samba/bin/cdcm_worker", std::to_string(i), ios));
 

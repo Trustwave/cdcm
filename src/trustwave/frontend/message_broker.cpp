@@ -63,11 +63,15 @@ void message_broker::bind_external()
 void message_broker::purge_workers()
 {
     std::deque <trustwave::sp_worker_t> toCull;
-    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    auto now = std::chrono::system_clock::now();
     auto idle_range = workers_.idle_workers();
     for (auto wrk = idle_range.first; wrk != idle_range.second; ++wrk){
-        if ((*wrk)->expiry_ <= now)
+        auto expiry=(*wrk)->expiry_;
+        if (expiry <= now)
+        {
             toCull.push_back(*wrk);
+
+        }
     }
 
     for (auto & wrk : toCull){
@@ -98,8 +102,8 @@ void message_broker::service_dispatch(std::unique_ptr <zmsg> &&msg, const std::s
     while (p.first != p.second && !requests_.empty()){
         auto wrk = workers_.get_by_last_worked_session(requests_.front().second);
         if (!wrk || (wrk && !wrk->idle_)){
-            AU_LOG_DEBUG("Not found last worked on session %s", id.c_str());
             wrk = workers_.get_next_worker();
+            AU_LOG_DEBUG("Not found last worked on session %s using %s", id.c_str(),wrk->identity_.c_str());
         }
         else{
             AU_LOG_DEBUG("Found last session %s", wrk->identity_.c_str());
@@ -149,7 +153,8 @@ void message_broker::worker_delete(trustwave::sp_worker_t wrk, bool send_disconn
 void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &&msg)
 {
     assert(msg && msg->parts() >= 1);     //  At least, command
-
+    std::cerr << "message_broker::worker_process1"<<std::endl;
+    workers_.dump();
     std::string command = reinterpret_cast <const char*>(msg->pop_front().c_str());
     bool worker_ready = workers_.exists(sender);
     auto wrk = worker_require(sender);
@@ -196,6 +201,8 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
             }
         }
     }
+    std::cerr << "message_broker::worker_process2"<<std::endl;
+        workers_.dump();
 }
 
 //  ---------------------------------------------------------------------
@@ -291,6 +298,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
 
         }
         else{
+            workers_.dump();
             trustwave::msg tm;
             tm.hdr = recieved_msg.hdr;
             tm.msgs.push_back(action_message);
@@ -330,15 +338,15 @@ void message_broker::handle_message(zmq::socket_t &socket, std::string expected_
 //  Get and process messages forever or until interrupted
 void message_broker::broker_loop()
 {
-    int64_t now = zmq_helpers::clock();
-    int64_t heartbeat_at = now + authenticated_scan_server::instance().settings.heartbeat_interval_;
+    auto now = zmq_helpers::clock();
+    auto heartbeat_at = now + std::chrono::milliseconds(authenticated_scan_server::instance().settings.heartbeat_interval_);
     zmq::pollitem_t items[] = { { internal_socket_->operator void *(), 0, ZMQ_POLLIN, 0 }, {
                     external_socket_->operator void *(), 0, ZMQ_POLLIN, 0 } };
     while (!zmq_helpers::interrupted){
-        int64_t timeout = heartbeat_at - now;
-        if (timeout < 0)
-            timeout = 0;
-        zmq::poll(items, 2, static_cast <long>(timeout));
+        auto timeout = heartbeat_at - now;
+        if (timeout.count() < 0)
+            timeout.zero();
+        zmq::poll(items, 2, static_cast <long>(timeout.count()));
         //  Process next input message, if any
         if (items[0].revents & ZMQ_POLLIN){
 
@@ -365,7 +373,7 @@ void message_broker::broker_loop()
                 worker_send(*it, const_cast <char*>( MDPW_HEARTBEAT), "", nullptr);
             }
 
-            heartbeat_at += authenticated_scan_server::instance().settings.heartbeat_interval_;
+            heartbeat_at +=  std::chrono::milliseconds(authenticated_scan_server::instance().settings.heartbeat_interval_);
             now = zmq_helpers::clock();
         }
     }

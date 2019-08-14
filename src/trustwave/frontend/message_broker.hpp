@@ -17,7 +17,6 @@
 #define MESSAGE_BROKER_HPP_
 
 #include "worker_container.hpp"
-#include <bits/stdint-intn.h>    // for int64_t
 #include <cstddef>              // for size_t
 #include <deque>                 // for deque
 #include <memory>                // for unique_ptr
@@ -35,17 +34,6 @@ class session;
 class header;
 class message_broker {
     //  This defines one worker, idle or active
-    struct worker {
-        std::string identity_;   //  Address of worker
-        std::string last_worked_session_;   //
-        int64_t expiry_;         //  Expires at unless heartbeat
-
-        worker(std::string identity, int64_t expiry = 0)
-        {
-            identity_ = identity;
-            expiry_ = expiry;
-        }
-    };
 
 public:
     static void th_func(zmq::context_t &ctx);  //  ---------------------------------------------------------------------
