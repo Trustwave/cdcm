@@ -1,82 +1,54 @@
-diff --git a/Makefile b/Makefile
-index 8e51514..2e6174a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -8,7 +8,11 @@ all:
- %:
- 	cd $(LIBPE_DIR) && $(MAKE) $@
- 	cd $(PEV_DIR) && $(MAKE) $@
--
-+	cd ../../lib && $(MAKE) pe_pev	
-+clean:
-+	cd $(LIBPE_DIR) && $(MAKE) $@
-+	cd $(PEV_DIR) && $(MAKE) $@
-+	rm ../../lib/libpe_pev.a	
- # Cygwin only
- zip:
- 	cd $(PEV_DIR)/windows && $(MAKE)
-diff --git a/lib/libpe b/lib/libpe
---- a/lib/libpe
-+++ b/lib/libpe
-@@ -1 +1 @@
--Subproject commit abd2507f1ab13e7a68492c95ba2a82fc138ff315
-+Subproject commit abd2507f1ab13e7a68492c95ba2a82fc138ff315-dirty
-diff --git a/src/Makefile b/src/Makefile
-index f4e8989..269a44a 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -85,23 +85,29 @@ export pev_BUILDDIR = ./build
- pev_SRCS_FILTER = $(wildcard ${dir}/*.c)
- pev_SRCS = $(foreach dir, ${SRC_DIRS}, ${pev_SRCS_FILTER})
- pev_OBJS = $(addprefix ${pev_BUILDDIR}/, $(addsuffix .o, $(basename ${pev_SRCS})))
--
--pev_COMMON_DEPS = \
-+staticlib_DIR = ../../../lib/
-+pev_Static_COMMON_DEPS = \
- 	$(pev_BUILDDIR)/compat/strlcat.o \
- 	$(pev_BUILDDIR)/config.o \
--	$(pev_BUILDDIR)/dylib.o \
--	$(pev_BUILDDIR)/malloc_s.o \
- 	$(pev_BUILDDIR)/utils.o \
- 	$(pev_BUILDDIR)/plugins.o \
- 	$(pev_BUILDDIR)/output_plugin.o \
- 	$(pev_BUILDDIR)/output.o \
- 	$(pev_BUILDDIR)/pev_api.o
- 
-+pev_COMMON_DEPS = \
-+	$(pev_Static_COMMON_DEPS) \
-+	$(pev_BUILDDIR)/malloc_s.o \
-+	$(pev_BUILDDIR)/dylib.o 
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..4fdc076
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,22 @@
++cmake_minimum_required(VERSION 3.9.0)
++project(pe_pev)
++set(CMAKE_VERBOSE_MAKEFILE ON)
++set(CMAKE_C_STANDARD 11)
++set(LIBPE_DIR lib/libpe)
++set(PEV_DIR src)
 +
- ####### Build rules
- 
- .PHONY: plugins install installdirs uninstall clean
- 
--all: $(PROGS) plugins
-+all: $(PROGS) plugins peversionlib
 +
-+peversionlib:  $(pev_Static_COMMON_DEPS)
-+	ar rcs  ${staticlib_DIR}/libpeversion.a  $(pev_BUILDDIR)/peres_lib.o $(pev_Static_COMMON_DEPS)
- 
- plugins:
- 	cd $(PLUGINS_DIR) && $(MAKE) $@
-@@ -143,6 +149,10 @@ rva2ofs: $(pev_BUILDDIR)/rva2ofs.o $(pev_OBJS)
- peldd: $(pev_BUILDDIR)/peldd.o $(pev_OBJS)
- 	$(CC) $< -o $(pev_BUILDDIR)/$@ $(pev_COMMON_DEPS) $(LDFLAGS) $(CFLAGS) $(CPPFLAGS)
- 
-+peres_lib: $(pev_BUILDDIR)/peres_lib.o $(pev_OBJS)
-+	$(CC) $< -o $(pev_BUILDDIR)/$@ $(pev_COMMON_DEPS) $(LDFLAGS) $(CFLAGS) $(CPPFLAGS)
-+
-+  
- # Generic rule matching sources
- 
- $(pev_BUILDDIR)/%.o: %.c
++include_directories(include)
++include_directories(include/compat)
++include_directories(include/compat/sys)
++include_directories(lib/libpe/include)
++include_directories(lib/libpe/include/libpe)
++include_directories(lib/libpe/libfuzzy)
++include_directories(lib/libpe/libudis86)
++include_directories(lib/libudis86)
++include_directories(lib/libudis86/libudis86)
++include_directories(src)
++add_subdirectory(${LIBPE_DIR})
++add_subdirectory(${PEV_DIR})
++add_library(pe_pev STATIC)
++target_link_libraries(pe_pev pe peversionlib)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+new file mode 100644
+index 0000000..733988d
+--- /dev/null
++++ b/src/CMakeLists.txt
+@@ -0,0 +1,11 @@
++set(pev_Static_SRC
++        output.c
++        pev_api.c
++        utils.c
++        output_plugin.c
++        compat/strlcat.c
++        peres_lib.c
++        )
++add_library(peversionlib OBJECT ${pev_Static_SRC})
++target_compile_definitions(peversionlib PUBLIC OBJ)
++target_link_libraries(peversionlib pe)
 diff --git a/src/peres_lib.c b/src/peres_lib.c
 new file mode 100644
-index 0000000..6a64293
+index 0000000..d543a2f
 --- /dev/null
 +++ b/src/peres_lib.c
-@@ -0,0 +1,477 @@
+@@ -0,0 +1,475 @@
 +/*
 + * peres_lib.c
 + *
@@ -552,5 +524,3 @@ index 0000000..6a64293
 +
 +    return EXIT_SUCCESS;
 +}
-+
-+
