@@ -1,21 +1,11 @@
-diff --git a/.gitignore b/.gitignore
-index 3a0d9dc..45622c1 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -1,3 +1,7 @@
-+src/peres_lib.c
-+src/CMakeLists.txt
-+lib/CMakeLists.txt
-+CMakeLists.txt
- pev.cbp
- bin
- obj
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 new file mode 100644
-index 0000000..1362f19
+index 0000000..4fdc076
 --- /dev/null
 +++ b/CMakeLists.txt
-@@ -0,0 +1,21 @@
+@@ -0,0 +1,22 @@
++cmake_minimum_required(VERSION 3.9.0)
++project(pe_pev)
 +set(CMAKE_VERBOSE_MAKEFILE ON)
 +set(CMAKE_C_STANDARD 11)
 +set(LIBPE_DIR lib/libpe)
@@ -36,52 +26,20 @@ index 0000000..1362f19
 +add_subdirectory(${PEV_DIR})
 +add_library(pe_pev STATIC)
 +target_link_libraries(pe_pev pe peversionlib)
-+add_subdirectory(file_version_test)
-diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
-new file mode 100644
-index 0000000..4c0c6c0
---- /dev/null
-+++ b/lib/CMakeLists.txt
-@@ -0,0 +1,20 @@
-+set(libpe_Static_SRC
-+        error.c
-+        hashes.c
-+        libfuzzy/edit_dist.c
-+        libudis86/decode.c
-+        libudis86/syn-att.c
-+        libudis86/syn-intel.c
-+        misc.c
-+        resources.c
-+        exports.c
-+        imports.c
-+        libfuzzy/fuzzy.c
-+        libudis86/itab.c
-+        libudis86/syn.c
-+        libudis86/udis86.c
-+        pe.c
-+
-+        )
-+add_library(pe OBJECT ${libpe_Static_SRC})
-+target_compile_definitions(pe PUBLIC OBJ)
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
 new file mode 100644
-index 0000000..c83053a
+index 0000000..733988d
 --- /dev/null
 +++ b/src/CMakeLists.txt
-@@ -0,0 +1,16 @@
-+set(PLUGINS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
+@@ -0,0 +1,11 @@
 +set(pev_Static_SRC
-+       # config.c
 +        output.c
 +        pev_api.c
 +        utils.c
 +        output_plugin.c
-+       # plugins.c
-+       # plugins.c
 +        compat/strlcat.c
 +        peres_lib.c
 +        )
-+add_definitions(-DPLUGINSDIR="${PLUGINS_DIR}")
 +add_library(peversionlib OBJECT ${pev_Static_SRC})
 +target_compile_definitions(peversionlib PUBLIC OBJ)
 +target_link_libraries(peversionlib pe)

@@ -3,7 +3,7 @@ project(cdcm)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-set (SAMBA_SRC /home/ascohen/dev/samba_fresh/samba)
+set (SAMBA_SRC ${CMAKE_SOURCE_DIR}/3rdparty/samba)
 set (SMB_INCLUDES
    ${SAMBA_SRC}
    ${SAMBA_SRC}/include
@@ -67,9 +67,11 @@ endif()
 add_definitions(-D__STDC_WANT_LIB_EXT1__)
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
 
-add_subdirectory(3rdparty)
+#add_subdirectory(3rdparty)
 add_subdirectory(common)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 add_subdirectory(services)
 add_subdirectory(clients)
+
+
