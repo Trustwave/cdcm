@@ -14,7 +14,7 @@
 // Comments: 
 
 #include "zmq_helpers.hpp"
-#include <bits/types/struct_timespec.h>  // for timespec
+
 #include <csignal>                      // for sigaction, sigemptyset, SIGINT
 #include <cstdarg>                      // for va_end, va_list, va_start
 #include <cstdio>                       // for printf, vprintf

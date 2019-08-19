@@ -6,4 +6,4 @@ add_library (trustwave::protocol ALIAS protocol)
 target_include_directories (protocol INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
-target_compile_features (json INTERFACE cxx_std_17)
+#target_compile_features (json INTERFACE cxx_std_17)

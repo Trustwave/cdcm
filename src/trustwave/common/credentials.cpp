@@ -17,6 +17,7 @@
 #include "credentials.hpp"
 extern "C" {
 #endif
+
 #include "auth/credentials/credentials.h"
 #ifdef __cplusplus
 }

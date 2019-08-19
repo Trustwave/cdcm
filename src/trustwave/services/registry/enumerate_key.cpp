@@ -18,8 +18,8 @@
 //=====================================================================================================================
 #include "enumerate_key.hpp"
 
-#include "../../3rdparty/json/include/tao/json.hpp"
-#include "../../3rdparty/json/include/tao/json/contrib/traits.hpp"
+#include "json/include/tao/json.hpp"
+#include "json/include/tao/json/contrib/traits.hpp"
 #include "../../common/protocol/msg_types.hpp"
 #include "../../common/session.hpp"
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"

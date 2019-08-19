@@ -15,7 +15,7 @@
 
 #ifndef TRUSTWAVE_FRONTEND_WORKER_CONTAINER_HPP_
 #define TRUSTWAVE_FRONTEND_WORKER_CONTAINER_HPP_
-#include <bits/stdint-uintn.h>                               // for uint32_t
+
 #include <boost/multi_index/detail/bidir_node_iterator.hpp>  // for bidir_node_iterator, operator==
 #include <boost/multi_index/detail/ord_index_impl.hpp>       // for ordered_index
 #include <boost/multi_index/identity.hpp>                    // for identity

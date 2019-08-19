@@ -24,5 +24,6 @@ target_link_libraries(cdcm_broker
 						tw-internal-actions 
 						tw-sessions-cache 
 						tw-zmq 
-						tw-singleton-runner  
+						tw-singleton-runner
+		libpe_pev.a
 						)

@@ -1,8 +1,5 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-new file mode 100644
-index 0000000..4fdc076
 --- /dev/null
-+++ b/CMakeLists.txt
++++ CMakeLists.txt
 @@ -0,0 +1,22 @@
 +cmake_minimum_required(VERSION 3.9.0)
 +project(pe_pev)
@@ -26,11 +23,8 @@ index 0000000..4fdc076
 +add_subdirectory(${PEV_DIR})
 +add_library(pe_pev STATIC)
 +target_link_libraries(pe_pev pe peversionlib)
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-new file mode 100644
-index 0000000..733988d
 --- /dev/null
-+++ b/src/CMakeLists.txt
++++ src/CMakeLists.txt
 @@ -0,0 +1,11 @@
 +set(pev_Static_SRC
 +        output.c
@@ -43,11 +37,8 @@ index 0000000..733988d
 +add_library(peversionlib OBJECT ${pev_Static_SRC})
 +target_compile_definitions(peversionlib PUBLIC OBJ)
 +target_link_libraries(peversionlib pe)
-diff --git a/src/peres_lib.c b/src/peres_lib.c
-new file mode 100644
-index 0000000..d543a2f
 --- /dev/null
-+++ b/src/peres_lib.c
++++ src/peres_lib.c
 @@ -0,0 +1,475 @@
 +/*
 + * peres_lib.c
@@ -524,3 +515,26 @@ index 0000000..d543a2f
 +
 +    return EXIT_SUCCESS;
 +}
+--- /dev/null
++++ lib/libpe/CMakeLists.txt
+@@ -0,0 +1,20 @@
++set(libpe_Static_SRC
++        error.c
++        hashes.c
++        libfuzzy/edit_dist.c
++        libudis86/decode.c
++        libudis86/syn-att.c
++        libudis86/syn-intel.c
++        misc.c
++        resources.c
++        exports.c
++        imports.c
++        libfuzzy/fuzzy.c
++        libudis86/itab.c
++        libudis86/syn.c
++        libudis86/udis86.c
++        pe.c
++
++        )
++add_library(pe OBJECT ${libpe_Static_SRC})
++target_compile_definitions(pe PUBLIC OBJ)
