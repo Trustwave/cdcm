@@ -12,4 +12,4 @@ set(SOURCE_FILES
 
 add_library(tw-internal-actions OBJECT ${SOURCE_FILES})
 target_compile_definitions(tw-internal-actions PUBLIC OBJ)
-target_link_libraries(tw-internal-actions ${CMAKE_SOURCE_DIR}/lib/libpe_pev.a crypto )
+target_link_libraries(tw-internal-actions libpe_pev.a crypto )
