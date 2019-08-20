@@ -2,6 +2,23 @@ cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
+include(CheckCXXCompilerFlag)
+
+function(enable_cxx_compiler_flag_if_supported flag)
+	string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
+	if(flag_already_set EQUAL -1)
+		check_cxx_compiler_flag("${flag}" flag_supported)
+		if(flag_supported)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}" PARENT_SCOPE)
+		endif()
+		unset(flag_supported CACHE)
+	endif()
+endfunction()
+
+# example usage
+enable_cxx_compiler_flag_if_supported("-Wall")
+enable_cxx_compiler_flag_if_supported("-Wextra")
+enable_cxx_compiler_flag_if_supported("-pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 set (SAMBA_SRC /opt/samba-4.10.6)
 set (SMB_INCLUDES
@@ -70,12 +87,12 @@ add_definitions(-D__STDC_WANT_LIB_EXT1__)
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
 link_directories(/opt/3rd/pe_pev/build)
 link_directories(${SMB_LINKS})
-#add_subdirectory(3rdparty)
+
 add_subdirectory(common)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 add_subdirectory(services)
 add_subdirectory(clients)
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
 
