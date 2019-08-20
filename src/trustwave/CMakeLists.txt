@@ -20,7 +20,7 @@ enable_cxx_compiler_flag_if_supported("-Wall")
 enable_cxx_compiler_flag_if_supported("-Wextra")
 enable_cxx_compiler_flag_if_supported("-pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-set (SAMBA_SRC /opt/samba-4.10.6)
+set (SAMBA_SRC /sandbox/src/deps/samba-4.10.6)
 set (SMB_INCLUDES
    ${SAMBA_SRC}
    ${SAMBA_SRC}/include
