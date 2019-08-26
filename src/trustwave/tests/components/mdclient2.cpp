@@ -30,7 +30,7 @@
 #include <functional>
 #include <vector>
 
-#include "../common/protocol/protocol.hpp"
+#include "../../common/protocol/protocol.hpp"
 std::vector<std::function<std::string(std::string)>> msgs1 ={
 [&](std::string id) ->std::string {return
                     R"(

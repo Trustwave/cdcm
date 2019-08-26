@@ -19,16 +19,9 @@
 #include <iostream>
 #include <memory>
 
-#include "../common/zmq/mdp.hpp"
-#include "../common/zmq/zmq_helpers.hpp"
-#include "../common/zmq/zmq_message.hpp"
-
-//  Structure of our class
-//  We access these properties only via class methods
-
-//  Structure of our class
-//  We access these properties only via class methods
-
+#include "../../common/zmq/mdp.hpp"
+#include "../../common/zmq/zmq_helpers.hpp"
+#include "../../common/zmq/zmq_message.hpp"
 class mdcli {
 public:
 
