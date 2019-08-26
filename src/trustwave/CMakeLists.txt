@@ -20,7 +20,8 @@ enable_cxx_compiler_flag_if_supported("-Wall")
 enable_cxx_compiler_flag_if_supported("-Wextra")
 enable_cxx_compiler_flag_if_supported("-pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-set (SAMBA_SRC /sandbox/src/deps/samba-4.10.6)
+set (DEPS_DIR /sandbox/src/deps)
+set (SAMBA_SRC ${DEPS_DIR}/samba-4.10.6)
 set (SMB_INCLUDES
    ${SAMBA_SRC}
    ${SAMBA_SRC}/include
@@ -82,10 +83,10 @@ endif()
 message (STATUS "${BOOST_LIBRARYDIR}")
 include_directories(${SMB_INCLUDES})
 link_directories(${BOOST_LIBRARYDIR})
-include_directories(/opt/3rd/)
+include_directories(${DEPS_DIR})
 add_definitions(-D__STDC_WANT_LIB_EXT1__)
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
-link_directories(/opt/3rd/pe_pev/build)
+link_directories(${DEPS_DIR}/libpe-pev/build)
 link_directories(${SMB_LINKS})
 
 add_subdirectory(common)
@@ -93,6 +94,6 @@ add_subdirectory(backend)
 add_subdirectory(frontend)
 add_subdirectory(services)
 add_subdirectory(clients)
-add_subdirectory(tests)
+#add_subdirectory(tests)
 
 
