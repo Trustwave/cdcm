@@ -67,7 +67,7 @@ extern "C" {
  */
 
 using namespace trustwave;
-static void smbc_auth_fn(const char * pServer, const char * pShare, char * pWorkgroup, int maxLenWorkgroup,
+static void smbc_auth_fn(const char * pServer, const char * , char * pWorkgroup, int maxLenWorkgroup,
                 char * pUsername, int maxLenUsername, char * pPassword, int maxLenPassword)
 {
     auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::remote>(std::string(pServer));

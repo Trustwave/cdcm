@@ -8,7 +8,11 @@
 //                              Include Files.
 //===========================================================================
 #include <zmq.hpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include <boost/process.hpp>
+//restore compiler switches
+#pragma GCC diagnostic pop
 #include <boost/asio.hpp>
 
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
@@ -39,7 +43,7 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
 
     return 0;
 }
-int main(int argc, const char **argv)
+int main(int , const char **)
 {
     zmq_helpers::version_assert(4, 0);
     zmq_helpers::catch_signals();

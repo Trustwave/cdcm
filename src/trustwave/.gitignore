@@ -1,4 +1,5 @@
 .DS_Store
+*.o
 /backend/CMakeFiles/cdcm_worker.dir/build.make
 /backend/CMakeFiles/cdcm_worker.dir/cdcm_worker_process.cpp.o
 /backend/CMakeFiles/cdcm_worker.dir/cmake_clean.cmake
@@ -761,3 +762,14 @@
 /CMakeCache.txt
 /Makefile
 /clients/cmake_install.cmake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps

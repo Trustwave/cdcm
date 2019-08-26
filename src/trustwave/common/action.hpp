@@ -52,7 +52,7 @@ public:
     {
         return command_;
     }
-    const bool short_job() const
+    bool short_job() const
     {
         return short_job_;
     }

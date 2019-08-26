@@ -8,15 +8,15 @@
 // An easy way to define an enum with a set of utilities to be converted 
 // into a string. Now, every time we want to define an enum type use the 
 // following macros. Please do not use the macros that start with _.
-//
-// example:
-// #define Food_LIST(m)   \
-//     m(Food, Apple, 1)  \
-//     m(Food, Banana, 2) \
-//     m(Food, Pear, 4)	  \
-//     m(Food, Grapes)
-//SmartEnum(Food_LIST)
-//
+/*
+ example:
+ #define Food_LIST(m)   \
+     m(Food, Apple, 1)  \
+     m(Food, Banana, 2) \
+     m(Food, Pear, 4)	  \
+     m(Food, Grapes)
+SmartEnum(Food_LIST)
+*/
 // This example creates the following
 //    1) enum Food {Apple=1, Banana=2, Pear=4, Grapes};
 //    2) static std::array<const char *,number_of_Food> {"", "Apple", "Banana","",  "Pear", "Grapes"};

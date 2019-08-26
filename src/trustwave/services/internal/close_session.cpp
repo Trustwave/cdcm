@@ -23,7 +23,7 @@
 
 using namespace trustwave;
 
-int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> res)
 {
     std::cout<<"In Close_Session"<<std::endl;
 

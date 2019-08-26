@@ -31,7 +31,7 @@ extern "C" {
 int get_ver(const char* path, char* res);
 }
 
-int Get_File_Version::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int Get_File_Version::act(boost::shared_ptr <session> , std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     auto fsact = std::dynamic_pointer_cast<local_get_file_version_msg>(action);
     res->res_.resize(256, 0);

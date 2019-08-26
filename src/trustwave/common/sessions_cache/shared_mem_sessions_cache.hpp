@@ -175,6 +175,7 @@ public:
     void flush_all_entries();
     void dump_by_expiration() const;
 
+
 private:
     sessions* map_;
     std::string name_;

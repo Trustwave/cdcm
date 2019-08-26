@@ -16,8 +16,8 @@
 #ifndef TRUSTWAVE_COMMON_PROTOCOL_PROTOCOL_HPP_
 #define TRUSTWAVE_COMMON_PROTOCOL_PROTOCOL_HPP_
 #include "../../common/protocol/msg_types.hpp"
-#include "json/include/tao/json/contrib/traits.hpp"
-#include "json/include/tao/json.hpp"
+#include "taocpp-json/include/tao/json/contrib/traits.hpp"
+#include "taocpp-json/include/tao/json.hpp"
 
 namespace tao {
 namespace json {

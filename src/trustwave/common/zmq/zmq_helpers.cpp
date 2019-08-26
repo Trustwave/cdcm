@@ -91,7 +91,7 @@ zmq_helpers::console (const char *format, ...)
 //  zmq_poll.
 
 bool zmq_helpers::interrupted = false;
-void zmq_helpers::signal_handler (int signal_value)
+void zmq_helpers::signal_handler (int )
 {
     interrupted = true;
 }

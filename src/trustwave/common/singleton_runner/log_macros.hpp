@@ -24,7 +24,7 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//        ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//        ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #define AU_LOG_INFO(...) LOGGER->log_event(   \
         trustwave::logger::info,            \
@@ -32,7 +32,7 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//         ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #define AU_LOG_ERROR(...) LOGGER->log_event(   \
         trustwave::logger::error,            \
@@ -40,7 +40,7 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//         ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #define AU_LOG_WARNING(...) LOGGER->log_event(   \
         trustwave::logger::warning,            \
@@ -48,7 +48,7 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//         ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #define AU_LOG_ERRNO_DEBUG(...) LOGGER->log_event(   \
         trustwave::logger::debug,            \
@@ -56,7 +56,7 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//         ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #define AU_LOG_ERRNO_INFO(...) LOGGER->log_event(   \
         trustwave::logger::info,            \
@@ -64,7 +64,7 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//         ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #define AU_LOG_ERRNO_ERROR(...) LOGGER->log_event(   \
         trustwave::logger::error,            \
@@ -72,6 +72,6 @@
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \
          __VA_ARGS__)
-//         ::trustwave::LoggerSource::instance()->get_source_id(),             \
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 
 #endif /* TRUSTWAVE_COMMON_SINGLETON_RUNNER_LOG_MACROS_HPP_ */
