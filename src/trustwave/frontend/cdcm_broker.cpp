@@ -36,14 +36,6 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
     monitor.run();
     ios.run();
     broker_thread.join();
-    if (zmq_helpers::interrupted){
-        printf("W: interrupt received, shutting down...\n");
-        for (auto&& p : workers_pull){
-            ::kill(p.native_handle(), SIGTERM);
-            p.wait();
-        }
-
-    }
 
     return 0;
 }

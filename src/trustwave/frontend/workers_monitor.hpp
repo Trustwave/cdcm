@@ -17,12 +17,12 @@ class workers_monitor
 {
 public:
     explicit workers_monitor( boost::asio::io_service& ios);
+    ~workers_monitor();
     void run();
 
 private:
     std::unique_ptr<boost::process::child> start_worker(std::string worker_name);
     void monitor(std::string worker_name);
-
 private:
     boost::asio::io_service& ios;
     std::map<std::string, std::unique_ptr<boost::process::child>> workers_pull;

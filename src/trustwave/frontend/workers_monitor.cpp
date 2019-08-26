@@ -18,6 +18,16 @@ workers_monitor::workers_monitor(boost::asio::io_service& ios_) : ios(ios_), num
 {
 }
 
+workers_monitor::~workers_monitor()
+{
+    std::cerr << "worker monitor destructor" << std::endl;
+    for (auto iter = workers_pull.begin(); iter != workers_pull.end() ; ++iter )
+    {
+        std::cerr << "about to terminate worker name: " << iter->first << std::endl;
+        iter->second->terminate();
+    }
+    workers_pull.erase(workers_pull.begin(), workers_pull.end());
+}
 void workers_monitor::run()
 {
     auto num_workers = authenticated_scan_server::instance().settings.worker_processes_;

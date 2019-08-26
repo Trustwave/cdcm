@@ -270,10 +270,12 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
     }
     for (auto action_message : recieved_msg.msgs){
         AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
+        std::cout << "Looking for " << action_message->name() << std::endl;
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
         if(!act1)
         {
             AU_LOG_ERROR("%s not found! ignoring all message", action_message->name().c_str());
+            std::cout << action_message->name() << " not found! ignoring all message" << std::endl;
             break;
         }
         if (act1->short_job()){
@@ -284,6 +286,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
             if (-1 == act1->act(trustwave::authenticated_scan_server::instance().get_session(
                                                             recieved_msg.hdr.session_id), action_message, res)){
                 AU_LOG_DEBUG("action %s returned with an error", action_message->name().c_str());
+                std::cout << "action " << action_message->name() << " returned with an error" << std::endl;
             }
             const tao::json::value res_as_json = result_message;
             auto res_body = to_string(res_as_json, 2);
@@ -293,6 +296,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
             reply->wrap(MDPC_CLIENT, client.c_str());
             reply->wrap(sender.c_str(), "");
             AU_LOG_DEBUG("sending to client :\n %s", msg->to_str(false,false,false).c_str());
+            std::cout << "sending to client :\n " << msg->to_str(false,false,false) << std::endl;
             reply->send(*external_socket_);
             replied_++;
 
@@ -318,6 +322,7 @@ void message_broker::handle_message(zmq::socket_t &socket, std::string expected_
     std::unique_ptr <zmsg> msg = std::make_unique <zmsg>(socket);
     if (msg->parts() == 0){
         AU_LOG_ERROR("empty message");
+        std::cout << "ERROR: empty message" << std::endl;
     }
     else{
 
