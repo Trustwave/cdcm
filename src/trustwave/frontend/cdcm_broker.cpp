@@ -28,7 +28,7 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
     if (!Initialize(logger_ptr, root_conf)) {
             std::cerr << "failed to initialize the logger!!!" << std::endl;
             abort();
-        }
+    }
     std::thread broker_thread(message_broker::th_func, std::ref(ctx));
 
     std::vector<bp::child> workers_pull;

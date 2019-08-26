@@ -26,11 +26,11 @@ boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_
                 const size_t size)
 {
     const std::string absolute_name(name);
-    printf("Creating Shared Mem Sessions Cache ( %s ) size ( %zu )", absolute_name.c_str(), size);
+    std::cout << "Creating Shared Mem Sessions Cache ( " << absolute_name << " ) size ( " << size << " )" << std::endl;
     boost::shared_ptr <shared_mem_sessions_cache> cache = boost::shared_ptr <shared_mem_sessions_cache>(
                     new shared_mem_sessions_cache(absolute_name, size, 30));
     if (false == cache->construct()){
-        printf("Failed Shared Mem Sessions Cache name ( %s ) size ( %zu )", absolute_name.c_str(), size);
+        std::cout << "Failed Shared Mem Sessions Cache name ( " << absolute_name << " ) size ( " << size  << " )" << std::endl;
         return boost::shared_ptr <shared_mem_sessions_cache>();
     }
 

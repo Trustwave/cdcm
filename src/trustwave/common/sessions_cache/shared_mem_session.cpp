@@ -13,10 +13,12 @@
 // Date    : 16 Jul 2019
 // Comments: 
 #include "../../common/sessions_cache/shared_mem_session.hpp"
+#include <iostream>
 using namespace trustwave;
 shared_mem_credentials::~shared_mem_credentials()
 {
     printf(" shared_mem_credentials is being destructed\n");
+    std::cout << " shared_mem_credentials is being destructed" << std::endl;
 }
 
 shared_mem_credentials::shared_mem_credentials(const void_allocator &va) :
