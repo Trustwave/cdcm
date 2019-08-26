@@ -9,7 +9,7 @@ link_directories( ${SMB_LINKS} )
 set(SOURCE_FILES 
 	cdcm_broker.cpp 
 	message_broker.cpp
-	)
+	workers_monitor.cpp)
 add_executable(cdcm_broker ${SOURCE_FILES})
 
 target_link_libraries(cdcm_broker  
@@ -25,5 +25,5 @@ target_link_libraries(cdcm_broker
 						tw-sessions-cache 
 						tw-zmq 
 						tw-singleton-runner
-		libpe_pev.a
+						libpe_pev.a
 						)

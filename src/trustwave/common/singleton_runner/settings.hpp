@@ -26,7 +26,7 @@ struct cdcm_settings
     uint32_t heartbeat_interval_;
     uint32_t reconnect_;
     uint32_t heartbeat_expiry_;
-    uint32_t worker_threads_;
+    uint32_t worker_processes_;
     std::string broker_client_listen_ep_;
     std::string broker_worker_listen_ep_;
     std::string worker_connect_ep_;

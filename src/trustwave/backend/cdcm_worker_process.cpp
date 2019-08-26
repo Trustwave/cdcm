@@ -26,7 +26,7 @@
 template<>
 int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::worker>(size_t id)
 {
-    const std::string root_conf("/home/ascohen/dev/samba_fresh/samba/trustwave");
+    const std::string root_conf("/opt/cdcm_conf/");
     LoggerSource::instance()->set_source(::trustwave::logger::worker, id);
     if (!Initialize(logger_ptr, root_conf)){
         std::cerr << "failed to initialize the logger!!!" << std::endl;
