@@ -136,7 +136,7 @@ public:
 
     // creation interface
 public:
-    static boost::shared_ptr <shared_mem_sessions_cache> get_or_create(const std::string &name, const size_t size);
+    static boost::shared_ptr <shared_mem_sessions_cache> get_or_create(const std::string &name, const size_t size, const size_t);
 public:
     bool add(sp_session_t);
     template<typename Tag>

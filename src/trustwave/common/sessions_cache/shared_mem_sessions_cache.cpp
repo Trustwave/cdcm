@@ -15,6 +15,7 @@
 
 #include "shared_mem_sessions_cache.hpp"
 #include "../session.hpp"
+#include "../singleton_runner/authenticated_scan_server.hpp"
 
 #include <boost/interprocess/managed_shared_memory.hpp>           // for interpro...
 #include <boost/smart_ptr/make_shared.hpp>
@@ -23,12 +24,12 @@
 
 using namespace trustwave;
 boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_create(const std::string &name,
-                const size_t size)
+                const size_t size,size_t session_idle_time)
 {
     const std::string absolute_name(name);
     std::cout << "Creating Shared Mem Sessions Cache ( " << absolute_name << " ) size ( " << size << " )" << std::endl;
     boost::shared_ptr <shared_mem_sessions_cache> cache = boost::shared_ptr <shared_mem_sessions_cache>(
-                    new shared_mem_sessions_cache(absolute_name, size, 30));
+                    new shared_mem_sessions_cache(absolute_name, size, session_idle_time));
     if (false == cache->construct()){
         std::cout << "Failed Shared Mem Sessions Cache name ( " << absolute_name << " ) size ( " << size  << " )" << std::endl;
         return boost::shared_ptr <shared_mem_sessions_cache>();
