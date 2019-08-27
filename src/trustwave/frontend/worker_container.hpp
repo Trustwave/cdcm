@@ -65,11 +65,11 @@ public:
                     heartbeat_expiry_(heartbeat_expiry)
     {
     }
-    bool exists(std::string& identity) const
+    bool exists(const std::string& identity) const
     {
         return cont_.get <id>().find(identity) != cont_.get <id>().end();
     }
-    sp_worker_t get(std::string& identity) const
+    sp_worker_t get(const std::string& identity) const
     {
         auto rv = cont_.get <id>().find(identity);
         if (rv != cont_.get <id>().end()){
@@ -85,7 +85,7 @@ public:
         }
         return sp_worker_t();
     }
-    sp_worker_t get_by_last_worked_session(std::string& sess_id) const
+    sp_worker_t get_by_last_worked_session(const std::string& sess_id) const
     {
 
         auto rv = cont_.get <session>().find(sess_id);
@@ -100,7 +100,7 @@ public:
         cont_.insert(w);
     }
 
-    bool erase(std::string& identity)
+    bool erase(const std::string& identity)
     {
         auto& id_idx = cont_.get <id>();
         auto s = id_idx.find(identity);
@@ -122,21 +122,7 @@ public:
 
         return !is_idle(identity);
     }
-    bool modify_idle(const std::string& identity,bool modify_to)
-    {
-        auto& idle_idx = cont_.get <idle_id>();
-        auto it2 = idle_idx.find(std::make_tuple(identity, !modify_to));
-        if (it2 != idle_idx.end())
-            return idle_idx.modify(it2, [this,modify_to](sp_worker_t x){x->idle_=modify_to;});
-        else{
-            auto& id_idx = cont_.get <id>();
-            auto s = id_idx.find(identity);
-            if (s == id_idx.end()){
-                return false;
-            }
-        }
-        return true;
-    }
+
     bool set_idle(const std::string& identity)
     {
         return modify_idle(identity,true);
@@ -178,6 +164,21 @@ public:
         }
     }
 private:
+    bool modify_idle(const std::string& identity,bool modify_to)
+    {
+        auto& idle_idx = cont_.get <idle_id>();
+        auto it2 = idle_idx.find(std::make_tuple(identity, !modify_to));
+        if (it2 != idle_idx.end())
+            return idle_idx.modify(it2, [this,modify_to](sp_worker_t x){x->idle_=modify_to;});
+        else{
+            auto& id_idx = cont_.get <id>();
+            auto s = id_idx.find(identity);
+            if (s == id_idx.end()){
+                return false;
+            }
+        }
+        return true;
+    }
     struct idle_ids_compare {
         bool operator()(const worker& x, const worker& y) const
         {

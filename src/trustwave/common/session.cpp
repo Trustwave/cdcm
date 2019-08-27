@@ -16,7 +16,11 @@
 #include "session.hpp"
 
 #include <boost/uuid/nil_generator.hpp>     // for nil_uuid
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include <boost/uuid/random_generator.hpp>  // for random_generator
+#pragma GCC diagnostic pop
+
 #include <boost/uuid/uuid_io.hpp>           // for to_string
 #include <utility>
 

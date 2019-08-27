@@ -9,8 +9,11 @@
 #include <string>
 #include <map>
 #include <memory>
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include <boost/process.hpp>
+//restore compiler switches
+#pragma GCC diagnostic pop
 #include <boost/asio.hpp>
 
 class workers_monitor

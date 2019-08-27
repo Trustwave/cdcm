@@ -164,7 +164,7 @@ public:
             source_id_ = id;
         }
     }
-    const trustwave::logger::sources get_source()
+    trustwave::logger::sources get_source()
     {
         return source_;
     }

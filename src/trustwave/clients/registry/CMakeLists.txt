@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
 
 include_directories(${SMB_INCLUDES} )
+enable_cxx_compiler_flag_if_supported("-Wno-builtin-macro-redefined")
 
 link_directories(  ${SMB_LINKS})
 set(SOURCE_FILES registry_client.cpp)

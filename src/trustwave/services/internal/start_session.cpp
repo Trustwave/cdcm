@@ -23,7 +23,7 @@
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 
-int Start_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int Start_Session::act(boost::shared_ptr <session> , std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     std::cout<<"In start session"<<std::endl;
     auto gsact = std::dynamic_pointer_cast<local_start_session_msg>(action);

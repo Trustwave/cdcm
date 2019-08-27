@@ -43,7 +43,7 @@ public:
     ~shared_mem_credentials();
 private:
     friend class shared_mem_session;
-    friend class session_converter;
+    friend struct session_converter;
     friend std::ostream &operator<<(std::ostream &os, const shared_mem_credentials &s);
     friend std::ostream &operator<<(std::ostream &os, const shared_mem_session &s);
 
@@ -66,7 +66,7 @@ class shared_mem_session {
 public:
     ~shared_mem_session();
 private:
-    friend class session_converter;
+    friend struct session_converter;
     friend class shared_mem_sessions_cache;
     friend class shared_mem_session_element;
 

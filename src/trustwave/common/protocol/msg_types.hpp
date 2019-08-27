@@ -21,7 +21,7 @@
 #include <vector>
 namespace trustwave {
 //todo assaf fix encapsulation
-class result_msg
+struct result_msg
 {
 public:
     std::string id_;
@@ -51,19 +51,13 @@ public:
     }
 };
 
-class action_msg
+struct action_msg
 {
-protected:
-    action_msg(std::string  name) :
-                    name_(std::move(std::move(std::move(std::move(name)))))
-    {
-    }
-public:
     virtual ~action_msg() = default;
     action_msg(const action_msg&) = default;
     action_msg(action_msg&&) = default;
-    action_msg& operator=(const action_msg&) = default;
-    action_msg& operator=(action_msg&&) = default;
+    action_msg& operator=(const action_msg&) = delete;
+    action_msg& operator=(action_msg&&) = delete;
     action_msg() = delete;
     const std::string& name() const
     {
@@ -77,9 +71,16 @@ public:
     {
         id_ = ids;
     }
-public:
+
     std::string id_;
     const std::string name_;
+
+protected:
+    action_msg(std::string  name) :
+                    name_(std::move(name))
+    {
+    }
+
 };
 
 struct reg_action_query_value_msg: public action_msg
