@@ -15,41 +15,9 @@
 //=====================================================================================================================
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include "common/sessions_cache/shared_mem_sessions_cache.hpp"
-#include "common/session.hpp"
+#include "shmem_fixtures.hpp"
 namespace utf = boost::unit_test;
 using  namespace trustwave;
-struct EmptyCache {
-    EmptyCache()  {
-
-
-        sessions = shared_mem_sessions_cache::get_or_create("sessions_test", 1024 * 1024 * 10,5);
-        sessions -> flush_all_entries();
-    }
-    ~EmptyCache() {  }
-    boost::shared_ptr <shared_mem_sessions_cache> sessions;
-};
-struct OneInCache:EmptyCache {
-    OneInCache()  {
-        credentials creds("WORKGROUP","admin1", "pass1", "ws1");
-        auto s=boost::make_shared<trustwave::session>("192.168.0.1", creds);
-        sessions->add(s);
-    }
-    ~OneInCache() {  }
-
-};
-struct TwoInCache:OneInCache {
-    TwoInCache()  {
-        credentials creds("WORKGROUP2","admin2", "pass2", "ws2");
-        auto s=boost::make_shared<trustwave::session>("192.168.0.2", creds);
-        sessions->add(s);
-    }
-    ~TwoInCache() {  }
-
-};
-
 
 BOOST_AUTO_TEST_SUITE(Session_Cache)
 

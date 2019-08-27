@@ -55,7 +55,7 @@ class action_msg
 {
 protected:
     action_msg(std::string  name) :
-                    name_(std::move(std::move(std::move(std::move(name)))))
+                    name_(std::move(name))
     {
     }
 public:
