@@ -761,3 +761,4 @@
 /CMakeCache.txt
 /Makefile
 /clients/cmake_install.cmake
+/cmake-build-debug/
