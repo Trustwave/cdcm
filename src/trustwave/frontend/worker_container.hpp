@@ -61,7 +61,7 @@ public:
     struct idle_id; // session_id  and also idle
     struct idle; //is idle
     struct expiration; // by expiration
-    worker_container(uint32_t heartbeat_expiry) :
+    worker_container(std::chrono::seconds heartbeat_expiry) :
                     heartbeat_expiry_(heartbeat_expiry)
     {
     }
@@ -156,10 +156,12 @@ public:
         for(auto w:id_idx)
         {
 
-            std::cerr << w->identity_ << std::endl;
-            std::cerr << w->last_worked_session_ << std::endl;
-            std::cerr << w->idle_ << std::endl;
-            std::cerr << std::chrono::duration_cast<std::chrono::milliseconds>(w->expiry_-chr::system_clock::now()).count() << std::endl<< std::endl;
+            std::cerr << "Worker : " << w->identity_ << std::endl;
+            std::cerr << "Last session : " << w->last_worked_session_ << std::endl;
+            std::cerr << "Idle : " << std::boolalpha<< w->idle_ << std::endl;
+            std::cerr << chr::system_clock::to_time_t(chr::system_clock::now())<< std::endl;
+            std::cerr << chr::system_clock::to_time_t(w->expiry_) << std::endl;
+            std::cerr << "Expiry : " << std::chrono::duration_cast<std::chrono::milliseconds>(w->expiry_-chr::system_clock::now()).count() << std::endl;
 
         }
     }

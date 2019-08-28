@@ -18,8 +18,10 @@
 #include <zmq.hpp>
 #include <iostream>
 #include <memory>
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #include "../../common/zmq/mdp.hpp"
+#pragma GCC diagnostic pop
 #include "../../common/zmq/zmq_helpers.hpp"
 #include "../../common/zmq/zmq_message.hpp"
 class mdcli {

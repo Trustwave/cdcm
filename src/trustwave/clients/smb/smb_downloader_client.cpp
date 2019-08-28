@@ -283,8 +283,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
     readbuf = new char[SMB_DEFAULT_BLOCKSIZE];
     if (!readbuf) {
-        AU_LOG_ERROR("Failed to allocate %zu bytes for read "
-                        "buffer (%s)", SMB_DEFAULT_BLOCKSIZE, strerror(errno));
+        AU_LOG_ERROR("Failed to allocate %d bytes for read buffer (%s)", SMB_DEFAULT_BLOCKSIZE, strerror(errno));
         if (local_fd_ != STDOUT_FILENO) {
             close(local_fd_);
         }
@@ -298,7 +297,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         bytesread = smbc_read(remote_fd_, readbuf, SMB_DEFAULT_BLOCKSIZE);
         if (bytesread < 0) {
-            AU_LOG_ERROR("Can't read %zu bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t ) curpos,
+            AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t ) curpos,
                             path);
             smbc_close(remote_fd_);
             if (local_fd_ != STDOUT_FILENO) {

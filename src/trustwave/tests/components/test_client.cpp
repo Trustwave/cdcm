@@ -25,7 +25,10 @@
 #include "mdcliapi2.hpp"
 #include <thread>
 #include <boost/uuid/uuid.hpp>         // streaming operators etc.
-#include <boost/uuid/random_generator.hpp>         // streaming operators etc.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#include <boost/uuid/random_generator.hpp>  // for random_generator
+#pragma GCC diagnostic pop
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 #include <functional>
 #include <vector>
@@ -111,7 +114,7 @@ static void enumf( std::string msg)
     }
 
 }
-static void fc(int c)
+static void fc(int )
 {
     mdcli session("tcp://127.0.0.1:5555", 1);
     auto act_id1 = boost::uuids::random_generator()();
@@ -244,7 +247,7 @@ static void fc(int c)
 
     }
 }
-int main(int argc, char *argv[])
+int main(int , char *[])
 {
     std::vector<std::thread> tp;
     for (unsigned int i = 0; i < 1; ++i)        //context+broker

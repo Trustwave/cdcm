@@ -9,7 +9,7 @@
 #include <boost/system/error_code.hpp>
 #include <sys/types.h>
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
-
+#include "../common/zmq/zmq_helpers.hpp"
 
 namespace bp = boost::process;
 using namespace std;
@@ -31,9 +31,8 @@ workers_monitor::~workers_monitor()
 void workers_monitor::run()
 {
     auto num_workers = authenticated_scan_server::instance().settings.worker_processes_;
-    for (size_t i=0; i< num_workers; ++i)
+    for (size_t i=1; i<= num_workers; ++i)
     {
-//        std::string worker_name = "worker_" + std::to_string(i);
         std::string worker_name = std::to_string(i);
         monitor(worker_name);
     }

@@ -115,7 +115,8 @@ message_worker::recv(zmsg *&reply_p)
 
     while (!zmq_helpers::interrupted){
         zmq::pollitem_t items[] = { { worker_->operator void *(), 0, ZMQ_POLLIN, 0 } };
-        zmq::poll(items, 1, heartbeat_*1000);
+
+        zmq::poll(items, 1, heartbeat_.count());
 
         if (items[0].revents & ZMQ_POLLIN){
             zmsg *msg = new zmsg(*worker_);

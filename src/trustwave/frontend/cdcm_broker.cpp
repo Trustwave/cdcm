@@ -34,8 +34,6 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
             abort();
     }
     std::thread broker_thread(message_broker::th_func, std::ref(ctx));
-
-    std::vector<bp::child> workers_pull;
     workers_monitor monitor(ios);
     monitor.run();
     ios.run();

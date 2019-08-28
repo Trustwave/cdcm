@@ -1,7 +1,7 @@
 {
     "cdcm": {
         "heartbeat_liveness": "3",
-        "heartbeat_interval": "3000",
+        "heartbeat_interval": "3",
         "reconnect": "3000",
         "session_idle_time": "10",
         "worker_processes": "3",
