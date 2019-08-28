@@ -51,7 +51,7 @@ struct worker {
         std::cerr << "Worker : " << identity_ << std::endl;
         std::cerr << "Last session : " << last_worked_session_ << std::endl;
         std::cerr << "Idle : " << std::boolalpha<< idle_ << std::endl;
-        std::cerr << "Expiry in : " << std::chrono::duration_cast<std::chrono::milliseconds>(expiry_-chr::system_clock::now()).count() <<" seconds"<< std::endl;
+        std::cerr << "Expiry in : " << std::chrono::duration_cast<std::chrono::milliseconds>(expiry_-chr::system_clock::now()).count() <<" milliseconds"<< std::endl;
     }
     worker(std::string identity) :
                     identity_(std::move(identity)), expiry_(), last_worked_session_("N/A"), idle_(true)
