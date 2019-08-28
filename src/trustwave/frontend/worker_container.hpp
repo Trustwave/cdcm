@@ -46,7 +46,13 @@ struct worker {
     std::chrono::time_point<chr::system_clock> expiry_;         //  Expires at unless heartbeat
     std::string last_worked_session_;   //
     bool idle_;
-
+    void dump() const
+    {
+        std::cerr << "Worker : " << identity_ << std::endl;
+        std::cerr << "Last session : " << last_worked_session_ << std::endl;
+        std::cerr << "Idle : " << std::boolalpha<< idle_ << std::endl;
+        std::cerr << "Expiry in : " << std::chrono::duration_cast<std::chrono::milliseconds>(expiry_-chr::system_clock::now()).count() <<" seconds"<< std::endl;
+    }
     worker(std::string identity) :
                     identity_(std::move(identity)), expiry_(), last_worked_session_("N/A"), idle_(true)
     {
@@ -87,7 +93,6 @@ public:
     }
     sp_worker_t get_by_last_worked_session(const std::string& sess_id) const
     {
-
         auto rv = cont_.get <session>().find(sess_id);
         if (rv != cont_.get <session>().end()){
             return *rv;
@@ -148,21 +153,14 @@ public:
         auto it2 = cont_.project <expiration>(cont_.get <id>().find(identity));
         return cont_.get <expiration>().modify(it2,
                         [this](sp_worker_t x){x->expiry_ =chr::system_clock::now()+heartbeat_expiry_;});
-
     }
     void dump()
     {
+        std::cerr << "================================================DUMP========================================" << std::endl;
         auto& id_idx = cont_.get <expiration>();
         for(auto w:id_idx)
         {
-
-            std::cerr << "Worker : " << w->identity_ << std::endl;
-            std::cerr << "Last session : " << w->last_worked_session_ << std::endl;
-            std::cerr << "Idle : " << std::boolalpha<< w->idle_ << std::endl;
-            std::cerr << chr::system_clock::to_time_t(chr::system_clock::now())<< std::endl;
-            std::cerr << chr::system_clock::to_time_t(w->expiry_) << std::endl;
-            std::cerr << "Expiry : " << std::chrono::duration_cast<std::chrono::milliseconds>(w->expiry_-chr::system_clock::now()).count() << std::endl;
-
+            w->dump();
         }
     }
 private:

@@ -79,16 +79,16 @@ std::unique_ptr<bp::child> workers_monitor::start_worker(std::string worker_name
     try
     {
         auto worker = std::make_unique<bp::child>(worker_bin_path, worker_name,
-                /*bp::std_err > ap,*/
-                  ios,
                   bp::on_exit( [  worker_name, this ](int status, const std::error_code& ec) {
                       std::cout << "on_exit handler called for worker: " << worker_name << std::endl;
                       std::cout << "on_exit status value: " << status << std::endl;
                       std::cout << "on_exit error code value: " << ec.value() << std::endl;
                       std::cout << "on_exit error code value: " << ec.message() << std::endl;
                       std::cout << "on_exit error code category: " << ec.category().name() << std::endl;
-                      monitor(worker_name);
-                  }));
+                      if(!zmq_helpers::interrupted) {
+                          monitor(worker_name);
+                      }
+                  }),ios);
         return std::move(worker);
     }
     catch (std::exception& exception)
