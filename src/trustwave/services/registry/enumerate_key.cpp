@@ -77,7 +77,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
         return -1;
     }
     if (!c->connect(*sess)){
-        AU_LOG_DEBUG("Failed connecting to ", sess->remote().c_str());
+        AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
         res->res("Failed to connect");
         return -1;
     }

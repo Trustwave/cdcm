@@ -21,7 +21,7 @@
 using namespace trustwave;
 
 struct EmptyContainer {
-    EmptyContainer():workers(5)  {
+    EmptyContainer():workers(std::chrono::seconds(5))  {
     }
     ~EmptyContainer() {  }
     worker_container workers;

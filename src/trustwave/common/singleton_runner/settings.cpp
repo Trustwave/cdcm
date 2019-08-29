@@ -26,7 +26,7 @@ void cdcm_settings::load(const std::string &filename)
     pt::read_json(filename, tree);
 
     heartbeat_liveness_   = tree.get<uint32_t>    ("cdcm.heartbeat_liveness");
-    heartbeat_interval_   = tree.get<uint32_t>    ("cdcm.heartbeat_interval");
+    heartbeat_interval_   = std::chrono::seconds(tree.get<uint32_t>    ("cdcm.heartbeat_interval"));
     session_idle_time_    = tree.get<uint32_t>    ("cdcm.session_idle_time");
     reconnect_            = tree.get<uint32_t>    ("cdcm.reconnect");
     worker_processes_     = tree.get<uint32_t>    ("cdcm.worker_processes");
@@ -39,7 +39,7 @@ void cdcm_settings::save(const std::string &filename)
 {
     pt::ptree tree;
     tree.put("cdcm.heartbeat_liveness"  , heartbeat_liveness_);
-    tree.put("cdcm.heartbeat_interval"  , heartbeat_interval_);
+    tree.put("cdcm.heartbeat_interval"  , heartbeat_interval_.count());
     tree.put("cdcm.session_idle_time"   , session_idle_time_);
     tree.put("cdcm.reconnect"           , reconnect_);
     tree.put("cdcm.worker_processes"      , worker_processes_);

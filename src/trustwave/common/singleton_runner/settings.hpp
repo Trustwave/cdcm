@@ -17,15 +17,15 @@
 #define TRUSTWAVE_COMMON_SINGLETON_RUNNER_SETTINGS_HPP_
 #include <cstdint>
 #include <string>
-
+#include <chrono>
 struct cdcm_settings
 {
 
     uint32_t session_idle_time_;
     uint32_t heartbeat_liveness_;
-    uint32_t heartbeat_interval_;
+    std::chrono::seconds heartbeat_interval_;
     uint32_t reconnect_;
-    uint32_t heartbeat_expiry_;
+    std::chrono::seconds heartbeat_expiry_;
     uint32_t worker_processes_;
     std::string broker_client_listen_ep_;
     std::string broker_worker_listen_ep_;

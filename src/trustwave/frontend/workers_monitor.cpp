@@ -9,7 +9,7 @@
 #include <boost/system/error_code.hpp>
 #include <sys/types.h>
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
-
+#include "../common/zmq/zmq_helpers.hpp"
 
 namespace bp = boost::process;
 using namespace std;
@@ -31,9 +31,8 @@ workers_monitor::~workers_monitor()
 void workers_monitor::run()
 {
     auto num_workers = authenticated_scan_server::instance().settings.worker_processes_;
-    for (size_t i=0; i< num_workers; ++i)
+    for (size_t i=1; i<= num_workers; ++i)
     {
-//        std::string worker_name = "worker_" + std::to_string(i);
         std::string worker_name = std::to_string(i);
         monitor(worker_name);
     }
@@ -80,16 +79,16 @@ std::unique_ptr<bp::child> workers_monitor::start_worker(std::string worker_name
     try
     {
         auto worker = std::make_unique<bp::child>(worker_bin_path, worker_name,
-                /*bp::std_err > ap,*/
-                  ios,
                   bp::on_exit( [  worker_name, this ](int status, const std::error_code& ec) {
                       std::cout << "on_exit handler called for worker: " << worker_name << std::endl;
                       std::cout << "on_exit status value: " << status << std::endl;
                       std::cout << "on_exit error code value: " << ec.value() << std::endl;
                       std::cout << "on_exit error code value: " << ec.message() << std::endl;
                       std::cout << "on_exit error code category: " << ec.category().name() << std::endl;
-                      monitor(worker_name);
-                  }));
+                      if(!zmq_helpers::interrupted) {
+                          monitor(worker_name);
+                      }
+                  }),ios);
         return std::move(worker);
     }
     catch (std::exception& exception)
