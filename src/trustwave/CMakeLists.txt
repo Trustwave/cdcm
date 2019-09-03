@@ -96,6 +96,10 @@ link_directories(${DEPS_DIR}/libpe-pev/build)
 link_directories(${SMB_LINKS})
 configure_file(cdcm_settings.json  /opt/cdcm_conf/cdcm_settings.json COPYONLY)
 configure_file(Logger/module.xml /opt/cdcm_conf/Logger/module.xml COPYONLY)
+set(bin_dest "bin")
+set(include_dest "include/cdcm-${VERSION}")
+set(lib_dest "lib/cdcm-${VERSION}")
+add_subdirectory(scripts)
 add_subdirectory(common)
 add_subdirectory(backend)
 add_subdirectory(frontend)
@@ -103,6 +107,8 @@ add_subdirectory(services)
 add_subdirectory(clients)
 add_subdirectory(tests)
 
-set(bin_dest "bin")
-set(include_dest "include/cdcm-${VERSION}")
-set(lib_dest "lib/cdcm-${VERSION}")
+#install(FILES Logger/module.xml cdcm_settings.json
+#		DESTINATION SYSCONF
+#		)
+
+
