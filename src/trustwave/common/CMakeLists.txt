@@ -16,3 +16,6 @@ add_subdirectory(protocol)
 add_subdirectory(sessions_cache)
 add_subdirectory(singleton_runner)
 add_subdirectory(zmq)
+
+install(TARGETS tw-common LIBRARY DESTINATION lib
+        DESTINATION ${lib_dest})

@@ -272,6 +272,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
         AU_LOG_ERROR("Malformed message %s",e.what());
         return;
     }
+    AU_LOG_DEBUG("body : %s", msg->body());
     if (recieved_msg.hdr.session_id != std::string("N/A")){
         trustwave::authenticated_scan_server::instance().sessions->touch_by <shared_mem_sessions_cache::id>(
                         recieved_msg.hdr.session_id);
@@ -298,11 +299,11 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
             auto res_body = to_string(res_as_json, 2);
             zmsg *reply = new zmsg;
             reply->body_set(res_body.c_str());
+            AU_LOG_DEBUG("sending to client :\n %s",res_body.c_str());
             std::string client = msg->unwrap();
             reply->wrap(MDPC_CLIENT, client.c_str());
             reply->wrap(sender.c_str(), "");
-            AU_LOG_DEBUG("sending to client :\n %s", msg->to_str(false,false,false).c_str());
-            std::cout << "sending to client :\n " << msg->to_str(false,false,false) << std::endl;
+
             reply->send(*external_socket_);
             replied_++;
 
