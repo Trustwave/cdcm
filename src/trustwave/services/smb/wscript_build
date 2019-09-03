@@ -1,6 +1,0 @@
-#!/usr/bin/env python
-   
-bld.SAMBA_SUBSYSTEM('smb-actions',
-	includes='../../../common/ ../../../', 
-    source='get_file.cpp',
-    deps='tw-session tw-smb-client')

@@ -1,6 +1,0 @@
-#!/usr/bin/env python
-   
-bld.SAMBA_SUBSYSTEM('tw-zmq',
-	includes='..',
-    source='zmq_helpers.cpp zmq_message.cpp',
-    deps='')
