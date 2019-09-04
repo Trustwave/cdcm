@@ -88,6 +88,7 @@ namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
 namespace logging = boost::log;
 namespace expr = boost::log::expressions;
+    namespace attrs = boost::log::attributes;
 //===========================================================================
 // @{CSEH}
 //								Logger
@@ -157,6 +158,42 @@ Logger::~Logger() {
     logging::core::get()->remove_all_sinks();
 }
 
+// The operator is used for regular stream formatting
+    std::ostream& operator<< (std::ostream& strm, ::trustwave::logger::severity_levels level)
+    {
+       // if (static_cast< std::size_t >(level) < sizeof(::trustwave::logger::severity_levelsArray) / sizeof(*::trustwave::logger::severity_levelsArray))
+            strm << ::trustwave::logger::severity_levelsArray[level];
+//        else
+//            strm << static_cast< int >(level);
+
+        return strm;
+    }
+
+// The operator is used when putting the severity level to log
+    logging::formatting_ostream& operator<<
+            (
+                    logging::formatting_ostream& strm,
+                    logging::to_log_manip<::trustwave::logger::severity_levels, tag::severity > const& manip
+            )
+    {
+//        static const char* strings[] =
+//                {
+//                        "NORM",
+//                        "NTFY",
+//                        "WARN",
+//                        "ERRR",
+//                        "CRIT"
+//                };
+
+        ::trustwave::logger::severity_levels level = manip.get();
+     //   if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
+            strm <<  ::trustwave::logger::severity_levelsArray[level];
+//        else
+//            strm << static_cast< int >(level);
+
+        return strm;
+    }
+
 //===========================================================================
 // @{FUNH}
 //								add_file_sink()
@@ -180,7 +217,10 @@ void Logger::add_file_sink(const ::trustwave::sink_conf &s) {
 				<< expr::format_date_time<boost::posix_time::ptime>("TimeStamp",
 					"%Y-%m-%d %H:%M:%S")
 				<< "]"
-				<< expr::smessage));
+				<< expr::attr< ::trustwave::logger::severity_levels >("Severity")
+				//<< " [" << std::setw(7) << std::left<< ::trustwave::logger::severity_levelsArray[severity]<<  "] "
+        << expr::format_named_scope("Scope", keywords::format = "%n", keywords::iteration = expr::reverse)
+                << expr::smessage));
 	sink->set_filter(severity >= s.filter);
 }
 //===========================================================================
@@ -258,6 +298,8 @@ bool Logger::internal_init(const std::string &conf_path) {
         }
         return false;
     }
+        attrs::named_scope Scope;
+        logging::core::get()->add_thread_attribute("Scope", Scope);
     //
     //  the follwing logs are written as errors so they will not be filter in any manner.
     //	---------------------------------------------------------------------------------

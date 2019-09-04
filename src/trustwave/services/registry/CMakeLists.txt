@@ -16,3 +16,5 @@ set(SOURCE_FILES
 add_library(tw-registry-actions OBJECT ${SOURCE_FILES})
 target_compile_definitions(tw-registry-actions PUBLIC OBJ)
 target_link_libraries(tw-registry-actions  tw-registry-client)
+install(TARGETS tw-registry-actions LIBRARY DESTINATION lib
+		DESTINATION ${lib_dest})

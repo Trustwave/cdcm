@@ -178,15 +178,23 @@ int message_worker::worker_loop()
     mw.connect_to_broker();
     using namespace tao::json;
     zmsg *reply = nullptr;
-    while (1){
+    while (true){
         zmsg *request = mw.recv(reply);
         if (request == 0){
             break;              //  Worker was interrupted
         }
         std::string mstr(request->body());
-        const auto req_body = from_string(mstr);
-        AU_LOG_DEBUG("msg: %s", to_string(req_body, 2).c_str());
-        auto request_body = req_body.as <trustwave::msg>();
+        trustwave::msg request_body;
+        try {
+            const auto req_body_as_json = from_string(mstr);
+            AU_LOG_DEBUG("msg: %s", to_string(req_body_as_json, 2).c_str());
+            request_body = req_body_as_json.as<trustwave::msg>();
+        }
+        catch(std::exception& e)
+        {
+            AU_LOG_ERROR("Malformed message %s",e.what());
+            continue;
+        }
         auto result_message = std::make_shared <trustwave::result_msg>();
         trustwave::res_msg res;
         res.hdr = request_body.hdr;

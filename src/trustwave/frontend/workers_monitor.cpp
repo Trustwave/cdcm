@@ -14,7 +14,7 @@
 namespace bp = boost::process;
 using namespace std;
 using namespace trustwave;
-workers_monitor::workers_monitor(boost::asio::io_service& ios_) : ios(ios_), num_workers (authenticated_scan_server::instance().settings.worker_processes_), worker_bin_path("../backend/cdcm_worker")
+workers_monitor::workers_monitor(boost::asio::io_service& ios_) : ios(ios_), num_workers (authenticated_scan_server::instance().settings.worker_processes_), worker_bin_path("cdcm_worker")
 {
 }
 
@@ -78,7 +78,7 @@ std::unique_ptr<bp::child> workers_monitor::start_worker(std::string worker_name
     cout << "in start_worker. worker name: " << worker_name << endl;
     try
     {
-        auto worker = std::make_unique<bp::child>(worker_bin_path, worker_name,
+        auto worker = std::make_unique<bp::child>(bp::search_path(worker_bin_path), worker_name,
                   bp::on_exit( [  worker_name, this ](int status, const std::error_code& ec) {
                       std::cout << "on_exit handler called for worker: " << worker_name << std::endl;
                       std::cout << "on_exit status value: " << status << std::endl;

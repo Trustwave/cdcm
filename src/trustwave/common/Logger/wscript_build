@@ -1,5 +1,0 @@
-#!/usr/bin/env python
- 
-bld.SAMBA_SUBSYSTEM('tw-logger',  
-    source='Logger.cpp conf/LoggerConfiguration.cpp',
-    includes='include/')

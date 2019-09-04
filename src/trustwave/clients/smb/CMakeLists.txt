@@ -13,3 +13,5 @@ set(SOURCE_FILES smb_downloader_client.cpp)
 add_library(tw-smb-client SHARED ${SOURCE_FILES})
 target_link_libraries(tw-smb-client  smbclient-raw smbclient tw-singleton-runner)
 
+install(TARGETS tw-smb-client LIBRARY DESTINATION lib
+        DESTINATION ${lib_dest})

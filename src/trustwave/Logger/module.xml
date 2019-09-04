@@ -17,7 +17,7 @@
     <supported_sinks>
       <sink name="file">
         <id>1</id>
-        <path>/tmp/</path>
+        <path>/var/cdcm/log/</path>
         <name>cdcm</name>
         <filter>debug</filter>
         <enable>true</enable>

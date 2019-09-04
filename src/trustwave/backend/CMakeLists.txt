@@ -7,3 +7,6 @@ add_executable(cdcm_worker ${SOURCE_FILES})
 target_link_libraries(cdcm_worker pthread zmq boost_system boost_log samba-debug-samba4 smbclient-raw-samba4 krb5 
 tw-logger  tw-common tw-registry-actions tw-smb-actions tw-internal-actions crypto ssl samba-credentials 
 tw-sessions-cache tw-zmq tw-singleton-runner  )
+
+install(TARGETS cdcm_worker RUNTIME DESTINATION bin
+        DESTINATION ${bin_dest})

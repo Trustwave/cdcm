@@ -15,7 +15,8 @@ add_executable(cdcm_broker ${SOURCE_FILES})
 target_link_libraries(cdcm_broker  
 						pthread 
 						zmq
-						boost_system 
+						boost_system
+						boost_filesystem
 						boost_log
 						tw-logger 
 						tw-smb-actions 
@@ -27,3 +28,5 @@ target_link_libraries(cdcm_broker
 						tw-singleton-runner
 						libpe_pev.a
 						)
+install(TARGETS cdcm_broker RUNTIME DESTINATION bin
+		DESTINATION ${bin_dest})

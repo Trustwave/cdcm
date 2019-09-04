@@ -1,8 +1,0 @@
-#!/usr/bin/env python
-
-bld.RECURSE('clients')
-bld.RECURSE('common')  
-bld.RECURSE('services')
-bld.RECURSE('frontend')
-bld.RECURSE('backend')  
-bld.RECURSE('tests')  

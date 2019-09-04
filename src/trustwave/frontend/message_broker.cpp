@@ -262,8 +262,17 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
      */
     using namespace tao::json;
     std::string mstr(msg->body());
-    const auto req_body_as_jsom = from_string(mstr);
-    auto recieved_msg = req_body_as_jsom.as <trustwave::msg>();
+    trustwave::msg recieved_msg;
+    try {
+        const auto req_body_as_json = from_string(mstr);
+        recieved_msg = req_body_as_json.as<trustwave::msg>();
+    }
+    catch(std::exception& e)
+    {
+        AU_LOG_ERROR("Malformed message %s",e.what());
+        return;
+    }
+    AU_LOG_DEBUG("body : %s", msg->body());
     if (recieved_msg.hdr.session_id != std::string("N/A")){
         trustwave::authenticated_scan_server::instance().sessions->touch_by <shared_mem_sessions_cache::id>(
                         recieved_msg.hdr.session_id);
@@ -275,7 +284,6 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
         if(!act1)
         {
             AU_LOG_ERROR("%s not found! ignoring all message", action_message->name().c_str());
-            std::cout << action_message->name() << " not found! ignoring all message" << std::endl;
             break;
         }
         if (act1->short_job()){
@@ -286,17 +294,16 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
             if (-1 == act1->act(trustwave::authenticated_scan_server::instance().get_session(
                                                             recieved_msg.hdr.session_id), action_message, res)){
                 AU_LOG_DEBUG("action %s returned with an error", action_message->name().c_str());
-                std::cout << "action " << action_message->name() << " returned with an error" << std::endl;
             }
             const tao::json::value res_as_json = result_message;
             auto res_body = to_string(res_as_json, 2);
             zmsg *reply = new zmsg;
             reply->body_set(res_body.c_str());
+            AU_LOG_DEBUG("sending to client :\n %s",res_body.c_str());
             std::string client = msg->unwrap();
             reply->wrap(MDPC_CLIENT, client.c_str());
             reply->wrap(sender.c_str(), "");
-            AU_LOG_DEBUG("sending to client :\n %s", msg->to_str(false,false,false).c_str());
-            std::cout << "sending to client :\n " << msg->to_str(false,false,false) << std::endl;
+
             reply->send(*external_socket_);
             replied_++;
 

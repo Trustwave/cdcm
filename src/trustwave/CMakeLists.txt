@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
+set(VERSION_MAJOR 1 CACHE STRING "major version" FORCE)
+set(VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
+set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR} CACHE STRING "version" FORCE)
+
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_INSTALL_RPATH "/usr/local/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 include(CheckCXXCompilerFlag)
-
 function(enable_cxx_compiler_flag_if_supported flag)
 	string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
 	if(flag_already_set EQUAL -1)
@@ -90,11 +96,19 @@ link_directories(${DEPS_DIR}/libpe-pev/build)
 link_directories(${SMB_LINKS})
 configure_file(cdcm_settings.json  /opt/cdcm_conf/cdcm_settings.json COPYONLY)
 configure_file(Logger/module.xml /opt/cdcm_conf/Logger/module.xml COPYONLY)
+set(bin_dest "bin")
+set(include_dest "include/cdcm-${VERSION}")
+set(lib_dest "lib/cdcm-${VERSION}")
+add_subdirectory(scripts)
 add_subdirectory(common)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 add_subdirectory(services)
 add_subdirectory(clients)
 add_subdirectory(tests)
+
+#install(FILES Logger/module.xml cdcm_settings.json
+#		DESTINATION SYSCONF
+#		)
 
 
