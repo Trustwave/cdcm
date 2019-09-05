@@ -209,8 +209,7 @@ int message_worker::worker_loop()
                 AU_LOG_ERROR("action %s not found", action_message->name().c_str());
             }
             result_message->id(action_message->id());
-            if (-1
-                            == action->act(
+            if (-1 == action->act(
                                             trustwave::authenticated_scan_server::instance().get_session(
                                                             request_body.hdr.session_id), action_message,
                                             result_message)){

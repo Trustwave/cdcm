@@ -38,13 +38,14 @@ int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<a
     if (!c){
         return -1;
     }
-    auto veact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
+
+    AU_LOG_ERROR("About to cast to %s",action->name().c_str());
+    auto veact = std::dynamic_pointer_cast<reg_action_value_exists_msg>(action);
     if (!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error");
         return -1;
     }
-
     if (!c->connect(*sess)) {
         AU_LOG_DEBUG("Failed connecting to %s",sess->remote().c_str());
         res->res("Failed to connect");

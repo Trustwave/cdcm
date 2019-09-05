@@ -10,8 +10,9 @@ set(SOURCE_FILES
 	query_value.cpp 
 	enumerate_key.cpp 
 	key_exists.cpp 
-	value_exists.cpp
-	)
+	get_os.cpp
+		value_exists.cpp
+		)
 	
 add_library(tw-registry-actions OBJECT ${SOURCE_FILES})
 target_compile_definitions(tw-registry-actions PUBLIC OBJ)
