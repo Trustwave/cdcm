@@ -16,12 +16,8 @@
 //===========================================================================
 //                              Include Files.
 //===========================================================================
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#include <boost/process.hpp>
-#include <boost/asio.hpp>
-//restore compiler switches
-#pragma GCC diagnostic pop
+
+#include <thread>
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../common/zmq/zmq_helpers.hpp"
 #include "../common/typedefs.hpp"
