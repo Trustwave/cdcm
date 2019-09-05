@@ -93,6 +93,13 @@ struct reg_action_query_value_msg: public action_msg
     std::string value_;
 
 };
+struct reg_action_get_os_msg: public action_msg
+{
+    reg_action_get_os_msg() :
+            action_msg("get_os")
+    {
+    }
+};
 struct reg_action_enum_key_msg: public action_msg
 {
     reg_action_enum_key_msg() :
@@ -102,6 +109,15 @@ struct reg_action_enum_key_msg: public action_msg
     std::string key_;
 
 };
+    struct reg_action_value_exists_msg: public action_msg
+    {
+        reg_action_value_exists_msg() :
+                action_msg("value_exists")
+        {
+        }
+        std::string key_;
+        std::string value_;
+    };
 struct reg_action_key_exists_msg: public action_msg
 {
     reg_action_key_exists_msg() :
@@ -111,6 +127,7 @@ struct reg_action_key_exists_msg: public action_msg
     std::string key_;
 
 };
+
 struct local_start_session_msg: public action_msg
 {
 
