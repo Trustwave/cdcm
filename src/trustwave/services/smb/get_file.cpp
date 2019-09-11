@@ -33,7 +33,7 @@ int SMB_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg
 {
 
     if (!sess || (sess && sess->id().is_nil())) {
-        res->res("Session Not Found ERROR");
+        res->res("Error: Session not found");
         return -1;
     }
 

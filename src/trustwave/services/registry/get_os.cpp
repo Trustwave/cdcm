@@ -32,7 +32,7 @@ static constexpr std::array<const std::string_view,5> values{"CurrentBuild", "Cu
 int GetOS_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_msg> action, std::shared_ptr <result_msg> res)
 {
     if (!sess || (sess && sess->id().is_nil())) {
-        res->res("Session Not Found ERROR");
+        res->res("Error: Session not found");
         return -1;
     }
     auto c = client(sess, res);
@@ -43,13 +43,13 @@ int GetOS_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_
     auto qvact = std::dynamic_pointer_cast <reg_action_get_os_msg>(action);
     if (!qvact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error");
+        res->res("Error: internal error");
         return -1;
     }
 
     if (!c->connect(*sess)){
         AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Failed to connect");
+        res->res("Error: Failed to connect");
         return -1;
     }
     static constexpr std::string_view  key="SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion";

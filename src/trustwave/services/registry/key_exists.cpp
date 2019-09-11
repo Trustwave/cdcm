@@ -31,7 +31,7 @@ int Key_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <ac
 {
 
     if (!sess || (sess && sess->id().is_nil())){
-        res->res("Session Not Found ERROR");
+        res->res("Error: Session not found");
         return -1;
     }
     auto c = client(sess, res);
@@ -43,14 +43,14 @@ int Key_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <ac
     auto keact = std::dynamic_pointer_cast <reg_action_key_exists_msg>(action);
     if (!keact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Bad message");
+        res->res("Error: internal error");
         return -1;
 
     }
 
     if (!c->connect(*sess)){
         AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Failed to connect");
+        res->res("Error: Failed to connect");
         return -1;
     }
     if (!std::get <0>(c->open_key(keact->key_.c_str()))){

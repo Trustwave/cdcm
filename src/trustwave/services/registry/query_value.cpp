@@ -31,7 +31,7 @@ using namespace trustwave;
 int Query_Value_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_msg> action, std::shared_ptr <result_msg> res)
 {
     if (!sess || (sess && sess->id().is_nil())) {
-         res->res("Session Not Found ERROR");
+        res->res("Error: Session not found");
          return -1;
      }
 
@@ -44,18 +44,18 @@ int Query_Value_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <a
     auto qvact = std::dynamic_pointer_cast <reg_action_query_value_msg>(action);
     if (!qvact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error");
+        res->res("Error: internal error");
         return -1;
     }
 
     if (!c->connect(*sess)){
         AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Failed to connect");
+        res->res("Error: Failed to connect");
         return -1;
     }
     if (!std::get <0>(c->open_key(qvact->key_.c_str()))){
         AU_LOG_DEBUG("Failed opening  %s", qvact->key_.c_str());
-        res->res("Failed to open key");
+        res->res("Error: Failed to open key");
         return -1;
     }
     trustwave::registry_value rv;

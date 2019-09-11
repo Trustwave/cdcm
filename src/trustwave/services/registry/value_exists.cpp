@@ -30,7 +30,7 @@ int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<a
 {
 
     if (!sess || (sess && sess->id().is_nil())){
-        res->res("Session Not Found ERROR");
+        res->res("Error: Session not found");
         return -1;
     }
     auto c = client(sess, res);
@@ -43,17 +43,18 @@ int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<a
     auto veact = std::dynamic_pointer_cast<reg_action_value_exists_msg>(action);
     if (!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error");
+        res->res("Error: internal error");
         return -1;
     }
     if (!c->connect(*sess)) {
         AU_LOG_DEBUG("Failed connecting to %s",sess->remote().c_str());
-        res->res("Failed to connect");
+        res->res("Error: Failed to connect");
         return -1;
     }
     if (!std::get<0>(c->open_key(veact->key_.c_str()))) {
         AU_LOG_DEBUG("Failed opening  %s",veact->key_.c_str());
-        res->res("Key doesn't exist");
+        res->res("False");
+      //  res->res("Key doesn't exist");
         return -1;
     }
     trustwave::registry_value rv;

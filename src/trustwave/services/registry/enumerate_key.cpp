@@ -62,7 +62,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
 {
 
     if (!sess || (sess && sess->id().is_nil())){
-        res->res("Session Not Found ERROR");
+        res->res("Error: Session not found");
         return -1;
     }
     auto c = client(sess, res);
@@ -73,22 +73,28 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
     auto ekact = std::dynamic_pointer_cast <reg_action_enum_key_msg>(action);
     if (!ekact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Bad message");
+        res->res("Error: internal error");
         return -1;
     }
     if (!c->connect(*sess)){
         AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Failed to connect");
+        res->res("Error: Failed to connect");
         return -1;
     }
     trustwave::enum_key ek;
-    c->enumerate_key(ekact->key_, ek);
+    auto ret = c->enumerate_key(ekact->key_, ek);
+    if(std::get<0>(ret)) {
+        const tao::json::value v1 = ek;
+        res->res(to_string(v1, 2));
 
-    const tao::json::value v1 = ek;
-
-    res->res(to_string(v1, 2));
+    }
+    else
+    {
+        auto status =werror_to_ntstatus(std::get<1>(ret));
+        AU_LOG_DEBUG("%s",nt_errstr(status));
+        res->res(std::string("Error: ")+nt_errstr(status));
+    }
     return 0;
-
 }
 
 Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
