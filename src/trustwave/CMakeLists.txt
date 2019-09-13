@@ -27,7 +27,11 @@ enable_cxx_compiler_flag_if_supported("-Wextra")
 #enable_cxx_compiler_flag_if_supported("-Werror")
 enable_cxx_compiler_flag_if_supported("-pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-set (DEPS_DIR /sandbox/src/deps)
+if (DEFINED ENV{DEPS_DIR})
+	set (DEPS_DIR ENV{DEPS_DIR})
+else()
+	set (DEPS_DIR /sandbox/src/deps)
+endif()
 set (SAMBA_SRC ${DEPS_DIR}/samba-4.10.6)
 set (SMB_INCLUDES
    ${SAMBA_SRC}
