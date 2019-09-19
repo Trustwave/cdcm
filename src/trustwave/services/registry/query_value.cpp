@@ -60,9 +60,14 @@ int Query_Value_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <a
     }
     trustwave::registry_value rv;
     c->key_get_value_by_name(qvact->value_.c_str(), rv);
-    AU_LOG_INFO(rv.value().c_str());
-
-    res->res(rv.value());
+    if (rv.value().empty()) {
+        res->res("Error: value is empty");
+        AU_LOG_ERROR("Error: value is empty");
+    }
+    else {
+        res->res(rv.value());
+        AU_LOG_INFO(rv.value().c_str());
+    }
     return 0;
 
 }
