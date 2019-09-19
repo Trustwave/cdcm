@@ -59,7 +59,6 @@ shared_mem_sessions_cache::shared_mem_sessions_cache(const std::string &name, co
 
 shared_mem_sessions_cache::~shared_mem_sessions_cache()
 {
-    printf("Shared memory Sessions cache Destructed\n");
     /*WriteLock auto_lock(lock_);
     segment_->get_segment_manager()->destroy_ptr(map_);*/
 }

@@ -66,7 +66,7 @@ public:
     }
     ~shared_mem_session_element()
     {
-        printf("%s is being destructed\n", session_.remote_.c_str());
+      //  printf("%s is being destructed\n", session_.remote_.c_str());
     }
     shared_mem_session_element(sp_session_t spUC, size_t, const void_allocator &va);
     // Avoid copy semantic
@@ -149,7 +149,7 @@ public:
             s = idx.find(String(kv.c_str(), char_allocator(segment_->get_segment_manager())));
         }
         if (s == idx.end()){
-            printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
+          // printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
             return sp_session_t();
         }
         return this->update <Tag>(s);
@@ -164,7 +164,7 @@ public:
             s = idx.find(String(kv.c_str(), char_allocator(segment_->get_segment_manager())));
         }
         if (s == idx.end()){
-            printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
+         //   printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
             return false;
         }
         this->update <Tag>(s);
