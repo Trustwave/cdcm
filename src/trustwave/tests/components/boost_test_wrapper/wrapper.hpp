@@ -33,7 +33,8 @@ namespace trustwave {
 
         ~wrapper();
 
-        std::unique_ptr<boost::process::child>  start_external_test(std::string command, std::string params,std::pair<std::future<std::string>,std::future<std::string>>&& pa);
+        std::unique_ptr<boost::process::child>  start_external_test(std::string command,
+                std::string params,std::pair<std::future<std::string>,std::future<std::string>>&& streams,std::future<std::error_code>&&);
 
     private:
         boost::asio::io_service &ios;
