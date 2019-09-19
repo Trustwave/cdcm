@@ -27,11 +27,11 @@ boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_
                 const size_t size,size_t session_idle_time)
 {
     const std::string absolute_name(name);
-    std::cout << "Creating Shared Mem Sessions Cache ( " << absolute_name << " ) size ( " << size << " )" << std::endl;
+   // std::cout << "Creating Shared Mem Sessions Cache ( " << absolute_name << " ) size ( " << size << " )" << std::endl;
     boost::shared_ptr <shared_mem_sessions_cache> cache = boost::shared_ptr <shared_mem_sessions_cache>(
                     new shared_mem_sessions_cache(absolute_name, size, session_idle_time));
     if (false == cache->construct()){
-        std::cout << "Failed Shared Mem Sessions Cache name ( " << absolute_name << " ) size ( " << size  << " )" << std::endl;
+    //    std::cout << "Failed Shared Mem Sessions Cache name ( " << absolute_name << " ) size ( " << size  << " )" << std::endl;
         return boost::shared_ptr <shared_mem_sessions_cache>();
     }
 
@@ -59,7 +59,6 @@ shared_mem_sessions_cache::shared_mem_sessions_cache(const std::string &name, co
 
 shared_mem_sessions_cache::~shared_mem_sessions_cache()
 {
-    printf("Shared memory Sessions cache Destructed\n");
     /*WriteLock auto_lock(lock_);
     segment_->get_segment_manager()->destroy_ptr(map_);*/
 }
@@ -99,15 +98,15 @@ bool shared_mem_sessions_cache::add(const sp_session_t sp_session)
         auto f = remote_idx.find(String(sp_session->remote().c_str(), char_allocator(segment_->get_segment_manager())));
         if (f != remote_idx.end()){
             remote_idx.erase(f);
-            printf("found in cache %s", sp_session->remote().c_str());
+     //       printf("found in cache %s", sp_session->remote().c_str());
         }
         auto it = map_->insert(shared_mem_session_element(sp_session, session_idle_timeout_, va));
         if (!it.second){
-            printf("No need to insert duplicated Session ( ID: %s ) to cache",
+       //     printf("No need to insert duplicated Session ( ID: %s ) to cache",
                             sp_session->idstr().c_str());
             return true;
         }
-        std::cerr << *it.first;
+   //     std::cerr << *it.first;
     } catch (...){
         printf("Cannot allocate Session for cache");
         return false;

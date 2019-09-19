@@ -15,7 +15,7 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CP
 #configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cdcm.spec.in" "${CMAKE_CURRENT_BINARY_DIR}/cdcm.spec" @ONLY IMMEDIATE)
 #set(CPACK_RPM_USER_BINARY_SPECFILE "${CMAKE_CURRENT_BINARY_DIR}/cdcm.spec")
 include(CPack)
-	
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INSTALL_RPATH "/usr/local/lib")
@@ -39,9 +39,11 @@ enable_cxx_compiler_flag_if_supported("-Wextra")
 enable_cxx_compiler_flag_if_supported("-pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 if (DEFINED ENV{DEPS_DIR})
-	set (DEPS_DIR $ENV{DEPS_DIR})
+    set (DEPS_DIR $ENV{DEPS_DIR})
+    message(STATUS "Build machine")
 else()
 	set (DEPS_DIR /sandbox/src/deps)
+    message(STATUS "Development machine")
 endif()
 set (SAMBA_SRC ${DEPS_DIR}/samba-4.10.6)
 set (SMB_INCLUDES

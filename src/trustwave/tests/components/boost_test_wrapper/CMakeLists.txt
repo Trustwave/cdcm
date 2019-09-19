@@ -1,5 +1,3 @@
 set(SOURCE_FILES wrapper.cpp)
 add_library(test_wrapper SHARED ${SOURCE_FILES})
 target_link_libraries(test_wrapper boost_system )
-add_executable(wt main.cpp)
-target_link_libraries(wt test_wrapper pthread boost_system boost_filesystem)

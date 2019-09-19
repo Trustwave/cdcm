@@ -17,8 +17,6 @@
 using namespace trustwave;
 shared_mem_credentials::~shared_mem_credentials()
 {
-    printf(" shared_mem_credentials is being destructed\n");
-    std::cout << " shared_mem_credentials is being destructed" << std::endl;
 }
 
 shared_mem_credentials::shared_mem_credentials(const void_allocator &va) :
@@ -36,7 +34,6 @@ std::ostream &trustwave::operator<<(std::ostream &os, const shared_mem_credentia
 
 shared_mem_session::~shared_mem_session()
 {
-    printf(" shared_mem_session %s is being destructed\n", uuid_.c_str());
 }
 
 shared_mem_session::shared_mem_session(const void_allocator &va) :

@@ -28,20 +28,21 @@ wrapper::~wrapper()
     }
     workers_pool.erase(workers_pool.begin(), workers_pool.end());
 }
-std::unique_ptr<boost::process::child> wrapper::start_external_test(std::string command,std::string params,std::pair<std::future<std::string>,std::future<std::string>>&& pa)
+std::unique_ptr<boost::process::child> wrapper::start_external_test(std::string command,std::string params,std::pair<std::future<std::string>,std::future<std::string>>&& streams,std::future<std::error_code>&& ec_ret)
 {
+    const std::vector< boost::filesystem::path > cp={boost::filesystem::path("./"),
+                                                     boost::filesystem::path("../"),
+                                                     boost::filesystem::path("./functional_tests")};
     try
     {
 
-        auto p = std::make_unique<bp::child>( bp::search_path(command), params,
-                                                              bp::on_exit( [  command, this ](int status, const std::error_code& ec) {
-                                                                  std::cout << "on_exit handler called for worker: " << command << std::endl;
-                                                                  std::cout << "on_exit status value: " << status << std::endl;
-                                                                  std::cout << "on_exit error code value: " << ec.value() << std::endl;
-                                                                  std::cout << "on_exit error code value: " << ec.message() << std::endl;
-                                                                  std::cout << "on_exit error code category: " << ec.category().name() << std::endl;
+        std::shared_ptr<std::promise<std::error_code>> promise = std::make_shared<std::promise<std::error_code>>();
+        auto p = std::make_unique<bp::child>(bp::search_path(command,cp), params,
+                                             bp::on_exit( [  command, this ,promise](int status, const std::error_code& ec) {
+                                                 promise->set_value(std::move(ec));
 
-                                                              }), bp::std_in.close(),bp::std_out > pa.first, bp::std_err >pa.second,ios) ;
+
+                                                              }), bp::std_in.close(), bp::std_out > streams.first, bp::std_err > streams.second, ios) ;
 
         return std::move(p);
     }

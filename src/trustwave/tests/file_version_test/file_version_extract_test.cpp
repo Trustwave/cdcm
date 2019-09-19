@@ -1,41 +1,36 @@
 //=====================================================================================================================
 // Trustwave ltd. @{SRCH}
-//														wt_test.cpp
+//														file_version_extract_test.cpp
 //
 //---------------------------------------------------------------------------------------------------------------------
 // DESCRIPTION: 
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
-// By      : Assaf Cohen
-// Date    : 9/11/19
+// By      : 
+// Date    : 9/15/19
 // Comments:
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include "wrapper.hpp"
-using namespace trustwave;
+extern "C" {
+int get_ver(const char* path, char* res);
+}
+BOOST_AUTO_TEST_SUITE(Utils)
 
-struct fix1 {
-    fix1():w(ios)  {
+    BOOST_AUTO_TEST_CASE(file_version) {
+        std::string res;
+        res.resize(256, 0);
+
+        if (-1 == get_ver("assets/pe_test.asset", std::addressof(res[0]))) {
+            BOOST_TEST(false);
+        }
+        res.resize(strlen(res.c_str()));
+        BOOST_TEST_MESSAGE(res);
+        BOOST_TEST(res=="5.2.3790.1830");
+
 
     }
-    ~fix1() {  }
-    boost::asio::io_service ios;
-    std::pair<std::future<std::string>,std::future<std::string>> pa=std::make_pair(std::future<std::string>(),std::future<std::string>());
-    wrapper w;
-};
-
-BOOST_FIXTURE_TEST_SUITE(Functional,fix1)
-
-    BOOST_AUTO_TEST_CASE(abc) {
-        auto p=w.start_external_test("ls","-la",std::move(pa));
-        ios.run();
-        std::cout<<pa.first.get();
-        BOOST_TEST(true);
-    }
-
-
 BOOST_AUTO_TEST_SUITE_END()
