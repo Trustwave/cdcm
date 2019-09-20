@@ -29,8 +29,7 @@ ExternalData_Add_Target(tests_externalData)
 
 add_executable (tests_run test_runner.cpp ${TEST_SRCS} )
 add_custom_command(TARGET tests_run POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "$<TARGET_FILE_DIR:tests_run>/assets"
-        COMMAND ${CMAKE_COMMAND} -E echo "$pta"
+        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:tests_run>/assets
         COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:tests_run>/assets
         COMMAND ${CMAKE_COMMAND} -E copy ${pta} $<TARGET_FILE_DIR:tests_run>/assets/
         )
