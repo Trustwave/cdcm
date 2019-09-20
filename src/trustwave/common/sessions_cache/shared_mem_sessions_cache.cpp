@@ -71,18 +71,18 @@ bool shared_mem_sessions_cache::construct()
         //associated with a c-string.
         segment_ = boost::make_shared <bip::managed_shared_memory>(bip::open_or_create, name_.c_str(), segment_size_);
         if (!segment_){
-            printf("Failed Creating managed_shared_memory as owner");
+    //        printf("Failed Creating managed_shared_memory as owner");
             return false;
         }
         map_ = segment_->find_or_construct <sessions>((name_ + std::string("_SET")).c_str())(sessions::ctor_args_list(),
                         segment_->get_allocator <shared_mem_session_element>());
 
         if (nullptr == map_){
-            printf("Failed to create shared map");
+       //     printf("Failed to create shared map");
             return false;
         }
     } catch (bip::interprocess_exception &ex){
-        printf("Catched IPC exception : %s", ex.what());
+   //     printf("Catched IPC exception : %s", ex.what());
         return false;
     }
     return true;
@@ -108,11 +108,11 @@ bool shared_mem_sessions_cache::add(const sp_session_t sp_session)
         }
    //     std::cerr << *it.first;
     } catch (...){
-        printf("Cannot allocate Session for cache");
+      //  printf("Cannot allocate Session for cache");
         return false;
     }
 
-    printf("Session ( ID: %s ) added \n", sp_session->idstr().c_str());
+  //  printf("Session ( ID: %s ) added \n", sp_session->idstr().c_str());
     return true;
 }
 
@@ -125,7 +125,7 @@ bool shared_mem_sessions_cache::remove_by_id(const std::string &ids)
         return false;
     }
     else{
-        std::cerr << "dest: " << s->session_.remote_.c_str() << '\n';
+  //      std::cerr << "dest: " << s->session_.remote_.c_str() << '\n';
         id_idx.erase(s);
         return true;
     }
@@ -143,9 +143,9 @@ bool shared_mem_sessions_cache::clean()
     WriteLock auto_lock(lock_);
 
     for (auto it = exp_idx.begin(); it != till_now; ++it){
-        std::cerr << "dest: " << it->session_.remote_.c_str() << '\n';
-        std::cerr << "expiration: " << it->expiration_time_ << " "
-                        << (it->expiration_time_ <= now ? std::string(" expired") : std::string(" valid ")) << "\n";
+   //     std::cerr << "dest: " << it->session_.remote_.c_str() << '\n';
+  //      std::cerr << "expiration: " << it->expiration_time_ << " "
+  //                      << (it->expiration_time_ <= now ? std::string(" expired") : std::string(" valid ")) << "\n";
     }
     exp_idx.erase(exp_idx.begin(), till_now);
     return true;
