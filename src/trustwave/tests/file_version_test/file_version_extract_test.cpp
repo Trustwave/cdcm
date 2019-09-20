@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE(Utils)
         std::string assets_path;
 
         BOOST_TEST_MESSAGE(boost::unit_test::framework::master_test_suite().argv[2]);
-        std::cerr<<boost::unit_test::framework::master_test_suite().argv[2];
+
         if(boost::unit_test::framework::master_test_suite().argc<3)
         {
             assets_path.assign("assets/pe_test.asset");
@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_SUITE(Utils)
         else {
             assets_path.assign(boost::unit_test::framework::master_test_suite().argv[2]).append("/pe_test.asset");
         }
+        std::cerr<<assets_path;
         BOOST_TEST_MESSAGE(assets_path);
 
         if (-1 == get_ver(assets_path.c_str(), std::addressof(res[0]))) {
