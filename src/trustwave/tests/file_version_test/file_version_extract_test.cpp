@@ -24,7 +24,9 @@ BOOST_AUTO_TEST_SUITE(Utils)
         std::string res;
         res.resize(256, 0);
         std::string assets_path;
+
         BOOST_TEST_MESSAGE(boost::unit_test::framework::master_test_suite().argv[2]);
+        std::cerr<<boost::unit_test::framework::master_test_suite().argv[2];
         if(boost::unit_test::framework::master_test_suite().argc<3)
         {
             assets_path.assign("assets/pe_test.asset");
