@@ -103,7 +103,7 @@ bool shared_mem_sessions_cache::add(const sp_session_t sp_session)
         auto it = map_->insert(shared_mem_session_element(sp_session, session_idle_timeout_, va));
         if (!it.second){
        //     printf("No need to insert duplicated Session ( ID: %s ) to cache",
-                            sp_session->idstr().c_str());
+      //                      sp_session->idstr().c_str());
             return true;
         }
    //     std::cerr << *it.first;

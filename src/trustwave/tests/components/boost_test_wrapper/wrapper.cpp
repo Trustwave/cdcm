@@ -37,8 +37,9 @@ std::unique_ptr<boost::process::child> wrapper::start_external_test(std::string 
     {
 
         std::shared_ptr<std::promise<std::error_code>> promise = std::make_shared<std::promise<std::error_code>>();
+        ec_ret= promise->get_future();
         auto p = std::make_unique<bp::child>(bp::search_path(command,cp), params,
-                                             bp::on_exit( [  command, this ,promise](int status, const std::error_code& ec) {
+                                             bp::on_exit( [  command, this ,promise](int , const std::error_code& ec) {
                                                  promise->set_value(std::move(ec));
 
 
