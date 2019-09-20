@@ -18,12 +18,12 @@ add_subdirectory(components)
 include(ExternalData)
 
 set(ExternalData_URL_TEMPLATES
-        "file://${CMAKE_CURRENT_BINARY_DIR}/assets/%(algo)/%(hash)"
+        "file://${CMAKE_CURRENT_SOURCE_DIR}/assets/%(algo)/%(hash)"
         )
 
 ExternalData_Expand_Arguments(tests_externalData
         pta
-        DATA{assets/,RECURSE:,REGEX:.*.asset}
+        DATA{assets/pe_test.asset}
         )
 ExternalData_Add_Target(tests_externalData)
 
