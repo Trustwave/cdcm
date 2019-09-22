@@ -153,8 +153,7 @@ void message_broker::worker_delete(trustwave::sp_worker_t wrk, bool send_disconn
 void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &&msg)
 {
     assert(msg && msg->parts() >= 1);     //  At least, command
-    std::cerr << "message_broker::worker_process1"<<std::endl;
-    workers_.dump();
+    //workers_.dump();
     std::string command = reinterpret_cast <const char*>(msg->pop_front().c_str());
     bool worker_ready = workers_.exists(sender);
     auto wrk = worker_require(sender);
@@ -201,8 +200,7 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
             }
         }
     }
-    std::cerr << "message_broker::worker_process2"<<std::endl;
-        workers_.dump();
+    //workers_.dump();
 }
 
 //  ---------------------------------------------------------------------
@@ -309,7 +307,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
 
         }
         else{
-            workers_.dump();
+            //workers_.dump();
             trustwave::msg tm;
             tm.hdr = recieved_msg.hdr;
             tm.msgs.push_back(action_message);
