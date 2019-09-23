@@ -55,7 +55,7 @@ int GetOS_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_
     static constexpr std::string_view  key="SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion";
     if (!std::get <0>(c->open_key(key.data()))){
         AU_LOG_DEBUG("Failed opening  %s", key.data());
-        res->res("Failed to open key");
+        res->res("Error: Failed to open key");
     }
     std::map<std::string,std::string> results_map;
     for (auto val:values)
