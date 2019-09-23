@@ -27,7 +27,7 @@ std::shared_ptr <trustwave::registry_client> Registry_Action::client(boost::shar
 /*        c = std::make_shared <trustwave::registry_client>();
         if (!c){*/
             AU_LOG_ERROR("Failed dynamic cast");
-            res->res("Error");
+            res->res("Error: Failed dynamic cast");
         //}
     }
     return c;
