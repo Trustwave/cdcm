@@ -275,9 +275,9 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
         trustwave::authenticated_scan_server::instance().sessions->touch_by <shared_mem_sessions_cache::id>(
                         recieved_msg.hdr.session_id);
     }
+    trustwave::msg tm;
     for (auto action_message : recieved_msg.msgs){
         AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
-        std::cout << "Looking for " << action_message->name() << std::endl;
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
         if(!act1)
         {
@@ -307,16 +307,19 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
 
         }
         else{
-            //workers_.dump();
-            trustwave::msg tm;
+            workers_.dump();
+
             tm.hdr = recieved_msg.hdr;
             tm.msgs.push_back(action_message);
-            value v(tm);
-            auto m = std::make_unique <zmsg>();
-            m->body_set(to_string(v, 2).c_str());
-            m->wrap(sender.c_str(), "");
-            service_dispatch(std::move(m), recieved_msg.hdr.session_id);
         }
+    }
+    if(false == tm.msgs.empty())
+    {
+        value v(tm);
+        auto m = std::make_unique <zmsg>();
+        m->body_set(to_string(v, 2).c_str());
+        m->wrap(sender.c_str(), "");
+        service_dispatch(std::move(m), recieved_msg.hdr.session_id);
     }
 }
 

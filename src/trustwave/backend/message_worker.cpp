@@ -195,10 +195,10 @@ int message_worker::worker_loop()
             AU_LOG_ERROR("Malformed message %s",e.what());
             continue;
         }
-        auto result_message = std::make_shared <trustwave::result_msg>();
+
         trustwave::res_msg res;
         res.hdr = request_body.hdr;
-        res.msgs.push_back(result_message);
+
         AU_LOG_DEBUG("actions count is %zu", request_body.msgs.size());
         for (auto action_message : request_body.msgs){
             AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
@@ -208,7 +208,9 @@ int message_worker::worker_loop()
             if (!action){
                 AU_LOG_ERROR("action %s not found", action_message->name().c_str());
             }
+            auto result_message = std::make_shared <trustwave::result_msg>();
             result_message->id(action_message->id());
+            res.msgs.push_back(result_message);
             if (-1 == action->act(
                                             trustwave::authenticated_scan_server::instance().get_session(
                                                             request_body.hdr.session_id), action_message,
