@@ -43,7 +43,7 @@ int SMB_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg
     std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
     trustwave::smb_downloader_client rc;
     if (!rc.download(base.c_str(), "", false, true, tmp_name.c_str())) {
-        res->res("Download Failed");
+        res->res("Error: Download Failed");
         return -1;
     }
 
