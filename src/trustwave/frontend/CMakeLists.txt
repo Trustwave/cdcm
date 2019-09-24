@@ -29,10 +29,8 @@ target_link_libraries(cdcm_broker
 						libpe_pev.a
 						)
 install(TARGETS cdcm_broker
-		CONFIGURATIONS Debug
 		RUNTIME DESTINATION bin
 		DESTINATION ${bin_dest})
 install(TARGETS cdcm_broker
-		CONFIGURATIONS Debug
 		RUNTIME DESTINATION bin
 		DESTINATION ${release_bin_dest})
