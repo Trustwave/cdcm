@@ -6,3 +6,5 @@ add_library(tw-zmq SHARED ${SOURCE_FILES})
 install(TARGETS tw-zmq LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
 
+install(TARGETS    tw-zmq  LIBRARY  DESTINATION lib
+        DESTINATION ${release_lib_dest})

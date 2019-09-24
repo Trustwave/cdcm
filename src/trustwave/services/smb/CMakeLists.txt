@@ -9,3 +9,6 @@ add_library(tw-smb-actions OBJECT ${SOURCE_FILES})
 target_link_libraries(tw-smb-actions  tw-smb-client)
 install(TARGETS tw-smb-actions LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
+
+install(TARGETS    tw-smb-actions  LIBRARY  DESTINATION lib
+        DESTINATION ${release_lib_dest})

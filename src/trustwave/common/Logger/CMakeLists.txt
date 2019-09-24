@@ -6,3 +6,5 @@ target_link_libraries(tw-logger boost_log)
 install(TARGETS tw-logger LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
 
+install(TARGETS  tw-logger LIBRARY  DESTINATION lib
+        DESTINATION ${release_lib_dest})

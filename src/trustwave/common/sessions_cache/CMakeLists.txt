@@ -13,3 +13,6 @@ target_link_libraries(tw-sessions-cache tw-common)
 
 install(TARGETS tw-sessions-cache LIBRARY DESTINATION lib
 		DESTINATION ${lib_dest})
+
+install(TARGETS  tw-sessions-cache LIBRARY  DESTINATION lib
+		DESTINATION ${release_lib_dest})

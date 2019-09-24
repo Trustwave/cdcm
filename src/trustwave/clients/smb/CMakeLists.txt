@@ -15,3 +15,6 @@ target_link_libraries(tw-smb-client  smbclient-raw smbclient tw-singleton-runner
 
 install(TARGETS tw-smb-client LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
+
+install(TARGETS tw-smb-client LIBRARY DESTINATION DESTINATION lib
+        DESTINATION ${release_lib_dest})

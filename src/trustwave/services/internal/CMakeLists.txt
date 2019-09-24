@@ -16,3 +16,6 @@ target_link_libraries(tw-internal-actions libpe_pev.a crypto )
 
 install(TARGETS tw-internal-actions LIBRARY DESTINATION lib
 		DESTINATION ${lib_dest})
+
+install(TARGETS     tw-internal-actions  LIBRARY  DESTINATION lib
+		DESTINATION ${release_lib_dest})

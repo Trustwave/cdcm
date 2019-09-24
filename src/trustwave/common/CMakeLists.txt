@@ -19,3 +19,6 @@ add_subdirectory(zmq)
 
 install(TARGETS tw-common LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
+
+install(TARGETS    tw-common  LIBRARY  DESTINATION lib
+        DESTINATION ${release_lib_dest})
