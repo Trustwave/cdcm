@@ -29,6 +29,5 @@ target_link_libraries(cdcm_worker
 install(TARGETS cdcm_worker RUNTIME DESTINATION bin
         DESTINATION ${bin_dest})
 install(TARGETS cdcm_worker
-        CONFIGURATIONS Debug
         RUNTIME DESTINATION bin
         DESTINATION ${release_bin_dest})
