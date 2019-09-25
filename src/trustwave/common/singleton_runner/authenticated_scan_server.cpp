@@ -23,8 +23,8 @@ authenticated_scan_server::authenticated_scan_server() :
     //
     //  configuration path.
     //  -------------------
-    const std::string root_conf("/opt/cdcm_conf");
-    settings.load(root_conf + "/cdcm_settings.json");
+
+    settings.load(std::string(conf_root) + "/cdcm_settings.json");
     sessions = shared_mem_sessions_cache::get_or_create("sessions", 1024 * 1024 * 10,settings.session_idle_time_);
 
 }

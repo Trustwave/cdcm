@@ -27,9 +27,8 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
     zmq::context_t ctx(1);
     boost::asio::io_service ios;
     namespace bp = boost::process;
-    const std::string root_conf("/opt/cdcm_conf/");
     LoggerSource::instance()->set_source(::trustwave::logger::broker);
-    if (!Initialize(logger_ptr, root_conf)) {
+    if (!Initialize(logger_ptr, conf_root)) {
             std::cerr << "failed to initialize the logger!!!" << std::endl;
             abort();
     }

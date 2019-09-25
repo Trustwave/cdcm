@@ -23,6 +23,9 @@ struct process_type
     struct     broker;
     struct     worker;
 };
+
+static constexpr std::string_view conf_root("/var/cdcm/conf/");
+
 }
 
 #endif /* TRUSTWAVE_COMMON_TYPEDEFS_HPP_ */

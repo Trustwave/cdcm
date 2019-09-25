@@ -114,7 +114,7 @@ public:
     virtual ~ILogger()
     = default;
 
-    virtual bool init(const std::string &conf_path) = 0;
+    virtual bool init(const std::string_view conf_path) = 0;
 
     virtual void log_event(const logger::severity_levels severity, long collect, const char *file_name,
                     const char *function_name, long line_number, const trustwave::logger::sources source,
@@ -184,6 +184,6 @@ private:
     size_t source_id_{0};
 };
 
-bool Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf);
+bool Initialize(std::unique_ptr<ILogger>& logger, const std::string_view root_conf);
 }
 #endif //COMMON_LOGGER_H

@@ -63,6 +63,7 @@ set (SMB_LINKS
 	${SAMBA_SRC}/bin/default/auth/credentials
 	${SAMBA_SRC}/bin/default/source4/lib/registry
 	${SAMBA_SRC}/bin/default/lib/auth/credentials
+    ${SAMBA_SRC}/bin/default/source3/libsmb
 	
 )
 set(Boost_USE_MULTITHREADED ON)  
@@ -97,8 +98,8 @@ include_directories(${DEPS_DIR})
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
 link_directories(${DEPS_DIR}/libpe-pev/build)
 link_directories(${SMB_LINKS})
-configure_file(cdcm_settings.json  /opt/cdcm_conf/cdcm_settings.json COPYONLY)
-configure_file(Logger/module.xml /opt/cdcm_conf/Logger/module.xml COPYONLY)
+configure_file(cdcm_settings.json  /var/cdcm/conf/cdcm_settings.json COPYONLY)
+configure_file(Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
 set(bin_dest "bin")
 set(release_bin_dest "/opt/output/bin")
 set(release_lib_dest "/opt/output/libs")

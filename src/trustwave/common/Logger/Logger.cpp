@@ -105,7 +105,7 @@ public:
 	//
 	//	Logger API.
 	//	-----------
-	bool init(const std::string &conf_path) override;
+	bool init(const std::string_view conf_path) override;
 
 	//
 	//	Logger API.
@@ -126,7 +126,7 @@ public:
 private:
     bool register_sinks(::trustwave::LoggerConfiguration conf);
 	void add_file_sink(const ::trustwave::sink_conf &s);
-    bool internal_init(const std::string &conf_path);
+    bool internal_init(const std::string_view conf_path);
 
 private:
 //    static Syslog_Client *logger_;
@@ -260,12 +260,12 @@ bool Logger::register_sinks(::trustwave::LoggerConfiguration conf) {
 //---------------------------------------------------------------------------
 // Description: read the configuration file and update the logger according.
 //===========================================================================
-bool Logger::internal_init(const std::string &conf_path) {
+bool Logger::internal_init(const std::string_view conf_path) {
     //
     //	read the configuration file.
     //	----------------------------
     ::trustwave::LoggerConfiguration conf;
-    conf.load(conf_path + "/Logger/module.xml");
+    conf.load(std::string(conf_path) + "/Logger/module.xml");
 
     auto supported_severity = conf.get_sevirity_default_level();
     if (::trustwave::logger::all_severity_levels < supported_severity) {
@@ -316,7 +316,7 @@ bool Logger::internal_init(const std::string &conf_path) {
 // Description: read the configuration file and update the logger according.
 // This function should be called once per logger.
 //===========================================================================
-bool Logger::init(const std::string &conf_path) {
+bool Logger::init(const std::string_view conf_path) {
     //
     //	promise that only one can initialize the logger.
     //	-------------------------------------------------
@@ -448,7 +448,7 @@ trustwave::LoggerSource* trustwave::LoggerSource::instance() {
 //---------------------------------------------------------------------------
 // Description: 
 //===========================================================================
-bool trustwave::Initialize(std::unique_ptr<ILogger>& logger, const std::string &root_conf) {
+bool trustwave::Initialize(std::unique_ptr<ILogger>& logger, const std::string_view root_conf) {
 
     logger = std::make_unique<detail::Logger>();
     if (false == logger->init(root_conf)) {
