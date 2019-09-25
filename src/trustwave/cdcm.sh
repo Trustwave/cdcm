@@ -1,4 +1,4 @@
-!/bin/sh
+#!/bin/sh
 ulimit -c 0
 ulimit -n 131072
 TODO=start
