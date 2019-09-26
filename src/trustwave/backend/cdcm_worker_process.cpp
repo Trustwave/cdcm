@@ -31,7 +31,7 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::wor
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }
-    std::cerr << "worker "<< id << " logger initialised!!!" << std::endl;
+  //  std::cerr << "worker "<< id << " logger initialised!!!" << std::endl;
     std::thread worker_thread(message_worker::worker_loop);
     worker_thread.join();
     return 0;
