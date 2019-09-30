@@ -1,9 +1,0 @@
-[submodule "src/trustwave/3rdparty/json"]
-	path = src/trustwave/3rdparty/json
-	url = https://github.com/taocpp/json.git
-[submodule "src/trustwave/3rdparty/pev"]
-	path = src/trustwave/3rdparty/pev
-	url = https://github.com/merces/pev.git
-[submodule "src/trustwave/3rdparty/samba"]
-	path = src/trustwave/3rdparty/samba
-	url = https://github.com/samba-team/samba.git
