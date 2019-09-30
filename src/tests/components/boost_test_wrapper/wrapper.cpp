@@ -49,7 +49,7 @@ std::unique_ptr<boost::process::child> wrapper::start_external_test(std::string 
     }
     catch (std::exception& exception)
     {
-        std::cout << "got exception: " << exception.what() << std::endl;
+        std::cout << std::endl<< "Got exception: " << exception.what() << std::endl;
         return nullptr;
     }
 }
