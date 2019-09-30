@@ -10,8 +10,7 @@ enable_testing()
 include_directories (${Boost_INCLUDE_DIRS})
 
 
-file(GLOB_RECURSE TEST_SRCS RELATIVE . *_test.cpp)
-
+file(GLOB_RECURSE TEST_SRCS . *_test.cpp)
 add_subdirectory(components)
 add_subdirectory(functional_tests)
 
