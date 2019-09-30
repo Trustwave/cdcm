@@ -1,4 +1,5 @@
-
+cmake_minimum_required(VERSION 3.9.0)
+project(cdcm)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,7 +14,8 @@ function(enable_cxx_compiler_flag_if_supported flag)
 		unset(flag_supported CACHE)
 	endif()
 endfunction()
-
+include(CodeCoverage.cmake)
+APPEND_COVERAGE_COMPILER_FLAGS()
 enable_cxx_compiler_flag_if_supported("-Wall")
 enable_cxx_compiler_flag_if_supported("-Wextra")
 #enable_cxx_compiler_flag_if_supported("-Werror")
@@ -106,7 +108,10 @@ add_subdirectory(frontend)
 add_subdirectory(services)
 add_subdirectory(clients)
 add_subdirectory(tests)
+configure_file(cdcm_settings.json /var/cdcm/conf/cdcm_settings.json COPYONLY)
+configure_file(Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
 
+install(FILES scripts/cdcm.sh DESTINATION ${release_bin_dest})
 #install(FILES Logger/module.xml cdcm_settings.json
 #		DESTINATION SYSCONF
 #		)
