@@ -41,9 +41,7 @@ std::unique_ptr<boost::process::child> wrapper::start_external_test(std::string 
         auto p = std::make_unique<bp::child>(bp::search_path(command,cp), params,
                                              bp::on_exit( [  command, this ,promise](int , const std::error_code& ec) {
                                                  promise->set_value(std::move(ec));
-
-
-                                                              }), bp::std_in.close(), bp::std_out > streams.first, bp::std_err > streams.second, ios) ;
+                                             }), bp::std_in.close(), bp::std_out > streams.first, bp::std_err > streams.second, ios) ;
 
         return std::move(p);
     }
