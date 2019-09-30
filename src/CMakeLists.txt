@@ -1,8 +1,3 @@
-cmake_minimum_required(VERSION 3.9.0)
-project(cdcm)
-set(VERSION_MAJOR 1 CACHE STRING "major version" FORCE)
-set(VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
-set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR} CACHE STRING "version" FORCE)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
@@ -98,8 +93,7 @@ include_directories(${DEPS_DIR})
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
 link_directories(${DEPS_DIR}/libpe-pev/build)
 link_directories(${SMB_LINKS})
-configure_file(../cdcm_settings.json /var/cdcm/conf/cdcm_settings.json COPYONLY)
-configure_file(../Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
+
 set(bin_dest "bin")
 set(release_bin_dest "/opt/output/bin")
 set(release_lib_dest "/opt/output/libs")
@@ -118,5 +112,3 @@ add_subdirectory(tests)
 #		)
 
 
-install(FILES scripts/cdcm.sh
-		DESTINATION ${release_bin_dest})
