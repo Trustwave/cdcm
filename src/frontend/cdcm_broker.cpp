@@ -17,8 +17,8 @@
 
 #include "../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../common/zmq/zmq_helpers.hpp"
-#include "frontend/message_broker.hpp"
-#include "frontend/workers_monitor.hpp"
+#include "message_broker.hpp"
+#include "workers_monitor.hpp"
 
 template<>
 int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::broker>(size_t)
