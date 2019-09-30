@@ -118,5 +118,5 @@ add_subdirectory(tests)
 #		)
 
 
-install(FILES cdcm.sh
+install(FILES scripts/cdcm.sh
 		DESTINATION ${release_bin_dest})
