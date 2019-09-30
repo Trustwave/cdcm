@@ -108,10 +108,10 @@ add_subdirectory(frontend)
 add_subdirectory(services)
 add_subdirectory(clients)
 add_subdirectory(tests)
-configure_file(cdcm_settings.json /var/cdcm/conf/cdcm_settings.json COPYONLY)
-configure_file(Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
+configure_file(../cdcm_settings.json /var/cdcm/conf/cdcm_settings.json COPYONLY)
+configure_file(../Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
 
-install(FILES scripts/cdcm.sh DESTINATION ${release_bin_dest})
+install(FILES ../scripts/cdcm.sh DESTINATION ${release_bin_dest})
 #install(FILES Logger/module.xml cdcm_settings.json
 #		DESTINATION SYSCONF
 #		)
