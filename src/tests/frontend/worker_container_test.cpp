@@ -17,7 +17,7 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <chrono>                                            // for system_clock, chrono
-#include "frontend/worker_container.hpp"
+#include "../../frontend/worker_container.hpp"
 using namespace trustwave;
 
 struct EmptyContainer {
