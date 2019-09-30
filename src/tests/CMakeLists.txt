@@ -1,5 +1,5 @@
 set (Boost_USE_STATIC_LIBS OFF)
-#find_package(Boost  unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 include_directories (${Boost_INCLUDE_DIRS})
 include_directories (../trustwave)
 #Setup CMake to run tests
