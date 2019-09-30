@@ -21,7 +21,7 @@
 #include <iomanip>
 #include <string>
 
-#include "clients/smb/smb_downloader_client.hpp"
+#include "../../clients/smb/smb_downloader_client.hpp"
 #include "get_file.hpp"
 
 #include "../../common/protocol/msg_types.hpp"
