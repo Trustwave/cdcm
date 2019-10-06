@@ -63,6 +63,7 @@ set (SMB_LINKS
     ${SAMBA_SRC}/bin/default/source3/libsmb
 	
 )
+
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_USE_STATIC_LIBS ON)
