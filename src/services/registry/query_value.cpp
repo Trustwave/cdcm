@@ -47,12 +47,13 @@ int Query_Value_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <a
         res->res("Error: internal error");
         return -1;
     }
-
-    if (!c->connect(*sess)){
-        AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Error: Failed to connect");
+    result r=c->connect(*sess);
+    if (!std::get <0>(r)){
+        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(),win_errstr(std::get <1>(r)));
+        res->res(std::string("Error: ")+std::string(win_errstr(std::get <1>(r))));
         return -1;
     }
+
     if (!std::get <0>(c->open_key(qvact->key_.c_str()))){
         AU_LOG_DEBUG("Failed opening  %s", qvact->key_.c_str());
         res->res("Error: Failed to open key");

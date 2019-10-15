@@ -30,7 +30,7 @@ class Start_Session: public Action_Base
 
 public:
     Start_Session() :
-                    Action_Base("start_session", "start_session",true)
+                    Action_Base("start_session", "start_session",false)
     {
     }
     int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;

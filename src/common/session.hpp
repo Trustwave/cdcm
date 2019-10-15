@@ -44,10 +44,7 @@ public:
         }
         return clients_[c];
     }
-   /* void client_done(size_t c)
-    {
-        clients_[c].second = false;
-    }*/
+
     explicit operator bool() const
     {
         return uuid_.is_nil();

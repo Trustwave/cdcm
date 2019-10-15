@@ -47,9 +47,10 @@ int GetOS_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_
         return -1;
     }
 
-    if (!c->connect(*sess)){
-        AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Error: Failed to connect");
+    result r=c->connect(*sess);
+    if (!std::get <0>(r)){
+        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(),win_errstr(std::get <1>(r)));
+        res->res(std::string("Error: ")+std::string(win_errstr(std::get <1>(r))));
         return -1;
     }
     static constexpr std::string_view  key="SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion";

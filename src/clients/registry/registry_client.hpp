@@ -69,7 +69,7 @@ class registry_client: public cdcm_client
 public:
     registry_client();
     ~registry_client() override;
-    bool connect(const session& sess);
+    result connect(const session& sess);
     result key_get_value_by_name(const char *name, registry_value& rv);
 
     result key_get_value_by_index(uint32_t idx, const char **name,

@@ -31,6 +31,7 @@ int Key_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <ac
 {
 
     if (!sess || (sess && sess->id().is_nil())){
+        AU_LOG_ERROR("Session not found");
         res->res("Error: Session not found");
         return -1;
     }
@@ -47,12 +48,13 @@ int Key_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <ac
         return -1;
 
     }
-
-    if (!c->connect(*sess)){
-        AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
-        res->res("Error: Failed to connect");
+    result r=c->connect(*sess);
+    if (!std::get <0>(r)){
+        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(),win_errstr(std::get <1>(r)));
+        res->res(std::string("Error: ")+std::string(win_errstr(std::get <1>(r))));
         return -1;
     }
+
     if (!std::get <0>(c->open_key(keact->key_.c_str()))){
         AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
         res->res("False");
