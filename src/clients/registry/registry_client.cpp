@@ -136,7 +136,7 @@ result registry_client::enumerate_key(const std::string &key, enum_key &ek) {
             for (uint32_t i = 0; i < ki.num_subkeys; i++) {
                 reg_key_get_subkey_by_index(ctx_, ctx_->current, i, &nm, &cnm, &lm);
                 time_t lmt = nt_time_to_unix(lm);
-                ek.sub_keyes_.push_back({nm, cnm ? cnm : "None", std::ctime(&lmt)});
+                ek.sub_keys_.push_back({nm, cnm ? cnm : "None", std::ctime(&lmt)});
 
             }
             for (uint32_t i = 0; i < ki.num_values; i++) {

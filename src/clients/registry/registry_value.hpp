@@ -66,7 +66,7 @@ struct sub_key
 };
 struct enum_key
 {
-    std::vector<sub_key> sub_keyes_;
+    std::vector<sub_key> sub_keys_;
     std::vector<registry_value> registry_values_;
 };
 

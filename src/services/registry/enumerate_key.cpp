@@ -48,7 +48,7 @@ TAO_JSON_BIND_REQUIRED ("last_modified", &trustwave::sub_key::last_modified_)>
 
 template<>
 struct traits <trustwave::enum_key> : binding::object <
-TAO_JSON_BIND_REQUIRED ("sub_keyes", &trustwave::enum_key::sub_keyes_),
+TAO_JSON_BIND_REQUIRED ("sub_keys", &trustwave::enum_key::sub_keys_),
 TAO_JSON_BIND_REQUIRED ("registry_values", &trustwave::enum_key::registry_values_)>
 {
 };
