@@ -77,7 +77,7 @@ bool trustwave::LoggerConfiguration::load(const std::string &file_name) {
 	//	------------------------------------------------
 	version_ = pt.get("Logger.version", 1);
     if (1 != version_) {
-        std::cout << "unsupported verion " << version_ << std::endl;
+        std::cout << "unsupported version " << version_ << std::endl;
         return false;
     }
 	//
@@ -110,7 +110,8 @@ bool trustwave::LoggerConfiguration::load(const std::string &file_name) {
 	//	string to enum.
 	//	---------------
 	static std::map<std::string, trustwave::logger::severity_levels, ci_less> severity_levels_to_string = {
-	                                                                                                 {"debug", trustwave::logger::debug},
+	                                                                                                 {"debug1", trustwave::logger::debug1},
+                                                                                                     {"debug2", trustwave::logger::debug2},
 	                                                                                                 {"info", trustwave::logger::info},
 																									 {"warn", trustwave::logger::warning},
 																									 {"error", trustwave::logger::error}};

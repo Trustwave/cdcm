@@ -217,7 +217,7 @@ void Logger::add_file_sink(const ::trustwave::sink_conf &s) {
 				<< expr::format_date_time<boost::posix_time::ptime>("TimeStamp",
 					"%Y-%m-%d %H:%M:%S")
 				<< "]"
-				<< expr::attr< ::trustwave::logger::severity_levels >("Severity")
+				//<< expr::attr< ::trustwave::logger::severity_levels >("Severity")
 				//<< " [" << std::setw(7) << std::left<< ::trustwave::logger::severity_levelsArray[severity]<<  "] "
         << expr::format_named_scope("Scope", keywords::format = "%n", keywords::iteration = expr::reverse)
                 << expr::smessage));
@@ -269,7 +269,7 @@ bool Logger::internal_init(const std::string_view conf_path) {
 
     auto supported_severity = conf.get_sevirity_default_level();
     if (::trustwave::logger::all_severity_levels < supported_severity) {
-        std::cout << "bad supported_severity - " << supported_severity << std::endl;
+        std::cout << "bad supported_severity - " << supported_severity << " "<<::trustwave::logger::all_severity_levels << std::endl;
         return false;
     }
     //
@@ -351,9 +351,9 @@ void Logger::log_event(const trustwave::logger::severity_levels severity,
 	//
 	//	unsupported severity_levels will fail to log.
 	//	---------------------------------------------
-	if ((supported_default_severity_ & severity) == false) {
-        return;
-    }
+//	if ((supported_default_severity_ & severity) == false) {
+//        return;
+//    }
 	//
 	//	severity_levels should be enabled in the source.
 	//	------------------------------------------------

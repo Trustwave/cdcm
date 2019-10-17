@@ -17,9 +17,16 @@
 #define TRUSTWAVE_COMMON_SINGLETON_RUNNER_LOG_MACROS_HPP_
 
 #define LOGGER trustwave::authenticated_scan_server::instance().logger()
-
 #define AU_LOG_DEBUG(...) LOGGER->log_event(   \
-        trustwave::logger::debug,            \
+        trustwave::logger::debug2,            \
+        trustwave::logger::COLLECT_FROM_NONE,                               \
+        ERR_LOG,                                                            \
+        ::trustwave::LoggerSource::instance()->get_source(),                \
+         __VA_ARGS__)
+//        ::trustwave::LoggerSource::instance()->get_source_id(),
+
+#define AU_LOG_DEBUG1(...) LOGGER->log_event(   \
+        trustwave::logger::debug1,            \
         trustwave::logger::COLLECT_FROM_NONE,                               \
         ERR_LOG,                                                            \
         ::trustwave::LoggerSource::instance()->get_source(),                \

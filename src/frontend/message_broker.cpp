@@ -103,10 +103,10 @@ void message_broker::service_dispatch(std::unique_ptr <zmsg> &&msg, const std::s
         auto wrk = workers_.get_by_last_worked_session(requests_.front().second);
         if (!wrk || (wrk && !wrk->idle_)){
             wrk = workers_.get_next_worker();
-            AU_LOG_DEBUG("Not found last worked on session %s using %s", id.c_str(),wrk->identity_.c_str());
+            AU_LOG_DEBUG1("Not found last worked on session %s using %s", id.c_str(),wrk->identity_.c_str());
         }
         else{
-            AU_LOG_DEBUG("Found last session %s", wrk->identity_.c_str());
+            AU_LOG_DEBUG1("Found last session %s", wrk->identity_.c_str());
         }
         auto front_msg = std::move(requests_.front());
         requests_.pop_front();
@@ -221,8 +221,14 @@ void message_broker::worker_send(trustwave::sp_worker_t worker_ptr, const char *
     //  Stack routing envelope to start of message
     msg->wrap(worker_ptr->identity_.c_str(), "");
 
-    AU_LOG_DEBUG("sending %s to worker", mdps_commands[(int ) *command]);
-    AU_LOG_DEBUG("body : %s", msg->body());
+    if(strcmp(MDPW_REQUEST,command)==0)
+    {
+        AU_LOG_DEBUG("sending %s to worker", mdps_commands[(int ) *command]);
+        AU_LOG_DEBUG("body : %s", msg->body());
+    } else
+    {
+        AU_LOG_DEBUG1("sending %s to worker", mdps_commands[(int ) *command]);
+    }
     msg->send(*internal_socket_);
 }
 
@@ -277,7 +283,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
     }
     trustwave::msg tm;
     for (auto action_message : recieved_msg.msgs){
-        AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
+        AU_LOG_DEBUG1("Looking for %s", action_message->name().c_str());
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
         if(!act1)
         {
@@ -330,13 +336,12 @@ void message_broker::handle_message(zmq::socket_t &socket, std::string expected_
     std::unique_ptr <zmsg> msg = std::make_unique <zmsg>(socket);
     if (msg->parts() == 0){
         AU_LOG_ERROR("empty message");
-        std::cout << "ERROR: empty message" << std::endl;
     }
     else{
 
         std::string sender = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
         msg->pop_front(); //empty message
-        AU_LOG_DEBUG("received message from [ %s ]: %s", sender.c_str(), msg->to_str(false, true, false).c_str());
+        AU_LOG_DEBUG1("received message from [ %s ]: %s", sender.c_str(), msg->to_str(false, true, false).c_str());
         std::string header = std::string(reinterpret_cast <const char*>(msg->pop_front().c_str()));
         if (header.compare(expected_origin) == 0){
             process_func(sender, std::move(msg));

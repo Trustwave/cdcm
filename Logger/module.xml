@@ -3,23 +3,24 @@
   <version>1</version>
   <Project>
     <name>Credentialed_Scanner</name>
-    <level>15</level>
+    <level>30</level>
     <severity_levels>
-    <debug value="1"/>
-        <info value="2"/>
-        <warning value="4"/>
-        <error value="8"/>
+    <debug1 value="1"/>
+        <debug2 value="2"/>
+        <info value="4"/>
+        <warning value="8"/>
+        <error value="16"/>
     </severity_levels>
     <modules>
-        <module name="broker" id="1" level="15" enable="true"/>
-        <module name="worker" id="2" level="15" enable="true"/>
+        <module name="broker" id="1" level="30" enable="true"/>
+        <module name="worker" id="2" level="30" enable="true"/>
      </modules>
     <supported_sinks>
       <sink name="file">
         <id>1</id>
         <path>/var/cdcm/log/</path>
         <name>cdcm</name>
-        <filter>debug</filter>
+        <filter>debug1</filter>
         <enable>true</enable>
       </sink>
 

@@ -41,10 +41,11 @@ namespace trustwave {
 namespace logger {
 
 #define severity_levels_LIST(m)		     \
-      m(severity_levels, debug, 1<<0)    \
-      m(severity_levels, info,    1<<1)  \
-      m(severity_levels, warning, 1<<2)  \
-      m(severity_levels, error,   1<<3)
+      m(severity_levels, debug1,  1<<0)  \
+      m(severity_levels, debug2,  1<<1)  \
+      m(severity_levels, info,    1<<2)  \
+      m(severity_levels, warning, 1<<3)  \
+      m(severity_levels, error,   1<<4)
 SmartEnum(severity_levels)
 
 //enum severity_levels {
@@ -96,7 +97,7 @@ SmartEnum(sinks)
 //    num_of_sinks
 //};
 
-constexpr unsigned long all_severity_levels = debug | info | warning | error;
+constexpr unsigned long all_severity_levels = debug1 | debug2 | info | warning | error;
 constexpr unsigned long all_sources = broker | worker;
 constexpr unsigned long all_collect_from_system = COLLECT_FROM_NONE | COLLECT_FROM_SYSTEM | COLLECT_FROM_ERNO;
 constexpr unsigned long all_sinks = file | event_log | output_debug_string;

@@ -63,11 +63,12 @@ void message_worker::send_to_broker(const char *command, std::string option, zms
     msg->push_front(MDPW_WORKER);
     msg->push_front("");
     std::string cmd = command;
-    if (cmd.compare(MDPW_REPLY) == 0){
-        std::cerr << "sending reply " << msg->body() << std::endl;
-    }
     AU_LOG_DEBUG("I: sending %s to broker", mdps_commands[(int ) *command]);
-    AU_LOG_DEBUG("I: body: %s", msg->body());
+    if (cmd.compare(MDPW_REPLY) == 0){
+        AU_LOG_DEBUG("I: body: %s", msg->body());
+    } else{
+        AU_LOG_DEBUG1("I: body: %s", msg->body());
+    }
     msg->send(*worker_);
     delete msg;
 }
@@ -201,7 +202,7 @@ int message_worker::worker_loop()
 
         AU_LOG_DEBUG("actions count is %zu", request_body.msgs.size());
         for (auto action_message : request_body.msgs){
-            AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
+            AU_LOG_DEBUG1("Looking for %s", action_message->name().c_str());
 
             auto action = trustwave::authenticated_scan_server::instance().public_dispatcher.find(
                             action_message->name());
