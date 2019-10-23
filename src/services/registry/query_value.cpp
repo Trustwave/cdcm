@@ -44,7 +44,7 @@ int Query_Value_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <a
     auto qvact = std::dynamic_pointer_cast <reg_action_query_value_msg>(action);
     if (!qvact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: internal error");
+        res->res("Error: Internal error");
         return -1;
     }
     result r=c->connect(*sess);
@@ -62,8 +62,8 @@ int Query_Value_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <a
     trustwave::registry_value rv;
     c->key_get_value_by_name(qvact->value_.c_str(), rv);
     if (rv.value().empty()) {
-        res->res("Error: value is empty");
-        AU_LOG_ERROR("Error: value is empty");
+        res->res("Error: Value is empty");
+        AU_LOG_ERROR("Error: Value is empty");
     }
     else {
         res->res(rv.value());

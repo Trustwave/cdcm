@@ -43,7 +43,7 @@ int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<a
     auto veact = std::dynamic_pointer_cast<reg_action_value_exists_msg>(action);
     if (!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: internal error");
+        res->res("Error: Internal error");
         return -1;
     }
     result r=c->connect(*sess);

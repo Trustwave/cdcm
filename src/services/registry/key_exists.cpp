@@ -44,7 +44,7 @@ int Key_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <ac
     auto keact = std::dynamic_pointer_cast <reg_action_key_exists_msg>(action);
     if (!keact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: internal error");
+        res->res("Error: Internal error");
         return -1;
 
     }

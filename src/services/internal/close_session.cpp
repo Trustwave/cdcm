@@ -28,7 +28,7 @@ int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
     std::cout<<"In Close_Session"<<std::endl;
 
     if (!sess || (sess && sess->id().is_nil())) {
-         res->res("Error: Session Not Found");
+         res->res("Error: Session not found");
          return -1;
      }
 

@@ -43,7 +43,7 @@ int GetOS_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_
     auto qvact = std::dynamic_pointer_cast <reg_action_get_os_msg>(action);
     if (!qvact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: internal error");
+        res->res("Error: Internal error");
         return -1;
     }
 

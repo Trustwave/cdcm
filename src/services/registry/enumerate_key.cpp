@@ -73,7 +73,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
     auto ekact = std::dynamic_pointer_cast <reg_action_enum_key_msg>(action);
     if (!ekact){
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: internal error");
+        res->res("Error: Internal error");
         return -1;
     }
     result r=c->connect(*sess);
