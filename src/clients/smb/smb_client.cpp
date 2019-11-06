@@ -16,7 +16,8 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include "smb_downloader_client.hpp"
+#include "smb_client.hpp"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,6 +30,7 @@ extern "C" {
 }
 #endif
 #undef uint_t
+
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../../common/session.hpp"
 /**@ingroup callback
@@ -67,13 +69,14 @@ extern "C" {
  */
 
 using namespace trustwave;
-static void smbc_auth_fn(const char * pServer, const char * , char * pWorkgroup, int maxLenWorkgroup,
-                char * pUsername, int maxLenUsername, char * pPassword, int maxLenPassword)
-{
-    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::remote>(std::string(pServer));
-  //  AU_LOG_DEBUG("server is %s ", pServer);
+
+static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, int maxLenWorkgroup,
+                         char *pUsername, int maxLenUsername, char *pPassword, int maxLenPassword) {
+    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::remote>(
+            std::string(pServer));
+    //  AU_LOG_DEBUG("server is %s ", pServer);
     static int krb5_set = 1;
-    const char* wg = "WORKGROUP";
+    const char *wg = "WORKGROUP";
     if (!sess->id().is_nil()) {
 
         AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
@@ -91,26 +94,8 @@ static void smbc_auth_fn(const char * pServer, const char * , char * pWorkgroup,
     krb5_set = 1;
 }
 
-SMBCCTX* smb_downloader_client::create_smbctx()
-{
-    SMBCCTX *ctx = nullptr;
 
-    if ((ctx = smbc_new_context()) == nullptr)
-        return nullptr;
-
-    smbc_setDebug(ctx, /*debuglevel*/1);
-    smbc_setFunctionAuthData(ctx, smbc_auth_fn);
-
-    if (smbc_init_context(ctx) == nullptr) {
-        smbc_free_context(ctx, 1);
-        return nullptr;
-    }
-
-    return ctx;
-}
-bool smb_downloader_client::connect(const char *path)
-{
-    ctx_ = create_smbctx();
+bool smb_client::connect(const char *path) {
     if (smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return true;
@@ -118,33 +103,32 @@ bool smb_downloader_client::connect(const char *path)
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
 
     if (remote_fd_ < 0) {
-        switch (errno)
-        {
-        case EISDIR:
+        switch (errno) {
+            case EISDIR:
 
-            AU_LOG_ERROR("%s is a directory", path);
-            return false;
+                AU_LOG_ERROR("%s is a directory", path);
+                return false;
 
-        case ENOENT:
-            AU_LOG_ERROR("%s can't be found on the remote server", path);
-            return false;
+            case ENOENT:
+                AU_LOG_ERROR("%s can't be found on the remote server", path);
+                return false;
 
-        case ENOMEM:
-            AU_LOG_ERROR("Not enough memory");
-            return false;
+            case ENOMEM:
+                AU_LOG_ERROR("Not enough memory");
+                return false;
 
-        case ENODEV:
-            AU_LOG_ERROR("The share name used in %s does not exist", path);
-            return false;
+            case ENODEV:
+                AU_LOG_ERROR("The share name used in %s does not exist", path);
+                return false;
 
-        case EACCES:
-            AU_LOG_ERROR("You don't have enough permissions "
-                            "to access %s", path);
-            return false;
+            case EACCES:
+                AU_LOG_ERROR("You don't have enough permissions "
+                             "to access %s", path);
+                return false;
 
-        default:
-            AU_LOG_ERROR("unknown smbc_open error");
-            return false;
+            default:
+                AU_LOG_ERROR("unknown smbc_open error");
+                return false;
         }
     }
     if (smbc_fstat(remote_fd_, &remotestat_) < 0) {
@@ -154,12 +138,11 @@ bool smb_downloader_client::connect(const char *path)
     return true;
 }
 
-bool smb_downloader_client::download( const char *base, const char *name, bool resume,
-                bool toplevel, const char *outfile)
-{
+bool smb_client::download(const char *base, const char *name, bool resume,
+                          bool toplevel, const char *outfile) {
     char path[SMB_MAXPATHLEN];
     snprintf(path, SMB_MAXPATHLEN - 1, "%s%s%s", base,
-                    (*base && *name && name[0] != '/' && base[strlen(base) - 1] != '/') ? "/" : "", name);
+             (*base && *name && name[0] != '/' && base[strlen(base) - 1] != '/') ? "/" : "", name);
     if (!connect(path)) {
         return false;
     }
@@ -170,17 +153,14 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
     const char *newpath;
     if (outfile) {
         newpath = outfile;
-    }
-    else if (!name[0]) {
+    } else if (!name[0]) {
         newpath = strrchr(base, '/');
         if (newpath) {
             newpath++;
-        }
-        else {
+        } else {
             newpath = base;
         }
-    }
-    else {
+    } else {
         newpath = name;
     }
 
@@ -204,7 +184,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
     if (localstat_.st_size && localstat_.st_size == remotestat_.st_size) {
         AU_LOG_ERROR("%s is already downloaded "
-                        "completely.", path);
+                     "completely.", path);
         AU_LOG_ERROR("%s", path);
         smbc_close(remote_fd_);
         close(local_fd_);
@@ -215,9 +195,9 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
         offset_download = localstat_.st_size - RESUME_DOWNLOAD_OFFSET;
         offset_check = localstat_.st_size - RESUME_CHECK_OFFSET;
         AU_LOG_INFO("Trying to start resume of %s at %jd"
-                        "At the moment %jd of %jd bytes have "
-                        "been retrieved", newpath, (intmax_t ) offset_check, (intmax_t ) localstat_.st_size,
-                        (intmax_t ) remotestat_.st_size);
+                    "At the moment %jd of %jd bytes have "
+                    "been retrieved", newpath, (intmax_t) offset_check, (intmax_t) localstat_.st_size,
+                    (intmax_t) remotestat_.st_size);
     }
 
     if (offset_check) {
@@ -226,7 +206,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
          * offset_download */
         off1 = lseek(local_fd_, offset_check, SEEK_SET);
         if (off1 < 0) {
-            AU_LOG_ERROR("Can't seek to %jd in local file %s", (intmax_t ) offset_check, newpath);
+            AU_LOG_ERROR("Can't seek to %jd in local file %s", (intmax_t) offset_check, newpath);
             smbc_close(remote_fd_);
             close(local_fd_);
             return false;
@@ -234,7 +214,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         off2 = smbc_lseek(remote_fd_, offset_check, SEEK_SET);
         if (off2 < 0) {
-            AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t ) offset_check, newpath);
+            AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t) offset_check, newpath);
             smbc_close(remote_fd_);
             close(local_fd_);
             return false;
@@ -242,8 +222,8 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         if (off1 != off2) {
             AU_LOG_ERROR("Offset in local and remote "
-                            "files are different "
-                            "(local: %jd, remote: %jd)", (intmax_t ) off1, (intmax_t ) off2);
+                         "files are different "
+                         "(local: %jd, remote: %jd)", (intmax_t) off1, (intmax_t) off2);
             smbc_close(remote_fd_);
             close(local_fd_);
             return false;
@@ -251,7 +231,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         if (smbc_read(remote_fd_, checkbuf[0], RESUME_CHECK_SIZE) != RESUME_CHECK_SIZE) {
             AU_LOG_ERROR("Can't read %d bytes from "
-                            "remote file %s", RESUME_CHECK_SIZE, path);
+                         "remote file %s", RESUME_CHECK_SIZE, path);
             smbc_close(remote_fd_);
             close(local_fd_);
             return false;
@@ -259,7 +239,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         if (read(local_fd_, checkbuf[1], RESUME_CHECK_SIZE) != RESUME_CHECK_SIZE) {
             AU_LOG_ERROR("Can't read %d bytes from "
-                            "local file %s", RESUME_CHECK_SIZE, name);
+                         "local file %s", RESUME_CHECK_SIZE, name);
             smbc_close(remote_fd_);
             close(local_fd_);
             return false;
@@ -267,14 +247,13 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         if (memcmp(checkbuf[0], checkbuf[1], RESUME_CHECK_SIZE) == 0) {
             AU_LOG_INFO("Current local and remote file "
-                            "appear to be the same. "
-                            "Starting download from "
-                            "offset %jd", (intmax_t ) offset_download);
-        }
-        else {
+                        "appear to be the same. "
+                        "Starting download from "
+                        "offset %jd", (intmax_t) offset_download);
+        } else {
             AU_LOG_ERROR("Local and remote file appear "
-                            "to be different, not "
-                            "doing resume for %s", path);
+                         "to be different, not "
+                         "doing resume for %s", path);
             smbc_close(remote_fd_);
             close(local_fd_);
             return false;
@@ -297,8 +276,8 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
         bytesread = smbc_read(remote_fd_, readbuf, SMB_DEFAULT_BLOCKSIZE);
         if (bytesread < 0) {
-            AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t ) curpos,
-                            path);
+            AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t) curpos,
+                         path);
             smbc_close(remote_fd_);
             if (local_fd_ != STDOUT_FILENO) {
                 close(local_fd_);
@@ -312,7 +291,7 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
         byteswritten = write(local_fd_, readbuf, bytesread);
         if (byteswritten != bytesread) {
             AU_LOG_ERROR("Can't write %zd bytes to local file %s at "
-                            "offset %jd", bytesread, path, (intmax_t ) curpos);
+                         "offset %jd", bytesread, path, (intmax_t) curpos);
             delete[] readbuf;
             smbc_close(remote_fd_);
             if (local_fd_ != STDOUT_FILENO) {
@@ -326,5 +305,39 @@ bool smb_downloader_client::download( const char *base, const char *name, bool r
 
     smbc_close(remote_fd_);
     close(local_fd_);
+    return true;
+}
+
+bool smb_client::list(const std::string &path,std::vector<trustwave::dirent> &dirents) {
+    int dh1, dsize, dirc;
+    char dirbuf[SMB_DEFAULT_BLOCKSIZE];
+    char *dirp;
+    if (smbc_init(smbc_auth_fn, 1) < 0) {
+        AU_LOG_ERROR("Unable to initialize libsmbclient");
+        return true;
+    }
+    if ((dh1 = smbc_opendir(path.c_str())) < 1) {
+        AU_LOG_ERROR( "Could not open directory: %s: %s\n",
+                path.c_str(), strerror(errno));
+
+        return false;
+    }
+    dirp = (char *) dirbuf;
+    if ((dirc = smbc_getdents(dh1, (struct smbc_dirent *) dirp,
+                              sizeof(dirbuf))) < 0) {
+
+        AU_LOG_ERROR( "Problems getting directory entries: %s\n",
+                strerror(errno));
+        return false;
+    }
+    while (dirc > 0) {
+        dsize = ((struct smbc_dirent *) dirp)->dirlen;
+        if(((struct smbc_dirent *) dirp)->smbc_type == 7 || ((struct smbc_dirent *) dirp)->smbc_type==8) {
+            dirents.push_back(
+                    { std::string(((struct smbc_dirent *) dirp)->name ),((struct smbc_dirent *) dirp)->smbc_type==7 ? std::string("DIR"):std::string("FILE")});
+        }
+        dirp += dsize;
+        dirc -= dsize;
+    }
     return true;
 }

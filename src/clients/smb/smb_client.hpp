@@ -30,6 +30,7 @@ extern "C" {
 #endif
 #undef uint_t
 #include <string>
+#include <vector>
 #include "../../common/client.hpp"
 static constexpr uint16_t SMB_MAXPATHLEN = MAXPATHLEN;
 static constexpr uint16_t RESUME_CHECK_SIZE = 512;
@@ -41,24 +42,30 @@ static constexpr uint16_t SMB_DEFAULT_BLOCKSIZE = 64000;
 //=====================================================================================================================
 namespace trustwave {
 class session;
-class smb_downloader_client:public cdcm_client
+    struct dirent
+    {
+        std::string name_;
+        std::string type_;
+    };
+class smb_client: public cdcm_client
 {
 public:
-    smb_downloader_client()
-    = default;
-    ~smb_downloader_client() override
+    smb_client()= default;
+    ~smb_client() override
     = default;
     bool download( const char *base, const char *name, bool resume, bool toplevel,
                     const char *outfile);
+    bool list( const std::string& ,std::vector<trustwave::dirent> &);
+
 private:
-    SMBCCTX* create_smbctx();
+
     bool connect(const char *path);
     int remote_fd_ = -1;
     int local_fd_ = -1;
     off_t total_bytes_ = 0;
     struct stat localstat_;
     struct stat remotestat_;
-    SMBCCTX *ctx_ = nullptr;
+
 
 };
 }

@@ -1,20 +1,20 @@
 //=====================================================================================================================
 // Trustwave ltd. @{SRCH}
-//														get_file.hpp
+//														list_dir.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: @{HDES}
-// -----------
+// DESCRIPTION: 
+//
+//
 //---------------------------------------------------------------------------------------------------------------------
-// CHANGES LOG: @{HREV}
-// -----------
-// Revision: 01.00
 // By      : Assaf Cohen
-// Date    : 15 May 2019
+// Date    : 11/4/19
 // Comments:
-
-#ifndef TRUSTWAVE_SERVICES_SMB_ACTIONS_SMB_ACTION_HPP_
-#define TRUSTWAVE_SERVICES_SMB_ACTIONS_SMB_ACTION_HPP_
+//=====================================================================================================================
+//                          						Include files
+//=====================================================================================================================
+#ifndef SRC_SERVICES_SMB_LIST_DIR_HPP
+#define SRC_SERVICES_SMB_LIST_DIR_HPP
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
@@ -24,19 +24,18 @@
 //=====================================================================================================================
 namespace trustwave {
 
-class SMB_Get_File: public Action_Base
-{
-    static Dispatcher<Action_Base>::Registrator m_registrator;
-
-public:
-    SMB_Get_File() :
-                    Action_Base("get_file", "get_file")
+    class SMB_List_Dir: public Action_Base
     {
-    }
+        static Dispatcher<Action_Base>::Registrator m_registrator;
 
-    int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
-};
+    public:
+        SMB_List_Dir() :
+                Action_Base("list_dir", "list_dir")
+        {
+        }
+
+        int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
+    };
 
 }
-
-#endif /* TRUSTWAVE_SERVICES_SMB_ACTIONS_SMB_ACTION_HPP_ */
+#endif //SRC_SERVICES_SMB_LIST_DIR_HPP

@@ -9,9 +9,9 @@ link_directories(${SMB_LINKS})
 #add_library( smbclient SHARED IMPORTED )
 #set_property( TARGET smbclient PROPERTY IMPORTED_LOCATION ${SAMBA_SRC}/bin/default/source3/libsmb/libsmbclient.so )
 
-set(SOURCE_FILES smb_downloader_client.cpp)
+set(SOURCE_FILES smb_client.cpp)
 add_library(tw-smb-client SHARED ${SOURCE_FILES})
-target_link_libraries(tw-smb-client  smbclient-raw-samba4 smbclient tw-singleton-runner)
+target_link_libraries(tw-smb-client   smbclient tw-singleton-runner)
 
 install(TARGETS tw-smb-client LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})

@@ -56,6 +56,7 @@ TAO_JSON_BIND_REQUIRED("id", &trustwave::action_msg::id_)>
 
 template<>
 struct traits<std::shared_ptr<trustwave::action_msg> > : binding::factory<
+                TAO_JSON_FACTORY_BIND1( trustwave::smb_list_dir_msg ),
                 TAO_JSON_FACTORY_BIND1( trustwave::smb_get_file_msg ),
                 TAO_JSON_FACTORY_BIND1(trustwave::reg_action_query_value_msg ),
                 TAO_JSON_FACTORY_BIND1(trustwave::reg_action_get_os_msg ),
@@ -81,6 +82,13 @@ struct traits<trustwave::smb_get_file_msg> : binding::object<
 {
     TAO_JSON_DEFAULT_KEY( "get_file" );
 };
+    template<>
+    struct traits<trustwave::smb_list_dir_msg> : binding::object<
+            binding::inherit<traits<trustwave::single_param_action_msg> > ,
+            TAO_JSON_BIND_REQUIRED( "pattern", &trustwave::smb_list_dir_msg::pattern ) >
+    {
+        TAO_JSON_DEFAULT_KEY( "list_dir" );
+    };
 template<>
 struct traits<trustwave::get_remote_file_version_msg> : binding::object<
                 binding::inherit<traits<trustwave::single_param_action_msg> >>

@@ -182,6 +182,19 @@ struct smb_get_file_msg: public single_param_action_msg
     {
     }
 };
+struct smb_list_dir_msg: public single_param_action_msg
+{
+
+    smb_list_dir_msg() :
+            single_param_action_msg("list_dir")
+    {
+    }
+    smb_list_dir_msg(const single_param_action_msg& o) :
+            single_param_action_msg(o, "list_dir")
+    {
+    }
+    std::string pattern;
+};
 struct get_remote_file_version_msg: public single_param_action_msg
 {
 

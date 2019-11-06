@@ -4,7 +4,7 @@ project(cdcm)
 link_directories(${SMB_LINKS})
 include_directories(${SMB_INCLUDES})
 include_directories(../../trustwave)
-set(SOURCE_FILES get_file.cpp)
+set(SOURCE_FILES get_file.cpp list_dir.cpp)
 add_library(tw-smb-actions OBJECT ${SOURCE_FILES})
 target_link_libraries(tw-smb-actions  tw-smb-client)
 install(TARGETS tw-smb-actions LIBRARY DESTINATION lib
