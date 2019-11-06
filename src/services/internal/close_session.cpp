@@ -23,17 +23,16 @@
 
 using namespace trustwave;
 
-int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> res)
+int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
-    std::cout<<"In Close_Session"<<std::endl;
-
     if (!sess || (sess && sess->id().is_nil())) {
-         res->res("Session Not Found ERROR");
+         res->res("Error: Session Not Found");
          return -1;
      }
 
     authenticated_scan_server::instance().sessions->remove_by_id(sess->idstr());
-    res->res("session closed");
+    res->id(am->id());
+    res->res("Session closed");
     return 0;
 
 }
