@@ -29,7 +29,7 @@ int Start_Session::act(boost::shared_ptr <session> , std::shared_ptr<action_msg>
     auto gsact = std::dynamic_pointer_cast<local_start_session_msg>(action);
     if(!gsact)
     {
-        res->res("Error: internal error");
+        res->res("Error: Internal error");
         return -1;
     }
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);

@@ -26,7 +26,7 @@ using namespace trustwave;
 int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
     if (!sess || (sess && sess->id().is_nil())) {
-         res->res("Error: Session Not Found");
+         res->res("Error: Session not found");
          return -1;
      }
 
