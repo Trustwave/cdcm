@@ -25,7 +25,7 @@
 #include "../../common/protocol/msg_types.hpp"
 #include "../../common/session.hpp"
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "wildcards/single_include/wildcards.hpp"
+#include "../../common/wildcards.hpp"
 
 using namespace trustwave;
 namespace tao {
@@ -51,24 +51,23 @@ int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_ms
     base.append(sess->remote()).append("/").append(smb_action->param);
     std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
-    std::vector<trustwave::dirent> r;
-    if (!rc.list(base.c_str(), r)) {
+    std::vector<trustwave::dirent> dir_entries;
+    if (!rc.list(base.c_str(), dir_entries)) {
         res->res("Error: List Failed");
         return -1;
     }
     if (!smb_action->pattern.empty()) {
-        r.erase(std::remove_if(r.begin(),
-                               r.end(),
-                               [&](const trustwave::dirent &fname) -> bool {
-                                   std::cerr << fname.name_ << std::endl;
+        dir_entries.erase(std::remove_if(dir_entries.begin(),
+                                         dir_entries.end(),
+                                         [&](const trustwave::dirent &fname) -> bool {
                                    return !wildcards::match(
                                            cx::make_string_view(fname.name_.c_str(), fname.name_.length()),
                                            cx::make_string_view(smb_action->pattern.c_str(),
                                                                 smb_action->pattern.length()));
                                }),
-                r.end());
+                          dir_entries.end());
     }
-    const tao::json::value v1 = r;
+    const tao::json::value v1 = dir_entries;
     res->res(to_string(v1, 2));
 
     return 0;

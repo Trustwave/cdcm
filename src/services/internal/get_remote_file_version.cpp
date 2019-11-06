@@ -23,7 +23,7 @@ int Get_Remote_File_Version::act(boost::shared_ptr <session> sess, std::shared_p
 {
     auto spact_msg = std::dynamic_pointer_cast<single_param_action_msg>(action); //the real
     if (!spact_msg) {
-        res->res("Malformed message");
+        res->res("Error: Malformed message");
         return -1;
     }
     auto gfact = authenticated_scan_server::instance().public_dispatcher.find("get_file");
@@ -31,7 +31,8 @@ int Get_Remote_File_Version::act(boost::shared_ptr <session> sess, std::shared_p
         auto lmsg = std::make_shared<local_get_file_version_msg>(*spact_msg);
         lmsg->param = res->res();
         auto fsact = authenticated_scan_server::instance().prv_dispatcher.find("get_file_version");
-        return fsact->act(sess, lmsg, res);
+        int ret = fsact->act(sess, lmsg, res);
+
     }
     return -1;
 

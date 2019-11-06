@@ -4,7 +4,7 @@
         "heartbeat_interval": "3",
         "reconnect": "3000",
         "session_idle_time": "10",
-        "worker_processes": "3",
+        "worker_processes": "1",
         "broker_worker_listening_ep": "tcp:\/\/*:5556",
         "broker_client_listening_ep": "tcp:\/\/*:5555",
         "worker_connect_ep": "tcp:\/\/127.0.0.1:5556"
