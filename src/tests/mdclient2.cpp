@@ -1,26 +1,4 @@
-//===========================================================================
-// Trustwave ltd. @{SRCH}
-//								mdclient2.cpp
-//
-//---------------------------------------------------------------------------
-// DESCRIPTION: @{HDES}
-// -----------
-//---------------------------------------------------------------------------
-// CHANGES LOG: @{HREV}
-// -----------
-// Revision: 01.00
-// By      : Assaf Cohen
-// Date    : 23 Jun 2019
-// Comments: 
 
-//
-//  Majordomo Protocol client example - asynchronous
-//  Uses the mdcli API to hide all MDP aspects
-//
-//  Lets us 'build mdclient' and 'build all'
-//
-//     Andreas Hoelzlwimmer <andreas.hoelzlwimmer@fh-hagenberg.at>
-//
 
 #include "mdcliapi2.hpp"
 #include <thread>
@@ -31,75 +9,6 @@
 #include <vector>
 
 #include "../common/protocol/protocol.hpp"
-std::vector<std::function<std::string(std::string)>> msgs1 ={
-[&](std::string id) ->std::string {return
-                    R"(
-{      
-"H":
-    {
-        "session_id" : ")"
-                    + id
-                    + R"("
-    },
-"msgs":
-    [
-
-        {
-                "enumerate" :
-                {
-                    "id": ")"
-                    + boost::uuids::to_string(boost::uuids::random_generator()())
-                    + R"(",
-                    "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
-                    
-                }
-        }
-    ]
-})";},
-[&](std::string id) ->std::string {return
-                    R"(
-{      
-"H":
-    {
-        "session_id" : ")"
-                    + id
-                    + R"("
-    },
-"msgs":
-    [
-
-        {
-                "key_exists" :
-                {
-                    "id": ")"
-                    + boost::uuids::to_string(boost::uuids::random_generator()())
-                    + R"(",
-                    "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
-                    
-                }
-        }
-    ]
-})";}};
-/*
- *                  {
- "get_file" :
- {
- "id": ")"
- + act_id2
- + R"(",
- "param":"ADMIN$/winhlp32.exe"
- }
- },
- {
- "get_remote_file_version" :
- {
- "id": ")"
- + act_id3
- + R"(",
- "param":"ADMIN$/winhlp32.exe"
- }
- },
- */
 static void enumf( std::string msg)
 {
     mdcli session("tcp://127.0.0.1:5555", 1);
@@ -158,15 +67,7 @@ static void fc(int c)
         delete reply;
         reply = nullptr;
 
-        std::vector<std::thread> tp;
-        for (unsigned int i = 0; i < 2; ++i)        //context+broker
-                        {
-            tp.push_back(std::move(std::thread(enumf, msgs1[i % msgs1.size()](new_session_id))));
 
-        }
-        for (unsigned int i = 0; i < tp.size(); i++) {
-            tp.at(i).join();
-        }
         std::string actions =
                         R"(
           {      
@@ -180,12 +81,13 @@ static void fc(int c)
                 [
    
                     {
-                            "enumerate" :
+                            "list_dir" :
                             {
                                 "id": ")"
                                         + act_id4
                                         + R"(",
-                                "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
+                                "param":"admin$",
+                                "pattern":"*.exe"
                                 
                             }
                     }
@@ -194,53 +96,6 @@ static void fc(int c)
         printf("Request is:\n%s\n", actions.c_str());
 
         zmsg *reply = session.send_and_recv(actions);
-        if (reply) {
-            std::cout << reply->body() << std::endl;
-            auto act_id1 = boost::uuids::to_string(boost::uuids::random_generator()());
-            auto new_session_id = a1.msgs[0]->res();
-            delete reply;
-            reply = nullptr;
-            std::string actions =
-                            R"(
-                          {      
-                            "H":
-                                {
-                                    "session_id" : ")"
-                                            + new_session_id
-                                            + R"("
-                                },
-                            "msgs":
-                                [
-                   
-                                    {
-                                            "key_exists" :
-                                            {
-                                                "id": ")"
-                                            + act_id1
-                                            + R"(",
-                                                "key":"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion"
-                                                
-                                            }
-                                    }
-                                ]
-                        })";
-            printf("Request is:\n%s\n", actions.c_str());
-
-            zmsg *reply = session.send_and_recv(actions);
-            if (reply) {
-                std::cout << reply->body() << std::endl;
-
-            }
-            else {
-                printf("Break\n");
-
-            }
-
-        }
-        else {
-            printf("Break\n");
-
-        }
 
     }
 }

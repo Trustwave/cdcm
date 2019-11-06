@@ -93,6 +93,8 @@ message (STATUS "${BOOST_LIBRARYDIR}")
 include_directories(${SMB_INCLUDES})
 link_directories(${BOOST_LIBRARYDIR})
 include_directories(${DEPS_DIR})
+include_directories(${DEPS_DIR}/wildcards/single_include)
+
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
 link_directories(${DEPS_DIR}/libpe-pev/build)
 link_directories(${SMB_LINKS})
