@@ -174,7 +174,16 @@ public:
     bool clean();
     void flush_all_entries();
     void dump_by_expiration() const;
-
+    std::vector<std::string> get_sessions_id_list() const
+    {
+        std::vector<std::string> rv;
+        auto& idx = map_->get <id>();
+        for(auto& sess:idx)
+        {
+            rv.push_back(std::string(sess.s_id()));
+        }
+        return rv;
+    }
 
 private:
     sessions* map_;

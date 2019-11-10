@@ -30,6 +30,8 @@ struct cdcm_settings
     std::string broker_client_listen_ep_;
     std::string broker_worker_listen_ep_;
     std::string worker_connect_ep_;
+    std::string downloaded_files_path_;
+    std::chrono::seconds maintenance_interval_;
     void load(const std::string &filename);
     void save(const std::string &filename);
 };

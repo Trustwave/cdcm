@@ -19,7 +19,7 @@
 #include "../common/zmq/zmq_helpers.hpp"
 #include "message_broker.hpp"
 #include "workers_monitor.hpp"
-
+#include "maintenance.hpp"
 template<>
 int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::broker>(size_t)
 {
@@ -32,8 +32,9 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
             std::cerr << "failed to initialize the logger!!!" << std::endl;
             abort();
     }
-    std::thread broker_thread(message_broker::th_func, std::ref(ctx));
+    std::thread broker_thread(message_broker::th_func, std::ref(ctx),std::ref(ios));
     workers_monitor monitor(ios);
+    maintenance m(ios);
     monitor.run();
     ios.run();
     broker_thread.join();

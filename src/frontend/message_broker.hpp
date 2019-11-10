@@ -22,7 +22,7 @@
 #include <memory>                // for unique_ptr
 #include <string>                // for string
 #include <utility>               // for pair
-
+#include <boost/asio.hpp>
 namespace zmq {
 class context_t;
 class socket_t;
@@ -36,7 +36,7 @@ class message_broker {
     //  This defines one worker, idle or active
 
 public:
-    static void th_func(zmq::context_t &ctx);  //  ---------------------------------------------------------------------
+    static void th_func(zmq::context_t &ctx,boost::asio::io_service& ios);  //  ---------------------------------------------------------------------
     //  Destructor for broker object
     ~message_broker();
 private:

@@ -40,7 +40,7 @@ int SMB_Get_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_m
     auto smb_action = std::dynamic_pointer_cast<smb_get_file_msg>(action);
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
-    std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
+    std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     if (!rc.download(base.c_str(), "", false, true, tmp_name.c_str())) {
         res->res("Error: Download failed");

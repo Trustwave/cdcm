@@ -9,7 +9,8 @@ link_directories( ${SMB_LINKS} )
 set(SOURCE_FILES
         cdcm_broker.cpp
         message_broker.cpp
-        workers_monitor.cpp)
+        workers_monitor.cpp
+		maintenance.cpp)
 add_executable(cdcm_broker ${SOURCE_FILES})
 
 target_link_libraries(cdcm_broker  

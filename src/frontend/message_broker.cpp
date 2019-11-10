@@ -23,7 +23,7 @@
 #include "../common/zmq/zmq_message.hpp"
 #include <zmq.hpp>
 #include <functional>
-
+#include <boost/asio.hpp>
 using namespace trustwave;
 message_broker::message_broker(zmq::context_t &ctx) :
                 context_(ctx), internal_socket_(new zmq::socket_t(context_, ZMQ_ROUTER)), external_socket_(
@@ -398,11 +398,12 @@ void message_broker::broker_loop()
 
 }
 
-void message_broker::th_func(zmq::context_t &ctx)
+void message_broker::th_func(zmq::context_t &ctx,boost::asio::io_service& ios)
 {
     message_broker brk(ctx);
     brk.bind_internal();
     brk.bind_external();
     brk.broker_loop();
+    ios.stop();
 
 }
