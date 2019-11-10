@@ -207,7 +207,7 @@ void Logger::add_file_sink(const ::trustwave::sink_conf &s) {
                                             std::string(::trustwave::LoggerSource::instance()->get_source_id())+".log.%N");
 	boost::shared_ptr< sinks::synchronous_sink< sinks::text_file_backend > > sink =
 		logging::add_file_log(keywords::file_name = fname.c_str(),
-
+                              keywords::auto_flush = true,
 			keywords::rotation_size = 100 * 1024 * 1024,
 			keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
 			keywords::open_mode = (std::ios::out | std::ios::app),
@@ -222,6 +222,8 @@ void Logger::add_file_sink(const ::trustwave::sink_conf &s) {
         << expr::format_named_scope("Scope", keywords::format = "%n", keywords::iteration = expr::reverse)
                 << expr::smessage));
 	sink->set_filter(severity >= s.filter);
+
+
 }
 //===========================================================================
 // @{FUNH}
