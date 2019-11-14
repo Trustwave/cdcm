@@ -81,8 +81,8 @@ static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, in
 
         AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
         strncpy(pWorkgroup, wg, maxLenWorkgroup - 1);
-        strncpy(pUsername, cli_credentials_get_username(sess->creds()), maxLenUsername - 1);
-        strncpy(pPassword, cli_credentials_get_password(sess->creds()), maxLenPassword - 1);
+        strncpy(pUsername, sess->creds().username_.c_str(), maxLenUsername - 1);
+        strncpy(pPassword, sess->creds().password_.c_str(), maxLenPassword - 1);
         return;
     }
 

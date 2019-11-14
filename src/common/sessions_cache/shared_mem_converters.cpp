@@ -19,14 +19,6 @@
 #include "shared_mem_converters.hpp"
 #include "shared_mem_session.hpp"
 #include "../session.hpp"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "auth/credentials/credentials.h"
-#ifdef __cplusplus
-}
-#endif
 #include <boost/make_shared.hpp>
 
 trustwave::sp_session_t trustwave::session_converter::convert(const shared_mem_session &sm)
@@ -50,19 +42,11 @@ trustwave::shared_mem_session trustwave::session_converter::convert(const sp_ses
     rv.uuid_ = String(idstr.c_str(), idstr.length(), va);
     auto remote = session->remote();
     rv.remote_ = String(remote.c_str(), remote.length(), va);
-    struct cli_credentials* c = session->creds();
-
-    std::string val(cli_credentials_get_domain(c));
-    rv.creds_.domain_ = String(val.c_str(), val.length(), va);
-
-    val.assign(cli_credentials_get_username(c));
-    rv.creds_.username_ = String(val.c_str(), val.length(), va);
-
-    val.assign(cli_credentials_get_password(c));
-    rv.creds_.password_ = String(val.c_str(), val.length(), va);
-
-    val.assign(cli_credentials_get_workstation(c));
-    rv.creds_.workstation_ = String(val.c_str(), val.length(), va);
-        return rv;
+    credentials c = session->creds();
+    rv.creds_.domain_ = String(c.domain_.c_str(),c.domain_.length(), va);
+    rv.creds_.username_ = String(c.username_.c_str(),c.username_.length(), va);
+    rv.creds_.password_ = String(c.password_.c_str(),c.password_.length(), va);
+    rv.creds_.workstation_ = String(c.workstation_.c_str(),c.workstation_.length(), va);
+    return rv;
 }
 

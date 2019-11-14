@@ -17,11 +17,19 @@
 //=====================================================================================================================
 #include "registry_client.hpp"
 #include "registry_value.hpp"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "auth/credentials/credentials.h"
+#ifdef __cplusplus
+}
+#endif
 #include "../libcli/registry/util_reg.h"
 #include "lib/util/time.h"
 #include <ctime>
 
 #include "../../common/session.hpp"
+#include "../../common/credentials.hpp"
 
 using namespace trustwave;
 
@@ -43,7 +51,12 @@ registry_client::~registry_client() {
 
 result registry_client::connect(const session &sess) {
 
-    WERROR error = reg_open_remote(NULL, &ctx_->registry, NULL, sess.creds(), ::loadparm_init_global(false),
+        auto creds = ::cli_credentials_init(nullptr);
+    cli_credentials_set_domain(creds, sess.creds().domain_.c_str(), CRED_SPECIFIED);
+    cli_credentials_set_username(creds, sess.creds().username_.c_str(), CRED_SPECIFIED);
+    cli_credentials_set_password(creds, sess.creds().password_.c_str(), CRED_SPECIFIED);
+    cli_credentials_set_workstation(creds, sess.creds().workstation_.c_str(), CRED_SPECIFIED);
+    WERROR error = reg_open_remote(NULL, &ctx_->registry, NULL, creds, ::loadparm_init_global(false),
                                    sess.remote().c_str(), ev_ctx_);
 
     if (!W_ERROR_IS_OK(error)) {

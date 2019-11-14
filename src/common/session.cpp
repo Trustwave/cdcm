@@ -50,8 +50,8 @@ const std::string& session::remote() const
 {
     return remote_;
 }
-struct cli_credentials* session::creds() const
+credentials session::creds() const
 {
-    return creds_.creds();
+    return creds_;
 }
 

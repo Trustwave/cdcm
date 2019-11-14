@@ -22,7 +22,6 @@
 #include <array>
 #include <memory>
 
-struct cli_credentials;
 
 namespace trustwave {
 class cdcm_client;
@@ -34,7 +33,7 @@ public:
     std::string idstr() const;
 
     const std::string& remote() const;
-    cli_credentials* creds() const;
+    credentials creds() const;
 
     template<typename T>
     std::shared_ptr <cdcm_client> get_client(size_t c)
