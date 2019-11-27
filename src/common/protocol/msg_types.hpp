@@ -37,7 +37,7 @@ public:
     {
         return id_;
     }
-    void id(const std::string ids)
+    void id(const std::string& ids)
     {
         id_ = ids;
     }
@@ -45,7 +45,7 @@ public:
     {
         return res_;
     }
-    void res(const std::string ress)
+    void res(const std::string& ress)
     {
         res_ = ress;
     }
@@ -67,7 +67,7 @@ struct action_msg
     {
         return id_;
     }
-    void id(const std::string ids)
+    void id(const std::string& ids)
     {
         id_ = ids;
     }
@@ -76,7 +76,7 @@ struct action_msg
     const std::string name_;
 
 protected:
-    action_msg(std::string  name) :
+    explicit action_msg(std::string  name) :
                     name_(std::move(name))
     {
     }
@@ -109,7 +109,7 @@ struct reg_action_enum_key_msg: public action_msg
     std::string key_;
 
 };
-    struct reg_action_value_exists_msg: public action_msg
+struct reg_action_value_exists_msg: public action_msg
     {
         reg_action_value_exists_msg() :
                 action_msg("value_exists")
@@ -127,7 +127,6 @@ struct reg_action_key_exists_msg: public action_msg
     std::string key_;
 
 };
-
 struct local_start_session_msg: public action_msg
 {
 
@@ -151,12 +150,11 @@ struct local_close_session_msg: public action_msg
     }
 
 };
-
 struct single_param_action_msg: public action_msg
 {
 protected:
     single_param_action_msg() = delete;
-    single_param_action_msg(const std::string& name) :
+    explicit single_param_action_msg(const std::string& name) :
                     action_msg(name)
     {
     }
@@ -169,7 +167,19 @@ protected:
 public:
     std::string param;
 };
+struct smb_get_file_info_msg: public single_param_action_msg
+    {
 
+        smb_get_file_info_msg() :
+                single_param_action_msg("get_file_info")
+        {
+        }
+        explicit smb_get_file_info_msg(const single_param_action_msg& o) :
+                single_param_action_msg(o, "get_file_info")
+        {
+        }
+    };
+/*
 struct smb_get_file_msg: public single_param_action_msg
 {
 
@@ -182,6 +192,7 @@ struct smb_get_file_msg: public single_param_action_msg
     {
     }
 };
+*/
 struct smb_list_dir_msg: public single_param_action_msg
 {
 
@@ -189,12 +200,13 @@ struct smb_list_dir_msg: public single_param_action_msg
             single_param_action_msg("list_dir")
     {
     }
-    smb_list_dir_msg(const single_param_action_msg& o) :
+    explicit smb_list_dir_msg(const single_param_action_msg& o) :
             single_param_action_msg(o, "list_dir")
     {
     }
     std::string pattern;
 };
+/*
 struct get_remote_file_version_msg: public single_param_action_msg
 {
 
@@ -207,7 +219,6 @@ struct get_remote_file_version_msg: public single_param_action_msg
     {
     }
 };
-
 struct local_get_file_version_msg: public single_param_action_msg
 {
 
@@ -220,6 +231,17 @@ struct local_get_file_version_msg: public single_param_action_msg
     {
     }
 };
+*/
+struct smb_read_file_msg: public action_msg
+    {
+        smb_read_file_msg() :
+                action_msg("read_file")
+        {
+        }
+        std::string path_;
+        std::string size_;
+        std::string offset_;
+    };
 
 struct header
 {

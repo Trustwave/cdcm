@@ -32,6 +32,7 @@ extern "C" {
 #include <string>
 #include <vector>
 #include "../../common/client.hpp"
+#include "../../common/file_reader_interface.hpp"
 static constexpr uint16_t SMB_MAXPATHLEN = MAXPATHLEN;
 static constexpr uint16_t RESUME_CHECK_SIZE = 512;
 static constexpr uint16_t RESUME_DOWNLOAD_OFFSET = 1024;
@@ -47,7 +48,7 @@ class session;
         std::string name_;
         std::string type_;
     };
-class smb_client: public cdcm_client
+class smb_client: public cdcm_client,public file_reader_interface
 {
 public:
     smb_client()= default;
@@ -56,15 +57,21 @@ public:
     bool download( const char *base, const char *name, bool resume, bool toplevel,
                     const char *outfile);
     bool list( const std::string& ,std::vector<trustwave::dirent> &);
+    bool download_portion_to_memory(const char *base, const char *name,off_t offset, off_t count);
+    bool download_portion_to_disk(const char *base, const char *name,off_t offset, off_t count);
+    bool read(size_t offset, size_t size, char *dest) override ;
+    [[nodiscard]] uintmax_t file_size() const override ;
+    bool validate_open() override ;
+    bool connect(const char *path);
 
 private:
-
-    bool connect(const char *path);
+    bool download_portion(off_t curpos, off_t count, bool to_file);
     int remote_fd_ = -1;
     int local_fd_ = -1;
-    off_t total_bytes_ = 0;
+    //off_t total_bytes_ = 0;
     struct stat localstat_;
     struct stat remotestat_;
+    std::string_view current_open_path_;
 
 
 };

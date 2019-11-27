@@ -9,7 +9,6 @@ foreach(dir ${dirs})
 endforeach()
 set(SOURCE_FILES credentials.cpp session.cpp)
 add_library(tw-common SHARED ${SOURCE_FILES})
-target_link_libraries(tw-common  samba-credentials)
 
 add_subdirectory(Logger)
 add_subdirectory(protocol)

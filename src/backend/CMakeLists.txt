@@ -3,6 +3,7 @@ project(cdcm)
 include_directories(../3rdparty ../trustwave)
 link_directories( ${SMB_LINKS} )
 set(SOURCE_FILES cdcm_worker_process.cpp message_worker.cpp)
+add_subdirectory(utils)
 add_executable(cdcm_worker ${SOURCE_FILES})
 target_link_libraries(cdcm_worker
                         pthread zmq

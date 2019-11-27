@@ -80,9 +80,10 @@ static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, in
     if (!sess->id().is_nil()) {
 
         AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
-        strncpy(pWorkgroup, wg, maxLenWorkgroup - 1);
-        strncpy(pUsername, sess->creds().username_.c_str(), maxLenUsername - 1);
-        strncpy(pPassword, sess->creds().password_.c_str(), maxLenPassword - 1);
+        strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1));
+        strncpy(pUsername, sess->creds().username_.c_str(), static_cast<size_t>(maxLenUsername - 1));
+        strncpy(pPassword, sess->creds().password_.c_str(), static_cast<size_t>(maxLenPassword - 1));
+        AU_LOG_INFO("smbc_auth_fn session for %s found and set", pServer);
         return;
     }
 
@@ -98,29 +99,24 @@ static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, in
 bool smb_client::connect(const char *path) {
     if (smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
-        return true;
+        return false;
     }
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
-
+    current_open_path_ =path;
     if (remote_fd_ < 0) {
         switch (errno) {
             case EISDIR:
-
                 AU_LOG_ERROR("%s is a directory", path);
                 return false;
-
             case ENOENT:
                 AU_LOG_ERROR("%s can't be found on the remote server", path);
                 return false;
-
             case ENOMEM:
                 AU_LOG_ERROR("Not enough memory");
                 return false;
-
             case ENODEV:
                 AU_LOG_ERROR("The share name used in %s does not exist", path);
                 return false;
-
             case EACCES:
                 AU_LOG_ERROR("You don't have enough permissions "
                              "to access %s", path);
@@ -147,7 +143,7 @@ bool smb_client::download(const char *base, const char *name, bool resume,
         return false;
     }
     char checkbuf[2][RESUME_CHECK_SIZE];
-    char *readbuf = nullptr;
+
     off_t offset_download = 0, offset_check = 0, curpos = 0;
 
     const char *newpath;
@@ -237,7 +233,7 @@ bool smb_client::download(const char *base, const char *name, bool resume,
             return false;
         }
 
-        if (read(local_fd_, checkbuf[1], RESUME_CHECK_SIZE) != RESUME_CHECK_SIZE) {
+        if (::read(local_fd_, checkbuf[1], RESUME_CHECK_SIZE) != RESUME_CHECK_SIZE) {
             AU_LOG_ERROR("Can't read %d bytes from "
                          "local file %s", RESUME_CHECK_SIZE, name);
             smbc_close(remote_fd_);
@@ -259,25 +255,27 @@ bool smb_client::download(const char *base, const char *name, bool resume,
             return false;
         }
     }
+    download_portion(curpos, remotestat_.st_size, true);
 
-    readbuf = new char[SMB_DEFAULT_BLOCKSIZE];
-    if (!readbuf) {
-        AU_LOG_ERROR("Failed to allocate %d bytes for read buffer (%s)", SMB_DEFAULT_BLOCKSIZE, strerror(errno));
-        if (local_fd_ != STDOUT_FILENO) {
-            close(local_fd_);
-        }
-        return false;
-    }
 
+    smbc_close(remote_fd_);
+    close(local_fd_);
+    return true;
+}
+static constexpr off_t max_mem_segment=512*1024*1024;//fixme assaf make it configurable
+
+bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
+{
+    char *readbuf = new char[SMB_DEFAULT_BLOCKSIZE];
     /* Now, download all bytes from offset_download to the end */
-    for (curpos = offset_download; curpos < remotestat_.st_size; curpos += SMB_DEFAULT_BLOCKSIZE) {
-        ssize_t bytesread;
-        ssize_t byteswritten;
+    for (; curpos < count; curpos += SMB_DEFAULT_BLOCKSIZE) {
+        ssize_t bytesread=0;
+        ssize_t byteswritten=0;
 
         bytesread = smbc_read(remote_fd_, readbuf, SMB_DEFAULT_BLOCKSIZE);
         if (bytesread < 0) {
             AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t) curpos,
-                         path);
+                         current_open_path_.data());
             smbc_close(remote_fd_);
             if (local_fd_ != STDOUT_FILENO) {
                 close(local_fd_);
@@ -286,35 +284,56 @@ bool smb_client::download(const char *base, const char *name, bool resume,
             return false;
         }
 
-        total_bytes_ += bytesread;
-
-        byteswritten = write(local_fd_, readbuf, bytesread);
+        if(to_file)
+        {
+            byteswritten = write(local_fd_, readbuf, static_cast<size_t>(bytesread));
+        } else{
+            byteswritten+=bytesread;
+        }
         if (byteswritten != bytesread) {
             AU_LOG_ERROR("Can't write %zd bytes to local file %s at "
-                         "offset %jd", bytesread, path, (intmax_t) curpos);
+                         "offset %jd", bytesread, current_open_path_.data(), (intmax_t) curpos);
             delete[] readbuf;
             smbc_close(remote_fd_);
-            if (local_fd_ != STDOUT_FILENO) {
+            if (local_fd_ != STDOUT_FILENO) {//fixme assaf change condition to -1
                 close(local_fd_);
             }
             return false;
         }
     }
-
     delete[] readbuf;
 
     smbc_close(remote_fd_);
     close(local_fd_);
     return true;
 }
+bool smb_client::download_portion_to_memory(const char *base, const char *name,off_t offset = 0, off_t count=max_mem_segment)
+{
+    char path[SMB_MAXPATHLEN];
+    snprintf(path, SMB_MAXPATHLEN - 1, "%s%s%s", base,
+             (*base && *name && name[0] != '/' && base[strlen(base) - 1] != '/') ? "/" : "", name);
+    if (!connect(path)) {
+        return false;
+    }
+    off_t off = smbc_lseek(remote_fd_, offset, SEEK_SET);
+    if (off < 0) {
+        AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t) offset, path);
+        smbc_close(remote_fd_);
+        close(local_fd_);
+        return false;
+    }
+    return download_portion(off, off + count, false);
 
+
+
+}
 bool smb_client::list(const std::string &path,std::vector<trustwave::dirent> &dirents) {
     int dh1, dsize, dirc;
     char dirbuf[SMB_DEFAULT_BLOCKSIZE];
     char *dirp;
     if (smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
-        return true;
+        return false;
     }
     if ((dh1 = smbc_opendir(path.c_str())) < 1) {
         AU_LOG_ERROR( "Could not open directory: %s: %s\n",
@@ -323,7 +342,7 @@ bool smb_client::list(const std::string &path,std::vector<trustwave::dirent> &di
         return false;
     }
     dirp = (char *) dirbuf;
-    if ((dirc = smbc_getdents(dh1, (struct smbc_dirent *) dirp,
+    if ((dirc = smbc_getdents(static_cast<unsigned int>(dh1), (struct smbc_dirent *) dirp,
                               sizeof(dirbuf))) < 0) {
 
         AU_LOG_ERROR( "Problems getting directory entries: %s\n",
@@ -340,4 +359,40 @@ bool smb_client::list(const std::string &path,std::vector<trustwave::dirent> &di
         dirc -= dsize;
     }
     return true;
+}
+
+bool smb_client::read(size_t offset, size_t size, char *dest)
+{
+    off_t off = smbc_lseek(remote_fd_, offset, SEEK_SET);
+    if (off < 0) {
+        AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t) offset, current_open_path_.data());
+        smbc_close(remote_fd_);
+        close(local_fd_);
+        return false;
+    }
+
+    /* Now, download all bytes from offset_download to size */
+    size_t curpos=0;
+    for (; curpos < size; curpos += SMB_DEFAULT_BLOCKSIZE) {
+        ssize_t bytesread;
+        bytesread = smbc_read(remote_fd_, dest+curpos, SMB_DEFAULT_BLOCKSIZE);
+        if (bytesread < 0) {
+            AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t) curpos,
+                         current_open_path_.data());
+            smbc_close(remote_fd_);
+            return false;
+        }
+        curpos += bytesread;
+    }
+// smbc_close(remote_fd_);
+    return true;
+}
+uintmax_t smb_client::file_size() const
+{
+
+        return static_cast<uintmax_t>(remotestat_.st_size);
+}
+bool smb_client::validate_open()
+{
+    return connect(current_open_path_.data());
 }

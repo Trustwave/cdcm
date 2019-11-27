@@ -6,8 +6,8 @@ include_directories(../../trustwave)
 set(SOURCE_FILES
         start_session.cpp
         close_session.cpp
-        file_version.cpp
-        get_remote_file_version.cpp
+#        file_version.cpp
+#        get_remote_file_version.cpp
 )
 
 add_library(tw-internal-actions OBJECT ${SOURCE_FILES})

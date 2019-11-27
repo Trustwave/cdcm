@@ -28,8 +28,7 @@
 #include "../../common/wildcards.hpp"
 
 using namespace trustwave;
-namespace tao {
-    namespace json {
+namespace tao::json {
         template<>
         struct traits<trustwave::dirent> : binding::object<
                 TAO_JSON_BIND_REQUIRED ("name", &trustwave::dirent::name_),
@@ -56,6 +55,7 @@ int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_ms
         res->res("Error: List Failed");
         return -1;
     }
+    AU_LOG_INFO("list returned");
     if (!smb_action->pattern.empty()) {
         dir_entries.erase(std::remove_if(dir_entries.begin(),
                                          dir_entries.end(),
