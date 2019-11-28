@@ -35,7 +35,6 @@ namespace tao::json {
                 TAO_JSON_BIND_REQUIRED ("type", &trustwave::dirent::type_) > {
         };
     }
-}
 
 int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
                       std::shared_ptr<result_msg> res) {

@@ -10,7 +10,7 @@ set(SOURCE_FILES
         query_value.cpp
         enumerate_key.cpp
         key_exists.cpp
-        get_os.cpp
+      #  get_os.cpp
         value_exists.cpp
 		)
 	

@@ -19,22 +19,22 @@ namespace trustwave {
     class bounded_chunk {
     public:
         typedef size_t offset_type;
-        bounded_chunk(size_t off, size_t s) : offset_(off), end_(s) {
+        bounded_chunk(offset_type off, offset_type s) : offset_(off), end_(s) {
         }
 
         [[nodiscard]] inline bool contains(const bounded_chunk &bc) const {
             return offset_ <= bc.offset_ && end() >= bc.end();
         }
 
-        [[nodiscard]] inline size_t offset() const {
+        [[nodiscard]] inline offset_type offset() const {
             return offset_;
         }
 
-        [[nodiscard]] inline size_t size() const {
+        [[nodiscard]] inline offset_type size() const {
             return end_ - offset_;
         }
 
-        [[nodiscard]] inline size_t end() const {
+        [[nodiscard]] inline offset_type end() const {
             return end_;
         }
 

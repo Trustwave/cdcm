@@ -32,16 +32,16 @@ file_reader::file_reader(const std::string &fname) : fname_(fname), stream_(fnam
     }
 }
 
-bool file_reader::read(size_t offset, size_t size, char *dest) {
+ssize_t file_reader::read(size_t offset, size_t size, char *dest) {
     if (offset + size > fsize_) {
-        return false;
+        return -1;
     }
     stream_.seekg(offset, std::ios_base::beg);
-    if (!stream_) {
-        return false;
+    if (!stream_.good()) {
+        return -1;
     }
     stream_.read(dest, size);
-    return stream_.good();
+    return stream_.good()?size:-1;
 }
 
 uintmax_t file_reader::file_size() const {

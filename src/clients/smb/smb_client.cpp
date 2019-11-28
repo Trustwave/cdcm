@@ -361,31 +361,30 @@ bool smb_client::list(const std::string &path,std::vector<trustwave::dirent> &di
     return true;
 }
 
-bool smb_client::read(size_t offset, size_t size, char *dest)
+ssize_t smb_client::read(size_t offset, size_t size, char *dest)
 {
     off_t off = smbc_lseek(remote_fd_, offset, SEEK_SET);
     if (off < 0) {
         AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t) offset, current_open_path_.data());
         smbc_close(remote_fd_);
         close(local_fd_);
-        return false;
+        return -1;
     }
 
     /* Now, download all bytes from offset_download to size */
     size_t curpos=0;
-    for (; curpos < size; curpos += SMB_DEFAULT_BLOCKSIZE) {
-        ssize_t bytesread;
-        bytesread = smbc_read(remote_fd_, dest+curpos, SMB_DEFAULT_BLOCKSIZE);
+    while ( curpos < size) {
+        ssize_t bytesread = smbc_read(remote_fd_, dest+curpos, SMB_DEFAULT_BLOCKSIZE);
         if (bytesread < 0) {
             AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t) curpos,
                          current_open_path_.data());
             smbc_close(remote_fd_);
-            return false;
+            return -1;
         }
         curpos += bytesread;
     }
 // smbc_close(remote_fd_);
-    return true;
+    return curpos;
 }
 uintmax_t smb_client::file_size() const
 {

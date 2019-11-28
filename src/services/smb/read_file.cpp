@@ -27,56 +27,83 @@
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 namespace {
-     const std::string base64_chars =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz"
-            "0123456789+/";
+    namespace {
+        const char base64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                      "abcdefghijklmnopqrstuvwxyz"
+                                      "0123456789+/";
 
+// Reverse translation Alphabet -> binary value
+// It is also constant array but it is too large to initialize it here.
+// There are 256 entries to serve each possible ASCII character
+// The array is produced by the following code:
+// for ( i = 0; i < 256; i++ ) base64Value[i] = -1;
+// for ( i = 0; i < 64; i++ ) base64Value[(int)base64Alphabet[i]] = i;
 
-     inline bool is_base64(unsigned char c) {
-        return (isalnum(c) || (c == '+') || (c == '/'));
+        const int base64Value[] = {
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+                61, -1, -1, -1, -1, -1, -1, -1, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10,
+                11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1,
+                -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+                43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1};
+
+// A constant defined by Base64 algorithm
+        const unsigned char PAD = '=';
     }
 
-    std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
-        std::string ret;
-        int i = 0;
-        int j = 0;
-        unsigned char char_array_3[3];
-        unsigned char char_array_4[4];
+    size_t base64_encoded_length(size_t origLen) {
+        return (((origLen + 2) / 3) << 2);
+    }
 
-        while (in_len--) {
-            char_array_3[i++] = *(bytes_to_encode++);
-            if (i == 3) {
-                char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-                char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-                char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-                char_array_4[3] = char_array_3[2] & 0x3f;
 
-                for(i = 0; (i <4) ; i++)
-                    ret += base64_chars[char_array_4[i]];
-                i = 0;
-            }
+    std::string base64_encode(const char *inBuf, ssize_t inLen
+                                        ) {
+        if (nullptr == inBuf|| 0 == inLen ) {
+            return std::string();
         }
 
-        if (i)
+        unsigned int bitsContainer = 0;                  // A container for 24 bits from the input stream
+        unsigned char currByte; // A current byte from the input stream
+        size_t charCount = 0;   // Count byte tripples
+        size_t outPos = 0;      // Current letter in the output stream
+
+        std::string ret;
+        ret.reserve(base64_encoded_length(inLen));
+        while (inLen--) // Scan the input bit stream
         {
-            for(j = i; j < 3; j++)
-                char_array_3[j] = '\0';
+            currByte = *(inBuf++);
+            bitsContainer |= currByte;
+            charCount++;
 
-            char_array_4[0] = ( char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+            if (3 == charCount) {
+                ret[outPos++] = base64Alphabet[bitsContainer >> 18 & 0x3f];
+                ret[outPos++] = base64Alphabet[(bitsContainer >> 12) & 0x3f];
+                ret[outPos++] = base64Alphabet[(bitsContainer >> 6) & 0x3f];
+                ret[outPos++] = base64Alphabet[bitsContainer & 0x3f];
+                bitsContainer = 0;
+                charCount = 0;
+            } else { bitsContainer <<= 8; }
+        }
 
-            for (j = 0; (j < i + 1); j++)
-                ret += base64_chars[char_array_4[j]];
-
-            while((i++ < 3))
-                ret += '=';
-
+        if (charCount) {
+            bitsContainer <<= 16 - (8 * charCount);
+            ret[outPos++] = base64Alphabet[bitsContainer >> 18 & 0x3f];
+            ret[outPos++] = base64Alphabet[(bitsContainer >> 12) & 0x3f];
+            if (charCount == 1) { ret[outPos++] = PAD; } else {
+                ret[outPos++] = base64Alphabet[(bitsContainer >> 6) & 0x3f];
+            }
+            ret[outPos++] = PAD;
         }
 
         return ret;
-
     }
 }
 int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
@@ -98,7 +125,7 @@ int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
     auto buff = new char[sz];
     rc.read(off,sz,buff);//fixme assaf me return ssize_t
     ssize_t r=100;
-auto b64_str = base64_encode(reinterpret_cast<unsigned char *>(buff),r);
+    auto b64_str = base64_encode(buff,r);
     res->res(b64_str);
     return 0;
 }

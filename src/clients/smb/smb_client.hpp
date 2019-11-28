@@ -58,8 +58,7 @@ public:
                     const char *outfile);
     bool list( const std::string& ,std::vector<trustwave::dirent> &);
     bool download_portion_to_memory(const char *base, const char *name,off_t offset, off_t count);
-    bool download_portion_to_disk(const char *base, const char *name,off_t offset, off_t count);
-    bool read(size_t offset, size_t size, char *dest) override ;
+    ssize_t read(size_t offset, size_t size, char *dest) override ;
     [[nodiscard]] uintmax_t file_size() const override ;
     bool validate_open() override ;
     bool connect(const char *path);
@@ -68,7 +67,6 @@ private:
     bool download_portion(off_t curpos, off_t count, bool to_file);
     int remote_fd_ = -1;
     int local_fd_ = -1;
-    //off_t total_bytes_ = 0;
     struct stat localstat_;
     struct stat remotestat_;
     std::string_view current_open_path_;

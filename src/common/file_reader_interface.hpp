@@ -18,10 +18,11 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <sys/types.h>
 namespace trustwave {
     class file_reader_interface {
     public:
-        virtual bool read(size_t offset, size_t size, char *dest) = 0;
+        virtual ssize_t read(size_t offset, size_t size, char *dest) = 0;
 
         [[nodiscard]] virtual uintmax_t file_size() const = 0;
 
