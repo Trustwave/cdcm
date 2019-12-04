@@ -67,6 +67,7 @@ namespace {
     std::string base64_encode(const char *inBuf, ssize_t inLen
                                         ) {
         if (nullptr == inBuf|| 0 == inLen ) {
+            AU_LOG_ERROR("inLen : %d inBuf : ",inLen,inBuf);
             return std::string();
         }
 
@@ -102,13 +103,12 @@ namespace {
             }
             ret[outPos++] = PAD;
         }
-
-        return ret;
+        //AU_LOG_ERROR("ret : %s",ret.c_str());
+        return std::move(ret);
     }
 }
 int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
-
     if (!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
         return -1;
@@ -119,15 +119,29 @@ int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
     base.append(sess->remote()).append("/").append(smb_action->path_);
     std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
-    rc.connect(base.c_str());
+    auto connect_result  = rc.connect(base.c_str());
+    if(!connect_result.first)
+    {
+        res->res(std::string("Error: %s",(connect_result.second == -1?std::string_view ("Unknown error").data():strerror(connect_result.second))));
+    }
     auto off = smb_action->offset_.empty()?0:std::stoul(smb_action->offset_);
     auto sz = smb_action->size_.empty()?0:std::stoul(smb_action->size_);
-    auto buff = new char[sz];
-    rc.read(off,sz,buff);//fixme assaf me return ssize_t
-    ssize_t r=100;
-    auto b64_str = base64_encode(buff,r);
-    res->res(b64_str);
+    if (0==sz)
+    {
+        sz = rc.file_size()-off;
+    }
+    AU_LOG_ERROR("Recieved offset: %zu size: %zu",off,sz);
+    auto buff = new(std::nothrow) char[sz];
+    if(nullptr == buff)
+    {
+        res->res("Error: Memory allocation failed");
+        return -1;
+    }
+    ssize_t r = rc.read(off,sz,buff);
+    auto c64_str = base64_encode(buff,r);
+    res->res(c64_str.c_str());//fixme assaf figure aou whi strin assignment doesn't  work
     return 0;
+
 }
 
 Dispatcher<Action_Base>::Registrator SMB_Read_File::m_registrator(new SMB_Read_File,

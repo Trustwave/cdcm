@@ -54,6 +54,7 @@ namespace tao {
                 TAO_JSON_FACTORY_BIND1(trustwave::smb_list_dir_msg),
                 TAO_JSON_FACTORY_BIND1(trustwave::smb_get_file_info_msg),
                 TAO_JSON_FACTORY_BIND1(trustwave::smb_read_file_msg),
+                TAO_JSON_FACTORY_BIND1(trustwave::smb_file_exists_msg),
                 //TAO_JSON_FACTORY_BIND1(trustwave::smb_get_file_msg),
                 TAO_JSON_FACTORY_BIND1(trustwave::reg_action_query_value_msg),
              //   TAO_JSON_FACTORY_BIND1(trustwave::reg_action_get_os_msg),
@@ -85,6 +86,11 @@ namespace tao {
         struct traits<trustwave::smb_get_file_info_msg> : binding::object<
                 binding::inherit<traits<trustwave::single_param_action_msg> > > {
             TAO_JSON_DEFAULT_KEY("get_file_info");
+        };
+        template<>
+        struct traits<trustwave::smb_file_exists_msg> : binding::object<
+                binding::inherit<traits<trustwave::single_param_action_msg> > > {
+            TAO_JSON_DEFAULT_KEY("file_exists");
         };
         template<>
         struct traits<trustwave::smb_list_dir_msg> : binding::object<

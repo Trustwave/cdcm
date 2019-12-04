@@ -13,17 +13,27 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include <string>
-
-#include "../../clients/smb/smb_client.hpp"
 #include "get_file_info.hpp"
+#include <string>
+#include <codecvt>
+#include "taocpp-json/include/tao/json.hpp"
+#include "taocpp-json/include/tao/json/contrib/traits.hpp"
+#include "../../clients/smb/smb_client.hpp"
 
 #include "../../common/protocol/msg_types.hpp"
 #include "../../common/session.hpp"
 #include "../../common/singleton_runner/authenticated_scan_server.hpp"
 #include "../../backend/utils/pe_context.hpp"
 using namespace trustwave;
-
+auto push_back = [](tao::json::events::to_value& c,const std::string& k,const std::string&v)
+        {
+            c.begin_object();
+            c.key(k);
+            c.string(v);
+            c.member();
+            c.end_object();
+            c.element();
+        };
 int SMB_Get_File_Info::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
 
@@ -35,18 +45,32 @@ int SMB_Get_File_Info::act(boost::shared_ptr <session> sess, std::shared_ptr<act
     auto smb_action = std::dynamic_pointer_cast<smb_get_file_info_msg>(action);
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
-    std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
-    rc.connect(base.c_str());
+    auto connect_res = rc.connect(base.c_str());
+    if(connect_res.first == false)
+    {
+        res->res(std::string("Error: " )+std::string((std::strerror(connect_res.second))));
+        return 0;
+    }
+
     pe_context pc(rc);
     pc.parse();
-    pc.showVersion();
-//    if (!rc.download(base.c_str(), "", false, true, tmp_name.c_str())) {
-//        res->res("Error: Download failed");
-//        return -1;
-//    }
+    std::map<std::u16string,std::u16string> ret;
 
-    res->res(tmp_name);
+    pc.extract_info(ret);
+    tao::json::events::to_value c;
+    c.begin_array();
+    push_back(c,"Size",std::to_string(rc.file_size()));
+    push_back(c,"Path","FIXME");
+    push_back(c,"LastModified",std::to_string(rc.last_modified()));
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
+    for(const auto&e :ret)
+    {
+        push_back(c,convert.to_bytes(std::u16string(e.first)),convert.to_bytes(std::u16string(e.second)));
+    }
+    c.end_array();
+
+    res->res(to_string(c.value));
     return 0;
 
 }

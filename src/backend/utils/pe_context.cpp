@@ -19,7 +19,7 @@
 #include <string>
 #include <string_view>
 #include <locale>
-#include <codecvt>
+
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 using namespace trustwave;
@@ -36,6 +36,30 @@ namespace {
     template<typename T, typename P>
     T *ptr_dec(P *p, size_t o) {
         return reinterpret_cast<T *>(((char *) (p) - (o)));
+    }
+    template<typename T>
+    bool  allocate_elements(uint32_t e_count,T**& dest_arr,void*& dest_ptr)
+    {
+        if (e_count> 0) {
+            dest_arr = malloc_helper<T *>(e_count);
+            if (dest_arr == nullptr)
+                return false;
+            for (uint32_t i = 0; i <e_count; i++) {
+                dest_arr[i] = ptr_add<T>(dest_ptr,i * sizeof(T));
+            }
+        } else {
+            dest_ptr = nullptr;
+        }
+        return true;
+    }
+    template<typename T>
+    void  optional_header_parse(pe_file_t& pe,T*& p)
+    {
+        p = reinterpret_cast<T *>(pe.optional_hdr_ptr);
+        pe.optional_hdr.length = sizeof(T);
+        pe.num_directories = p->NumberOfRvaAndSizes;
+        pe.entrypoint = p->AddressOfEntryPoint;
+        pe.imagebase = p->ImageBase;
     }
     template< typename P>
     auto calculate_padding(P *p,const char* data) {
@@ -59,24 +83,19 @@ pe_context::pe_context(file_reader_interface& fr) : fm_(fr) {}
 
 int pe_context::parse() {
     fm_.map_chunk(0, 64);
-
     pe_.dos_hdr = reinterpret_cast<IMAGE_DOS_HEADER *>( fm_.data());
     if (pe_.dos_hdr->e_magic != MAGIC_MZ)
+    {
         return LIBPE_E_NOT_A_PE_FILE;
-    const uint32_t *signature_ptr = ptr_add<uint32_t>(pe_.dos_hdr,
-                                                      pe_.dos_hdr->e_lfanew);
-
-    if (!fm_.map_chunk_by_pointer(signature_ptr, LIBPE_SIZEOF_MEMBER(pe_file_t, signature))) {
-        return LIBPE_E_INVALID_LFANEW;//todo assaf 4
     }
-
+    const auto signature_ptr = ptr_add<uint32_t>(pe_.dos_hdr,pe_.dos_hdr->e_lfanew);
+    if (!fm_.map_chunk_by_pointer(signature_ptr, LIBPE_SIZEOF_MEMBER(pe_file_t, signature))) {
+        return LIBPE_E_INVALID_LFANEW;
+    }
     // NT signature (PE\0\0), or 16-bit Windows NE signature (NE\0\0).
     pe_.signature = *signature_ptr;
-
-
     switch (pe_.signature) {
         default:
-            //fprintf(stderr, "Invalid signature: %x\n", pe_.signature);
             return LIBPE_E_INVALID_SIGNATURE;
         case SIGNATURE_NE:
         case SIGNATURE_PE:
@@ -97,46 +116,32 @@ int pe_context::parse() {
     // Figure out whether it's a PE32 or PE32+.
     auto *opt_type_ptr = reinterpret_cast<uint16_t *>( pe_.optional_hdr_ptr);
     if (!fm_.map_chunk_by_pointer(opt_type_ptr, LIBPE_SIZEOF_MEMBER(IMAGE_OPTIONAL_HEADER, type)))
-        return LIBPE_E_MISSING_OPTIONAL_HEADER;//todo assaf 2
+        return LIBPE_E_MISSING_OPTIONAL_HEADER;
 
     pe_.optional_hdr.type = *opt_type_ptr;
     switch (pe_.optional_hdr.type) {
         default:
         case MAGIC_ROM:
-            // Oh boy! We do not support ROM. Abort!
-            //fprintf(stderr, "ROM image is not supported\n");
             return LIBPE_E_UNSUPPORTED_IMAGE;
         case MAGIC_PE32:
             if (!fm_.map_chunk_by_pointer(pe_.optional_hdr_ptr,
                                           sizeof(IMAGE_OPTIONAL_HEADER_32)))
-                return LIBPE_E_MISSING_OPTIONAL_HEADER;//todo assaf 96
-            pe_.optional_hdr._32 = reinterpret_cast<IMAGE_OPTIONAL_HEADER_32 *>( pe_.optional_hdr_ptr);
-            pe_.optional_hdr.length = sizeof(IMAGE_OPTIONAL_HEADER_32);
-            pe_.num_directories =
-                    pe_.optional_hdr._32->NumberOfRvaAndSizes;
-            pe_.entrypoint = pe_.optional_hdr._32->AddressOfEntryPoint;
-            pe_.imagebase = pe_.optional_hdr._32->ImageBase;
+                return LIBPE_E_MISSING_OPTIONAL_HEADER;
+            optional_header_parse<IMAGE_OPTIONAL_HEADER_32>(pe_,pe_.optional_hdr._32);
             break;
         case MAGIC_PE64:
             if (!fm_.map_chunk_by_pointer(pe_.optional_hdr_ptr,
                                           sizeof(IMAGE_OPTIONAL_HEADER_64)))
-                return LIBPE_E_MISSING_OPTIONAL_HEADER;//todo assaf 112
-            pe_.optional_hdr._64 = reinterpret_cast<IMAGE_OPTIONAL_HEADER_64 *>( pe_.optional_hdr_ptr);
-            pe_.optional_hdr.length = sizeof(IMAGE_OPTIONAL_HEADER_64);
-            pe_.num_directories =
-                    pe_.optional_hdr._64->NumberOfRvaAndSizes;
-            pe_.entrypoint = pe_.optional_hdr._64->AddressOfEntryPoint;
-            pe_.imagebase = pe_.optional_hdr._64->ImageBase;
+                return LIBPE_E_MISSING_OPTIONAL_HEADER;
+            optional_header_parse<IMAGE_OPTIONAL_HEADER_64>(pe_,pe_.optional_hdr._64);
             break;
     }
 
-    if (pe_.num_directories > MAX_DIRECTORIES)/*16*/ {
-        //fprintf(stderr, "Too many directories (%u)\n", pe_.num_directories);
+    if (pe_.num_directories > MAX_DIRECTORIES) {
         return LIBPE_E_TOO_MANY_DIRECTORIES;
     }
 
-    if (pe_.num_sections > MAX_SECTIONS)/*96*/ {
-        //fprintf(stderr, "Too many sections (%u)\n", pe_.num_sections);
+    if (pe_.num_sections > MAX_SECTIONS) {
         return LIBPE_E_TOO_MANY_SECTIONS;
     }
 
@@ -145,36 +150,23 @@ int pe_context::parse() {
 
     if (!fm_.map_chunk_by_pointer(pe_.directories_ptr,
                                   sizeof(IMAGE_DATA_DIRECTORY) * pe_.num_directories))
-        return LIBPE_E_ALLOCATION_FAILURE;//todo assaf 2 fixe ret
+        return LIBPE_E_ALLOCATION_FAILURE;
     uint32_t sections_offset = LIBPE_SIZEOF_MEMBER(pe_file_t, signature)
                                + sizeof(IMAGE_FILE_HEADER)
                                + pe_.coff_hdr->SizeOfOptionalHeader;
     pe_.sections_ptr = ptr_add<void>(signature_ptr, sections_offset);
     if (!fm_.map_chunk_by_pointer(pe_.sections_ptr, sizeof(IMAGE_SECTION_HEADER) * pe_.num_sections))
-        return LIBPE_E_ALLOCATION_FAILURE;//todo assaf 2 fixe ret
-    if (pe_.num_directories > 0) {
-        pe_.directories = malloc_helper<IMAGE_DATA_DIRECTORY *>(pe_.num_directories);
-        if (pe_.directories == nullptr)
-            return LIBPE_E_ALLOCATION_FAILURE;
-        for (uint32_t i = 0; i < pe_.num_directories; i++) {
-            pe_.directories[i] = ptr_add<IMAGE_DATA_DIRECTORY>(pe_.directories_ptr,
-                                                               i * sizeof(IMAGE_DATA_DIRECTORY));
-        }
-    } else {
-        pe_.directories_ptr = nullptr;
+        return LIBPE_E_ALLOCATION_FAILURE;
+
+    if (!allocate_elements<IMAGE_DATA_DIRECTORY>(pe_.num_directories,pe_.directories,pe_.directories_ptr))
+    {
+        return LIBPE_E_ALLOCATION_FAILURE;
+    }
+    if (!allocate_elements<IMAGE_SECTION_HEADER>(pe_.num_sections,pe_.sections,pe_.sections_ptr))
+    {
+        return LIBPE_E_ALLOCATION_FAILURE;
     }
 
-    if (pe_.num_sections > 0) {
-        pe_.sections = malloc_helper<IMAGE_SECTION_HEADER *>(pe_.num_sections);
-        if (pe_.sections == nullptr)
-            return LIBPE_E_ALLOCATION_FAILURE;
-        for (uint32_t i = 0; i < pe_.num_sections; i++) {
-            pe_.sections[i] = ptr_add<IMAGE_SECTION_HEADER>(pe_.sections_ptr,
-                                                            i * sizeof(IMAGE_SECTION_HEADER));
-        }
-    } else {
-        pe_.sections_ptr = nullptr;
-    }
     return 0;
 }
 
@@ -233,13 +225,11 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
     void *ptr = ptr_add<void>(fm_.data(), offset);
 
     if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY))) {
-        // TODO: Should we report something?
         return nullptr;
     }
 
     auto node = malloc_helper<NODE_PERES>();
     if (node == nullptr) {
-        // TODO(jweyrich): Report allocation failure?
         return nullptr;
     }
     memset(node, 0, sizeof(NODE_PERES));
@@ -256,7 +246,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
         offset = resourceDirOffset + offsetDirectory1;
         ptr = ptr_add<void>(fm_.data(), offset);
         if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY))) {
-            // TODO: Should we report something?
             goto _error;
         }
 
@@ -274,7 +263,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                      lastDirectoryEntryNodeAtLevel1->resource.directoryEntry->DirectoryData.data.OffsetToDirectory;
             ptr = ptr_add<void>(fm_.data(), offset);
             if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY))) {
-                // TODO: Should we report something?
                 goto _error;
             }
 
@@ -293,7 +281,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                          offsetDirectory2;
                 ptr = ptr_add<void>(fm_.data(), offset);
                 if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY))) {
-                    // TODO: Should we report something?
                     goto _error;
                 }
 
@@ -306,7 +293,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                          node->resource.directoryEntry->DirectoryData.data.OffsetToDirectory; // posiciona em 0x72
                 ptr = ptr_add<void>(fm_.data(), offset);
                 if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY))) {
-                    // TODO: Should we report something?
                     goto _error;
                 }
 
@@ -323,7 +309,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                                                              RDT_LEVEL3)->resource.resourceDirectory->NumberOfIdEntries); y++) {
                     ptr = ptr_add<void>(fm_.data(), offset);
                     if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY))) {
-                        // TODO: Should we report something?
                         goto _error;
                     }
                     node = createNode(node, RDT_DIRECTORY_ENTRY);
@@ -334,7 +319,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                     offset = resourceDirOffset + node->resource.directoryEntry->DirectoryName.name.NameOffset;
                     ptr = ptr_add<void>(fm_.data(), offset);
                     if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_STRING))) {
-                        // TODO: Should we report something?
                         goto _error;
                     }
                     node = createNode(node, RDT_DATA_STRING);
@@ -353,7 +337,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                     node->rootNode = rootNode;
                     node->nodeLevel = RDT_LEVEL3;
                     node->resource.dataEntry = reinterpret_cast<IMAGE_RESOURCE_DATA_ENTRY *>( ptr);
-                    //showNode(node);
 
                     offset += sizeof(IMAGE_RESOURCE_DATA_ENTRY);
                 }
@@ -446,7 +429,7 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
     sum_output.err = LIBPE_E_OK;
     return sum_output;
 }*/
-void pe_context::showVersion() {
+void pe_context::extract_info(std::map<std::u16string,std::u16string>& ret) {
     NODE_PERES *node = discoveryNodesPeres();
     assert(node != nullptr);
 
@@ -487,28 +470,25 @@ void pe_context::showVersion() {
     }
 
    // VS_FIXEDFILEINFO *info = reinterpret_cast<VS_FIXEDFILEINFO *>(const_cast<char *> (buffer));
-    auto *vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO)+8);//todo assaf 8?????
+    auto vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO)+8);//todo assaf 8?????
     //first
     static constexpr auto string_file_version_len = 28;
-    WORD *padding = ptr_add<WORD>(vih, sizeof(version_info_header)+string_file_version_len);
-    auto *st_vih = ptr_add<version_info_header>(padding, calculate_padding(padding,fm_.data()));//
+    auto padding = ptr_add<WORD>(vih, sizeof(version_info_header)+string_file_version_len);
+    auto st_vih = ptr_add<version_info_header>(padding, calculate_padding(padding,fm_.data()));//
 
     //second
     static constexpr auto string_table_key_len = 16;
-    WORD *st_padding = ptr_add<WORD>(st_vih, sizeof(version_info_header)+string_table_key_len);
-    auto *str_vih = ptr_add<version_info_header>(st_padding,
+    auto st_padding = ptr_add<WORD>(st_vih, sizeof(version_info_header)+string_table_key_len);
+    auto str_vih = ptr_add<version_info_header>(st_padding,
                                                                 calculate_padding(st_padding, fm_.data()));//
 
-   // char16_t * unicode1 = ptr_add<char16_t>(st_vih, sizeof(version_info_header));
-    const char *buffer_end = ptr_add<char>(buffer,dataEntrySize );
+    auto buffer_end = ptr_add<char>(buffer,dataEntrySize );
 
-
-    std::map<std::u16string,std::u16string> ret;
     std::unordered_set<std::u16string> s
     =
             {            u"CompanyName",            u"FileDescription",            u"FileVersion",            u"ProductName",            u"ProductVersion"}    ;
 
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
+
 
      while(str_vih->wLength> 0 && ptr_add<char>(str_vih, str_vih->wLength)<=buffer_end) {
 
@@ -523,10 +503,7 @@ void pe_context::showVersion() {
          }
          str_vih = ptr_add<version_info_header>(vend, calculate_padding(vend,fm_.data()));
      }
-     for(const auto& a:ret) {
-         std::cerr << convert.to_bytes(std::u16string(a.first)) << " : "
-                   << convert.to_bytes(std::u16string(a.second)) << std::endl;
-     }
+
 
 
 

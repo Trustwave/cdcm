@@ -47,7 +47,8 @@ public:
     }
     void res(const std::string& ress)
     {
-        res_ = ress;
+
+        res_.assign(ress);
     }
 };
 
@@ -176,6 +177,18 @@ struct smb_get_file_info_msg: public single_param_action_msg
         }
         explicit smb_get_file_info_msg(const single_param_action_msg& o) :
                 single_param_action_msg(o, "get_file_info")
+        {
+        }
+    };
+    struct smb_file_exists_msg: public single_param_action_msg
+    {
+
+        smb_file_exists_msg() :
+                single_param_action_msg("file_exists")
+        {
+        }
+        explicit smb_file_exists_msg(const single_param_action_msg& o) :
+                single_param_action_msg(o, "file_exists")
         {
         }
     };

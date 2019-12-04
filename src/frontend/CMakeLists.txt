@@ -18,6 +18,7 @@ target_link_libraries(cdcm_broker
 						zmq
 						boost_system
 						boost_filesystem
+		samba-credentials
 						boost_log
 						tw-logger 
 						tw-smb-actions 
@@ -28,6 +29,7 @@ target_link_libraries(cdcm_broker
 						tw-zmq 
 						tw-singleton-runner
 						libpe_pev.a
+		tw-registry-client
 						)
 install(TARGETS cdcm_broker
 		RUNTIME DESTINATION bin

@@ -37,7 +37,7 @@ static constexpr uint16_t SMB_MAXPATHLEN = MAXPATHLEN;
 static constexpr uint16_t RESUME_CHECK_SIZE = 512;
 static constexpr uint16_t RESUME_DOWNLOAD_OFFSET = 1024;
 static constexpr uint16_t RESUME_CHECK_OFFSET = RESUME_DOWNLOAD_OFFSET + RESUME_CHECK_SIZE;
-static constexpr uint16_t SMB_DEFAULT_BLOCKSIZE = 64000;
+static constexpr uint16_t SMB_DEFAULT_BLOCKSIZE = 1024*64;
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
@@ -60,8 +60,9 @@ public:
     bool download_portion_to_memory(const char *base, const char *name,off_t offset, off_t count);
     ssize_t read(size_t offset, size_t size, char *dest) override ;
     [[nodiscard]] uintmax_t file_size() const override ;
+    [[nodiscard]] time_t last_modified() const;
     bool validate_open() override ;
-    bool connect(const char *path);
+    std::pair<bool,int> connect(const char *path);
 
 private:
     bool download_portion(off_t curpos, off_t count, bool to_file);

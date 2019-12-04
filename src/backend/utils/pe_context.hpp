@@ -212,7 +212,7 @@ namespace trustwave {
         IMAGE_DATA_DIRECTORY *pe_directory_by_entry(ImageDirectoryEntry entry);
         NODE_PERES *discoveryNodesPeres();
         //pe_final_output_t pe_get_resources();
-        void showVersion();
+        void extract_info(std::map<std::u16string,std::u16string>& );
 
     private:
 
