@@ -98,7 +98,16 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
     }
     return 0;
 }
+//
+//Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
+//                authenticated_scan_server::instance().public_dispatcher);
 
-Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
-                authenticated_scan_server::instance().public_dispatcher);
 
+// instance of the our plugin
+static std::shared_ptr<Enumerate_Key_Action> instance = nullptr;
+
+
+// extern function, that declared in "action.hpp", for export the plugin from dll
+std::shared_ptr<trustwave::Action_Base> import_action() {
+    return instance ? instance : (instance = std::make_shared<Enumerate_Key_Action>());
+}
