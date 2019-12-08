@@ -40,7 +40,6 @@ public:
     Action_Base(std::string name, std::string command, bool sj = false) :
                     name_(std::move(name)), command_(std::move(command)), short_job_(sj)
     {
-        std::cerr<<"Action_Base Ctor"<<std::endl;
     }
 
     virtual ~Action_Base()
@@ -65,11 +64,9 @@ private:
     const bool short_job_;
 };
 }
-//Some comment
 using import_action_cb_t = std::shared_ptr<trustwave::Action_Base>( );
 
 extern "C" {
-//Some comment
     extern std::shared_ptr<trustwave::Action_Base> import_action();
 }
 
