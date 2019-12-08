@@ -1,6 +1,6 @@
 //===========================================================================
 // Trustwave ltd. @{SRCH}
-//								value_exists.hpp
+//								enumerate_key.hpp
 //
 //---------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
@@ -10,11 +10,11 @@
 // -----------
 // Revision: 01.00
 // By      : Assaf Cohen
-// Date    : 7 Jul 2019
+// Date    : 4 Jul 2019
 // Comments: 
 
-#ifndef TRUSTWAVE_SERVICES_REGISTRY_VALUE_EXISTS_HPP_
-#define TRUSTWAVE_SERVICES_REGISTRY_VALUE_EXISTS_HPP_
+#ifndef TRUSTWAVE_SERVICES_REGISTRY_ENUMERATE_KEY_HPP_
+#define TRUSTWAVE_SERVICES_REGISTRY_ENUMERATE_KEY_HPP_
 
 //=====================================================================================================================
 //                                                  Include files
@@ -25,17 +25,17 @@
 //=====================================================================================================================
 namespace trustwave {
 
-class Value_Exists_Action: public Registry_Action
+class Enumerate_Key_Action: public Registry_Action
 {
-    static Dispatcher<Action_Base>::Registrator m_registrator;
 
 public:
-    Value_Exists_Action() :
-        Registry_Action("value_exists", "value_exists")
+    Enumerate_Key_Action() :
+        Registry_Action("enumerate", "enumerate")
     {
     }
 
     int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
 };
+
 }
-#endif /* TRUSTWAVE_SERVICES_REGISTRY_VALUE_EXISTS_HPP_ */
+#endif /* TRUSTWAVE_SERVICES_REGISTRY_ENUMERATE_KEY_HPP_ */

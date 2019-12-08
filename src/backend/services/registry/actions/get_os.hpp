@@ -26,7 +26,6 @@ namespace trustwave {
 
     class GetOS_Action: public Registry_Action
     {
-        static Dispatcher<Action_Base>::Registrator m_registrator;
 
     public:
         GetOS_Action() :

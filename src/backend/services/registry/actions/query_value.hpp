@@ -27,7 +27,6 @@ namespace trustwave {
 
 class Query_Value_Action: public Registry_Action
 {
-    static Dispatcher<Action_Base>::Registrator m_registrator;
 
 public:
     Query_Value_Action() :
