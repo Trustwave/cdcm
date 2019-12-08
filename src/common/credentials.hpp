@@ -30,9 +30,9 @@ struct credentials
     credentials(const std::string& domain, const std::string& username, const std::string& password,
                     const std::string workstation);
 
-    ~credentials();
+    ~credentials()=default;
     void creds(const std::string& domain, const std::string& username, const std::string& password,
-               const std::string workstation);
+               const std::string& workstation);
     std::string domain_;
     std::string username_;
     std::string password_;

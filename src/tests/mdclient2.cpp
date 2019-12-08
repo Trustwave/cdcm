@@ -8,18 +8,19 @@
 #include <vector>
 
 #include "../common/protocol/protocol.hpp"
-static void enumf( std::string& msg)
-{
-    mdcli session("tcp://127.0.0.1:5555", 1);
+//static void enumf( std::string& msg)
+//{
+//    mdcli session("tcp://127.0.0.1:5555", 1);
+//
+//    zmsg *reply = session.send_and_recv(msg);
+//    if (reply) {
+//        std::cout << reply->body() << std::endl;
+//        delete reply;
+//    }
+//
+//}
 
-    zmsg *reply = session.send_and_recv(msg);
-    if (reply) {
-        std::cout << reply->body() << std::endl;
-        delete reply;
-    }
-
-}
-static void fc(int c)
+static void fc(int )
 {
     mdcli session("tcp://127.0.0.1:5555", 1);
     auto act_id1 = boost::uuids::random_generator()();
@@ -98,10 +99,11 @@ static void fc(int c)
         })";
         printf("Request is:\n%s\n", actions.c_str());
         zmsg *reply = session.send_and_recv(actions);
+        (void)reply;
 
     }
 }
-int main(int argc, char *argv[])
+int main(int , char **)
 {
     std::vector<std::thread> tp;
     for (unsigned int i = 0; i < 1; ++i)        //context+broker

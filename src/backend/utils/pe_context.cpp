@@ -43,7 +43,9 @@ namespace {
         if (e_count> 0) {
             dest_arr = malloc_helper<T *>(e_count);
             if (dest_arr == nullptr)
+            {
                 return false;
+            }
             for (uint32_t i = 0; i <e_count; i++) {
                 dest_arr[i] = ptr_add<T>(dest_ptr,i * sizeof(T));
             }
@@ -66,7 +68,8 @@ namespace {
         return (4 - ((reinterpret_cast<char*>(p)-data)%4))%4;
 
     }
-    typedef uint16_t  WORD;
+
+    using WORD=uint16_t;
 
 #pragma pack(push, 1)
 

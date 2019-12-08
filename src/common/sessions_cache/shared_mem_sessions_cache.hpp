@@ -38,7 +38,7 @@ namespace trustwave {
 //===================================================================
 class session;
 class shared_mem_sessions_cache;
-struct shared_mem_session_element;
+class shared_mem_session_element;
 namespace bip = boost::interprocess;
 namespace bmi = boost::multi_index;
 namespace chr = std::chrono;
@@ -68,7 +68,7 @@ public:
     {
       //  printf("%s is being destructed\n", session_.remote_.c_str());
     }
-    shared_mem_session_element(sp_session_t spUC, size_t, const void_allocator &va);
+    shared_mem_session_element(sp_session_t sp_session, size_t, const void_allocator &va);
     // Avoid copy semantic
     shared_mem_session_element(const shared_mem_session_element&) = delete;
     shared_mem_session_element& operator=(const shared_mem_session_element&) = delete;
@@ -170,7 +170,7 @@ public:
         this->update <Tag>(s);
         return true;
     }
-    bool remove_by_id(const std::string &id);
+    bool remove_by_id(const std::string &);
     bool clean();
     void flush_all_entries();
     void dump_by_expiration() const;

@@ -10,7 +10,6 @@ set(SOURCE_FILES
 add_library(tw-sessions-cache SHARED ${SOURCE_FILES})
 target_link_libraries(tw-sessions-cache tw-common)
 
-
 install(TARGETS tw-sessions-cache LIBRARY DESTINATION lib
 		DESTINATION ${lib_dest})
 

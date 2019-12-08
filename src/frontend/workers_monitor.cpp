@@ -80,7 +80,7 @@ std::unique_ptr<bp::child> workers_monitor::start_worker(std::string worker_name
     try
     {
         auto worker = std::make_unique<bp::child>(bp::search_path(worker_bin_path), worker_name,
-                  bp::on_exit( [  worker_name, this ](int status, const std::error_code& ec) {
+                  bp::on_exit( [  worker_name, this ](int, const std::error_code& ) {
 
                       if(!zmq_helpers::interrupted) {
                           monitor(worker_name);
@@ -90,7 +90,6 @@ std::unique_ptr<bp::child> workers_monitor::start_worker(std::string worker_name
     }
     catch (std::exception& exception)
     {
-       // cout << "got exception: " << exception.what() << endl;
         return nullptr;
     }
 }

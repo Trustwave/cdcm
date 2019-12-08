@@ -31,7 +31,7 @@ class zmsg;
 //  This defines a single broker
 namespace trustwave {
 class session;
-class header;
+struct header;
 class message_broker {
     //  This defines one worker, idle or active
 

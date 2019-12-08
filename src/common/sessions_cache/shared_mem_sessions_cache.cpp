@@ -26,11 +26,10 @@ using namespace trustwave;
 boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_create(const std::string &name,
                 const size_t size,size_t session_idle_time)
 {
-    const std::string absolute_name(name);
    // std::cout << "Creating Shared Mem Sessions Cache ( " << absolute_name << " ) size ( " << size << " )" << std::endl;
     boost::shared_ptr <shared_mem_sessions_cache> cache = boost::shared_ptr <shared_mem_sessions_cache>(
-                    new shared_mem_sessions_cache(absolute_name, size, session_idle_time));
-    if (false == cache->construct()){
+                    new shared_mem_sessions_cache(name, size, session_idle_time));
+    if (cache->construct()){
     //    std::cout << "Failed Shared Mem Sessions Cache name ( " << absolute_name << " ) size ( " << size  << " )" << std::endl;
         return boost::shared_ptr <shared_mem_sessions_cache>();
     }
@@ -52,17 +51,12 @@ std::ostream &trustwave::operator<<(std::ostream &os, const shared_mem_session_e
 }
 
 shared_mem_sessions_cache::shared_mem_sessions_cache(const std::string &name, const size_t size, size_t idle_timeout) :
-                map_(), name_(name), lock_(bip::open_or_create, (name + std::string("_lock")).c_str()), segment_(), segment_size_(
+                map_(), name_(name), lock_(bip::open_or_create, (name + std::string("_lock")).c_str()), segment_size_(
                                 size), session_idle_timeout_(idle_timeout)
 {
 }
 
-shared_mem_sessions_cache::~shared_mem_sessions_cache()
-{
-    /*WriteLock auto_lock(lock_);
-    segment_->get_segment_manager()->destroy_ptr(map_);*/
-}
-
+shared_mem_sessions_cache::~shared_mem_sessions_cache()=default;
 bool shared_mem_sessions_cache::construct()
 {
     try{

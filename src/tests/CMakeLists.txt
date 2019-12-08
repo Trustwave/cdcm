@@ -1,7 +1,7 @@
 set (Boost_USE_STATIC_LIBS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 include_directories (${Boost_INCLUDE_DIRS})
-include_directories (../trustwave)
 #Setup CMake to run tests
 enable_testing()
 

@@ -50,7 +50,7 @@ console (const char *format, ...);
 //  zmq_poll.
 
 static bool interrupted;
-static void signal_handler (int signal_value);
+static void signal_handler (int);
 static void catch_signals ();
 };
 

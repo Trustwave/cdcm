@@ -31,7 +31,7 @@
 //=====================================================================================================================
 namespace trustwave {
 
-struct session;
+class session;
 struct action_msg;
 struct result_msg;
 class Action_Base: public boost::noncopyable
@@ -40,6 +40,7 @@ public:
     Action_Base(std::string name, std::string command, bool sj = false) :
                     name_(std::move(name)), command_(std::move(command)), short_job_(sj)
     {
+        std::cerr<<"Action_Base Ctor"<<std::endl;
     }
 
     virtual ~Action_Base()

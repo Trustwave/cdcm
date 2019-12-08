@@ -17,15 +17,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include "shmem_fixtures.hpp"
-#ifdef __cplusplus
-
-extern "C" {
-#endif
-
-#include "auth/credentials/credentials.h"
-#ifdef __cplusplus
-}
-#endif
 namespace utf = boost::unit_test;
 using  namespace trustwave;
 

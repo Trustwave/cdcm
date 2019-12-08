@@ -60,10 +60,10 @@ zmq_helpers::clock ()
 void
 zmq_helpers::sleep (std::chrono::milliseconds msecs)
 {
-    struct timespec t;
-        t.tv_sec =  std::chrono::duration_cast<std::chrono::seconds>(msecs).count();
-        t.tv_nsec = (msecs.count()% 1000) ;
-        nanosleep (&t, nullptr);
+    struct timespec t{};
+    t.tv_sec =  std::chrono::duration_cast<std::chrono::seconds>(msecs).count();
+    t.tv_nsec = (msecs.count()% 1000) ;
+    nanosleep (&t, nullptr);
 }
 
 void
@@ -71,7 +71,7 @@ zmq_helpers::console (const char *format, ...)
 {
     time_t curtime =  std::chrono::system_clock::to_time_t(clock());
     struct tm *loctime = localtime (&curtime);
-    char *formatted = new char[20];
+    auto formatted = new char[20];
     strftime (formatted, 20, "%y-%m-%d %H:%M:%S ", loctime);
     printf ("%s", formatted);
     delete[] formatted;
@@ -91,14 +91,14 @@ zmq_helpers::console (const char *format, ...)
 //  zmq_poll.
 
 bool zmq_helpers::interrupted = false;
-void zmq_helpers::signal_handler (int )
+void zmq_helpers::signal_handler (int)
 {
     interrupted = true;
 }
 
 void zmq_helpers::catch_signals ()
 {
-    struct sigaction action;
+    struct sigaction action{};
     action.sa_handler = signal_handler;
     action.sa_flags = 0;
     sigemptyset (&action.sa_mask);

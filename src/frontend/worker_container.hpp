@@ -139,7 +139,7 @@ public:
     bool update_last_worked(const std::string& identity, const std::string& sess_id)
     {
         auto it2 = cont_.project <session>(cont_.get <id>().find(identity));
-        return cont_.get <session>().modify(it2, [&sess_id,this](sp_worker_t x){x->last_worked_session_ =sess_id;});
+        return cont_.get <session>().modify(it2, [&sess_id](sp_worker_t x){x->last_worked_session_ =sess_id;});
     }
     auto idle_workers()
     {

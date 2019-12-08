@@ -22,6 +22,7 @@
 #include "../common/zmq/zmq_helpers.hpp"
 #include "../common/typedefs.hpp"
 #include "message_worker.hpp"
+#include "utils/action_manager.hpp"
 template<>
 int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::worker>(size_t id)
 {
@@ -32,6 +33,7 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::wor
         abort();
     }
   //  std::cerr << "worker "<< id << " logger initialised!!!" << std::endl;
+    auto sl_vec = action_manager::load("/opt/output/libs/plugins/",public_dispatcher);
     std::thread worker_thread(message_worker::worker_loop);
     worker_thread.join();
     return 0;

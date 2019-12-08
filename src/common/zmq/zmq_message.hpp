@@ -60,7 +60,7 @@ public:
     //  Lets us print UUIDs as C strings and use them as addresses
     //
     static std::unique_ptr<char[]>
-    encode_uuid(unsigned char *data);
+    encode_uuid(const unsigned char *data);
 
     // --------------------------------------------------------------------------
     // Formats 17-byte UUID as 33-char string starting with '@'

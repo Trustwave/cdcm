@@ -35,17 +35,17 @@ class shared_mem_session;
 class shared_mem_session_element;
 class shared_mem_credentials;
 
-std::ostream &operator<<(std::ostream &os, const shared_mem_session &s);
-std::ostream &operator<<(std::ostream &os, const shared_mem_credentials &s);
+std::ostream &operator<<(std::ostream &, const shared_mem_session &);
+std::ostream &operator<<(std::ostream &, const shared_mem_credentials &);
 
 class shared_mem_credentials {
 public:
-    ~shared_mem_credentials();
+    ~shared_mem_credentials()=default;
 private:
     friend class shared_mem_session;
     friend struct session_converter;
-    friend std::ostream &operator<<(std::ostream &os, const shared_mem_credentials &s);
-    friend std::ostream &operator<<(std::ostream &os, const shared_mem_session &s);
+    friend std::ostream &operator<<(std::ostream &, const shared_mem_credentials &);
+    friend std::ostream &operator<<(std::ostream &, const shared_mem_session &);
 
         shared_mem_credentials(const void_allocator &va);
         // Avoid copy semantic
@@ -64,14 +64,14 @@ private:
 
 class shared_mem_session {
 public:
-    ~shared_mem_session();
+    ~shared_mem_session()=default;
 private:
     friend struct session_converter;
     friend class shared_mem_sessions_cache;
     friend class shared_mem_session_element;
 
-    friend std::ostream& operator<<(std::ostream &os, const shared_mem_session_element&ident_entry);
-    shared_mem_session(const void_allocator &va);
+    friend std::ostream& operator<<(std::ostream &, const shared_mem_session_element&);
+    explicit shared_mem_session(const void_allocator &va);
     // Avoid copy semantic
     shared_mem_session(const shared_mem_session&) = delete;
     shared_mem_session& operator=(const shared_mem_session&) = delete;
@@ -80,7 +80,7 @@ private:
     shared_mem_session(shared_mem_session&&) = default;
     shared_mem_session& operator=(shared_mem_session&&) = default;
 
-    friend std::ostream &operator<<(std::ostream &os, const shared_mem_session &s);
+    friend std::ostream &operator<<(std::ostream &, const shared_mem_session &);
     String uuid_;
     String remote_;
     shared_mem_credentials creds_;

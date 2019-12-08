@@ -1,8 +1,5 @@
 
 
-#include_directories(${SMB_INCLUDES})
-#link_directories( ${SMB_LINKS})
-
 get_property(dirs DIRECTORY  PROPERTY LINK_DIRECTORIES)
 foreach(dir ${dirs})
     message(STATUS "dir='${dir}'")

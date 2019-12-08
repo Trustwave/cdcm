@@ -24,14 +24,14 @@
 trustwave::sp_session_t trustwave::session_converter::convert(const shared_mem_session &sm)
 {
     sp_session_t rv = boost::make_shared <session>();
-    if (!rv->id(std::string(sm.uuid_.c_str(), (size_t) sm.uuid_.length()))){
+    if (!rv->id(std::string(sm.uuid_.c_str(), static_cast<size_t>(sm.uuid_.length())))){
         return sp_session_t();
     }
-    rv->remote(std::string(sm.remote_.c_str(), (size_t) sm.remote_.length()));
-    rv->creds(std::string(sm.creds_.domain_.c_str(), (size_t) sm.creds_.domain_.length()),
-                    std::string(sm.creds_.username_.c_str(), (size_t) sm.creds_.username_.length()),
-                    std::string(sm.creds_.password_.c_str(), (size_t) sm.creds_.password_.length()),
-                    std::string(sm.creds_.workstation_.c_str(), (size_t) sm.creds_.workstation_.length()));
+    rv->remote(std::string(sm.remote_.c_str(),static_cast<size_t>(sm.remote_.length())));
+    rv->creds(std::string(sm.creds_.domain_.c_str(),static_cast<size_t>( sm.creds_.domain_.length())),
+                    std::string(sm.creds_.username_.c_str(), static_cast<size_t>( sm.creds_.username_.length())),
+                    std::string(sm.creds_.password_.c_str(), static_cast<size_t>( sm.creds_.password_.length())),
+                    std::string(sm.creds_.workstation_.c_str(), static_cast<size_t>( sm.creds_.workstation_.length())));
     return rv;
 }
 

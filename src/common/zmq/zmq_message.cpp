@@ -99,13 +99,13 @@ bool zmsg::recv(zmq::socket_t & socket)
         } catch (zmq::error_t& error){
             return false;
         }
-        if (message.size() == 17 && ((unsigned char *) message.data())[0] == 0){
-            auto uuidstr = encode_uuid((unsigned char*) message.data());
+        if (message.size() == 17 && reinterpret_cast<unsigned char *>(( message.data()))[0] == 0){
+            auto uuidstr = encode_uuid(reinterpret_cast<unsigned char *>( message.data()));
             push_back(uuidstr.get());
 
         }
         else{
-            m_part_data.emplace_back((unsigned char*) message.data(), message.size());
+            m_part_data.emplace_back(reinterpret_cast<unsigned char *>(message.data()), message.size());
         }
         if (!message.more()){
             break;
@@ -144,7 +144,7 @@ size_t zmsg::parts()
 
 void zmsg::body_set(const char *body)
 {
-    if (m_part_data.size() > 0){
+    if (!m_part_data.empty()){
         m_part_data.erase(m_part_data.end() - 1);
     }
     push_back(body);
@@ -164,10 +164,11 @@ void zmsg::body_fmt(const char *format, ...)
 
 char * zmsg::body()
 {
-    if (m_part_data.size())
+    if (!m_part_data.empty())
+    {
         return (const_cast <char *>(reinterpret_cast <const char*>(m_part_data[m_part_data.size() - 1].c_str())));
-    else
-        return nullptr;
+    }
+    return nullptr;
 }
 
 // zmsg_push
@@ -186,7 +187,7 @@ void zmsg::push_back(const char *part)
 //  Formats 17-byte UUID as 33-char string starting with '@'
 //  Lets us print UUIDs as C strings and use them as addresses
 //
-std::unique_ptr <char[]> zmsg::encode_uuid(unsigned char *data)
+std::unique_ptr <char[]> zmsg::encode_uuid(const unsigned char *data)
 {
     static const char hex_char[] = "0123456789ABCDEF";
 
@@ -232,7 +233,7 @@ std::unique_ptr <char[]> zmsg::decode_uuid(char *uuidstr)
 // zmsg_pop
 zmsg::ustring zmsg::pop_front()
 {
-    if (m_part_data.size() == 0){
+    if (m_part_data.empty()){
         return ustring();
     }
     ustring part = m_part_data.front();
@@ -241,11 +242,10 @@ zmsg::ustring zmsg::pop_front()
 }
 zmsg::ustring zmsg::front()
 {
-    if (m_part_data.size() == 0){
+    if (m_part_data.empty()){
         return ustring();
     }
     ustring part = m_part_data.front();
-    //m_part_data.erase(m_part_data.begin());
     return part;
 }
 void zmsg::append(const char *part)
@@ -256,17 +256,15 @@ void zmsg::append(const char *part)
 
 char *zmsg::address()
 {
-    if (m_part_data.size() > 0){
+    if (!m_part_data.empty()){
         return reinterpret_cast <char*>(const_cast <unsigned char *>(m_part_data[0].c_str()));
     }
-    else{
-        return nullptr;
-    }
+    return nullptr;
 }
 
 void zmsg::wrap(const char *address, const char *delim)
 {
-    if (delim){
+    if (nullptr != delim){
         push_front(delim);
     }
     push_front(address);
@@ -274,11 +272,11 @@ void zmsg::wrap(const char *address, const char *delim)
 
 std::string zmsg::unwrap()
 {
-    if (m_part_data.size() == 0){
+    if (m_part_data.empty()){
         return nullptr;
     }
     std::string addr = reinterpret_cast <const char*>(pop_front().c_str());
-    if (address() && *address() == 0){
+    if (nullptr!=address() && *address() == 0){
         pop_front();
     }
     return addr;
@@ -290,18 +288,18 @@ void zmsg::dump()
     std::cerr << "--------------------------------------" << std::endl;
     for (auto data : m_part_data){
         // Dump the message as text or binary
-        int is_text = 1;
+        bool is_text = true;
         for (unsigned char char_nbr : data)
             if (char_nbr < 32 || char_nbr > 127)
-                is_text = 0;
+                is_text = false;
 
         std::cerr << "[" << std::setw(3) << std::setfill('0') << data.size() << "] ";
         for (unsigned char char_nbr : data){
             if (is_text){
-                std::cerr << (char) char_nbr;
+                std::cerr << static_cast<char>( char_nbr);
             }
             else{
-                std::cerr << std::hex << std::setw(2) << std::setfill(' ') << (unsigned short int) char_nbr;
+                std::cerr << std::hex << std::setw(2) << std::setfill(' ') << static_cast<uint16_t >(char_nbr);
             }
         }
         std::cerr << std::endl;
@@ -330,12 +328,12 @@ std::string zmsg::to_str(bool with_header, bool with_body, bool full)
 
     printer binary_print = [&](unsigned char c)->void
     {
-        ss << std::hex << std::setw(2) << std::setfill('0') << (short int) c;
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int16_t) c;
     };
     auto part_print = [&](const ustring& data)
     {
         bool is_text = check_is_text(data);
-        ss << "[" << std::setw(3) << std::setfill('0') << (int) data.size() << "] ";
+        ss << "[" << std::setw(3) << std::setfill('0') <<  data.size() << "] ";
         ::for_each_n(data.begin(), full?data.size():30, is_text ? text_print : binary_print);
         ss << std::endl;
     };
