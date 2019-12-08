@@ -40,7 +40,6 @@ public:
     Action_Base(std::string name, std::string command, bool sj = false) :
                     name_(std::move(name)), command_(std::move(command)), short_job_(sj)
     {
-        std::cerr<<"Action_Base Ctor"<<std::endl;
     }
 
     virtual ~Action_Base()
