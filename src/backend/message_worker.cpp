@@ -52,7 +52,7 @@ message_worker::~message_worker()
 //  ---------------------------------------------------------------------
 //  Send message to broker
 //  If no _msg is provided, creates one internally
-void message_worker::send_to_broker(const char *command, std::string option, zmsg *_msg)
+void message_worker::send_to_broker(const char *command,const std::string& option, zmsg *_msg)
 {
     zmsg *msg = _msg ? new zmsg(*_msg) : new zmsg();
     //  Stack protocol envelope to start of message
@@ -78,7 +78,7 @@ void message_worker::send_to_broker(const char *command, std::string option, zms
 
 void message_worker::connect_to_broker()
 {
-    worker_.reset(new zmq::socket_t(context_, ZMQ_DEALER));
+    worker_=std::make_unique<zmq::socket_t>(context_, ZMQ_DEALER);
     int linger = 0;
     worker_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
     zmq_helpers::set_id(*worker_);
@@ -87,7 +87,7 @@ void message_worker::connect_to_broker()
                     authenticated_scan_server::instance().settings.worker_connect_ep_.c_str());
 
     //  Register service with broker
-    send_to_broker(MDPW_READY, "", NULL);
+    send_to_broker(MDPW_READY, "", nullptr);
 
     //  If liveness hits zero, queue is considered disconnected
     liveness_ = authenticated_scan_server::instance().settings.heartbeat_liveness_;
@@ -110,7 +110,7 @@ message_worker::recv(zmsg *&reply_p)
         send_to_broker(MDPW_REPLY, "", reply);
         ++replied_;
         delete reply_p;
-        reply_p = 0;
+        reply_p = nullptr;
     }
     expect_reply_ = true;
 
@@ -161,13 +161,13 @@ message_worker::recv(zmsg *&reply_p)
         }
         //  Send HEARTBEAT if it's time
         if (zmq_helpers::clock() >= heartbeat_at_){
-            send_to_broker( MDPW_HEARTBEAT, "", NULL);
+            send_to_broker( MDPW_HEARTBEAT, "", nullptr);
             heartbeat_at_ += heartbeat_;
         }
     }
     if (zmq_helpers::interrupted)
         AU_LOG_DEBUG("W: interrupt received, killing worker...\n");
-    return NULL;
+    return nullptr;
 }
 int message_worker::worker_loop()
 {
@@ -181,7 +181,7 @@ int message_worker::worker_loop()
     zmsg *reply = nullptr;
     while (true){
         zmsg *request = mw.recv(reply);
-        if (request == 0){
+        if (request == nullptr){
             break;              //  Worker was interrupted
         }
         std::string mstr(request->body());

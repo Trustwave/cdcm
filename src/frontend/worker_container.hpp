@@ -53,7 +53,7 @@ struct worker {
         std::cerr << "Idle : " << std::boolalpha<< idle_ << std::endl;
         std::cerr << "Expiry in : " << std::chrono::duration_cast<std::chrono::milliseconds>(expiry_-chr::system_clock::now()).count() <<" milliseconds"<< std::endl;
     }
-    worker(std::string identity) :
+    explicit worker(std::string identity) :
                     identity_(std::move(identity)), expiry_(), last_worked_session_("N/A"), idle_(true)
     {
     }
@@ -67,15 +67,15 @@ public:
     struct idle_id; // session_id  and also idle
     struct idle; //is idle
     struct expiration; // by expiration
-    worker_container(std::chrono::seconds heartbeat_expiry) :
+    explicit worker_container(std::chrono::seconds heartbeat_expiry) :
                     heartbeat_expiry_(heartbeat_expiry)
     {
     }
-    bool exists(const std::string& identity) const
+    [[nodiscard]] bool exists(const std::string& identity) const
     {
         return cont_.get <id>().find(identity) != cont_.get <id>().end();
     }
-    sp_worker_t get(const std::string& identity) const
+    [[nodiscard]]  sp_worker_t get(const std::string& identity) const
     {
         auto rv = cont_.get <id>().find(identity);
         if (rv != cont_.get <id>().end()){
@@ -83,7 +83,7 @@ public:
         }
         return sp_worker_t();
     }
-    sp_worker_t get_next_worker() const
+    [[nodiscard]]  sp_worker_t get_next_worker() const
     {
         auto rv = cont_.get <expiration>().begin();
         if (rv != cont_.get <expiration>().end()){
@@ -91,7 +91,7 @@ public:
         }
         return sp_worker_t();
     }
-    sp_worker_t get_by_last_worked_session(const std::string& sess_id) const
+    [[nodiscard]]  sp_worker_t get_by_last_worked_session(const std::string& sess_id) const
     {
         auto rv = cont_.get <session>().find(sess_id);
         if (rv != cont_.get <session>().end()){
@@ -117,12 +117,12 @@ public:
             return true;
         }
     }
-    bool is_idle(const std::string& identity) const
+    [[nodiscard]]  bool is_idle(const std::string& identity) const
     {
         auto& idle_idx = cont_.get <idle_id>();
         return idle_idx.count(std::make_tuple(identity, true)) > 0;
     }
-    bool is_busy(const std::string& identity) const
+    [[nodiscard]]  bool is_busy(const std::string& identity) const
     {
 
         return !is_idle(identity);
@@ -213,11 +213,11 @@ private:
         {
             return compare(x.identity_, x.idle_, std::get <0>(y), std::get <1>(y));
         }
-        bool compare(const std::string& l1, const std::string& l2) const
+        [[nodiscard]]  bool compare(const std::string& l1, const std::string& l2) const
         {
             return l1 < l2;
         }
-        bool compare(const std::string& l1, bool f1, const std::string& l2, bool f2) const
+        [[nodiscard]] bool compare(const std::string& l1, bool f1, const std::string& l2, bool f2) const
         {
             if (l1 != l2)
                 return l1 < l2;

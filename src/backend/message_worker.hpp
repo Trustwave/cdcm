@@ -35,7 +35,7 @@ public:
 
     //  ---------------------------------------------------------------------
     //  Constructor
-    message_worker(zmq::context_t &ctx);
+    explicit message_worker(zmq::context_t &ctx);
     ~message_worker();
     static int worker_loop();
     //  ---------------------------------------------------------------------
@@ -51,7 +51,7 @@ private:
     //  ---------------------------------------------------------------------
     //  Send message to broker
     //  If no _msg is provided, creates one internally
-    void send_to_broker(const char *command, std::string option, zmsg *_msg);
+    void send_to_broker(const char *command, const std::string& option, zmsg *_msg);
     zmq::context_t& context_;
     std::string broker_;
     std::unique_ptr<zmq::socket_t> worker_;     //  Socket to broker

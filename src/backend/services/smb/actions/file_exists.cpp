@@ -41,18 +41,16 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
     std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     auto connect_res = rc.connect(base.c_str());
-    if(!connect_res.first)
-    {
-        if(connect_res.second == EEXIST)
+    if(!connect_res.first){
+        if(connect_res.second == EEXIST) {
             res->res(std::string("False"));
-        else
+        }else{
             res->res(std::string("Error: " )+std::string((std::strerror(connect_res.second))));
-    } else
-    {
+        }
+    }else{
         res->res(std::string("True"));
     }
     return 0;
-
 }
 
 // instance of the our plugin

@@ -28,8 +28,7 @@
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
-namespace tao {
-namespace json {
+namespace tao ::json {
 
 template<>
 struct traits <trustwave::registry_value> : binding::object <
@@ -53,7 +52,7 @@ TAO_JSON_BIND_REQUIRED ("registry_values", &trustwave::enum_key::registry_values
 {
 };
 }
-}
+
 
 using namespace trustwave;
 
@@ -83,7 +82,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr 
         return -1;
     }
 
-    trustwave::enum_key ek;
+    trustwave::enum_key ek{};
     auto ret = c->enumerate_key(ekact->key_, ek);
     if(std::get<0>(ret)) {
         const tao::json::value v1 = ek;

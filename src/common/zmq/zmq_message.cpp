@@ -18,7 +18,6 @@
 #include <cstdarg>            // for va_end, va_list, va_start
 #include <cstdio>             // for vsnprintf
 #include <cstring>            // for memcpy, size_t, strlen, NULL
-#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
 #include <functional>          // for function
 #include <iomanip>             // for operator<<, setfill, setw
 #include <iostream>            // for operator<<, basic_ostream, basic_ostre...

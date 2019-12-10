@@ -49,7 +49,7 @@ private:
     void bind_external();
     //  ---------------------------------------------------------------------
     //  Constructor for broker object
-    message_broker(zmq::context_t& ctx);
+    explicit message_broker(zmq::context_t& ctx);
     //  ---------------------------------------------------------------------
     //  Delete any idle workers that haven't pinged us in a while.
     void purge_workers();
@@ -60,25 +60,25 @@ private:
     //  ---------------------------------------------------------------------
     //  Creates worker if necessary
     trustwave::sp_worker_t
-    worker_require(std::string identity);
+    worker_require(const std::string& identity);
     //  ---------------------------------------------------------------------
     //  Deletes worker from all data structures, and destroys worker
     void worker_delete(trustwave::sp_worker_t wrk, bool send_disconnect);
     //  ---------------------------------------------------------------------
     //  Process message sent to us by a worker
-    void worker_process(std::string sender, std::unique_ptr <zmsg>&& msg);
+    void worker_process(const std::string& sender, std::unique_ptr <zmsg>&& msg);
     //  ---------------------------------------------------------------------
     //  Send message to worker
     //  If pointer to message is provided, sends that message
-    void worker_send(trustwave::sp_worker_t worker, const char *command, std::string option,
+    void worker_send(trustwave::sp_worker_t worker, const char *command,const std::string& option,
                     std::unique_ptr <zmsg> _msg);
     //  ---------------------------------------------------------------------
     //  This worker is now waiting for work
     void worker_waiting(trustwave::sp_worker_t worker_ptr);
     //  ---------------------------------------------------------------------
     //  Process a request coming from a client
-    void client_process(std::string sender, std::unique_ptr <zmsg>&& msg);
-    void handle_message(zmq::socket_t &,std::string,std::function<void(std::string,std::unique_ptr <zmsg> && )>);
+    void client_process(const std::string& sender, std::unique_ptr <zmsg>&& msg);
+    void handle_message(zmq::socket_t &,const std::string&,std::function<void(std::string,std::unique_ptr <zmsg> && )>);
 
 private:
     zmq::context_t& context_;               //  0MQ context

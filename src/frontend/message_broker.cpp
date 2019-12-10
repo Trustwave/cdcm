@@ -119,7 +119,7 @@ void message_broker::service_dispatch(std::unique_ptr <zmsg> &&msg, const std::s
 //  ---------------------------------------------------------------------
 //  Creates worker if necessary
 
-trustwave::sp_worker_t message_broker::worker_require(std::string identity)
+trustwave::sp_worker_t message_broker::worker_require(const std::string& identity)
 {
     assert(identity.length() != 0);
     //  self->workers is keyed off worker identity
@@ -150,7 +150,7 @@ void message_broker::worker_delete(trustwave::sp_worker_t wrk, bool send_disconn
 //  ---------------------------------------------------------------------
 //  Process message sent to us by a worker
 
-void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &&msg)
+void message_broker::worker_process(const std::string& sender, std::unique_ptr <zmsg> &&msg)
 {
     assert(msg && msg->parts() >= 1);     //  At least, command
     //workers_.dump();
@@ -207,7 +207,7 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
 //  Send message to worker
 //  If pointer to message is provided, sends that message
 
-void message_broker::worker_send(trustwave::sp_worker_t worker_ptr, const char *command, std::string option,
+void message_broker::worker_send(trustwave::sp_worker_t worker_ptr, const char *command,const std::string& option,
                 std::unique_ptr <zmsg> _msg)
 {
     std::unique_ptr <zmsg> msg(_msg ? new zmsg(*_msg) : new zmsg());
@@ -249,7 +249,7 @@ void message_broker::worker_waiting(trustwave::sp_worker_t worker_ptr)
 //  ---------------------------------------------------------------------
 //  Process a request coming from a client
 
-void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &&msg)
+void message_broker::client_process(const std::string& sender, std::unique_ptr <zmsg> &&msg)
 {
     assert(msg && msg->parts() >= 2);     //  Service name + body
 
@@ -317,7 +317,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
 
         }
     }
-    if(false == tm.msgs.empty())
+    if(! tm.msgs.empty())
     {
         value v(tm);
         auto m = std::make_unique <zmsg>();
@@ -327,7 +327,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
     }
 }
 
-void message_broker::handle_message(zmq::socket_t &socket, std::string expected_origin,
+void message_broker::handle_message(zmq::socket_t &socket,const std::string& expected_origin,
                 std::function <void(std::string, std::unique_ptr <zmsg>&&)> process_func)
 {
 
@@ -362,7 +362,7 @@ void message_broker::broker_loop()
         auto timeout = heartbeat_at - now;
         if (timeout.count() < 0)
             timeout.zero();
-        zmq::poll(items, 2, static_cast <long>(timeout.count()));
+        zmq::poll(items, 2, timeout.count());
         //  Process next input message, if any
         if (items[0].revents & ZMQ_POLLIN){
 

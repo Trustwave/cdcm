@@ -25,7 +25,7 @@ public:
 
 private:
     std::unique_ptr<boost::process::child> start_worker(std::string worker_name);
-    void monitor(std::string worker_name);
+    void monitor(const std::string& worker_name);
 private:
     boost::asio::io_service& ios;
     std::map<std::string, std::unique_ptr<boost::process::child>> workers_pull;

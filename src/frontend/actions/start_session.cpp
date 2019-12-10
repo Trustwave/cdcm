@@ -33,7 +33,7 @@ int Start_Session::act(boost::shared_ptr <session> , std::shared_ptr<action_msg>
     }
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
     auto sess=boost::make_shared<trustwave::session>(gsact->remote, creds);
-    if(false == authenticated_scan_server::instance().sessions->add(sess))
+    if(!authenticated_scan_server::instance().sessions->add(sess))
     {
         res->res("Error: Failed adding new session");
         return -1;

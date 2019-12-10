@@ -68,8 +68,8 @@ private:
     bool download_portion(off_t curpos, off_t count, bool to_file);
     int remote_fd_ = -1;
     int local_fd_ = -1;
-    struct stat localstat_;
-    struct stat remotestat_;
+    struct stat localstat_{};
+    struct stat remotestat_{};
     std::string_view current_open_path_;
 
 

@@ -36,7 +36,7 @@ namespace trustwave {
 
         shared_library(const shared_library& rhs) = delete;
 
-        shared_library(const boost::filesystem::path& p):shared_library() {
+        explicit shared_library(const boost::filesystem::path& p):shared_library() {
             open(p);
         }
 

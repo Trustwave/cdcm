@@ -22,7 +22,7 @@ namespace trustwave {
     class maintenance
     {
     public:
-        maintenance(boost::asio::io_service& ios);
+       explicit maintenance(boost::asio::io_service& ios);
         void maintenance_function();
     private:
         boost::asio::steady_timer timer_;

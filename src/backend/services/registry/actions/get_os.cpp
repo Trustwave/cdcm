@@ -53,7 +53,7 @@ int GetOS_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_
         res->res(std::string("Error: ")+std::string(win_errstr(std::get <1>(r))));
         return -1;
     }
-    static constexpr std::string_view  key="SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion";
+    static constexpr std::string_view  key=R"(SOFTWARE\Microsoft\Windows NT\CurrentVersion)";
     if (!std::get <0>(c->open_key(key.data()))){
         AU_LOG_DEBUG("Failed opening  %s", key.data());
         res->res("Error: Failed to open key");

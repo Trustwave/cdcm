@@ -21,19 +21,15 @@
 
 #include "../include/Logger.h"
 #include <map>
-#include <locale>
 #include <iostream>
 #include <fstream>
-#include <functional>
 #include <boost/foreach.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
-
 #include "../include/Logger.h"
 //===========================================================================
 // @{CSEH}
-//								ci_less()
 //
 //---------------------------------------------------------------------------
 // Description: Comparator for case-insensitive comparison in STL 

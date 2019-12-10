@@ -45,11 +45,11 @@ public:
     {
         type_ = type;
     }
-    void value(std::string value)
+    void value(const std::string& value)
     {
         value_ = value;
     }
-    void name(std::string name)
+    void name(const std::string& name)
     {
         name_ = name;
     }

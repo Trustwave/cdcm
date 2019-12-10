@@ -4,7 +4,6 @@
 
 #include "workers_monitor.hpp"
 #include <utility>      // std::pair, std::make_pair
-#include <boost/filesystem.hpp>
 #include <boost/process/extend.hpp>
 #include <boost/system/error_code.hpp>
 #include <sys/types.h>
@@ -41,7 +40,7 @@ void workers_monitor::run()
 
 }
 
-void workers_monitor::monitor(std::string worker_name)
+void workers_monitor::monitor(const std::string& worker_name)
 {
   //  cout << "in monitor, worker name: " << worker_name << endl;
     auto worker_pair = workers_pull.find(worker_name);
@@ -69,9 +68,9 @@ void workers_monitor::monitor(std::string worker_name)
         if (worker != nullptr ) {
             workers_pull.emplace(worker_name,std::move(worker));
         }
-        else {
+     //   else {
        //     cerr  << "error: worker process cannot be created" << endl; //ERROR
-        }
+      //  }
     }
 }
 

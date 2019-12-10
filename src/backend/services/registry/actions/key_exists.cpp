@@ -58,8 +58,7 @@ int Key_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <ac
     if (!std::get <0>(c->open_key(keact->key_.c_str()))){
         AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
         res->res("False");
-    }
-    else{
+    } else{
         res->res("True");
     }
 
