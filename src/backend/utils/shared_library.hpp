@@ -80,7 +80,6 @@ namespace trustwave {
             if ((ret = dlopen(p.c_str(), RTLD_GLOBAL |
                                                        RTLD_LAZY))) {
                 filename_ = p.generic_string();
-                std::cout << p << std::endl;
                 return ret;
             }
 

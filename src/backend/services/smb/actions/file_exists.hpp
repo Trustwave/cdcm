@@ -32,7 +32,6 @@ namespace trustwave {
         SMB_File_Exists() :
                 Action_Base("file_exists", "file_exists")
         {
-            std::cerr << "ASDASDASDASSDSDFWCWCWCWWXWSCSDCW";
         }
 
         int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;

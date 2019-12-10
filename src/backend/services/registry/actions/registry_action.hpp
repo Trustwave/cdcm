@@ -34,7 +34,6 @@ public:
     Registry_Action(const std::string &name, const std::string &command) :
                     Action_Base(name, command)
     {
-        std::cerr<<"Registry_Action Ctor"<<std::endl;
     }
 
     std::shared_ptr<registry_client> client(boost::shared_ptr<session>,

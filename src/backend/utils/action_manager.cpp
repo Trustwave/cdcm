@@ -17,6 +17,7 @@
 #include "../../common/dispatcher.hpp"
 #include "../../common/action.hpp"
 #include "shared_library.hpp"
+#include "../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 
 std::vector<std::shared_ptr<shared_library>> action_manager::load(const boost::filesystem::path& p_dir,Dispatcher<Action_Base>& d) {
@@ -28,14 +29,14 @@ std::vector<std::shared_ptr<shared_library>> action_manager::load(const boost::f
         auto actionl = sl->get<import_action_cb_t>("import_action");
         if(actionl)
         {
-            std::cout <<p->path().filename().string() << " loaded"<<std::endl;
+            AU_LOG_DEBUG("%s loaded.",p->path().filename().string().c_str());
             auto action=actionl();
             d.register1(action);
             sl_vec.push_back(sl);
         }
         else
         {
-            std::cout <<p->path().filename().string() << " failed to load"<<std::endl;
+            AU_LOG_ERROR("%s failed to load.",p->path().filename().string().c_str());
             sl->close();
         }
 
