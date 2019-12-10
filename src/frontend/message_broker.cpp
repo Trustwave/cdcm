@@ -171,8 +171,8 @@ void message_broker::worker_process(std::string sender, std::unique_ptr <zmsg> &
                 //  Remove & save client return envelope and insert the
                 //  protocol header and service name, then rewrap envelope.
                 std::string client = msg->unwrap();
-                msg->wrap(MDPC_CLIENT, nullptr);
-                msg->wrap(client.c_str(), nullptr);
+                msg->wrap(MDPC_CLIENT, "");
+                msg->wrap(client.c_str(), "");
                 msg->send(*external_socket_);
                 replied_++;
                 worker_waiting(wrk);
@@ -219,7 +219,7 @@ void message_broker::worker_send(trustwave::sp_worker_t worker_ptr, const char *
     msg->push_front(command);
     msg->push_front(MDPW_WORKER);
     //  Stack routing envelope to start of message
-    msg->wrap(worker_ptr->identity_.c_str(), nullptr);
+    msg->wrap(worker_ptr->identity_.c_str(), "");
 
     if(strcmp(MDPW_REQUEST,command)==0)
     {
@@ -310,7 +310,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
             AU_LOG_DEBUG("sending to client :\n %s",res_body.c_str());
             std::string client = msg->unwrap();
             reply->wrap(MDPC_CLIENT, client.c_str());
-            reply->wrap(sender.c_str(), nullptr);
+            reply->wrap(sender.c_str(), "");
 
             reply->send(*external_socket_);
             replied_++;
@@ -322,7 +322,7 @@ void message_broker::client_process(std::string sender, std::unique_ptr <zmsg> &
         value v(tm);
         auto m = std::make_unique <zmsg>();
         m->body_set(to_string(v, 2).c_str());
-        m->wrap(sender.c_str(), nullptr);
+        m->wrap(sender.c_str(), "");
         service_dispatch(std::move(m), recieved_msg.hdr.session_id);
     }
 }

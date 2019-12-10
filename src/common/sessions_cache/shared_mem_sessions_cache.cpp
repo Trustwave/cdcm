@@ -29,7 +29,7 @@ boost::shared_ptr <shared_mem_sessions_cache> shared_mem_sessions_cache::get_or_
    // std::cout << "Creating Shared Mem Sessions Cache ( " << absolute_name << " ) size ( " << size << " )" << std::endl;
     boost::shared_ptr <shared_mem_sessions_cache> cache = boost::shared_ptr <shared_mem_sessions_cache>(
                     new shared_mem_sessions_cache(name, size, session_idle_time));
-    if (cache->construct()){
+    if (false == cache->construct()){
     //    std::cout << "Failed Shared Mem Sessions Cache name ( " << absolute_name << " ) size ( " << size  << " )" << std::endl;
         return boost::shared_ptr <shared_mem_sessions_cache>();
     }
