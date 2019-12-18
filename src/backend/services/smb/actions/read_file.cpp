@@ -22,7 +22,7 @@
 #include "../smb_client.hpp"
 #include "read_file.hpp"
 
-#include "../../../../common/protocol/msg_types.hpp"
+#include "../../../protocol/msg_types.hpp"
 #include "../../../../common/session.hpp"
 #include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
@@ -35,7 +35,7 @@ namespace {
         const unsigned char PAD = '=';
     }
 
-    size_t base64_encoded_length(size_t origLen) {
+    static constexpr size_t base64_encoded_length(size_t origLen) {
         return (((origLen + 2) / 3) << 2);
     }
 
@@ -52,8 +52,7 @@ namespace {
         size_t charCount = 0;   // Count byte tripples
         size_t outPos = 0;      // Current letter in the output stream
 
-        std::string ret;
-        ret.reserve(base64_encoded_length(inLen));
+        std::string ret(base64_encoded_length(inLen)+1,'\0');
         while (inLen--) // Scan the input bit stream
         {
             currByte = *(inBuf++);
