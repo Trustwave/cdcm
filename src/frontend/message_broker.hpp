@@ -36,7 +36,7 @@ class message_broker {
     //  This defines one worker, idle or active
 
 public:
-    static void th_func(zmq::context_t &ctx,boost::asio::io_service& ios);  //  ---------------------------------------------------------------------
+    static void th_func(zmq::context_t &ctx,boost::asio::io_context& ios);  //  ---------------------------------------------------------------------
     //  Destructor for broker object
     ~message_broker();
 private:

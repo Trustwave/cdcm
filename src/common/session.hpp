@@ -24,6 +24,14 @@
 
 
 namespace trustwave {
+
+enum cdcm_client_type {
+    REGISTRY_CLIENT,
+    SMB_CLIENT,
+    NO_CLIENT =2
+};
+
+
 class cdcm_client;
 class session {
 public:
@@ -34,9 +42,9 @@ public:
 
     const std::string& remote() const;
     credentials creds() const;
-
+    
     template<typename T>
-    std::shared_ptr <cdcm_client> get_client(size_t c)
+    std::shared_ptr <cdcm_client> get_client(cdcm_client_type c)
     {
         if (!clients_[c]){
             clients_[c].reset(new T);
@@ -58,10 +66,12 @@ public:
         }
         return true;
     }
+
     void remote(const std::string& dest)
     {
         remote_ = dest;
     }
+
     void creds(const std::string& domain, const std::string& username, const std::string& password,
                     const std::string& workstation)
     {
