@@ -82,7 +82,7 @@ namespace trustwave {
                 filename_ = p.generic_string();
                 return ret;
             }
-
+            std::cerr << "failed to open " << p.c_str() << ". dlerror: " << dlerror() << std::endl;
             return nullptr;
         }
 
