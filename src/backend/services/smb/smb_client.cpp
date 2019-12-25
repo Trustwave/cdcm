@@ -97,11 +97,13 @@ static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, in
 
 
 std::pair<bool,int> smb_client::connect(const char *path) {
+    AU_LOG_ERROR("path: %s", path);
     if (smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return std::make_pair(false,-1);
     }
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
+
     current_open_path_ =path;
     if (remote_fd_ <= 0) {
         return std::make_pair(false,errno);
