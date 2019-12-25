@@ -38,11 +38,23 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
     auto smb_action = std::dynamic_pointer_cast<smb_file_exists_msg>(action);
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
-    std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     auto connect_res = rc.connect(base.c_str());
     if(!connect_res.first){
-        if(connect_res.second == EEXIST) {
+            //rotem TODO: remove this after code review
+//         based on linux error https://www-numi.fnal.gov/offline_software/srt_public_context/WebDocs/Errors/unix_system_errors.html and description in
+//         ENOMEM  Out of memory. error no 12
+//         EINVAL if an invalid parameter passed, like no file, or smbc_init not called. error no 22
+//         EEXIST  pathname already exists and O_CREAT and O_EXCL were used. error no 17
+//         EISDIR  pathname  refers  to  a  directory  and the access requested involved writing. error no 21
+//         EACCES  The requested access to the file is not allowed. error no 13
+//         ENODEV The requested share does not exist. error no 19
+//         ENOTDIR A file on the path is not a directory. error no 20
+//         ENOENT  A directory component in pathname does not exist. error no 02
+
+        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
+
+        if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT ) {
             res->res(std::string("False"));
         }else{
             res->res(std::string("Error: " )+std::string((std::strerror(connect_res.second))));
