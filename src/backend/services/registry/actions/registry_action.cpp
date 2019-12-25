@@ -22,7 +22,7 @@ using namespace trustwave;
 std::shared_ptr <trustwave::registry_client> Registry_Action::client(boost::shared_ptr <session> sess,
                 std::shared_ptr <result_msg> res)
 {
-    auto c = std::dynamic_pointer_cast <trustwave::registry_client>(sess->get_client <trustwave::registry_client>(0));
+    auto c = std::dynamic_pointer_cast <trustwave::registry_client>(sess->get_client <trustwave::registry_client>(cdcm_client_type::REGISTRY_CLIENT));
     if (!c){
             AU_LOG_ERROR("Failed dynamic cast");
             res->res("Error: Failed dynamic cast");
