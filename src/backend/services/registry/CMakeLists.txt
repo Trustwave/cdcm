@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
+include(../samba.cmake)
 
 enable_cxx_compiler_flag_if_supported("-Wno-builtin-macro-redefined")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

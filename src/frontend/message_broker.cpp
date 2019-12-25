@@ -26,9 +26,11 @@
 #include <boost/asio.hpp>
 using namespace trustwave;
 message_broker::message_broker(zmq::context_t &ctx) :
-                context_(ctx), internal_socket_(new zmq::socket_t(context_, ZMQ_ROUTER)), external_socket_(
-                                new zmq::socket_t(context_, ZMQ_ROUTER)), workers_(
-                                authenticated_scan_server::instance().settings.heartbeat_expiry_), replied_(0)
+                context_(ctx),
+                internal_socket_(new zmq::socket_t(context_, ZMQ_ROUTER)),
+                external_socket_(new zmq::socket_t(context_, ZMQ_ROUTER)),
+                workers_(authenticated_scan_server::instance().settings.heartbeat_expiry_),
+                replied_(0)
 {
 }
 
@@ -283,7 +285,8 @@ void message_broker::client_process(const std::string& sender, std::unique_ptr <
     }
     trustwave::msg tm;
     for (auto action_message : recieved_msg.msgs){
-        AU_LOG_DEBUG1("Looking for %s", action_message->name().c_str());
+        //AU_LOG_DEBUG1("Looking for %s", action_message->name().c_str());
+        AU_LOG_DEBUG("Looking for %s", action_message->name().c_str());
         auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
         if(!act1)
         {
@@ -396,7 +399,7 @@ void message_broker::broker_loop()
 
 }
 
-void message_broker::th_func(zmq::context_t &ctx,boost::asio::io_service& ios)
+void message_broker::th_func(zmq::context_t &ctx,boost::asio::io_context& ios)
 {
     message_broker brk(ctx);
     brk.bind_internal();
