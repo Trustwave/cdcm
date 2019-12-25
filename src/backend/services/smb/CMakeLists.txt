@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
+include(../samba.cmake)
 
 set(SOURCE_FILES smb_client.cpp)
 add_library(tw-smb-client SHARED ${SOURCE_FILES})
