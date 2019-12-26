@@ -22,10 +22,10 @@
 #include "list_dir.hpp"
 #include "taocpp-json/include/tao/json.hpp"
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
-#include "../../../../common/protocol/msg_types.hpp"
-#include "../../../../common/session.hpp"
-#include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../../../../common/wildcards.hpp"
+#include "protocol/msg_types.hpp"
+#include "session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "wildcards.hpp"
 
 using namespace trustwave;
 namespace tao::json {

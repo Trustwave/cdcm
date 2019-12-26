@@ -25,10 +25,11 @@
 #include <memory>
 #include <string>                      // for string
 #include <utility>
-
+#include <taocpp-json/include/tao/json/value.hpp>//fixme assaf should use fwd decl
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
+
 namespace trustwave {
 
 class session;
@@ -37,31 +38,23 @@ struct result_msg;
 class Action_Base: public boost::noncopyable
 {
 public:
-    Action_Base(std::string name, std::string command, bool sj = false) :
-                    name_(std::move(name)), command_(std::move(command)), short_job_(sj)
+    Action_Base( const std::string_view command) :
+                  command_(std::move(command))
     {
     }
 
     virtual ~Action_Base()
     = default;
-    const std::string &name() const
-    {
-        return name_;
-    }
-    const std::string &command() const
+
+    const std::string_view command() const
     {
         return command_;
     }
-    bool short_job() const
-    {
-        return short_job_;
-    }
-    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
 
+    virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
+    virtual std::shared_ptr<action_msg> get_message(const tao::json::value & v) const = 0;
 private:
-    const std::string name_;
-    const std::string command_;
-    const bool short_job_;
+    const std::string_view command_;
 };
 }
 using import_action_cb_t = std::shared_ptr<trustwave::Action_Base>( );

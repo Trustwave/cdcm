@@ -47,13 +47,13 @@ namespace {
             return std::string();
         }
 
-        unsigned int bitsContainer = 0;                  // A container for 24 bits from the input stream
-        unsigned char currByte; // A current byte from the input stream
-        size_t charCount = 0;   // Count byte tripples
-        size_t outPos = 0;      // Current letter in the output stream
+        unsigned int bitsContainer = 0;     // A container for 24 bits from the input stream
+        unsigned char currByte;             // A current byte from the input stream
+        size_t charCount = 0;               // Count byte tripples
+        size_t outPos = 0;                  // Current letter in the output stream
 
         std::string ret(base64_encoded_length(inLen)+1,'\0');
-        while (inLen--) // Scan the input bit stream
+        while (inLen--)                     // Scan the input bit stream
         {
             currByte = *(inBuf++);
             bitsContainer |= currByte;

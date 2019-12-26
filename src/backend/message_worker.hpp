@@ -29,6 +29,8 @@ class zmsg;
 namespace trustwave{
 class session;
 class header;
+class action_msg;
+class res_msg;
 class message_worker
 {
 public:
@@ -46,11 +48,6 @@ public:
     zmsg *
     recv(zmsg *&reply_p);
 private:
-    //  ---------------------------------------------------------------------
-    //  Destructor
-    //  ---------------------------------------------------------------------
-    //  Send message to broker
-    //  If no _msg is provided, creates one internally
     void send_to_broker(const char *command, const std::string& option, zmsg *_msg);
     zmq::context_t& context_;
     std::string broker_;

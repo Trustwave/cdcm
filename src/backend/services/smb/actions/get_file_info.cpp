@@ -16,14 +16,13 @@
 #include "get_file_info.hpp"
 #include <string>
 #include <codecvt>
-#include "taocpp-json/include/tao/json.hpp"
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "../smb_client.hpp"
 
-#include "../../../../common/protocol/msg_types.hpp"
-#include "../../../../common/session.hpp"
-#include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../../../utils/pe_context.hpp"
+#include "protocol/msg_types.hpp"
+#include "session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "pe_context.hpp"
 using namespace trustwave;
 auto push_back = [](tao::json::events::to_value& c,const std::string& k,const std::string&v)
         {

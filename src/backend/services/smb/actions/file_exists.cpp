@@ -21,10 +21,10 @@
 #include "../smb_client.hpp"
 #include "file_exists.hpp"
 
-#include "../../../../common/protocol/msg_types.hpp"
-#include "../../../../common/session.hpp"
-#include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../../../utils/pe_context.hpp"
+#include "protocol/msg_types.hpp"
+#include "session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "pe_context.hpp"
 using namespace trustwave;
 
 int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
@@ -56,8 +56,8 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
 // instance of the our plugin
 static std::shared_ptr<SMB_File_Exists> instance = nullptr;
 
-
 // extern function, that declared in "action.hpp", for export the plugin from dll
 std::shared_ptr<trustwave::Action_Base> import_action() {
     return instance ? instance : (instance = std::make_shared<SMB_File_Exists>());
 }
+

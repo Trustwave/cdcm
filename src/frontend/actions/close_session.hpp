@@ -18,10 +18,37 @@
 //=====================================================================================================================
 //                                                  Include files
 //=====================================================================================================================
-#include "../../common/action.hpp"
+#include "action.hpp"
+#include "protocol/msg_types.hpp"
+#include "protocol/protocol.hpp"
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
+namespace trustwave{
+    struct local_close_session_msg: public action_msg
+    {
+        static constexpr std::string_view act_name{"close_session"};
+        local_close_session_msg() :
+                action_msg(act_name)
+        {
+        }
+
+    };
+}
+namespace tao::json
+{
+    template<>
+    struct traits<trustwave::local_close_session_msg>
+            : binding::object<binding::inherit<traits<trustwave::action_msg> >> {
+        TAO_JSON_DEFAULT_KEY(trustwave::local_close_session_msg::act_name.data());
+        template< template< typename... > class Traits >
+        static trustwave::local_close_session_msg as( const tao::json::basic_value< Traits >&  )
+        {
+            trustwave::local_close_session_msg result;
+            return result;
+        }
+    };
+}
 namespace trustwave {
 
 class Close_Session: public Action_Base
@@ -30,11 +57,17 @@ class Close_Session: public Action_Base
 
 public:
     Close_Session() :
-                    Action_Base("close_session", "close_session",true)
+                    Action_Base(trustwave::local_close_session_msg::act_name)
     {
     }
     int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
+    [[nodiscard]] std::shared_ptr<action_msg> get_message(const tao::json::value& v) const override
+    {
+        return v.as<std::shared_ptr<local_close_session_msg>>();
+    }
+
 };
 
 }
+
 #endif /* TRUSTWAVE_SERVICES_INTERNAL_CLOSE_SESSION_HPP_ */

@@ -39,7 +39,7 @@ public:
 
 public:
     using T_Ptr = std::shared_ptr<T>;
-    typedef std::map<std::string, T_Ptr> Ts_Map;
+    typedef std::map<std::string_view , T_Ptr> Ts_Map;
 
     virtual ~Dispatcher()
     = default;
@@ -60,11 +60,15 @@ public:
         }
         return it->second;
     }
+    bool has(const std::string &t_name) const
+    {
+        return  map_.cend() != map_.find(t_name);
+    }
     struct Registrator
     {
         Registrator(T *t, Dispatcher & d)
         {
-         //   std::cerr<<t->name()<<std::endl;
+            std::cerr<<t->command()<<std::endl;
             d.register1(t);
         }
         Registrator(T *t, Dispatcher * d)

@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <taocpp-json/include/tao/json/value.hpp>
 namespace trustwave {
 //todo assaf fix encapsulation
 struct result_msg
@@ -60,9 +61,9 @@ struct action_msg
     action_msg& operator=(const action_msg&) = delete;
     action_msg& operator=(action_msg&&) = delete;
     action_msg() = delete;
-    const std::string& name() const
+    const std::string name() const
     {
-        return name_;
+        return std::string(name_);
     }
     std::string id() const
     {
@@ -74,192 +75,38 @@ struct action_msg
     }
 
     std::string id_;
-    const std::string name_;
+    const std::string_view name_;
 
 protected:
-    explicit action_msg(std::string  name) : name_(std::move(name))
+    explicit action_msg(const std::string_view name) :
+                    name_(name)
     {
     }
 
 };
+    struct single_param_action_msg : public action_msg {
+    protected:
+        single_param_action_msg() = delete;
 
-struct reg_action_query_value_msg: public action_msg
-{
-    reg_action_query_value_msg() : action_msg("query_value")
-    {
-    }
-    std::string key_;
-    std::string value_;
-
-};
-
-struct reg_action_get_os_msg: public action_msg
-{
-    reg_action_get_os_msg() : action_msg("get_os")
-    {
-    }
-};
-
-struct reg_action_enum_key_msg: public action_msg
-{
-    reg_action_enum_key_msg() : action_msg("enumerate")
-    {
-    }
-    std::string key_;
-
-};
-
-struct reg_action_value_exists_msg: public action_msg
-{
-    reg_action_value_exists_msg() : action_msg("value_exists")
-    {
-    }
-    std::string key_;
-    std::string value_;
-};
-
-struct reg_action_key_exists_msg: public action_msg
-{
-    reg_action_key_exists_msg() : action_msg("key_exists")
-    {
-    }
-    std::string key_;
-
-};
-
-struct local_start_session_msg: public action_msg
-{
-
-    local_start_session_msg() : action_msg("start_session")
-    {
-    }
-    std::string remote;
-    std::string domain;
-    std::string username;
-    std::string password;
-    std::string workstation;
-};
-
-struct local_close_session_msg: public action_msg
-{
-
-    local_close_session_msg() : action_msg("close_session")
-    {
-    }
-
-};
-struct single_param_action_msg: public action_msg
-{
-protected:
-    single_param_action_msg() = delete;
-    explicit single_param_action_msg(const std::string& name) : action_msg(name)
-    {
-    }
-
-    single_param_action_msg(const single_param_action_msg& o, const std::string& name) : action_msg(name)
-    {
-        id_ = o.id_;
-        param = o.param;
-    }
-public:
-    std::string param;
-};
-
-struct smb_get_file_info_msg: public single_param_action_msg
-{
-
-        smb_get_file_info_msg() : single_param_action_msg("get_file_info")
-        {
+        explicit single_param_action_msg(const std::string_view name) :
+                action_msg(name) {
         }
 
-        explicit smb_get_file_info_msg(const single_param_action_msg& o) : single_param_action_msg(o, "get_file_info")
-        {
+        single_param_action_msg(const single_param_action_msg &o,const std::string_view &name) :
+                action_msg(name) {
+            id_ = o.id_;
+            param = o.param;
         }
-};
 
-struct smb_file_exists_msg: public single_param_action_msg
-{
+    public:
+        std::string param;
+    };
 
-    smb_file_exists_msg() : single_param_action_msg("file_exists")
-    {
-    }
-
-    explicit smb_file_exists_msg(const single_param_action_msg& o) : single_param_action_msg(o, "file_exists")
-    {
-    }
-};
-
-/*
-struct smb_get_file_msg: public single_param_action_msg
-{
-
-    smb_get_file_msg() :
-                    single_param_action_msg("get_file")
-    {
-    }
-    smb_get_file_msg(const single_param_action_msg& o) :
-                    single_param_action_msg(o, "get_file")
-    {
-    }
-};
-*/
-
-struct smb_list_dir_msg: public single_param_action_msg
-{
-
-    smb_list_dir_msg() : single_param_action_msg("list_dir")
-    {
-    }
-
-    explicit smb_list_dir_msg(const single_param_action_msg& o) : single_param_action_msg(o, "list_dir")
-    {
-    }
-    std::string pattern;
-};
-
-/*
-struct get_remote_file_version_msg: public single_param_action_msg
-{
-
-    get_remote_file_version_msg() :
-                    single_param_action_msg("get_remote_file_version")
-    {
-    }
-    get_remote_file_version_msg(const single_param_action_msg& o) :
-                    single_param_action_msg(o, "get_remote_file_version")
-    {
-    }
-};
-
-struct local_get_file_version_msg: public single_param_action_msg
-{
-
-    local_get_file_version_msg() :
-                    single_param_action_msg("local_get_file_version_msg")
-    {
-    }
-    local_get_file_version_msg(const single_param_action_msg& o) :
-                    single_param_action_msg(o, "local_get_file_version_msg")
-    {
-    }
-};
-*/
-
-struct smb_read_file_msg: public action_msg
-{
-        smb_read_file_msg() : action_msg("read_file")
-        {
-        }
-        std::string path_;
-        std::string size_;
-        std::string offset_;
-};
 
 struct header
 {
     std::string session_id;
 };
-
 struct msg
 {
     header hdr;
@@ -271,7 +118,22 @@ struct msg
     msg& operator=(msg&&) = default;
     msg() = default;
 };
+    struct raw_msg {
+        header hdr;
+        std::vector< std::map< std::string, tao::json::value, std::less<> > > msgs;
 
+        virtual ~raw_msg() = default;
+
+        raw_msg(const raw_msg &) = default;
+
+        raw_msg(raw_msg &&) = default;
+
+        raw_msg &operator=(const raw_msg &) = default;
+
+        raw_msg &operator=(raw_msg &&) = default;
+
+        raw_msg() = default;
+    };
 struct res_msg
 {
     header hdr;

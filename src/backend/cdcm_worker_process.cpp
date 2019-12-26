@@ -18,9 +18,9 @@
 //===========================================================================
 
 #include <thread>
-#include "../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../common/zmq/zmq_helpers.hpp"
-#include "../common/typedefs.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "zmq/zmq_helpers.hpp"
+#include "typedefs.hpp"
 #include "message_worker.hpp"
 #include "utils/action_manager.hpp"
 template<>

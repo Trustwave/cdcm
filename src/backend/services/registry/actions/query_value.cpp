@@ -18,9 +18,9 @@
 //=====================================================================================================================
 #include "query_value.hpp"
 
-#include "../../../../common/protocol/msg_types.hpp"
-#include "../../../../common/session.hpp"
-#include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
+#include "protocol/msg_types.hpp"
+#include "session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
 #include "../registry_value.hpp"
 //=====================================================================================================================

@@ -32,6 +32,8 @@ class zmsg;
 namespace trustwave {
 class session;
 struct header;
+class action_msg;
+class res_msg;
 class message_broker {
     //  This defines one worker, idle or active
 
@@ -79,7 +81,8 @@ private:
     //  Process a request coming from a client
     void client_process(const std::string& sender, std::unique_ptr <zmsg>&& msg);
     void handle_message(zmq::socket_t &,const std::string&,std::function<void(std::string,std::unique_ptr <zmsg> && )>);
-
+    void do_act(trustwave::res_msg& , std::shared_ptr<action_msg> ,boost::shared_ptr <session> );
+    void send_local_to_client(const trustwave::res_msg& ,const std::string &,const std::string &);
 private:
     zmq::context_t& context_;               //  0MQ context
     std::unique_ptr <zmq::socket_t> internal_socket_;       //  Socket for workers

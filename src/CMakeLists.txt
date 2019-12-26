@@ -58,7 +58,7 @@ message (STATUS "${BOOST_LIBRARYDIR}")
 
 link_directories(${BOOST_LIBRARYDIR})
 include_directories(${DEPS_DIR})
-
+include_directories(common)
 add_definitions(-DCMAKE_BUILD_TYPE=Debug)
 link_directories(${DEPS_DIR}/libpe-pev/build)
 
