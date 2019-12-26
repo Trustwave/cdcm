@@ -16,7 +16,7 @@
 #ifndef UTILS_FILE_READER_HPP
 #define UTILS_FILE_READER_HPP
 
-#include "../../common/file_reader_interface.hpp"
+#include "file_reader_interface.hpp"
 #include <string>
 #include <fstream>
 

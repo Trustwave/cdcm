@@ -19,7 +19,7 @@
 #include <string>
 #include <memory>
 #include <boost/icl/split_interval_map.hpp>
-#include "../../common/file_reader_interface.hpp"
+#include "file_reader_interface.hpp"
 #include "bounded_chunk.hpp"
 
 namespace trustwave {

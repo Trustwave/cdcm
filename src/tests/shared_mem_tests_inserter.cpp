@@ -17,10 +17,10 @@
 #include <thread>
 #include <boost/smart_ptr/make_shared.hpp>
 
-#include "../common/session.hpp"
-#include "../common/sessions_cache/shared_mem_converters.hpp"
-#include "../common/sessions_cache/shared_mem_session.hpp"
-#include "../common/sessions_cache/shared_mem_sessions_cache.hpp"
+#include "session.hpp"
+#include "sessions_cache/shared_mem_converters.hpp"
+#include "sessions_cache/shared_mem_session.hpp"
+#include "sessions_cache/shared_mem_sessions_cache.hpp"
 using namespace trustwave;
 
 

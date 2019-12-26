@@ -14,13 +14,13 @@
 // Comments: 
 
 #include "message_broker.hpp"
-#include "../common/client.hpp"
-#include "../common/session.hpp"
+#include "client.hpp"
+#include "session.hpp"
 #include "protocol/protocol.hpp"
-#include "../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../common/zmq/mdp.hpp"
-#include "../common/zmq/zmq_helpers.hpp"
-#include "../common/zmq/zmq_message.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "zmq/mdp.hpp"
+#include "zmq/zmq_helpers.hpp"
+#include "zmq/zmq_message.hpp"
 #include <zmq.hpp>
 #include <functional>
 #include <boost/asio.hpp>

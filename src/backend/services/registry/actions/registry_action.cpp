@@ -15,9 +15,9 @@
 
 #include "registry_action.hpp"
 #include "../registry_client.hpp"
-#include "../../../../common/session.hpp"
-#include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../../../../common/protocol/msg_types.hpp"
+#include "session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "protocol/msg_types.hpp"
 using namespace trustwave;
 std::shared_ptr <registry_client> Registry_Action::client(boost::shared_ptr <session> sess, std::shared_ptr <result_msg> res)
 {

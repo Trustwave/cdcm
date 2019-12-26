@@ -39,7 +39,7 @@ extern "C" {
 #undef uint_t  //rotem TODO: try to delete this line and see if works. it's leftover from samba
 #include <string>
 #include <tuple>
-#include "../../../common/client.hpp"
+#include "client.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================

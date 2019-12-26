@@ -31,8 +31,8 @@ extern "C" {
 #endif
 #undef uint_t
 
-#include "../../../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../../../common/session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "session.hpp"
 /**@ingroup callback
  * Authentication callback function type (traditional method)
  *

@@ -17,8 +17,8 @@
 #define CDCM_SHMEM_FIXTURES_HPP
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include "../../../common/sessions_cache/shared_mem_sessions_cache.hpp"
-#include "../../../common/session.hpp"
+#include "sessions_cache/shared_mem_sessions_cache.hpp"
+#include "session.hpp"
 struct EmptyCache {
     EmptyCache()  {
 

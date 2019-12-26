@@ -14,7 +14,7 @@
 //                          						Include files
 //=====================================================================================================================
 #include "maintenance.hpp"
-#include "../common/singleton_runner/authenticated_scan_server.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/uuid/random_generator.hpp>  // for random_generator
 #include <boost/uuid/uuid_io.hpp>           // for to_string

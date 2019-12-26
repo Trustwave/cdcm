@@ -7,8 +7,8 @@
 #include <boost/process/extend.hpp>
 #include <boost/system/error_code.hpp>
 #include <sys/types.h>
-#include "../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../common/zmq/zmq_helpers.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "zmq/zmq_helpers.hpp"
 
 namespace bp = boost::process;
 using namespace std;

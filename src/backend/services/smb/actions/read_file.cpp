@@ -22,9 +22,9 @@
 #include "../smb_client.hpp"
 #include "read_file.hpp"
 
-#include "../../../../common/protocol/msg_types.hpp"
-#include "../../../../common/session.hpp"
-#include "../../../../common/singleton_runner/authenticated_scan_server.hpp"
+#include "protocol/msg_types.hpp"
+#include "session.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 namespace {
     namespace {

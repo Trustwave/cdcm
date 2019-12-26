@@ -31,8 +31,8 @@ extern "C" {
 #undef uint_t
 #include <string>
 #include <vector>
-#include "../../../common/client.hpp"
-#include "../../../common/file_reader_interface.hpp"
+#include "client.hpp"
+#include "file_reader_interface.hpp"
 static constexpr uint16_t SMB_MAXPATHLEN = MAXPATHLEN;
 static constexpr uint16_t RESUME_CHECK_SIZE = 512;
 static constexpr uint16_t RESUME_DOWNLOAD_OFFSET = 1024;

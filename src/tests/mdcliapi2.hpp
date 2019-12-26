@@ -19,9 +19,9 @@
 #include <iostream>
 #include <memory>
 
-#include "../common/zmq/mdp.hpp"
-#include "../common/zmq/zmq_helpers.hpp"
-#include "../common/zmq/zmq_message.hpp"
+#include "zmq/mdp.hpp"
+#include "zmq/zmq_helpers.hpp"
+#include "zmq/zmq_message.hpp"
 
 //  Structure of our class
 //  We access these properties only via class methods
@@ -104,7 +104,7 @@ public:
        //  Frame 1: "MDPCxy" (six bytes, MDP/Client x.y)
        //  Frame 2: Service name (printable string)
        request->push_front ((char*)service.c_str());
-       request->push_front ((char*)MDPC_CLIENT);
+       request->push_front (trustwave::MDPC_CLIENT);
        request->push_front ((char*)"");
        if (m_verbose) {
            zmq_helpers::console ("I: send request to '%s' service:", service.c_str());
@@ -141,7 +141,7 @@ public:
            assert (msg->pop_front ().length() == 0);  // empty message
 
            std::basic_string<unsigned char> header = msg->pop_front();
-           assert (header.compare((unsigned char *)MDPC_CLIENT) == 0);
+           assert (header.compare((unsigned char *)trustwave::MDPC_CLIENT) == 0);
 
            std::basic_string<unsigned char> service = msg->pop_front();
            assert (service.compare((unsigned char *)service.c_str()) == 0);

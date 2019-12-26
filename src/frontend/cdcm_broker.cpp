@@ -10,8 +10,8 @@
 #include <zmq.hpp>
 #include <boost/asio.hpp>
 
-#include "../common/singleton_runner/authenticated_scan_server.hpp"
-#include "../common/zmq/zmq_helpers.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+#include "zmq/zmq_helpers.hpp"
 #include "message_broker.hpp"
 #include "workers_monitor.hpp"
 #include "maintenance.hpp"

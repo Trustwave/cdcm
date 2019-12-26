@@ -28,8 +28,8 @@ extern "C" {
 #include "lib/util/time.h"
 #include <ctime>
 
-#include "../../../common/session.hpp"
-#include "../../../common/credentials.hpp"
+#include "session.hpp"
+#include "credentials.hpp"
 
 using namespace trustwave;
 
