@@ -92,12 +92,13 @@ int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
     auto smb_action = std::dynamic_pointer_cast<smb_read_file_msg>(action);
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->path_);
-    std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     auto connect_result  = rc.connect(base.c_str());
     if(!connect_result.first)
     {
-        res->res(std::string("Error: %s",(connect_result.second == -1?std::string_view ("Unknown error").data():strerror(connect_result.second))));
+        AU_LOG_DEBUG("got smb error: %i - %s", connect_result.second, std::strerror(connect_result.second));
+        res->res(std::string("Error: ") + std::string(std::strerror(connect_result.second)));
+        return -1;
     }
     auto off = smb_action->offset_.empty()?0:std::stoul(smb_action->offset_);
     auto sz = smb_action->size_.empty()?0:std::stoul(smb_action->size_);
@@ -105,7 +106,7 @@ int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
     {
         sz = rc.file_size()-off;
     }
-    AU_LOG_ERROR("Recieved offset: %zu size: %zu",off,sz);
+    AU_LOG_ERROR("Received offset: %zu size: %zu",off,sz);
     auto buff = new(std::nothrow) char[sz];
     if(nullptr == buff)
     {
@@ -113,6 +114,11 @@ int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_
         return -1;
     }
     ssize_t r = rc.read(off,sz,buff);
+    if (-1 == r) {
+        res->res("Error: read_file failed");
+        return -1;
+    }
+
     auto c64_str = base64_encode(buff,r);
     res->res(c64_str.c_str());//fixme assaf figure aou whi strin assignment doesn't  work
     return 0;

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
+include(../../samba.cmake)
 
 include_directories(${SMB_INCLUDES})
 link_directories(   ${SMB_LINKS})

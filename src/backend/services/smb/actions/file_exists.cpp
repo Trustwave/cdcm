@@ -38,11 +38,13 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
     auto smb_action = std::dynamic_pointer_cast<smb_file_exists_msg>(action);
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
-    std::string tmp_name(authenticated_scan_server::instance().settings.downloaded_files_path_+"/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     auto connect_res = rc.connect(base.c_str());
     if(!connect_res.first){
-        if(connect_res.second == EEXIST) {
+
+        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
+
+        if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT ) {
             res->res(std::string("False"));
         }else{
             res->res(std::string("Error: " )+std::string((std::strerror(connect_res.second))));
@@ -55,6 +57,7 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
 
 // instance of the our plugin
 static std::shared_ptr<SMB_File_Exists> instance = nullptr;
+
 
 // extern function, that declared in "action.hpp", for export the plugin from dll
 std::shared_ptr<trustwave::Action_Base> import_action() {

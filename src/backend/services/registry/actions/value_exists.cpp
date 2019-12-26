@@ -39,7 +39,7 @@ int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<a
         return -1;
     }
 
-    AU_LOG_ERROR("About to cast to %s",action->name().c_str());
+    AU_LOG_DEBUG("About to cast to %s",action->name().c_str());
     auto veact = std::dynamic_pointer_cast<reg_action_value_exists_msg>(action);
     if (!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
