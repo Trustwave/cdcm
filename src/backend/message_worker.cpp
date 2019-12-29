@@ -97,10 +97,10 @@ message_worker::recv(zmsg *&reply_p) {
     //  Format and send the reply if we were provided one
     zmsg *reply = reply_p;
     assert(reply || !expect_reply_);
-    if (reply) {
-        assert(!reply_to_.empty());
+    if (reply && !reply_to_.empty()) {
+        //assert(!reply_to_.empty());
         reply->wrap(reply_to_.c_str(), "");
-        reply_to_ = "";
+        reply_to_.clear();
         send_to_broker(MDPW_REPLY, "", reply);
         ++replied_;
         delete reply_p;

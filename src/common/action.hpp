@@ -38,21 +38,21 @@ struct result_msg;
 class Action_Base: public boost::noncopyable
 {
 public:
-    Action_Base( const std::string_view command) :
-                  command_(std::move(command))
+    explicit Action_Base( const std::string_view command) :
+                  command_(command)
     {
     }
 
     virtual ~Action_Base()
     = default;
 
-    const std::string_view command() const
+    [[nodiscard]]std::string_view command() const
     {
         return command_;
     }
 
     virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
-    virtual std::shared_ptr<action_msg> get_message(const tao::json::value & v) const = 0;
+    [[nodiscard]] virtual std::shared_ptr<action_msg> get_message(const tao::json::value & v) const = 0;
 private:
     const std::string_view command_;
 };

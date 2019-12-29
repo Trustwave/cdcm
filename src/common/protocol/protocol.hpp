@@ -19,8 +19,7 @@
 #include <taocpp-json/include/tao/json/contrib/traits.hpp>
 #include <taocpp-json/include/tao/json.hpp>
 
-namespace tao {
-    namespace json {
+namespace tao::json {
 
         template<>
         struct traits<trustwave::header> : binding::object<
@@ -55,6 +54,5 @@ namespace tao {
         struct traits<trustwave::single_param_action_msg>
                 : binding::object<binding::inherit<traits<trustwave::action_msg> >,
                         TAO_JSON_BIND_REQUIRED("param", &trustwave::single_param_action_msg::param) > {};
-}
 }
 #endif /* TRUSTWAVE_COMMON_PROTOCOL_PROTOCOL_HPP_ */

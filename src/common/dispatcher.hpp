@@ -60,7 +60,7 @@ public:
         }
         return it->second;
     }
-    bool has(const std::string &t_name) const
+    [[nodiscard]] bool has(const std::string &t_name) const
     {
         return  map_.cend() != map_.find(t_name);
     }

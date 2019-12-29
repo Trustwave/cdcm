@@ -17,7 +17,7 @@
 
 using namespace trustwave;
 credentials::credentials(const std::string& domain, const std::string& username, const std::string& password,
-                const std::string workstation):domain_(domain),username_(username),password_(password),workstation_(workstation)
+                const std::string& workstation):domain_(domain),username_(username),password_(password),workstation_(workstation)
 {
 }
 void credentials::creds(const std::string& domain, const std::string& username, const std::string& password,

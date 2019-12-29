@@ -272,7 +272,7 @@ void zmsg::wrap(const char *address, const char *delim)
 std::string zmsg::unwrap()
 {
     if (m_part_data.empty()){
-        return nullptr;
+        return std::string();
     }
     std::string addr = reinterpret_cast <const char*>(pop_front().c_str());
     if (nullptr!=address() && *address() == 0){
@@ -285,7 +285,7 @@ void zmsg::dump()
 {
 
     std::cerr << "--------------------------------------" << std::endl;
-    for (auto data : m_part_data){
+    for (const auto& data : m_part_data){
         // Dump the message as text or binary
         bool is_text = true;
         for (unsigned char char_nbr : data)

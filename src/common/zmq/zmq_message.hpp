@@ -29,13 +29,13 @@ public:
     zmsg();
     //  --------------------------------------------------------------------------
     //  Constructor, sets initial body
-    zmsg(char const *body);
+    explicit zmsg(char const *body);
     //  -------------------------------------------------------------------------
     //  Constructor, sets initial body and sends message to socket
     zmsg(char const *body, zmq::socket_t &socket);
     //  --------------------------------------------------------------------------
     //  Constructor, calls first receive automatically
-    zmsg(zmq::socket_t &socket);
+    explicit zmsg(zmq::socket_t &socket);
     //  --------------------------------------------------------------------------
     //  Copy Constructor, equivalent to zmsg_dup
     zmsg(zmsg &msg);

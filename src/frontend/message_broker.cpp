@@ -167,11 +167,13 @@ void message_broker::worker_process(const std::string& sender, std::unique_ptr <
                 //  Remove & save client return envelope and insert the
                 //  protocol header and service name, then rewrap envelope.
                 std::string client = msg->unwrap();
-                msg->wrap(MDPC_CLIENT, "");
-                msg->wrap(client.c_str(), "");
-                msg->send(*external_socket_);
-                replied_++;
-                worker_waiting(wrk);
+                if(!client.empty()) {
+                    msg->wrap(MDPC_CLIENT, "");
+                    msg->wrap(client.c_str(), "");
+                    msg->send(*external_socket_);
+                    replied_++;
+                    worker_waiting(wrk);
+                }
             }
             else{
                 worker_delete(wrk, true);
@@ -257,14 +259,16 @@ void message_broker::do_act(trustwave::res_msg& result_message, std::shared_ptr<
 }
 void message_broker::send_local_to_client(const trustwave::res_msg& result_message,const std::string &sender,const std::string &client)
 {
-    const tao::json::value res_as_json = result_message;
-    auto res_body = to_string(res_as_json, 2);
-    zmsg *reply = new zmsg;
-    reply->body_set(res_body.c_str());
-    AU_LOG_DEBUG("sending to client :\n %s", res_body.c_str());
-    reply->wrap(MDPC_CLIENT, client.c_str());
-    reply->wrap(sender.c_str(), "");
-    reply->send(*external_socket_);
+    if(!client.empty()&&!sender.empty()) {
+        const tao::json::value res_as_json = result_message;
+        auto res_body = to_string(res_as_json, 2);
+        zmsg *reply = new zmsg;
+        reply->body_set(res_body.c_str());
+        AU_LOG_DEBUG("sending to client :\n %s", res_body.c_str());
+        reply->wrap(MDPC_CLIENT, client.c_str());
+        reply->wrap(sender.c_str(), "");
+        reply->send(*external_socket_);
+    }
 }
 
 void message_broker::client_process(const std::string &sender, std::unique_ptr<zmsg> &&msg) {

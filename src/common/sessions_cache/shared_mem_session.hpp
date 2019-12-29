@@ -41,40 +41,40 @@ std::ostream &operator<<(std::ostream &, const shared_mem_credentials &);
 class shared_mem_credentials {
 public:
     ~shared_mem_credentials()=default;
+    // Avoid copy semantic
+    shared_mem_credentials(const shared_mem_credentials&) = delete;
+    shared_mem_credentials& operator=(const shared_mem_credentials&) = delete;
 private:
     friend class shared_mem_session;
     friend struct session_converter;
+
     friend std::ostream &operator<<(std::ostream &, const shared_mem_credentials &);
     friend std::ostream &operator<<(std::ostream &, const shared_mem_session &);
-
-        shared_mem_credentials(const void_allocator &va);
-        // Avoid copy semantic
-        shared_mem_credentials(const shared_mem_credentials&) = delete;
-        shared_mem_credentials& operator=(const shared_mem_credentials&) = delete;
+    explicit shared_mem_credentials(const void_allocator &va);
 
         // Force move semantic
         shared_mem_credentials(shared_mem_credentials&&) = default;
-        shared_mem_credentials& operator=(shared_mem_credentials&&) = default;
+    shared_mem_credentials& operator=(shared_mem_credentials&&) = default;
 
         String domain_;
-        String username_;
-        String password_;
-        String workstation_;
+    String username_;
+    String password_;
+    String workstation_;
     };
 
 class shared_mem_session {
 public:
     ~shared_mem_session()=default;
-private:
-    friend struct session_converter;
-    friend class shared_mem_sessions_cache;
-    friend class shared_mem_session_element;
-
-    friend std::ostream& operator<<(std::ostream &, const shared_mem_session_element&);
-    explicit shared_mem_session(const void_allocator &va);
     // Avoid copy semantic
     shared_mem_session(const shared_mem_session&) = delete;
     shared_mem_session& operator=(const shared_mem_session&) = delete;
+private:
+    friend struct session_converter;
+    friend class shared_mem_sessions_cache;
+
+    friend class shared_mem_session_element;
+    friend std::ostream& operator<<(std::ostream &, const shared_mem_session_element&);
+    explicit shared_mem_session(const void_allocator &va);
 
     // Force move semantic
     shared_mem_session(shared_mem_session&&) = default;

@@ -61,9 +61,9 @@ struct action_msg
     action_msg& operator=(const action_msg&) = delete;
     action_msg& operator=(action_msg&&) = delete;
     action_msg() = delete;
-    const std::string name() const
+    std::string name() const
     {
-        return std::string(name_);
+        return std::move(std::string(name_));
     }
     std::string id() const
     {
@@ -85,8 +85,8 @@ protected:
 
 };
     struct single_param_action_msg : public action_msg {
-    protected:
         single_param_action_msg() = delete;
+    protected:
 
         explicit single_param_action_msg(const std::string_view name) :
                 action_msg(name) {

@@ -64,10 +64,7 @@ public:
     {
         return session_.remote_;
     }
-    ~shared_mem_session_element()
-    {
-      //  printf("%s is being destructed\n", session_.remote_.c_str());
-    }
+    ~shared_mem_session_element()=default;
     shared_mem_session_element(sp_session_t sp_session, size_t, const void_allocator &va);
     // Avoid copy semantic
     shared_mem_session_element(const shared_mem_session_element&) = delete;
@@ -118,7 +115,7 @@ private:
 
 private:
 
-    shared_mem_sessions_cache(const std::string &name, const size_t size, size_t);
+    shared_mem_sessions_cache(const std::string &name, size_t size, size_t);
 
     bool construct();
     template<typename Tag>
@@ -136,7 +133,7 @@ public:
 
     // creation interface
 public:
-    static boost::shared_ptr <shared_mem_sessions_cache> get_or_create(const std::string &name, const size_t size, const size_t);
+    static boost::shared_ptr <shared_mem_sessions_cache> get_or_create(const std::string &name, size_t size, size_t);
 public:
     bool add(sp_session_t);
     template<typename Tag>
