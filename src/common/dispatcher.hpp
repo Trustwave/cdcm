@@ -49,6 +49,7 @@ public:
     }
     void register1(T_Ptr t)
     {
+        std::cerr<<t->command()<<" Resgistered"<<std::endl;
         map_[t->command()] = t;
     }
     T_Ptr find(const std::string &t_name) const

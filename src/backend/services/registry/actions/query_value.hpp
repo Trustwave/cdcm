@@ -27,7 +27,7 @@
 //=====================================================================================================================
 namespace trustwave {
     struct reg_action_query_value_msg : public action_msg {
-        static constexpr std::string_view act_name{"list_dir"};
+        static constexpr std::string_view act_name{"query_value"};
         reg_action_query_value_msg() :
                 action_msg(act_name) {
         }

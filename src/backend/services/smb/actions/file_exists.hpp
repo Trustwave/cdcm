@@ -50,7 +50,7 @@ namespace tao::json {
         {
             trustwave::smb_file_exists_msg result;
             const auto o = v.at(trustwave::smb_file_exists_msg::act_name);
-            result.param = v.at( "param" ).template as< std::string >();
+            result.param = o.at( "param" ).template as< std::string >();
             return result;
         }
     };

@@ -29,10 +29,10 @@ std::vector<std::shared_ptr<shared_library>> action_manager::load(const boost::f
         auto actionl = sl->get<import_action_cb_t>("import_action");
         if(actionl)
         {
-            AU_LOG_DEBUG("%s loaded.",p->path().filename().string().c_str());
             auto action=actionl();
             d.register1(action);
             sl_vec.push_back(sl);
+            AU_LOG_DEBUG("%s loaded.",p->path().filename().string().c_str());
         }
         else
         {
