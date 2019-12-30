@@ -49,6 +49,7 @@ namespace tao::json {
     {
         trustwave::smb_read_file_msg result;
         const auto o = v.at(trustwave::smb_read_file_msg::act_name);
+        result.id_ = o.at( "id" ).template as< std::string >();
         result.path_ = o.at( "path" ).template as< std::string >();
         result.size_ = o.at( "size" ).template as< std::string >();
         result.offset_ =o.at( "offset" ).template as< std::string >();

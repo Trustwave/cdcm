@@ -48,8 +48,10 @@ namespace tao::json {
         template< template< typename... > class Traits >
         static trustwave::smb_file_exists_msg as( const tao::json::basic_value< Traits >& v )
         {
+            std::cerr<<"B2@";
             trustwave::smb_file_exists_msg result;
             const auto o = v.at(trustwave::smb_file_exists_msg::act_name);
+            result.id_ = o.at( "id" ).template as< std::string >();
             result.param = o.at( "param" ).template as< std::string >();
             return result;
         }

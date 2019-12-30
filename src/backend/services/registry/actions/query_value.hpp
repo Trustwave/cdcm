@@ -49,6 +49,7 @@ namespace tao::json{
     {
         trustwave::reg_action_query_value_msg result;
         const auto o = v.at(trustwave::reg_action_query_value_msg::act_name);
+        result.id_ = o.at( "id" ).template as< std::string >();
         result.key_ = o.at( "key" ).template as< std::string >();
         result.value_ = o.at( "value" ).template as< std::string >();
         return result;

@@ -201,7 +201,8 @@ namespace trustwave {
         }
 
     public:
-        explicit pe_context(file_reader_interface& );
+        explicit pe_context(file_reader_interface& fr) : fm_(fr),pe_() {}
+
 
         ~pe_context() {
             free(pe_.directories);

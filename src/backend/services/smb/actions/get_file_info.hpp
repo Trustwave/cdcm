@@ -37,20 +37,21 @@ namespace trustwave{
     };
 }
 namespace tao::json {
+
     template<>
     struct traits<trustwave::smb_get_file_info_msg> : binding::object<
             binding::inherit<traits<trustwave::single_param_action_msg> > > {
         TAO_JSON_DEFAULT_KEY(trustwave::smb_get_file_info_msg::act_name.data());
+        template< template< typename... > class Traits >
+        static trustwave::smb_get_file_info_msg as( const tao::json::basic_value< Traits >& v )
+        {
+            std::cerr<<"A!1";
+            trustwave::smb_get_file_info_msg result;
+            const auto o = v.at(trustwave::smb_get_file_info_msg::act_name);
+            result.param = o.at( "param" ).template as< std::string >();
+            return result;
+        }
     };
-    template< template< typename... > class Traits >
-    static trustwave::smb_get_file_info_msg as( const tao::json::basic_value< Traits >& v )
-    {
-        trustwave::smb_get_file_info_msg result;
-        const auto o = v.at(trustwave::smb_get_file_info_msg::act_name);
-        result.param = o.at( "param" ).template as< std::string >();
-
-      return result;
-    }
 }
 
 namespace trustwave {

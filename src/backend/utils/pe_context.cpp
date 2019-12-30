@@ -82,7 +82,7 @@ namespace {
 #pragma pack(pop)
 }
 
-pe_context::pe_context(file_reader_interface& fr) : fm_(fr),pe_{} {}
+
 
 int pe_context::parse() {
     fm_.map_chunk(0, 64);

@@ -200,6 +200,7 @@ int message_worker::worker_loop() {
                 }
                 auto act_m = act1->get_message(action_message);
                 auto res1 = std::make_shared<trustwave::result_msg>();
+                res1->id(act_m->id());
                 res.msgs.push_back(res1);
                 if (-1 == act1->act(sess, act_m, res1)) {
                     AU_LOG_DEBUG("action %s returned with an error", act_key.c_str());

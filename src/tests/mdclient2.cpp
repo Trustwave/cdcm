@@ -81,14 +81,12 @@ static void fc(int )
                 [
    
                     {
-                      "read_file"  :
+                      "get_file_info"  :
                             {
                                 "id": ")"
                                         + act_id4
                                         + R"(",
-                                "path":"ADMIN$//hh.exe",
-                                "offset":"100",
-                                "size":"100"
+                                "param":"ADMIN$//hh.exe"
 
 
 

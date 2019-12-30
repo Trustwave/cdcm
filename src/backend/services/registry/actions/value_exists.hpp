@@ -49,7 +49,8 @@ namespace tao::json {
     static trustwave::reg_action_value_exists_msg as( const tao::json::basic_value< Traits >& v )
     {
         trustwave::reg_action_value_exists_msg result;
-        const auto o = v.at(trustwave::reg_action_value_exists_msg::act_name);;
+        const auto o = v.at(trustwave::reg_action_value_exists_msg::act_name);
+        result.id_ = o.at( "id" ).template as< std::string >();
         result.key_ = o.at( "key" ).template as< std::string >();
         result.value_ = o.at( "value" ).template as< std::string >();
         return result;

@@ -26,7 +26,14 @@ namespace trustwave {
     class file_mapper {
         typedef ::boost::icl::interval_set<size_t, std::less, bounded_chunk> chunks_map;
     public:
-        explicit file_mapper(file_reader_interface& );
+        explicit file_mapper(file_reader_interface & fr) : fr_(fr) {
+            if (fr_.validate_open()) {
+                allocated_size_ = fr_.file_size();
+                data_.reset(new char[allocated_size_]);
+                memset(data_.get(), 0, allocated_size_);
+            }
+        }
+
 
         template<typename P>
         bool map_chunk_by_pointer(const P *offset, size_t size) {

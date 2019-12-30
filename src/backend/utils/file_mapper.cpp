@@ -18,13 +18,7 @@
 
 using namespace trustwave;
 
-file_mapper::file_mapper(file_reader_interface & fr) : fr_(fr) {
-    if (fr_.validate_open()) {
-        allocated_size_ = fr_.file_size();
-        data_.reset(new char[allocated_size_]);
-        memset(data_.get(), 0, allocated_size_);
-    }
-}
+
 
 bool file_mapper::map_chunk(size_t offset, size_t size) {
     if (in_bound(offset, size)) {
