@@ -175,61 +175,67 @@ int message_worker::worker_loop() {
             break;              //  Worker was interrupted
         }
         std::string mstr(request->body());
-        trustwave::msg request_body;
+        msg request_body;
+        res_msg result;
         try {
             const auto req_body_as_json = from_string(mstr);
             AU_LOG_DEBUG("msg: %s", to_string(req_body_as_json, 2).c_str());
             auto msg_object = req_body_as_json.get_object();
             request_body.hdr = msg_object.at("H").as<header>();
             auto msgs_array = msg_object.at("msgs").get_array();
-            trustwave::res_msg res;
-            res.hdr = request_body.hdr;
-
+            result.hdr = request_body.hdr;
             AU_LOG_DEBUG("actions count is %zu", msgs_array.size());
-            auto sess = trustwave::authenticated_scan_server::instance().get_session(res.hdr.session_id);
+
             for (auto action_message : msgs_array) {
-                auto action_obj = action_message.get_object();
-                const auto act_key = action_obj.cbegin()->first;
+                auto action_msg_obj = action_message.get_object();
+                const auto act_key = action_msg_obj.cbegin()->first;
                 AU_LOG_DEBUG("Looking for %s", act_key.c_str());
-                auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(act_key);
-                if(act1)
+                auto action_result = std::make_shared<result_msg>();
+                auto action = authenticated_scan_server::instance().public_dispatcher.find(act_key);
+                if(action)
                 {
                     AU_LOG_DEBUG("%s found", act_key.c_str());
-                    auto act_m = act1->get_message(action_message);
-                    auto res1 = std::make_shared<trustwave::result_msg>();
-                    res1->id(act_m->id());
-                    res.msgs.push_back(res1);
-                    if (-1 == act1->act(sess, act_m, res1)) {
+                    auto act_m = action->get_message(action_message);
+                    action_result->id(act_m->id());
+                    result.msgs.push_back(action_result);
+                    auto sess = authenticated_scan_server::instance().get_session(result.hdr.session_id);
+                    if (-1 == action->act(sess, act_m, action_result)) {
                         AU_LOG_DEBUG("action %s returned with an error", act_key.c_str());
                     }
                 } else{
                     AU_LOG_DEBUG("%s not found", act_key.c_str());
-                    //extract id from malformed message
-                    auto res1 = std::make_shared<trustwave::result_msg>();
+                    //try extract id from malformed message
                     try{
-                        auto e = action_obj.cbegin()->second.at("id").template as< std::string >();
-                        res1->id(e);
+                        auto e = action_msg_obj.cbegin()->second.at("id").template as< std::string >();
+                        action_result->id(e);
                     }
                     catch (...)
                     {
-                        res1->id("unknown");
+                        action_result->id("unknown");
                     }
-                    res1->res("Error: Malformed message - "+tao::json::to_string(action_message));
-                    res.msgs.push_back(res1);
+                    action_result->res("Error: Malformed message - "+tao::json::to_string(action_message));
+                    result.msgs.push_back(action_result);
                 }
-
             }
-            const tao::json::value v1 = res;
+        }
+        catch (std::exception &e) {
+            AU_LOG_ERROR("Malformed message %s", e.what());
+            auto action_result = std::make_shared<result_msg>();
+            action_result->id("unknown");
+            action_result->res("Error: Malformed message ");
+            result.msgs.push_back(action_result);
+            continue;
+        }
+        try{
+            const tao::json::value v1 = result;
             auto reply_body_str = to_string(v1, 2);
             reply = new zmsg; //will be deleted in recv
             reply->append(reply_body_str.c_str());
         }
-        catch (std::exception &e) {
-            AU_LOG_ERROR("Malformed message %s", e.what());
-            //fixme assaf on error send somthing
-            continue;
+        catch (std::exception &e)
+        {
+            AU_LOG_ERROR("Failed building response message %s", e.what());
         }
-
     }
     if (zmq_helpers::interrupted) {
         AU_LOG_DEBUG("W: interrupt received, shutting down...\n");

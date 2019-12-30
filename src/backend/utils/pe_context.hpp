@@ -188,7 +188,6 @@ namespace trustwave {
 
             auto newNode = (NODE_PERES *) malloc(sizeof(NODE_PERES));
             if (newNode == nullptr) {
-                // TODO(jweyrich): Report allocation failure?
                 return nullptr;
             }
 

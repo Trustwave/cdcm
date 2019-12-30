@@ -36,6 +36,7 @@ struct cdcm_settings
     {
         size_t minimum_read_size_;
     }smb_;
+
     void load(const std::string &filename);
     void save(const std::string &filename);
 };

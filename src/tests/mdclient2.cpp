@@ -63,6 +63,8 @@ static void fc(int )
 
         auto a1 = t1.as<trustwave::res_msg>();
         auto act_id4 = boost::uuids::to_string(boost::uuids::random_generator()());
+        auto act_id5 = boost::uuids::to_string(boost::uuids::random_generator()());
+        auto act_id6 = boost::uuids::to_string(boost::uuids::random_generator()());
         auto new_session_id = a1.msgs[0]->res();
         delete reply;
         reply = nullptr;
@@ -81,7 +83,7 @@ static void fc(int )
                 [
    
                     {
-                      "get_file_info"  :
+                      "get_ile_info"  :
                             {
                                 "id": ")"
                                         + act_id4
@@ -91,6 +93,32 @@ static void fc(int )
 
 
                                 
+                            }
+                    },
+{
+                      "file_exists"  :
+                            {
+                                "id": ")"
+                                          + act_id5
+                                          + R"(",
+                                "param":"ADMIN$//hh.exe"
+
+
+
+
+                            }
+                    },
+{
+                      "get_file_info"  :
+                            {
+                                "id": ")"
+                                            + act_id6
+                                            + R"(",
+                                "param":"ADMIN$//hhs.exe"
+
+
+
+
                             }
                     }
                 ]

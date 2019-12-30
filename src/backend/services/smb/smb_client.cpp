@@ -97,7 +97,7 @@ static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, in
 
 
 std::pair<bool,int> smb_client::connect(const char *path) {
-    AU_LOG_ERROR("path: %s", path);
+    AU_LOG_DEBUG("path: %s", path);
     if (smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return std::make_pair(false,-1);
@@ -276,7 +276,7 @@ bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
                          "offset %jd", bytesread, current_open_path_.data(), (intmax_t) curpos);
             delete[] readbuf;
             smbc_close(remote_fd_);
-            if (local_fd_ != STDOUT_FILENO) {//fixme assaf change condition to -1
+            if (local_fd_ != -1) {
                 close(local_fd_);
             }
             return false;

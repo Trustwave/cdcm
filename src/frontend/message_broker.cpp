@@ -278,14 +278,12 @@ void message_broker::client_process(const std::string &sender, std::unique_ptr<z
      * 1. get body
      * 2. parse body
      * 3. for each action
-     *    if short
-     *        do internal
+     *    if found in local dispatcher
+     *        do loacally
      *    else
-
      *        create message , wrap sender and set single action as body
      *        dispatch message
      */
-    //fixme assaf update comment
     using namespace tao::json;
     std::string_view mstr(msg->body());
     trustwave::raw_msg unknown_actions_msg;
@@ -311,7 +309,6 @@ void message_broker::client_process(const std::string &sender, std::unique_ptr<z
                 AU_LOG_ERROR("%s not found! perhaps a worker plugin", act_key.c_str());
                 unknown_actions_msg.msgs.push_back(action_obj);
             }
-
     }
     }
     catch (std::exception &e) {

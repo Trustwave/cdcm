@@ -36,7 +36,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#undef uint_t  //rotem TODO: try to delete this line and see if works. it's leftover from samba
+#undef uint_t
 #include <string>
 #include <tuple>
 #include "client.hpp"

@@ -21,11 +21,12 @@
 extern "C" {
 #endif
 #include "auth/credentials/credentials.h"
-#ifdef __cplusplus
-}
-#endif
 #include "libcli/registry/util_reg.h"
 #include "lib/util/time.h"
+#ifdef __cplusplus
+}
+
+#endif
 #include <ctime>
 
 #include "session.hpp"

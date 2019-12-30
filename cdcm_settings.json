@@ -12,6 +12,9 @@
         "downloaded_file_path": "/var/cdcm/downloaded_files",
         "smb": {
             "minimum_read_size": "512"
+        },
+        "registry": {
+            "data_blob_size": "1048576"
         }
 
     }

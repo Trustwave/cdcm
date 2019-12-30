@@ -108,7 +108,7 @@ int pe_context::parse() {
                                               LIBPE_SIZEOF_MEMBER(pe_file_t, signature));
 
     if (!fm_.map_chunk_by_pointer(pe_.coff_hdr, sizeof(IMAGE_COFF_HEADER)))
-        return LIBPE_E_MISSING_COFF_HEADER;//todo assaf 20
+        return LIBPE_E_MISSING_COFF_HEADER;
 
     pe_.num_sections = pe_.coff_hdr->NumberOfSections;
 
@@ -333,7 +333,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                              node->lastNode->resource.directoryEntry->DirectoryData.data.OffsetToDirectory;
                     ptr = ptr_add<void>(fm_.data(), offset);
                     if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_ENTRY))) {
-                        // TODO: Should we report something?
                         goto _error;
                     }
                     node = createNode(node, RDT_DATA_ENTRY);
@@ -394,7 +393,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
     type_RDT_DATA_STRING *dataString = malloc_helper<type_RDT_DATA_STRING>(count.dataString);
     type_RDT_DATA_ENTRY *dataEntry = malloc_helper<type_RDT_DATA_ENTRY>(count.dataEntry);
 
-    // TODO: Handle allocation failure.
     NODE_PERES *Todelete = node;
     while (node != nullptr) {
         output = showNode(node, output);
@@ -468,12 +466,11 @@ void pe_context::extract_info(std::map<std::u16string,std::u16string>& ret) {
     const char *buffer = ptr_add<char>(fm_.data(), 32 + offsetData);
 
     if (!fm_.map_chunk_by_pointer(buffer, dataEntrySize)) {
-        // TODO: Should we report something?
         return;
     }
 
    // VS_FIXEDFILEINFO *info = reinterpret_cast<VS_FIXEDFILEINFO *>(const_cast<char *> (buffer));
-    auto vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO)+8);//todo assaf 8?????
+    auto vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO)+8);
     //first
     static constexpr auto string_file_version_len = 28;
     auto padding = ptr_add<WORD>(vih, sizeof(version_info_header)+string_file_version_len);
