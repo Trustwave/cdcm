@@ -32,10 +32,6 @@ struct cdcm_settings
     std::string worker_connect_ep_;
     std::string downloaded_files_path_;
     std::chrono::seconds maintenance_interval_;
-    struct smb
-    {
-        size_t minimum_read_size_;
-    }smb_;
 
     void load(const std::string &filename);
     void save(const std::string &filename);

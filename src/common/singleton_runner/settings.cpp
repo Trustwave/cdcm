@@ -36,7 +36,6 @@ void cdcm_settings::load(const std::string &filename)
     worker_connect_ep_  = tree.get<std::string> ("cdcm.worker_connect_ep");
     downloaded_files_path_  = tree.get<std::string> ("cdcm.downloaded_file_path");
     heartbeat_expiry_   = heartbeat_liveness_*heartbeat_interval_;
-    smb_.minimum_read_size_   = tree.get<size_t>    ("cdcm.smb.minimum_read_size");
 }
 void cdcm_settings::save(const std::string &filename)
 {
@@ -51,6 +50,5 @@ void cdcm_settings::save(const std::string &filename)
     tree.put("cdcm.broker_worker_listening_ep" , broker_worker_listen_ep_);
     tree.put("cdcm.worker_connect_ep"   , worker_connect_ep_);
     tree.put("cdcm.downloaded_file_path"   , downloaded_files_path_);
-    tree.put("cdcm.smb.minimum_read_size"   , smb_.minimum_read_size_);
     pt::write_json(filename, tree);
 }

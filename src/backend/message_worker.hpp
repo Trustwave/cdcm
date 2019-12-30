@@ -49,6 +49,7 @@ public:
     recv(zmsg *&reply_p);
 private:
     void send_to_broker(const char *command, const std::string& option, zmsg *_msg);
+
     zmq::context_t& context_;
     std::string broker_;
     std::unique_ptr<zmq::socket_t> worker_;     //  Socket to broker

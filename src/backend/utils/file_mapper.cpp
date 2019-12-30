@@ -40,6 +40,6 @@ bool file_mapper::map_chunk(size_t offset, size_t size) {
 }
 
 size_t file_mapper::minimum_read_size(size_t offset, size_t size) const {
-    static const auto mrs = authenticated_scan_server::instance().settings.smb_.minimum_read_size_;
-    return std::min(allocated_size_ - offset, std::max(mrs, size));
+    static const size_t minimum_read_size = 1024*16;
+    return std::min(allocated_size_ - offset, std::max(minimum_read_size, size));
 }

@@ -10,12 +10,7 @@
         "broker_client_listening_ep": "tcp:\/\/*:5555",
         "worker_connect_ep": "tcp:\/\/127.0.0.1:5556",
         "downloaded_file_path": "/var/cdcm/downloaded_files",
-        "smb": {
-            "minimum_read_size": "512"
-        },
-        "registry": {
-            "data_blob_size": "1048576"
-        }
+   
 
     }
 }
