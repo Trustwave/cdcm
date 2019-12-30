@@ -18,9 +18,9 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
+namespace tw = trustwave;
 namespace pt = boost::property_tree;
-void cdcm_settings::load(const std::string &filename)
+void tw::cdcm_settings::load(const std::string &filename)
 {
     pt::ptree tree;
     pt::read_json(filename, tree);
@@ -37,7 +37,7 @@ void cdcm_settings::load(const std::string &filename)
     downloaded_files_path_  = tree.get<std::string> ("cdcm.downloaded_file_path");
     heartbeat_expiry_   = heartbeat_liveness_*heartbeat_interval_;
 }
-void cdcm_settings::save(const std::string &filename)
+void tw::cdcm_settings::save(const std::string &filename)
 {
     pt::ptree tree;
     tree.put("cdcm.heartbeat_liveness"  , heartbeat_liveness_);
