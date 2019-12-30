@@ -11,7 +11,7 @@
 // Revision: 01.00
 // By      : Assaf Cohen
 // Date    : 26 Jun 2019
-// Comments: 
+// Comments:
 
 //  ---------------------------------------------------------------------
 //  Constructor
@@ -195,15 +195,27 @@ int message_worker::worker_loop() {
                 if(act1)
                 {
                     AU_LOG_DEBUG("%s found", act_key.c_str());
+                    auto act_m = act1->get_message(action_message);
+                    auto res1 = std::make_shared<trustwave::result_msg>();
+                    res1->id(act_m->id());
+                    res.msgs.push_back(res1);
+                    if (-1 == act1->act(sess, act_m, res1)) {
+                        AU_LOG_DEBUG("action %s returned with an error", act_key.c_str());
+                    }
                 } else{
-                    AU_LOG_DEBUG("%s not found", act_key.c_str());//fixme assaf handle it
-                }
-                auto act_m = act1->get_message(action_message);
-                auto res1 = std::make_shared<trustwave::result_msg>();
-                res1->id(act_m->id());
-                res.msgs.push_back(res1);
-                if (-1 == act1->act(sess, act_m, res1)) {
-                    AU_LOG_DEBUG("action %s returned with an error", act_key.c_str());
+                    AU_LOG_DEBUG("%s not found", act_key.c_str());
+                    //extract id from malformed message
+                    auto res1 = std::make_shared<trustwave::result_msg>();
+                    try{
+                        auto e = action_obj.cbegin()->second.at("id").template as< std::string >();
+                        res1->id(e);
+                    }
+                    catch (...)
+                    {
+                        res1->id("unknown");
+                    }
+                    res1->res("Error: Malformed message - "+tao::json::to_string(action_message));
+                    res.msgs.push_back(res1);
                 }
 
             }

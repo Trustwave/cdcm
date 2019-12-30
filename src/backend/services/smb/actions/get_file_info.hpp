@@ -45,9 +45,9 @@ namespace tao::json {
         template< template< typename... > class Traits >
         static trustwave::smb_get_file_info_msg as( const tao::json::basic_value< Traits >& v )
         {
-            std::cerr<<"A!1";
             trustwave::smb_get_file_info_msg result;
             const auto o = v.at(trustwave::smb_get_file_info_msg::act_name);
+            result.id_ = o.at( "id" ).template as< std::string >();
             result.param = o.at( "param" ).template as< std::string >();
             return result;
         }

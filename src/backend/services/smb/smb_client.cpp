@@ -363,7 +363,6 @@ ssize_t smb_client::read(size_t offset, size_t size, char *dest)
             return -1;
         }
         curpos += bytesread;
-        AU_LOG_ERROR("%zu",curpos);
     }
     return curpos;
 }
