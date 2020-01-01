@@ -19,11 +19,12 @@
 //                          						Include files
 //=====================================================================================================================
 #include "settings.hpp"
-#include "../action.hpp"
-#include "../typedefs.hpp"
-#include "../dispatcher.hpp"
-#include "../Logger/include/Logger.h"
-#include "../sessions_cache/shared_mem_sessions_cache.hpp"
+#include "action.hpp"
+#include "service_configuration.hpp"
+#include "typedefs.hpp"
+#include "dispatcher.hpp"
+#include "Logger/include/Logger.h"
+#include "sessions_cache/shared_mem_sessions_cache.hpp"
 
 //=====================================================================================================================
 //                          						namespaces
@@ -33,8 +34,8 @@ namespace trustwave {
 
 struct authenticated_scan_server {
     std::unique_ptr <ILogger> logger_ptr;
-    Dispatcher <Action_Base> prv_dispatcher;
     Dispatcher <Action_Base> public_dispatcher;
+    Dispatcher <service_configuration> service_conf_reppsitory;
     boost::shared_ptr <shared_mem_sessions_cache> sessions;
     cdcm_settings settings;
     authenticated_scan_server(const authenticated_scan_server&) = delete;

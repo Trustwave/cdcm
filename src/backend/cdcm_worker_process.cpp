@@ -33,7 +33,7 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::wor
         abort();
     }
   //  std::cerr << "worker "<< id << " logger initialised!!!" << std::endl;
-    auto sl_vec = action_manager::load("/opt/output/libs/plugins/",public_dispatcher);
+    auto sl_vec = action_manager::load("/opt/output/libs/plugins/",public_dispatcher);//fixme assaf move to conf
     std::thread worker_thread(message_worker::worker_loop);
     worker_thread.join();
     return 0;

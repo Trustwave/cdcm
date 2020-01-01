@@ -32,7 +32,9 @@ extern "C" {
 #include <string>
 #include <vector>
 #include "client.hpp"
+#include "configurable.hpp"
 #include "file_reader_interface.hpp"
+#include "smb_service_configuration.hpp"
 static constexpr uint16_t SMB_MAXPATHLEN = MAXPATHLEN;
 static constexpr uint16_t RESUME_CHECK_SIZE = 512;
 static constexpr uint16_t RESUME_DOWNLOAD_OFFSET = 1024;
@@ -41,14 +43,15 @@ static constexpr uint32_t SMB_DEFAULT_BLOCKSIZE = 1024*64;
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
+
 namespace trustwave {
 class session;
-    struct dirent
-    {
-        std::string name_;
-        std::string type_;
-    };
-class smb_client: public cdcm_client,public file_reader_interface
+struct dirent
+{
+    std::string name_;
+    std::string type_;
+};
+class smb_client: public cdcm_client,public file_reader_interface,public configurable<smb_service_configuration>
 {
 public:
     smb_client()= default;
@@ -58,6 +61,7 @@ public:
                     const char *outfile);
     bool list( const std::string& ,std::vector<trustwave::dirent> &);
     bool download_portion_to_memory(const char *base, const char *name,off_t offset, off_t count);
+    bool download_portion_to_memory(const char *base, const char *name,off_t offset);
     ssize_t read(size_t offset, size_t size, char *dest) override ;
     [[nodiscard]] uintmax_t file_size() const override ;
     [[nodiscard]] time_t last_modified() const;
@@ -65,6 +69,7 @@ public:
     std::pair<bool,int> connect(const char *path);
 
 private:
+
     bool download_portion(off_t curpos, off_t count, bool to_file);
     int remote_fd_ = -1;
     int local_fd_ = -1;

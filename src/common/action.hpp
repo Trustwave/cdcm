@@ -38,23 +38,23 @@ struct result_msg;
 class Action_Base: public boost::noncopyable
 {
 public:
-    explicit Action_Base( const std::string_view command) :
-                  command_(command)
+    explicit Action_Base( const std::string_view name) :
+                  name_(name)
     {
     }
 
     virtual ~Action_Base()
     = default;
 
-    [[nodiscard]]std::string_view command() const
+    [[nodiscard]]std::string_view name() const
     {
-        return command_;
+        return name_;
     }
 
     virtual int act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> , std::shared_ptr<result_msg> )=0;
     [[nodiscard]] virtual std::shared_ptr<action_msg> get_message(const tao::json::value & v) const = 0;
 private:
-    const std::string_view command_;
+    const std::string_view name_;
 };
 }
 using import_action_cb_t = std::shared_ptr<trustwave::Action_Base>( );

@@ -45,12 +45,21 @@ public:
     = default;
     void register1(T *t)
     {
-        map_[t->command()] = std::shared_ptr<T>(t);
+        map_[t->name()] = std::shared_ptr<T>(t);
     }
     void register1(T_Ptr t)
     {
-        std::cerr<<t->command()<<" Resgistered"<<std::endl;
-        map_[t->command()] = t;
+        std::cerr<<t->name()<<" Resgistered"<<std::endl;
+        map_[t->name()] = t;
+    }
+    T_Ptr find(const std::string_view t_name) const
+    {
+        auto it = map_.find(t_name);
+
+        if (it == map_.end()) {
+            return std::shared_ptr<T>();
+        }
+        return it->second;
     }
     T_Ptr find(const std::string &t_name) const
     {
@@ -65,11 +74,15 @@ public:
     {
         return  map_.cend() != map_.find(t_name);
     }
+    [[nodiscard]] bool has(const std::string_view t_name) const
+    {
+        return  map_.cend() != map_.find(t_name);
+    }
     struct Registrator
     {
         Registrator(T *t, Dispatcher & d)
         {
-            std::cerr<<t->command()<<std::endl;
+            std::cerr<<t->name()<<std::endl;
             d.register1(t);
         }
         Registrator(T *t, Dispatcher * d)

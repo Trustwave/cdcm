@@ -26,9 +26,9 @@
 namespace trustwave {
 
 enum cdcm_client_type {
-    REGISTRY_CLIENT,
-    SMB_CLIENT,
-    NO_CLIENT =2
+    REGISTRY_CLIENT=0,
+  //  SMB_CLIENT,//Irreleavant
+    CLIENTS_COUNT
 };
 
 
@@ -82,7 +82,7 @@ private:
     boost::uuids::uuid uuid_;
     std::string remote_;
     credentials creds_;
-    std::array <std::shared_ptr <cdcm_client>, 2> clients_;
+    std::array <std::shared_ptr <cdcm_client>, CLIENTS_COUNT> clients_;
 };
 }
 

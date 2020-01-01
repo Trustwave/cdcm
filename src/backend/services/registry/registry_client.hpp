@@ -40,6 +40,8 @@ extern "C" {
 #include <string>
 #include <tuple>
 #include "client.hpp"
+#include "registry_service_configuration.hpp"
+#include "configurable.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
@@ -57,7 +59,7 @@ struct regshell_context
 };
 using result = std::tuple<bool,WERROR>;
 
-class registry_client: public cdcm_client
+class registry_client: public cdcm_client,public configurable<registry_service_configuration>
 {
     struct key_info
     {
