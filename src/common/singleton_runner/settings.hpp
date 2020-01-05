@@ -92,7 +92,7 @@ namespace tao::json {
                 c.maintenance_interval_ = std::chrono::seconds(tv.value());
             }
             c.plugins_dir_ = o.template optional<std::string>("plugins_dir").value_or(c.plugins_dir_);
-
+return c;
         }
     };
 }
