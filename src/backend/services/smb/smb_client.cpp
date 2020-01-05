@@ -252,7 +252,6 @@ bool smb_client::download(const char *base, const char *name, bool resume,
     close(local_fd_);
     return true;
 }
-//static constexpr off_t max_mem_segment=512*1024*1024;//fixme assaf make it configurable
 
 bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
 {
@@ -388,4 +387,8 @@ time_t smb_client::last_modified() const
 bool smb_client::validate_open()
 {
     return connect(current_open_path_.data()).first;
+}
+smb_client::smb_client()
+{
+    this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
 }

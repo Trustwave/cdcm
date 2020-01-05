@@ -17,32 +17,32 @@
 #define SRC_COMMON_CONFIGURABLE_HPP
 
 #include "dispatcher.hpp"
-#include "service_configuration.hpp"
+#include "configuration.hpp"
+#include "singleton_runner/settings.hpp"
 namespace trustwave
 {
+
     template <typename T>
     class configurable
     {
-        [[nodiscard]] std::shared_ptr<service_configuration> conf()
+    protected:
+        [[nodiscard]] std::shared_ptr<configuration> conf()
         {
             if(!conf_) {
                 init_conf();
             }
             return conf_;
         }
-        void init_conf(Dispatcher <service_configuration>& service_conf_reppsitory)
+        void init_conf(Dispatcher <configuration>& service_conf_reppsitory)
         {
             if(!conf_)
             {
-
                 if(service_conf_reppsitory.has(T::srv_name))
                 {
                     conf_ =std::dynamic_pointer_cast<T>( service_conf_reppsitory.find(T::srv_name));
                 } else{
-
                     try {
-
-                        auto fn = std::string("/opt/output/libs/plugins/") + std::string(
+                        static const auto fn = std::string(service_conf_reppsitory.find_as<cdcm_settings>()->plugins_dir_) + std::string(
                                 T::srv_name) + std::string(".json");
                         const tao::json::value v = tao::json::parse_file(fn);
                         conf_ = v.as<std::shared_ptr<T>>();
@@ -50,13 +50,14 @@ namespace trustwave
                     }
                     catch (const std::exception& e)
                     {
-                        AU_LOG_ERROR("Failed reading %s configuration %s",T::svc_name.data(),e.what());
+                        //fixme assaf handle exception
+                        std::cerr<<"Failed reading "<<T::srv_name.data()<<" configuration "<<e.what()<<std::endl;
                     }
                 }
             }
         }
 
-    protected:
+
         std::shared_ptr<T> conf_;
     };
 }

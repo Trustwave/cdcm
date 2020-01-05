@@ -17,19 +17,19 @@
 #define SRC_BACKEND_SERVICES_SMB_SMB_SERVICE_CONFIGURATION_HPP
 namespace trustwave
 {
-    struct smb_service_configuration : public service_configuration {
+    struct smb_service_configuration : public configuration {
         static constexpr std::string_view srv_name{"smb"};
         smb_service_configuration() :
-                service_configuration(srv_name) {
+                configuration(srv_name) {
         }
-        off_t max_mem_segment=512*1024*1024;
+        off_t max_mem_segment=128*1024*1024;
 
     };
 }
 namespace tao::json {
     template<>
     struct traits<trustwave::smb_service_configuration>
-            : binding::object<binding::inherit<traits<trustwave::service_configuration> >,
+            : binding::object<binding::inherit<traits<trustwave::configuration> >,
               TAO_JSON_BIND_OPTIONAL("max_mem_segment", &trustwave::smb_service_configuration::max_mem_segment) > {
     //TAO_JSON_DEFAULT_KEY(trustwave::smb_service_configuration::srv_name.data());
 

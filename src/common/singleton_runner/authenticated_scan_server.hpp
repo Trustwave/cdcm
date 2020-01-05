@@ -20,7 +20,8 @@
 //=====================================================================================================================
 #include "settings.hpp"
 #include "action.hpp"
-#include "service_configuration.hpp"
+#include "configurable.hpp"
+#include "configuration.hpp"
 #include "typedefs.hpp"
 #include "dispatcher.hpp"
 #include "Logger/include/Logger.h"
@@ -32,17 +33,19 @@
 
 namespace trustwave {
 
-struct authenticated_scan_server {
+struct authenticated_scan_server:public configurable<cdcm_settings> {
     std::unique_ptr <ILogger> logger_ptr;
     Dispatcher <Action_Base> public_dispatcher;
-    Dispatcher <service_configuration> service_conf_reppsitory;
+    Dispatcher <configuration> service_conf_reppsitory;
     boost::shared_ptr <shared_mem_sessions_cache> sessions;
-    cdcm_settings settings;
     authenticated_scan_server(const authenticated_scan_server&) = delete;
     authenticated_scan_server& operator=(const authenticated_scan_server &) = delete;
     authenticated_scan_server(authenticated_scan_server &&) = delete;
     authenticated_scan_server & operator=(authenticated_scan_server &&) = delete;
-
+    std::shared_ptr<cdcm_settings> settings()
+    {
+        return conf_;
+    }
     static auto& instance()
     {
         static authenticated_scan_server app;

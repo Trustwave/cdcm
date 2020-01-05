@@ -19,34 +19,32 @@
 #include <taocpp-json/include/tao/json.hpp>
 
 namespace trustwave{
-    struct service_configuration {
-        virtual ~service_configuration() = default;
-        service_configuration(const service_configuration&) = default;
-        service_configuration(service_configuration&&) = default;
-        service_configuration& operator=(const service_configuration&) = default;
-        service_configuration& operator=(service_configuration&&) = delete;
-        service_configuration() = delete;
+    struct configuration {
+        virtual ~configuration() = default;
+        configuration(const configuration&) = default;
+        configuration(configuration&&) = default;
+        configuration& operator=(const configuration&) = default;
+        configuration& operator=(configuration&&) = delete;
+        configuration() = delete;
         const std::string_view name() const
         {
             return name_;
         }
-
+        const std::string_view name_;
     protected:
 
-        explicit service_configuration(const std::string_view name) :
+        explicit configuration(const std::string_view name) :
                 name_(name)
         {
         }
-        const std::string_view name_;
-        tao::json::value json_value_;
     };
 }
 
 namespace tao::json {
     template<>
-    struct traits<trustwave::service_configuration> : binding::object<
+    struct traits<trustwave::configuration> : binding::object<
 
-            TAO_JSON_BIND_REQUIRED("name", &trustwave::service_configuration::name) > {
+            TAO_JSON_BIND_REQUIRED("name", &trustwave::configuration::name_) > {
     };
 }
 

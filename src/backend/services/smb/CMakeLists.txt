@@ -6,9 +6,10 @@ add_library(tw-smb-client SHARED ${SOURCE_FILES})
 target_link_libraries(tw-smb-client smbclient tw-singleton-runner)
 add_subdirectory(actions)
 
-
 install(TARGETS tw-smb-client LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
 
 install(TARGETS tw-smb-client LIBRARY DESTINATION DESTINATION lib
         DESTINATION ${release_lib_dest})
+
+configure_file(smb.json ${release_lib_dest}/plugins/smb.json COPYONLY)

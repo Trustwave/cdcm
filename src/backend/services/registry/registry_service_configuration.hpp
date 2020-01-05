@@ -16,23 +16,23 @@
 #ifndef SRC_BACKEND_SERVICES_REGISTRY_REGISTRY_SERVICE_CONFIGURATION_HPP
 #define SRC_BACKEND_SERVICES_REGISTRY_REGISTRY_SERVICE_CONFIGURATION_HPP
 
-#include "service_configuration.hpp"
+#include "configuration.hpp"
 namespace trustwave
 {
-    struct registry_service_configuration : public service_configuration {
+    struct registry_service_configuration : public configuration {
         static constexpr std::string_view srv_name{"registry"};
         registry_service_configuration() :
-                service_configuration(srv_name) {
+                configuration(srv_name) {
         }
-        off_t max_mem_segment=512*1024*1024;
+        off_t data_blob_size=1024*1024;
 
     };
 }
 namespace tao::json {
     template<>
     struct traits<trustwave::registry_service_configuration>
-            : binding::object<binding::inherit<traits<trustwave::service_configuration> >,
-              TAO_JSON_BIND_OPTIONAL("max_mem_segment", &trustwave::registry_service_configuration::max_mem_segment) > {
+            : binding::object<binding::inherit<traits<trustwave::configuration> >,
+              TAO_JSON_BIND_OPTIONAL("data_blob_size", &trustwave::registry_service_configuration::data_blob_size) > {
     //TAO_JSON_DEFAULT_KEY(trustwave::registry_service_configuration::srv_name.data());
 
 
@@ -41,8 +41,7 @@ namespace tao::json {
     {
         trustwave::registry_service_configuration result;
         const auto o = v.at(trustwave::registry_service_configuration::srv_name);
-        result.max_mem_segment = o.template optional< off_t >( "max_mem_segment" ).value_or(result.max_mem_segment);
-
+        result.data_blob_size = o.template optional< off_t >( "data_blob_size" ).value_or(result.data_blob_size);
         return result;
     }
 };

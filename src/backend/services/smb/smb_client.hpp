@@ -54,7 +54,7 @@ struct dirent
 class smb_client: public cdcm_client,public file_reader_interface,public configurable<smb_service_configuration>
 {
 public:
-    smb_client()= default;
+    smb_client();
     ~smb_client() override
     = default;
     bool download( const char *base, const char *name, bool resume, bool toplevel,

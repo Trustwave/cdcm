@@ -15,7 +15,7 @@ using namespace std;
 using namespace trustwave;
 workers_monitor::workers_monitor(boost::asio::io_service& ios_) :
 ios(ios_),
-num_workers (authenticated_scan_server::instance().settings.worker_processes_), worker_bin_path("cdcm_worker")
+num_workers (authenticated_scan_server::instance().settings()->worker_processes_), worker_bin_path("cdcm_worker")
 {
 }
 
@@ -34,7 +34,7 @@ workers_monitor::~workers_monitor()
 }
 void workers_monitor::run()
 {
-    auto num_workers = authenticated_scan_server::instance().settings.worker_processes_;
+    auto num_workers = authenticated_scan_server::instance().settings()->worker_processes_;
     for (size_t i=1; i<= num_workers; ++i)
     {
         std::string worker_name = std::to_string(i);

@@ -55,6 +55,7 @@ namespace tao::json{
         {
             trustwave::local_start_session_msg result;
             const auto& object = v.at(trustwave::local_start_session_msg::act_name);
+            result.id_ = object.at( "id" ).template as< std::string >();
             result.remote = object.at( "remote" ).template as< std::string >();
             result.domain = object.at( "domain" ).template as< std::string >();
             result.username = object.at( "username" ).template as< std::string >();

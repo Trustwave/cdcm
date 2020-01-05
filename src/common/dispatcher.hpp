@@ -70,6 +70,16 @@ public:
         }
         return it->second;
     }
+    template <typename AS>
+    std::shared_ptr<AS> find_as() const
+    {
+        auto it = map_.find(AS::srv_name);
+
+        if (it == map_.end()) {
+            return std::shared_ptr<AS>();
+        }
+        return std::dynamic_pointer_cast<AS>( it->second);
+    }
     [[nodiscard]] bool has(const std::string &t_name) const
     {
         return  map_.cend() != map_.find(t_name);

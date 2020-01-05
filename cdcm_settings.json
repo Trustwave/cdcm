@@ -1,16 +1,16 @@
 {
     "cdcm": {
-        "heartbeat_liveness": "3",
-        "heartbeat_interval": "3",
-        "maintenance_interval": "3",
-        "reconnect": "3000",
-        "session_idle_time": "10",
-        "worker_processes": "1",
+        "heartbeat_liveness": 3,
+        "heartbeat_interval": 3,
+        "heartbeat_expiry": 3,
+        "maintenance_interval": 3,
+        "reconnect": 3000,
+        "session_idle_time": 10,
+        "worker_processes": 1,
         "broker_worker_listening_ep": "tcp:\/\/*:5556",
         "broker_client_listening_ep": "tcp:\/\/*:5555",
-        "worker_connect_ep": "tcp:\/\/127.0.0.1:5556",
-        "downloaded_file_path": "/var/cdcm/downloaded_files"
-   
-
+        "worker_connect_ep": "tcp://127.0.0.1:5556",
+        "downloaded_file_path": "/var/cdcm/downloaded_files",
+        "plugins_dir": "/opt/output/libs/plugins/"
     }
 }

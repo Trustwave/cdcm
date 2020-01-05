@@ -51,7 +51,6 @@ static void fc(int )
                        }
                    ]
            })";
-
     zmsg *reply = session.send_and_recv(get_session_m);
 
     if (reply) {
@@ -65,6 +64,7 @@ static void fc(int )
         auto act_id4 = boost::uuids::to_string(boost::uuids::random_generator()());
         auto act_id5 = boost::uuids::to_string(boost::uuids::random_generator()());
         auto act_id6 = boost::uuids::to_string(boost::uuids::random_generator()());
+        auto act_id7 = boost::uuids::to_string(boost::uuids::random_generator()());
         auto new_session_id = a1.msgs[0]->res();
         delete reply;
         reply = nullptr;
@@ -108,8 +108,19 @@ static void fc(int )
 
                             }
                     },
-{
-                      "get_file_info"  :
+{"enumerate"  :
+                            {
+                                "id": ")"
+                                            + act_id7
+                                            + R"(",
+                                "key":"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+
+
+
+
+                            }
+                    },
+                     { "get_file_info"  :
                             {
                                 "id": ")"
                                             + act_id6

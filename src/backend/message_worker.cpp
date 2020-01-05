@@ -33,9 +33,9 @@ using namespace trustwave;
 
 message_worker::message_worker(zmq::context_t &ctx) :
         context_(ctx), heartbeat_at_(), liveness_(
-        authenticated_scan_server::instance().settings.heartbeat_liveness_), heartbeat_(
-        authenticated_scan_server::instance().settings.heartbeat_interval_), reconnect_(
-        authenticated_scan_server::instance().settings.reconnect_), expect_reply_(false), replied_(
+        authenticated_scan_server::instance().settings()->heartbeat_liveness_), heartbeat_(
+        authenticated_scan_server::instance().settings()->heartbeat_interval_), reconnect_(
+        authenticated_scan_server::instance().settings()->reconnect_), expect_reply_(false), replied_(
         0) {
 }
 
@@ -77,15 +77,15 @@ void message_worker::connect_to_broker() {
     int linger = 0;
     worker_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
     zmq_helpers::set_id(*worker_);
-    worker_->connect(authenticated_scan_server::instance().settings.worker_connect_ep_);
+    worker_->connect(authenticated_scan_server::instance().settings()->worker_connect_ep_);
     AU_LOG_DEBUG("I: connecting to broker at %s...",
-                 authenticated_scan_server::instance().settings.worker_connect_ep_.c_str());
+                 authenticated_scan_server::instance().settings()->worker_connect_ep_.c_str());
 
     //  Register service with broker
     send_to_broker(MDPW_READY, "", nullptr);
 
     //  If liveness hits zero, queue is considered disconnected
-    liveness_ = authenticated_scan_server::instance().settings.heartbeat_liveness_;
+    liveness_ = authenticated_scan_server::instance().settings()->heartbeat_liveness_;
     heartbeat_at_ = zmq_helpers::clock() + heartbeat_;
 }
 
@@ -117,7 +117,7 @@ message_worker::recv(zmsg *&reply_p) {
             zmsg *msg = new zmsg(*worker_);
             AU_LOG_DEBUG("I: received message from broker body: %s", msg->body());
 
-            liveness_ = authenticated_scan_server::instance().settings.heartbeat_liveness_;
+            liveness_ = authenticated_scan_server::instance().settings()->heartbeat_liveness_;
 
             //  Don't try to handle errors, just assert noisily
             assert(msg->parts() >= 3);

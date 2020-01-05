@@ -28,7 +28,7 @@ using namespace trustwave;
 message_broker::message_broker(zmq::context_t &ctx) :
         context_(ctx), internal_socket_(new zmq::socket_t(context_, ZMQ_ROUTER)), external_socket_(
         new zmq::socket_t(context_, ZMQ_ROUTER)), workers_(
-        authenticated_scan_server::instance().settings.heartbeat_expiry_), replied_(0) {
+        authenticated_scan_server::instance().settings()->heartbeat_expiry_), replied_(0) {
 }
 
 //  ---------------------------------------------------------------------
@@ -45,13 +45,13 @@ message_broker::~message_broker()
 
 void message_broker::bind_internal()
 {
-    const auto ep = authenticated_scan_server::instance().settings.broker_worker_listen_ep_;
+    const auto ep = authenticated_scan_server::instance().settings()->broker_worker_listen_ep_;
     internal_socket_->bind(ep);
     AU_LOG_INFO("CDCM broker is internal active at %s", ep.c_str());
 }
 void message_broker::bind_external()
 {
-    const auto ep = authenticated_scan_server::instance().settings.broker_client_listen_ep_;
+    const auto ep = authenticated_scan_server::instance().settings()->broker_client_listen_ep_;
     external_socket_->bind(ep);
     AU_LOG_INFO("CDCM broker is external active at %s", ep.c_str());
 }
@@ -306,7 +306,7 @@ void message_broker::client_process(const std::string &sender, std::unique_ptr<z
                 known_actions_msg.msgs.push_back(act_m);
 
             } else{
-                AU_LOG_ERROR("%s not found! perhaps a worker plugin", act_key.c_str());
+                AU_LOG_DEBUG("%s not found! perhaps a worker plugin", act_key.c_str());
                 unknown_actions_msg.msgs.push_back(action_obj);
             }
     }
@@ -366,7 +366,7 @@ void message_broker::handle_message(zmq::socket_t &socket,const std::string& exp
 void message_broker::broker_loop()
 {
     auto now = zmq_helpers::clock();
-    auto heartbeat_at = now + std::chrono::milliseconds(authenticated_scan_server::instance().settings.heartbeat_interval_);
+    auto heartbeat_at = now + std::chrono::milliseconds(authenticated_scan_server::instance().settings()->heartbeat_interval_);
     zmq::pollitem_t items[] = { { internal_socket_->operator void *(), 0, ZMQ_POLLIN, 0 }, {
                     external_socket_->operator void *(), 0, ZMQ_POLLIN, 0 } };
     while (!zmq_helpers::interrupted){
@@ -400,7 +400,7 @@ void message_broker::broker_loop()
                 worker_send(*it, const_cast <char*>( MDPW_HEARTBEAT), "", nullptr);
             }
 
-            heartbeat_at +=  std::chrono::milliseconds(authenticated_scan_server::instance().settings.heartbeat_interval_);
+            heartbeat_at +=  std::chrono::milliseconds(authenticated_scan_server::instance().settings()->heartbeat_interval_);
             now = zmq_helpers::clock();
         }
     }

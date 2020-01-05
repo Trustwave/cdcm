@@ -31,15 +31,16 @@ extern "C" {
 
 #include "session.hpp"
 #include "credentials.hpp"
-
+#include "singleton_runner/authenticated_scan_server.hpp"
 using namespace trustwave;
 
 registry_client::registry_client() :
         ctx_(nullptr), ev_ctx_(nullptr),data_blob_{} {
+    this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
     ctx_ = talloc_zero(nullptr, struct regshell_context);
 
     ev_ctx_ = s4_event_context_init(ctx_);
-    data_blob_ = data_blob_talloc_zero(nullptr, 1024 * 1024);//fixme assaf move to conf
+    data_blob_ = data_blob_talloc_zero(nullptr, conf_->data_blob_size);
 
 }
 
