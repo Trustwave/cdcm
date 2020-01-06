@@ -25,7 +25,7 @@
 #include <memory>
 #include <string>                      // for string
 #include <utility>
-#include <taocpp-json/include/tao/json/value.hpp>//fixme assaf should use fwd decl
+#include <taocpp-json/include/tao/json/forward.hpp>
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
