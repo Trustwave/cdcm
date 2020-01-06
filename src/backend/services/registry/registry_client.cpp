@@ -37,7 +37,7 @@ using namespace trustwave;
 registry_client::registry_client() :
         ctx_(nullptr), ev_ctx_(nullptr),data_blob_{} {
     this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
-    ctx_ = talloc_zero(nullptr, struct regshell_context);
+    ctx_ = talloc_zero(nullptr, struct reg_context);
 
     ev_ctx_ = s4_event_context_init(ctx_);
     data_blob_ = data_blob_talloc_zero(nullptr, conf_->data_blob_size);

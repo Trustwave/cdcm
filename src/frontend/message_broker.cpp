@@ -313,7 +313,14 @@ void message_broker::client_process(const std::string &sender, std::unique_ptr<z
     }
     catch (std::exception &e) {
         AU_LOG_ERROR("Malformed message %s",e.what());
-        return;
+        trustwave::res_msg result_message;
+        result_message.hdr = unknown_actions_msg.hdr;
+        auto sess = trustwave::authenticated_scan_server::instance().get_session(result_message.hdr.session_id);
+        auto res = std::make_shared<trustwave::result_msg>();
+        result_message.msgs.push_back(res);
+        res->id("N/A");
+        res->res(std::string("Error: Malformed message ")+e.what());
+        send_local_to_client(result_message,sender, msg->unwrap());
     }
     AU_LOG_DEBUG("body : %s", msg->body());
     if (unknown_actions_msg.hdr.session_id != std::string("N/A")) {

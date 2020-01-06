@@ -113,7 +113,7 @@ static void fc(int )
                                 "id": ")"
                                             + act_id7
                                             + R"(",
-                                "key":"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                                "key":"\s /s SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 
 
 
