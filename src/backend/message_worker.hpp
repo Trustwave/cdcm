@@ -31,7 +31,7 @@ class session;
 class header;
 class action_msg;
 class res_msg;
-class message_worker
+class message_worker final
 {
 public:
 

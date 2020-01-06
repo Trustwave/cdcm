@@ -24,15 +24,22 @@
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
-struct credentials
+class credentials
 {
-
+public:
     credentials(const std::string& domain, const std::string& username, const std::string& password,
                     const std::string& workstation);
 
     ~credentials()=default;
     void creds(const std::string& domain, const std::string& username, const std::string& password,
                const std::string& workstation);
+    std::string domain() const;
+    std::string username() const;
+    std::string password() const;
+    std::string workstation() const;
+
+
+private:
     std::string domain_;
     std::string username_;
     std::string password_;

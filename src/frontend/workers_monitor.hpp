@@ -16,7 +16,7 @@
 #pragma GCC diagnostic pop
 #include <boost/asio.hpp>
 
-class workers_monitor
+class workers_monitor final
 {
 public:
     explicit workers_monitor( boost::asio::io_service& ios);

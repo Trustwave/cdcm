@@ -37,7 +37,7 @@ public:
 
    mdcli (std::string broker, int verbose)
    {
-       zmq_helpers::version_assert (4, 0);
+       trustwave::zmq_helpers::version_assert (4, 0);
 
        m_broker = broker;
        m_context = new zmq::context_t (1);
@@ -45,7 +45,7 @@ public:
        m_timeout = 10000;           //  msecs
        m_client = 0;
 
-       zmq_helpers::catch_signals ();
+       trustwave::zmq_helpers::catch_signals ();
        connect_to_broker ();
    }
 
@@ -72,10 +72,10 @@ public:
        m_client = new zmq::socket_t (*m_context, ZMQ_DEALER);
        int linger = 0;
        m_client->setsockopt (ZMQ_LINGER, &linger, sizeof (linger));
-       zmq_helpers::set_id(*m_client);
+       trustwave::zmq_helpers::set_id(*m_client);
        m_client->connect (m_broker.c_str());
        if (m_verbose)
-           zmq_helpers::console ("I: connecting to broker at %s...", m_broker.c_str());
+           trustwave::zmq_helpers::console ("I: connecting to broker at %s...", m_broker.c_str());
    }
 
 
@@ -107,7 +107,7 @@ public:
        request->push_front (trustwave::MDPC_CLIENT);
        request->push_front ((char*)"");
        if (m_verbose) {
-           zmq_helpers::console ("I: send request to '%s' service:", service.c_str());
+           trustwave::zmq_helpers::console ("I: send request to '%s' service:", service.c_str());
            request->dump ();
        }
        request->send (*m_client);
@@ -132,7 +132,7 @@ public:
        if (items[0].revents & ZMQ_POLLIN) {
            zmsg *msg = new zmsg (*m_client);
            if (m_verbose) {
-               zmq_helpers::console ("I: received reply:");
+               trustwave::zmq_helpers::console ("I: received reply:");
                msg->dump ();
            }
            //  Don't try to handle errors, just assert noisily
@@ -148,11 +148,11 @@ public:
 
            return msg;     //  Success
        }
-       if (zmq_helpers::interrupted)
+       if (trustwave::zmq_helpers::interrupted)
            std::cout << "W: interrupt received, killing client..." << std::endl;
        else
        if (m_verbose)
-           zmq_helpers::console ("W: permanent error, abandoning request");
+           trustwave::zmq_helpers::console ("W: permanent error, abandoning request");
 
        return 0;
    }

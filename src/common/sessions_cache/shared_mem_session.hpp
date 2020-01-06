@@ -38,7 +38,7 @@ class shared_mem_credentials;
 std::ostream &operator<<(std::ostream &, const shared_mem_session &);
 std::ostream &operator<<(std::ostream &, const shared_mem_credentials &);
 
-class shared_mem_credentials {
+class shared_mem_credentials final{
 public:
     ~shared_mem_credentials()=default;
     // Avoid copy semantic
@@ -62,7 +62,7 @@ private:
     String workstation_;
     };
 
-class shared_mem_session {
+class shared_mem_session final{
 public:
     ~shared_mem_session()=default;
     // Avoid copy semantic

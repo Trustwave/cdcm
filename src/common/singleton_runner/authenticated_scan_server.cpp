@@ -23,7 +23,7 @@ authenticated_scan_server::authenticated_scan_server() :
 
 
     auto fn = std::string(std::string(conf_root) + "/cdcm_settings.json");
-    const tao::json::value v = tao::json::parse_file(fn);
+    const tao::json::value v = tao::json::from_file(fn);
     conf_ = v.as<std::shared_ptr<cdcm_settings>>();
     service_conf_reppsitory.register1(conf_);
 

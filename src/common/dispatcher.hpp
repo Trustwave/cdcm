@@ -26,7 +26,7 @@
 //=====================================================================================================================
 namespace trustwave {
 template<typename T>
-class Dispatcher
+class Dispatcher final
 {
 protected:
 public:

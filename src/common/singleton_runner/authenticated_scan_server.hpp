@@ -33,11 +33,13 @@
 
 namespace trustwave {
 
-struct authenticated_scan_server:public configurable<cdcm_settings> {
+class authenticated_scan_server final:public configurable<cdcm_settings> {
+public:
     std::unique_ptr <ILogger> logger_ptr;
     Dispatcher <Action_Base> public_dispatcher;
     Dispatcher <configuration> service_conf_reppsitory;
     boost::shared_ptr <shared_mem_sessions_cache> sessions;
+    virtual ~authenticated_scan_server()=default;
     authenticated_scan_server(const authenticated_scan_server&) = delete;
     authenticated_scan_server& operator=(const authenticated_scan_server &) = delete;
     authenticated_scan_server(authenticated_scan_server &&) = delete;

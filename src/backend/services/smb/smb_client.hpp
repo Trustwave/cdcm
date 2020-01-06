@@ -51,11 +51,11 @@ struct dirent
     std::string name_;
     std::string type_;
 };
-class smb_client: public cdcm_client,public file_reader_interface,public configurable<smb_service_configuration>
+class smb_client final: public cdcm_client,public file_reader_interface,public configurable<smb_service_configuration>
 {
 public:
     smb_client();
-    ~smb_client() override
+    virtual ~smb_client() override
     = default;
     bool download( const char *base, const char *name, bool resume, bool toplevel,
                     const char *outfile);

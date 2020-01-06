@@ -83,15 +83,15 @@ static void smbc_auth_fn(const char *pServer, const char *, char *pWorkgroup, in
 
         AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
 
-        if(sess->creds().username_.empty())
+        if(sess->creds().username().empty())
         {
             strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1));
         } else {
-            strncpy(pWorkgroup, sess->creds().domain_.c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
+            strncpy(pWorkgroup, sess->creds().domain().c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
         }
 
-        strncpy(pUsername, sess->creds().username_.c_str(), static_cast<size_t>(maxLenUsername - 1));
-        strncpy(pPassword, sess->creds().password_.c_str(), static_cast<size_t>(maxLenPassword - 1));
+        strncpy(pUsername, sess->creds().username().c_str(), static_cast<size_t>(maxLenUsername - 1));
+        strncpy(pPassword, sess->creds().password().c_str(), static_cast<size_t>(maxLenPassword - 1));
         AU_LOG_INFO("smbc_auth_fn session for %s found and set", pServer);
         return;
     }

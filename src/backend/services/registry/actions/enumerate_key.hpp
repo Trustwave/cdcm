@@ -57,7 +57,7 @@ namespace tao::json {
 }
 namespace trustwave {
 
-class Enumerate_Key_Action: public Registry_Action
+class Enumerate_Key_Action final: public Registry_Action
 {
 
 public:

@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 namespace trustwave {
-class registry_value
+class registry_value final
 {
 public:
     registry_value() :

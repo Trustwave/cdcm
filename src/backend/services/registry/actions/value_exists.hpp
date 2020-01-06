@@ -59,7 +59,7 @@ namespace tao::json {
 }
 namespace trustwave {
 
-class Value_Exists_Action: public Registry_Action
+class Value_Exists_Action final: public Registry_Action
 {
 public:
     Value_Exists_Action() :

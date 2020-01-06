@@ -59,7 +59,7 @@ struct worker {
     }
 };
 using sp_worker_t = std::shared_ptr<worker>;
-class worker_container {
+class worker_container final {
 public:
     //Tags
     struct id; // worker id

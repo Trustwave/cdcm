@@ -57,7 +57,7 @@ namespace tao::json {
 }
 namespace trustwave {
 
-    class SMB_List_Dir: public Action_Base
+    class SMB_List_Dir final: public Action_Base
     {
     public:
         SMB_List_Dir() :

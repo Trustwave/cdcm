@@ -46,15 +46,15 @@ namespace trustwave {
 
         bool map_chunk(size_t offset, size_t size);
 
-        inline bool in_bound(size_t offset, size_t size) {
-            return size + offset <= allocated_size_;
-        }
-
-        inline char *data() {
+        inline char *data() const {
             return data_.get();
         }
 
     private:
+
+        inline bool in_bound(size_t offset, size_t size) const {
+            return size + offset <= allocated_size_;
+        }
         [[nodiscard]] size_t minimum_read_size(size_t offset, size_t size) const;
         file_reader_interface& fr_;
         uintmax_t allocated_size_;

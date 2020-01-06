@@ -1,0 +1,5 @@
+{
+  "winrm": {
+    "service_port": 5983
+  }
+}

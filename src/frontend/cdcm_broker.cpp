@@ -38,8 +38,8 @@ int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::bro
 }
 int main(int , const char **)
 {
-    zmq_helpers::version_assert(4, 0);
-    zmq_helpers::catch_signals();
+    trustwave::zmq_helpers::version_assert(4, 0);
+    trustwave::zmq_helpers::catch_signals();
 
     return trustwave::authenticated_scan_server::instance().run_as <::trustwave::process_type::broker>();
 }

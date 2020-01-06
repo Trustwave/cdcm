@@ -44,7 +44,7 @@ namespace trustwave
                     try {
                         static const auto fn = std::string(service_conf_reppsitory.find_as<cdcm_settings>()->plugins_dir_) + std::string(
                                 T::srv_name) + std::string(".json");
-                        const tao::json::value v = tao::json::parse_file(fn);
+                        const tao::json::value v = tao::json::from_file(fn);
                         conf_ = v.as<std::shared_ptr<T>>();
                         service_conf_reppsitory.register1(conf_);
                     }

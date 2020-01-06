@@ -28,3 +28,19 @@ void credentials::creds(const std::string& domain, const std::string& username, 
      password_=password;
      workstation_=workstation;
 }
+std::string credentials::domain() const
+{
+    return domain_;
+}
+std::string credentials::username() const
+{
+    return username_;
+}
+std::string credentials::password() const
+{
+    return password_;
+}
+std::string credentials::workstation() const
+{
+    return workstation_;
+}

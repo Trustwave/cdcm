@@ -23,7 +23,7 @@
 #include <iostream>                      // for basic_ostream::operator<<
 #include <zmq.h>                         // for zmq_version, ZMQ_IDENTITY
 #include <zmq.hpp>                       // for socket_t
-
+using namespace trustwave;
 std::string
 zmq_helpers::set_id (zmq::socket_t & socket)
 {

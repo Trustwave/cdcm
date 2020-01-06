@@ -49,7 +49,7 @@ namespace trustwave {
 class session;
 class registry_value;
 class enum_key;
-struct regshell_context
+struct reg_context
 {
     struct registry_context *registry;
     char *path;
@@ -59,7 +59,7 @@ struct regshell_context
 };
 using result = std::tuple<bool,WERROR>;
 
-class registry_client: public cdcm_client,public configurable<registry_service_configuration>
+class registry_client final: public cdcm_client,public configurable<registry_service_configuration>
 {
     struct key_info
     {
@@ -87,7 +87,7 @@ public:
 private:
     result key_get_info(key_info&);
 
-    regshell_context *ctx_;
+    reg_context *ctx_;
     tevent_context *ev_ctx_;
     DATA_BLOB data_blob_;
 

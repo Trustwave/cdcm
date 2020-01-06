@@ -16,7 +16,7 @@
 #ifndef UTILS_BOUNDED_CHUNK_HPP
 #define UTILS_BOUNDED_CHUNK_HPP
 namespace trustwave {
-    class bounded_chunk {
+    class bounded_chunk final{
     public:
         typedef size_t offset_type;
         bounded_chunk(offset_type off, offset_type s) : offset_(off), end_(s) {

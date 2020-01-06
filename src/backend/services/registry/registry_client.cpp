@@ -54,10 +54,10 @@ registry_client::~registry_client() {
 result registry_client::connect(const session &sess) {
 
         auto creds = ::cli_credentials_init(nullptr);
-    cli_credentials_set_domain(creds, sess.creds().domain_.c_str(), CRED_SPECIFIED);
-    cli_credentials_set_username(creds, sess.creds().username_.c_str(), CRED_SPECIFIED);
-    cli_credentials_set_password(creds, sess.creds().password_.c_str(), CRED_SPECIFIED);
-    cli_credentials_set_workstation(creds, sess.creds().workstation_.c_str(), CRED_SPECIFIED);
+    cli_credentials_set_domain(creds, sess.creds().domain().c_str(), CRED_SPECIFIED);
+    cli_credentials_set_username(creds, sess.creds().username().c_str(), CRED_SPECIFIED);
+    cli_credentials_set_password(creds, sess.creds().password().c_str(), CRED_SPECIFIED);
+    cli_credentials_set_workstation(creds, sess.creds().workstation().c_str(), CRED_SPECIFIED);
     WERROR error = reg_open_remote(nullptr, &ctx_->registry, nullptr, creds, ::loadparm_init_global(false),
                                    sess.remote().c_str(), ev_ctx_);
 

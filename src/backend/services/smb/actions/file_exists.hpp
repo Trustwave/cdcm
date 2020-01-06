@@ -57,7 +57,7 @@ namespace tao::json {
     };
 }
 namespace trustwave{
-    class SMB_File_Exists: public Action_Base
+    class SMB_File_Exists final: public Action_Base
     {
     public:
 

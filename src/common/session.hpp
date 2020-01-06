@@ -33,7 +33,7 @@ enum cdcm_client_type {
 
 
 class cdcm_client;
-class session {
+class session final{
 public:
     session();
     session(std::string  remote, const credentials& creds);

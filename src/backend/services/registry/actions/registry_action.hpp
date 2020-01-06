@@ -36,7 +36,7 @@ public:
     {
     }
 
-    std::shared_ptr<registry_client> client(boost::shared_ptr<session>,
+    static std::shared_ptr<registry_client> client(boost::shared_ptr<session>,
                     std::shared_ptr <result_msg> res);
 };
 }

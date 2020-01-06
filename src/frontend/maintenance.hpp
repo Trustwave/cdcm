@@ -19,7 +19,7 @@
 #include <boost/asio.hpp>
 #include <chrono>
 namespace trustwave {
-    class maintenance
+    class maintenance final
     {
     public:
        explicit maintenance(boost::asio::io_service& ios);

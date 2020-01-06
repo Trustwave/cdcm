@@ -35,7 +35,7 @@ namespace trustwave {
 class session;
 struct action_msg;
 struct result_msg;
-class Action_Base: public boost::noncopyable
+class Action_Base
 {
 public:
     explicit Action_Base( const std::string_view name) :
@@ -45,7 +45,10 @@ public:
 
     virtual ~Action_Base()
     = default;
-
+    Action_Base(const Action_Base&)=delete;
+    Action_Base& operator=(const Action_Base&)=delete;
+    Action_Base(const Action_Base&&)=delete;
+    Action_Base& operator=(const Action_Base&&)=delete;
     [[nodiscard]]std::string_view name() const
     {
         return name_;

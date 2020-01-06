@@ -51,7 +51,7 @@ namespace tao::json
 }
 namespace trustwave {
 
-class Close_Session: public Action_Base
+class Close_Session final: public Action_Base
 {
     static Dispatcher<Action_Base>::Registrator m_registrator;
 

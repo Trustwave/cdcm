@@ -22,7 +22,7 @@ namespace trustwave {
     class shared_library;
     template <typename T>
     class Dispatcher;
-    class action_manager {
+    class action_manager final{
       public:
      static  std::vector<std::shared_ptr<shared_library>> load(const boost::filesystem::path&,Dispatcher<Action_Base> &);
 

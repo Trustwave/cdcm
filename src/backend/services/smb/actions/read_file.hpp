@@ -61,7 +61,7 @@ namespace tao::json {
 }
 namespace trustwave {
 
-    class SMB_Read_File: public Action_Base
+    class SMB_Read_File final: public Action_Base
     {
     public:
         SMB_Read_File() :

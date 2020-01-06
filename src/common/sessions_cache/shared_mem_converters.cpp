@@ -43,10 +43,10 @@ trustwave::shared_mem_session trustwave::session_converter::convert(const sp_ses
     auto remote = session->remote();
     rv.remote_ = String(remote.c_str(), remote.length(), va);
     credentials c = session->creds();
-    rv.creds_.domain_ = String(c.domain_.c_str(),c.domain_.length(), va);
-    rv.creds_.username_ = String(c.username_.c_str(),c.username_.length(), va);
-    rv.creds_.password_ = String(c.password_.c_str(),c.password_.length(), va);
-    rv.creds_.workstation_ = String(c.workstation_.c_str(),c.workstation_.length(), va);
+    rv.creds_.domain_ = String(c.domain().c_str(),c.domain().length(), va);
+    rv.creds_.username_ = String(c.username().c_str(),c.username().length(), va);
+    rv.creds_.password_ = String(c.password().c_str(),c.password().length(), va);
+    rv.creds_.workstation_ = String(c.workstation().c_str(),c.workstation().length(), va);
     return rv;
 }
 

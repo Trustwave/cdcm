@@ -34,7 +34,7 @@ class session;
 struct header;
 class action_msg;
 class res_msg;
-class message_broker {
+class message_broker final{
     //  This defines one worker, idle or active
 
 public:

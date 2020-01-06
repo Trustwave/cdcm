@@ -26,22 +26,21 @@
 template<>
 int trustwave::authenticated_scan_server::run_as <::trustwave::process_type::worker>(size_t id)
 {
-    std::cout << "authenticated_scan_server::run_as <::trustwave::process_type::worker>. worker id " << id << std::endl;
+    std::cout << "authenticated_scan_server running as worker id " << id << std::endl;
     LoggerSource::instance()->set_source(::trustwave::logger::worker, id);
     if (!Initialize(logger_ptr, conf_root)){
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }
-  //  std::cerr << "worker "<< id << " logger initialised!!!" << std::endl;
-    auto sl_vec = action_manager::load("/opt/output/libs/plugins/",public_dispatcher);//fixme assaf move to conf
+    auto sl_vec = action_manager::load(conf_->plugins_dir_,public_dispatcher);
     std::thread worker_thread(message_worker::worker_loop);
     worker_thread.join();
     return 0;
 }
 int main(int , char **argv)
 {
-    zmq_helpers::version_assert(4, 0);
-    zmq_helpers::catch_signals();
+    trustwave::zmq_helpers::version_assert(4, 0);
+    trustwave::zmq_helpers::catch_signals();
     return trustwave::authenticated_scan_server::instance().run_as <::trustwave::process_type::worker>(
                     std::stoull(argv[1]));
 }
