@@ -114,35 +114,40 @@ message_worker::recv(zmsg *&reply_p) {
         zmq::poll(items, 1, heartbeat_.count());
 
         if (items[0].revents & ZMQ_POLLIN) {
-            zmsg *msg = new zmsg(*worker_);
-            AU_LOG_DEBUG("I: received message from broker body: %s", msg->body());
+            auto msg = std::make_unique<zmsg>();
+            if( msg->recv(*worker_)) {
+                AU_LOG_DEBUG("I: received message from broker body: %s", msg->body());
 
-            liveness_ = authenticated_scan_server::instance().settings()->heartbeat_liveness_;
+                liveness_ = authenticated_scan_server::instance().settings()->heartbeat_liveness_;
 
-            //  Don't try to handle errors, just assert noisily
-            assert(msg->parts() >= 3);
+                //  Don't try to handle errors, just assert noisily
+                assert(msg->parts() >= 3);
 
-            std::basic_string<unsigned char> empty = msg->pop_front();
-            assert(empty.compare(reinterpret_cast <const unsigned char *>("")) == 0);
+                auto empty = msg->pop_front();
+                assert(empty.compare(reinterpret_cast <const unsigned char *>("")) == 0);
 
-            std::basic_string<unsigned char> header = msg->pop_front();
-            AU_LOG_DEBUG("I: input message (%s)", header.c_str());
-            assert(header.compare(reinterpret_cast<const unsigned char * >(MDPW_WORKER)) == 0);
+                auto header = msg->pop_front();
+                AU_LOG_DEBUG("I: input message (%s)", header.c_str());
+                assert(header.compare(reinterpret_cast<const unsigned char * >(MDPW_WORKER)) == 0);
 
-            std::string command = reinterpret_cast <const char *>(msg->pop_front().c_str());
-            if (command.compare(MDPW_REQUEST) == 0) {
-                //  We should pop and save as many addresses as there are
-                //  up to a null part, but for now, just save one...
-                reply_to_ = msg->unwrap();
-                return msg;     //  We have a request to process
-            } else if (command.compare(MDPW_HEARTBEAT) == 0) {
-                //  Do nothing for heartbeats
-            } else if (command.compare(MDPW_DISCONNECT) == 0) {
-                connect_to_broker();
-            } else {
-                AU_LOG_DEBUG("E: invalid input message (%d)", (int) *(command.c_str()));
+                std::string command = reinterpret_cast <const char *>(msg->pop_front().c_str());
+                if (command.compare(MDPW_REQUEST) == 0) {
+                    //  We should pop and save as many addresses as there are
+                    //  up to a null part, but for now, just save one...
+                    reply_to_ = msg->unwrap();
+                    return msg.release();     //  We have a request to process
+                } else if (command.compare(MDPW_HEARTBEAT) == 0) {
+                    //  Do nothing for heartbeats
+                } else if (command.compare(MDPW_DISCONNECT) == 0) {
+                    connect_to_broker();
+                } else {
+                    AU_LOG_DEBUG("E: invalid input message (%d)", (int) *(command.c_str()));
+                }
             }
-            delete msg;
+            else
+            {
+                AU_LOG_DEBUG("I: invalid input message from broker body: %s", msg->body());
+            }
         } else if (--liveness_ == 0) {
             AU_LOG_DEBUG("W: disconnected from broker - retrying...");
             //sleep is allowed because there is absolutely nothing to do till reconnect time

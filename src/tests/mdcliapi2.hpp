@@ -130,7 +130,11 @@ public:
 
        //  If we got a reply, process it
        if (items[0].revents & ZMQ_POLLIN) {
-           zmsg *msg = new zmsg (*m_client);
+           zmsg *msg = new zmsg ();
+           if(!msg->recv(*m_client))
+           {
+               std::cout << "W: BAD MESSAGE" << std::endl;
+           }
            if (m_verbose) {
                trustwave::zmq_helpers::console ("I: received reply:");
                msg->dump ();

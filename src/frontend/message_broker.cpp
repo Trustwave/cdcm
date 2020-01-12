@@ -349,8 +349,8 @@ void message_broker::handle_message(zmq::socket_t &socket,const std::string& exp
                 std::function <void(std::string, std::unique_ptr <zmsg>&&)> process_func)
 {
 
-    std::unique_ptr <zmsg> msg = std::make_unique <zmsg>(socket);
-    if (msg->parts() == 0){
+    std::unique_ptr <zmsg> msg = std::make_unique <zmsg>();
+    if (!msg->recv(socket) || msg->parts() == 0){
         AU_LOG_ERROR("empty message");
     }
     else{
