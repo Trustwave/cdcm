@@ -11,7 +11,7 @@
 // Revision: 01.00
 // By      : Assaf Cohen
 // Date    : 4 Jul 2019
-// Comments:
+// Comments: 
 
 //=====================================================================================================================
 //                                                  Include files
@@ -22,18 +22,19 @@
 
 using namespace trustwave;
 
-int Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
+int Close_Session::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
-    if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
-        return -1;
-    }
+    if (!sess || (sess && sess->id().is_nil())) {
+         res->res("Error: Session not found");
+         return -1;
+     }
 
     authenticated_scan_server::instance().sessions->remove_by_id(sess->idstr());
     res->id(am->id());
     res->res("Session closed");
     return 0;
+
 }
 
-Dispatcher<Action_Base>::Registrator
-    Close_Session::m_registrator(new Close_Session, authenticated_scan_server::instance().public_dispatcher);
+Dispatcher<Action_Base>::Registrator Close_Session::m_registrator(new Close_Session,
+                authenticated_scan_server::instance().public_dispatcher);

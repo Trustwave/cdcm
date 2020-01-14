@@ -15,87 +15,85 @@
 // Comments: First Issue
 //===========================================================================
 #ifndef COMMON_OBSERVER_H
-#define COMMON_OBSERVER_H
+#define	COMMON_OBSERVER_H
 //===========================================================================
 //								Include Files.
 //===========================================================================
-#include <algorithm>
 #include <list>
+#include <algorithm>
 
 namespace trustwave {
-    namespace Patterns {
-        //===========================================================================
-        //								Forward declaration.
-        //===========================================================================
-        class Publisher;
-        //===========================================================================
-        // @{CSEH}
-        //								Subscriber
-        //
-        //---------------------------------------------------------------------------
-        // Description    :
-        //
-        //===========================================================================
-        class Subscriber {
-        public:
-            virtual ~Subscriber() {}
+namespace Patterns {
+//===========================================================================
+//								Forward declaration.
+//===========================================================================
+class Publisher;
+//===========================================================================
+// @{CSEH}
+//								Subscriber
+// 
+//---------------------------------------------------------------------------
+// Description    : 
+//
+//===========================================================================
+class Subscriber {
+public:
+	virtual ~Subscriber() { }
+	
+	virtual void update_subscriber(Publisher* changed_publisher, long hint=0) = 0;
 
-            virtual void update_subscriber(Publisher* changed_publisher, long hint = 0) = 0;
+protected:
+	Subscriber() { }
+};
+//===========================================================================
+// @{CSEH}
+//								Publisher
+// 
+//---------------------------------------------------------------------------
+// Description    : 
+//
+//===========================================================================
+class Publisher {
+	using subscriber_t = std::list<Subscriber*>;
 
-        protected:
-            Subscriber() {}
-        };
-        //===========================================================================
-        // @{CSEH}
-        //								Publisher
-        //
-        //---------------------------------------------------------------------------
-        // Description    :
-        //
-        //===========================================================================
-        class Publisher {
-            using subscriber_t = std::list<Subscriber*>;
+protected:
+	Publisher() { }
 
-        protected:
-            Publisher() {}
+public:
+	virtual ~Publisher() { }
 
-        public:
-            virtual ~Publisher() {}
+    Publisher(Publisher const&) = delete;
+    Publisher& operator =(Publisher const&) = delete;
+	Publisher(Publisher &&obj) noexcept = delete;
+	Publisher& operator=(Publisher &&obj) noexcept = delete;
 
-            Publisher(Publisher const&) = delete;
-            Publisher& operator=(Publisher const&) = delete;
-            Publisher(Publisher&& obj) noexcept = delete;
-            Publisher& operator=(Publisher&& obj) noexcept = delete;
+	bool add_subscriber(Subscriber *o) {
+		subscribers_.push_back(o);		
+		return true;
+	}
 
-            bool add_subscriber(Subscriber* o)
-            {
-                subscribers_.push_back(o);
-                return true;
-            }
+	bool remove_subscriber(Subscriber* o) {
+		auto it=std::find(subscribers_.begin(),subscribers_.end(),o);
+		
+		bool found_subscriber = (it != subscribers_.end());
+		if(found_subscriber) {
+			subscribers_.erase(it,it);
+		}
+		return found_subscriber;
+	}
 
-            bool remove_subscriber(Subscriber* o)
-            {
-                auto it = std::find(subscribers_.begin(), subscribers_.end(), o);
+	void notify_change(long hint=0)
+	{
+		for( auto s : subscribers_ ) {
+			s->update_subscriber(this, hint);
+		}
+	}
 
-                bool found_subscriber = (it != subscribers_.end());
-                if(found_subscriber) {
-                    subscribers_.erase(it, it);
-                }
-                return found_subscriber;
-            }
+private:
+	subscriber_t subscribers_;
+};
 
-            void notify_change(long hint = 0)
-            {
-                for(auto s: subscribers_) {
-                    s->update_subscriber(this, hint);
-                }
-            }
-
-        private:
-            subscriber_t subscribers_;
-        };
-
-    } // namespace Patterns
-} // namespace trustwave
+} // Patterns
+} // trustwave
 
 #endif // COMMON_OBSERVER_H

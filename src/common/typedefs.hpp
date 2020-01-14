@@ -11,20 +11,21 @@
 // Revision: 01.00
 // By      : Assaf Cohen
 // Date    : 5 Aug 2019
-// Comments:
+// Comments: 
 
 #ifndef TRUSTWAVE_COMMON_TYPEDEFS_HPP_
 #define TRUSTWAVE_COMMON_TYPEDEFS_HPP_
 
-namespace trustwave {
+namespace trustwave{
 
-    struct process_type {
-        struct broker;
-        struct worker;
-    };
+struct process_type
+{
+    struct     broker;
+    struct     worker;
+};
 
-    static constexpr std::string_view conf_root("/var/cdcm/conf/");
+static constexpr std::string_view conf_root("/var/cdcm/conf/");
 
-} // namespace trustwave
+}
 
 #endif /* TRUSTWAVE_COMMON_TYPEDEFS_HPP_ */

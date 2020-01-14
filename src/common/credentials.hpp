@@ -24,25 +24,27 @@
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
-    class credentials {
-    public:
-        credentials(const std::string& domain, const std::string& username, const std::string& password,
+class credentials
+{
+public:
+    credentials(const std::string& domain, const std::string& username, const std::string& password,
                     const std::string& workstation);
 
-        ~credentials() = default;
-        void creds(const std::string& domain, const std::string& username, const std::string& password,
-                   const std::string& workstation);
-        std::string domain() const;
-        std::string username() const;
-        std::string password() const;
-        std::string workstation() const;
+    ~credentials()=default;
+    void creds(const std::string& domain, const std::string& username, const std::string& password,
+               const std::string& workstation);
+    std::string domain() const;
+    std::string username() const;
+    std::string password() const;
+    std::string workstation() const;
 
-    private:
-        std::string domain_;
-        std::string username_;
-        std::string password_;
-        std::string workstation_;
-    };
-} // namespace trustwave
+
+private:
+    std::string domain_;
+    std::string username_;
+    std::string password_;
+    std::string workstation_;
+};
+}
 
 #endif /* TRUSTWAVE_COMMON_CREDENTIALS_HPP_ */

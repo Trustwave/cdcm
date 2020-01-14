@@ -11,7 +11,7 @@
 // Revision: 01.00
 // By      : Assaf Cohen
 // Date    : 4 Jul 2019
-// Comments:
+// Comments: 
 
 //=====================================================================================================================
 //                                                  Include files
@@ -30,50 +30,55 @@
 //=====================================================================================================================
 namespace tao ::json {
 
-    template<>
-    struct traits<trustwave::registry_value>:
-        binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
-                        TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_),
-                        TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
-    };
-    template<>
-    struct traits<trustwave::sub_key>:
-        binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::sub_key::name_),
-                        TAO_JSON_BIND_REQUIRED("class_name", &trustwave::sub_key::class_name_),
-                        TAO_JSON_BIND_REQUIRED("last_modified", &trustwave::sub_key::last_modified_)> {
-    };
+template<>
+struct traits <trustwave::registry_value> : binding::object <
+TAO_JSON_BIND_REQUIRED ("name", &trustwave::registry_value::name_),
+TAO_JSON_BIND_REQUIRED ("type", &trustwave::registry_value::type_),
+TAO_JSON_BIND_REQUIRED ("value", &trustwave::registry_value::value_)>
+{
+};
+template<>
+struct traits <trustwave::sub_key> : binding::object <
+TAO_JSON_BIND_REQUIRED ("name", &trustwave::sub_key::name_),
+TAO_JSON_BIND_REQUIRED ("class_name", &trustwave::sub_key::class_name_),
+TAO_JSON_BIND_REQUIRED ("last_modified", &trustwave::sub_key::last_modified_)>
+{
+};
 
-    template<>
-    struct traits<trustwave::enum_key>:
-        binding::object<TAO_JSON_BIND_REQUIRED("sub_keys", &trustwave::enum_key::sub_keys_),
-                        TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key::registry_values_)> {
-    };
-} // namespace tao::json
+template<>
+struct traits <trustwave::enum_key> : binding::object <
+TAO_JSON_BIND_REQUIRED ("sub_keys", &trustwave::enum_key::sub_keys_),
+TAO_JSON_BIND_REQUIRED ("registry_values", &trustwave::enum_key::registry_values_)>
+{
+};
+}
+
 
 using namespace trustwave;
 
-int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                              std::shared_ptr<result_msg> res)
+int Enumerate_Key_Action::act(boost::shared_ptr <session> sess, std::shared_ptr <action_msg> action,
+                std::shared_ptr <result_msg> res)
 {
-    if(!sess || (sess && sess->id().is_nil())) {
+
+    if (!sess || (sess && sess->id().is_nil())){
         res->res("Error: Session not found");
         return -1;
     }
     auto c = client(sess, res);
 
-    if(!c) {
+    if (!c){
         return -1;
     }
-    auto ekact = std::dynamic_pointer_cast<reg_action_enum_key_msg>(action);
-    if(!ekact) {
+    auto ekact = std::dynamic_pointer_cast <reg_action_enum_key_msg>(action);
+    if (!ekact){
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error: Internal error");
         return -1;
     }
-    result r = c->connect(*sess);
-    if(!std::get<0>(r)) {
-        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+    result r=c->connect(*sess);
+    if (!std::get <0>(r)){
+        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(),win_errstr(std::get <1>(r)));
+        res->res(std::string("Error: ")+std::string(win_errstr(std::get <1>(r))));
         return -1;
     }
 
@@ -82,23 +87,26 @@ int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<a
     if(std::get<0>(ret)) {
         const tao::json::value v1 = ek;
         res->res(to_string(v1, 2));
+
     }
-    else {
-        auto status = werror_to_ntstatus(std::get<1>(ret));
-        AU_LOG_DEBUG("%s", nt_errstr(status));
-        res->res(std::string("Error: ") + nt_errstr(status));
+    else
+    {
+        auto status =werror_to_ntstatus(std::get<1>(ret));
+        AU_LOG_DEBUG("%s",nt_errstr(status));
+        res->res(std::string("Error: ")+nt_errstr(status));
     }
     return 0;
 }
 //
-// Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
+//Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
 //                authenticated_scan_server::instance().public_dispatcher);
+
 
 // instance of the our plugin
 static std::shared_ptr<Enumerate_Key_Action> instance = nullptr;
 
+
 // extern function, that declared in "action.hpp", for export the plugin from dll
-std::shared_ptr<trustwave::Action_Base> import_action()
-{
+std::shared_ptr<trustwave::Action_Base> import_action() {
     return instance ? instance : (instance = std::make_shared<Enumerate_Key_Action>());
 }

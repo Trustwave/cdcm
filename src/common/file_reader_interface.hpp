@@ -3,7 +3,7 @@
 //														file_reader_interface.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION: 
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -22,13 +22,13 @@
 namespace trustwave {
     class file_reader_interface {
     public:
-        virtual ssize_t read(size_t offset, size_t size, char* dest) = 0;
+        virtual ssize_t read(size_t offset, size_t size, char *dest) = 0;
 
         [[nodiscard]] virtual uintmax_t file_size() const = 0;
 
         [[nodiscard]] virtual bool validate_open() = 0;
 
-        virtual ~file_reader_interface() = default;
+        virtual ~file_reader_interface()=default;
     };
-} // namespace trustwave
-#endif // SRC_COMMON_FILE_READER_INTERFACE_HPP
+}
+#endif //SRC_COMMON_FILE_READER_INTERFACE_HPP

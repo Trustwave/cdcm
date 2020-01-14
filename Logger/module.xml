@@ -1,30 +1,30 @@
 <?xml version="1.0"?>
 <Logger>
-    <version>1</version>
-    <Project>
-        <name>Credentialed_Scanner</name>
-        <level>30</level>
-        <severity_levels>
-            <debug1 value="1"/>
-            <debug2 value="2"/>
-            <info value="4"/>
-            <warning value="8"/>
-            <error value="16"/>
-        </severity_levels>
-        <modules>
-            <module name="broker" id="1" level="30" enable="true"/>
-            <module name="worker" id="2" level="30" enable="true"/>
-        </modules>
-        <supported_sinks>
-            <sink name="file">
-                <id>1</id>
-                <path>/var/cdcm/log/</path>
-                <name>cdcm</name>
-                <filter>debug1</filter>
-                <enable>true</enable>
-            </sink>
+  <version>1</version>
+  <Project>
+    <name>Credentialed_Scanner</name>
+    <level>30</level>
+    <severity_levels>
+    <debug1 value="1"/>
+        <debug2 value="2"/>
+        <info value="4"/>
+        <warning value="8"/>
+        <error value="16"/>
+    </severity_levels>
+    <modules>
+        <module name="broker" id="1" level="30" enable="true"/>
+        <module name="worker" id="2" level="30" enable="true"/>
+     </modules>
+    <supported_sinks>
+      <sink name="file">
+        <id>1</id>
+        <path>/var/cdcm/log/</path>
+        <name>cdcm</name>
+        <filter>debug1</filter>
+        <enable>true</enable>
+      </sink>
 
-        </supported_sinks>
-    </Project>
+    </supported_sinks>
+  </Project> 
 </Logger>
 

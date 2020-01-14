@@ -5,8 +5,9 @@
 #ifndef ROTEM_OS_H
 #define ROTEM_OS_H
 
+
 #ifdef _WIN32
-// define something for Windows (32-bit and 64-bit, this part is common)
+   //define something for Windows (32-bit and 64-bit, this part is common)
 #define WINDOWS_OS
 
 //   #ifdef _WIN64
@@ -27,13 +28,14 @@
 //    #   error "Unknown Apple platform"
 //    #endif
 #elif __linux__
-// linux
+    // linux
 #elif __unix__ // all unices not caught above
-// Unix
+    // Unix
 #elif defined(_POSIX_VERSION)
-// POSIX
+    // POSIX
 #else
-#error "Unknown compiler"
+#   error "Unknown compiler"
 #endif
 
-#endif // ROTEM_OS_H
+
+#endif //ROTEM_OS_H

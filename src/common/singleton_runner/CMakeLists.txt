@@ -8,5 +8,5 @@ target_link_libraries(tw-singleton-runner tw-logger tw-sessions-cache)
 install(TARGETS tw-singleton-runner LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
 
-install(TARGETS tw-singleton-runner LIBRARY DESTINATION lib
+install(TARGETS   tw-singleton-runner LIBRARY  DESTINATION lib
         DESTINATION ${release_lib_dest})

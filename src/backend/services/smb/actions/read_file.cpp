@@ -3,7 +3,7 @@
 //														read_file.cpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION: 
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -31,64 +31,60 @@ namespace {
         const char base64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                       "abcdefghijklmnopqrstuvwxyz"
                                       "0123456789+/";
-        // A constant defined by Base64 algorithm
+// A constant defined by Base64 algorithm
         const unsigned char PAD = '=';
-    } // namespace
+    }
 
-    static constexpr size_t base64_encoded_length(size_t origLen) { return (((origLen + 2) / 3) << 2); }
+    static constexpr size_t base64_encoded_length(size_t origLen) {
+        return (((origLen + 2) / 3) << 2);
+    }
 
-    std::string base64_encode(const char* inBuf, ssize_t inLen)
-    {
-        if(nullptr == inBuf || 0 == inLen) {
-            AU_LOG_ERROR("inLen : %d inBuf : ", inLen, inBuf);
+
+    std::string base64_encode(const char *inBuf, ssize_t inLen
+                                        ) {
+        if (nullptr == inBuf|| 0 == inLen ) {
+            AU_LOG_ERROR("inLen : %d inBuf : ",inLen,inBuf);
             return std::string();
         }
 
-        unsigned int bitsContainer = 0; // A container for 24 bits from the input stream
-        unsigned char currByte; // A current byte from the input stream
-        size_t charCount = 0; // Count byte tripples
-        size_t outPos = 0; // Current letter in the output stream
+        unsigned int bitsContainer = 0;     // A container for 24 bits from the input stream
+        unsigned char currByte;             // A current byte from the input stream
+        size_t charCount = 0;               // Count byte tripples
+        size_t outPos = 0;                  // Current letter in the output stream
 
-        std::string ret(base64_encoded_length(inLen) + 1, '\0');
-        while(inLen--) // Scan the input bit stream
+        std::string ret(base64_encoded_length(inLen)+1,'\0');
+        while (inLen--)                     // Scan the input bit stream
         {
             currByte = *(inBuf++);
             bitsContainer |= currByte;
             charCount++;
 
-            if(3 == charCount) {
+            if (3 == charCount) {
                 ret[outPos++] = base64Alphabet[bitsContainer >> 18 & 0x3f];
                 ret[outPos++] = base64Alphabet[(bitsContainer >> 12) & 0x3f];
                 ret[outPos++] = base64Alphabet[(bitsContainer >> 6) & 0x3f];
                 ret[outPos++] = base64Alphabet[bitsContainer & 0x3f];
                 bitsContainer = 0;
                 charCount = 0;
-            }
-            else {
-                bitsContainer <<= 8;
-            }
+            } else { bitsContainer <<= 8; }
         }
 
-        if(charCount) {
+        if (charCount) {
             bitsContainer <<= 16 - (8 * charCount);
             ret[outPos++] = base64Alphabet[bitsContainer >> 18 & 0x3f];
             ret[outPos++] = base64Alphabet[(bitsContainer >> 12) & 0x3f];
-            if(charCount == 1) {
-                ret[outPos++] = PAD;
-            }
-            else {
+            if (charCount == 1) { ret[outPos++] = PAD; } else {
                 ret[outPos++] = base64Alphabet[(bitsContainer >> 6) & 0x3f];
             }
             ret[outPos++] = PAD;
         }
-        // AU_LOG_ERROR("ret : %s",ret.c_str());
+        //AU_LOG_ERROR("ret : %s",ret.c_str());
         return ret;
     }
-} // namespace
-int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                       std::shared_ptr<result_msg> res)
+}
+int SMB_Read_File::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
-    if(!sess || (sess && sess->id().is_nil())) {
+    if (!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
         return -1;
     }
@@ -97,37 +93,41 @@ int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->path_);
     trustwave::smb_client rc;
-    auto connect_result = rc.connect(base.c_str());
-    if(!connect_result.first) {
+    auto connect_result  = rc.connect(base.c_str());
+    if(!connect_result.first)
+    {
         AU_LOG_DEBUG("got smb error: %i - %s", connect_result.second, std::strerror(connect_result.second));
         res->res(std::string("Error: ") + std::string(std::strerror(connect_result.second)));
         return -1;
     }
-    auto off = smb_action->offset_.empty() ? 0 : std::stoul(smb_action->offset_);
-    auto sz = smb_action->size_.empty() ? 0 : std::stoul(smb_action->size_);
-    if(0 == sz) {
-        sz = rc.file_size() - off;
+    auto off = smb_action->offset_.empty()?0:std::stoul(smb_action->offset_);
+    auto sz = smb_action->size_.empty()?0:std::stoul(smb_action->size_);
+    if (0==sz)
+    {
+        sz = rc.file_size()-off;
     }
-    AU_LOG_ERROR("Received offset: %zu size: %zu", off, sz);
+    AU_LOG_ERROR("Received offset: %zu size: %zu",off,sz);
     auto buff = new(std::nothrow) char[sz];
-    if(nullptr == buff) {
+    if(nullptr == buff)
+    {
         res->res("Error: Memory allocation failed");
         return -1;
     }
-    ssize_t r = rc.read(off, sz, buff);
-    if(-1 == r) {
+    ssize_t r = rc.read(off,sz,buff);
+    if (-1 == r) {
         res->res("Error: read_file failed");
         return -1;
     }
 
-    auto c64_str = base64_encode(buff, r);
-    res->res(c64_str.c_str()); // fixme assaf figure aou whi strin assignment doesn't  work
+    auto c64_str = base64_encode(buff,r);
+    res->res(c64_str.c_str());//fixme assaf figure aou whi strin assignment doesn't  work
     return 0;
+
 }
 static std::shared_ptr<SMB_Read_File> instance = nullptr;
 
+
 // extern function, that declared in "action.hpp", for export the plugin from dll
-std::shared_ptr<trustwave::Action_Base> import_action()
-{
+std::shared_ptr<trustwave::Action_Base> import_action() {
     return instance ? instance : (instance = std::make_shared<SMB_Read_File>());
 }

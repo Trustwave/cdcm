@@ -3,7 +3,7 @@
 //														get_file_info.cpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION: 
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -24,18 +24,19 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "pe_context.hpp"
 using namespace trustwave;
-auto push_back = [](tao::json::events::to_value& c, const std::string& k, const std::string& v) {
-    c.begin_object();
-    c.key(k);
-    c.string(v);
-    c.member();
-    c.end_object();
-    c.element();
-};
-int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                           std::shared_ptr<result_msg> res)
+auto push_back = [](tao::json::events::to_value& c,const std::string& k,const std::string&v)
+        {
+            c.begin_object();
+            c.key(k);
+            c.string(v);
+            c.member();
+            c.end_object();
+            c.element();
+        };
+int SMB_Get_File_Info::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
-    if(!sess || (sess && sess->id().is_nil())) {
+
+    if (!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
         return -1;
     }
@@ -45,34 +46,37 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
     base.append(sess->remote()).append("/").append(smb_action->param);
     trustwave::smb_client rc;
     auto connect_res = rc.connect(base.c_str());
-    if(connect_res.first == false) {
-        res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
+    if(connect_res.first == false)
+    {
+        res->res(std::string("Error: " )+std::string((std::strerror(connect_res.second))));
         return 0;
     }
 
     pe_context pc(rc);
     pc.parse();
-    std::map<std::u16string, std::u16string> ret;
+    std::map<std::u16string,std::u16string> ret;
 
     pc.extract_info(ret);
     tao::json::events::to_value c;
     c.begin_array();
-    push_back(c, "Size", std::to_string(rc.file_size()));
-    push_back(c, "Path", "FIXME");
-    push_back(c, "LastModified", std::to_string(rc.last_modified()));
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    for(const auto& e: ret) {
-        push_back(c, convert.to_bytes(std::u16string(e.first)), convert.to_bytes(std::u16string(e.second)));
+    push_back(c,"Size",std::to_string(rc.file_size()));
+    push_back(c,"Path","FIXME");
+    push_back(c,"LastModified",std::to_string(rc.last_modified()));
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
+    for(const auto&e :ret)
+    {
+        push_back(c,convert.to_bytes(std::u16string(e.first)),convert.to_bytes(std::u16string(e.second)));
     }
     c.end_array();
 
     res->res(to_string(c.value));
     return 0;
+
 }
 static std::shared_ptr<SMB_Get_File_Info> instance = nullptr;
 
+
 // extern function, that declared in "action.hpp", for export the plugin from dll
-std::shared_ptr<trustwave::Action_Base> import_action()
-{
+std::shared_ptr<trustwave::Action_Base> import_action() {
     return instance ? instance : (instance = std::make_shared<SMB_Get_File_Info>());
 }

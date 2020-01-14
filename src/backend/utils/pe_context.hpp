@@ -3,7 +3,7 @@
 //														pe_context.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION: 
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -26,23 +26,22 @@
 namespace trustwave {
     class pe_context final {
     public:
-        explicit pe_context(file_reader_interface& fr): fm_(fr), pe_() {}
-        ~pe_context()
-        {
+        explicit pe_context(file_reader_interface& fr) : fm_(fr),pe_() {}
+        ~pe_context() {
             free(pe_.directories);
             free(pe_.sections);
         }
         int parse();
-        void extract_info(std::map<std::u16string, std::u16string>&);
-
+        void extract_info(std::map<std::u16string,std::u16string>& );
     private:
         uint64_t pe_rva2ofs(uint64_t rva);
-        IMAGE_DATA_DIRECTORY* pe_directory_by_entry(ImageDirectoryEntry entry);
-        NODE_PERES* discoveryNodesPeres();
+        IMAGE_DATA_DIRECTORY *pe_directory_by_entry(ImageDirectoryEntry entry);
+        NODE_PERES *discoveryNodesPeres();
 
     private:
+
         file_mapper fm_;
         pe_file_t pe_;
     };
-} // namespace trustwave
-#endif // UTILS_PE_CONTEXT_HPP
+}
+#endif //UTILS_PE_CONTEXT_HPP

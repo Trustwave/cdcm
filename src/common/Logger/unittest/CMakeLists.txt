@@ -11,6 +11,7 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 #SET(Boost_USE_STATIC_LIBS ON)
 
 
+
 #find_package(Boost 1.68.0 COMPONENTS filesystem log REQUIRED)
 #if(Boost_FOUND)
 #    include_directories(${Boost_INCLUDE_DIRS})

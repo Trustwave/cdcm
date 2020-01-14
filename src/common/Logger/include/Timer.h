@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 // DESCRIPTION: @{HDES}
 // -----------
-//
+// 
 //---------------------------------------------------------------------------
 // CHANGES LOG: @{HREV}
 // -----------
@@ -24,45 +24,45 @@
 
 namespace trustwave {
 
-    //===========================================================================
-    // @{CSEH}
-    //                                Timer
-    //
-    //---------------------------------------------------------------------------
-    // Description    : An interface to a Timer
-    //===========================================================================
-    class Timer {
-    public:
-        virtual ~Timer() = default;
+//===========================================================================
+// @{CSEH}
+//                                Timer
+// 
+//---------------------------------------------------------------------------
+// Description    : An interface to a Timer
+//===========================================================================
+class Timer {
+public:
+	virtual ~Timer() = default;
 
-        virtual bool start(unsigned long interval) noexcept = 0;
-        virtual bool stop() noexcept = 0;
-    };
-    //===========================================================================
-    // @{CSEH}
-    //                                ManageTimer
-    //
-    //---------------------------------------------------------------------------
-    // Description    : Manage a timer on multiplatform enviroment.
-    //===========================================================================
-    class ManageTimer {
-    public:
-        ManageTimer(bool loop, std::function<void(void)> fn);
-        virtual ~ManageTimer() = default;
+	virtual bool start(unsigned long interval) noexcept = 0;
+	virtual bool stop() noexcept = 0;
+};
+//===========================================================================
+// @{CSEH}
+//                                ManageTimer
+// 
+//---------------------------------------------------------------------------
+// Description    : Manage a timer on multiplatform enviroment.
+//===========================================================================
+class ManageTimer {
+public:
+	ManageTimer(bool loop, std::function<void(void)> fn);
+	virtual ~ManageTimer() = default;
 
-        ManageTimer(ManageTimer const&) = delete;
-        ManageTimer& operator=(ManageTimer const&) = delete;
-        ManageTimer(ManageTimer&& obj) noexcept = delete;
-        ManageTimer& operator=(ManageTimer&& obj) noexcept = delete;
+	ManageTimer(ManageTimer const&) = delete;
+	ManageTimer& operator=(ManageTimer const&) = delete;
+	ManageTimer(ManageTimer &&obj) noexcept = delete;
+	ManageTimer& operator=(ManageTimer &&obj) noexcept = delete;
 
-        bool start(unsigned long interval) noexcept;
-        bool stop() noexcept;
+	bool start(unsigned long interval) noexcept;
+	bool stop() noexcept;
 
-        bool set_interval(unsigned long interval) noexcept;
+	bool set_interval(unsigned long interval) noexcept;
 
-    private:
-        std::unique_ptr<Timer> concreate_timer_;
-    };
+private:
+  std::unique_ptr<Timer> concreate_timer_;
+};
 
-} // namespace trustwave
-#endif // COMMON_TIMERS_H
+}// namespace MSC
+#endif //COMMON_TIMERS_H

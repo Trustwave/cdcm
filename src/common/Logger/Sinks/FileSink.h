@@ -5,4 +5,4 @@
 #ifndef COMMON_FILE_SINK_H
 #define COMMON_FILE_SINK_H
 
-#endif // ROTEM_FILE_SINK_H
+#endif //ROTEM_FILE_SINK_H

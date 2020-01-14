@@ -11,7 +11,7 @@
 // Revision: 01.00
 // By      : Assaf Cohen
 // Date    : 7 Jul 2019
-// Comments:
+// Comments: 
 //=====================================================================================================================
 //                                                  Include files
 //=====================================================================================================================
@@ -26,54 +26,55 @@
 //=====================================================================================================================
 using namespace trustwave;
 
-int Value_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                             std::shared_ptr<result_msg> res)
+int Value_Exists_Action::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
-    if(!sess || (sess && sess->id().is_nil())) {
+
+    if (!sess || (sess && sess->id().is_nil())){
         res->res("Error: Session not found");
         return -1;
     }
     auto c = client(sess, res);
 
-    if(!c) {
+    if (!c){
         return -1;
     }
 
-    AU_LOG_DEBUG("About to cast to %s", action->name().c_str());
+    AU_LOG_DEBUG("About to cast to %s",action->name().c_str());
     auto veact = std::dynamic_pointer_cast<reg_action_value_exists_msg>(action);
-    if(!veact) {
+    if (!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error: Internal error");
         return -1;
     }
-    result r = c->connect(*sess);
-    if(!std::get<0>(r)) {
-        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+    result r=c->connect(*sess);
+    if (!std::get <0>(r)){
+        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(),win_errstr(std::get <1>(r)));
+        res->res(std::string("Error: ")+std::string(win_errstr(std::get <1>(r))));
         return -1;
     }
-    if(!std::get<0>(c->open_key(veact->key_.c_str()))) {
-        AU_LOG_DEBUG("Failed opening  %s", veact->key_.c_str());
+    if (!std::get<0>(c->open_key(veact->key_.c_str()))) {
+        AU_LOG_DEBUG("Failed opening  %s",veact->key_.c_str());
         res->res("False");
-        //  res->res("Key doesn't exist");
+      //  res->res("Key doesn't exist");
         return -1;
     }
     trustwave::registry_value rv;
-    if(!std::get<0>(c->key_get_value_by_name(veact->value_.c_str(), rv))) {
-        AU_LOG_DEBUG("Failed getting value %s", veact->value_.c_str());
+    if (!std::get<0>(c->key_get_value_by_name(veact->value_.c_str(), rv))) {
+        AU_LOG_DEBUG("Failed getting value %s",veact->value_.c_str());
         res->res("False");
     }
     else {
         res->res("True");
     }
     return 0;
+
 }
 
 // instance of the our plugin
 static std::shared_ptr<Value_Exists_Action> instance = nullptr;
 
+
 // extern function, that declared in "action.hpp", for export the plugin from dll
-std::shared_ptr<trustwave::Action_Base> import_action()
-{
+std::shared_ptr<trustwave::Action_Base> import_action() {
     return instance ? instance : (instance = std::make_shared<Value_Exists_Action>());
 }

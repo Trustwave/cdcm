@@ -33,9 +33,9 @@
 //---------------------------------------------------------------------------
 // Description: Process entry point.
 //===========================================================================
-int main()
-{
-    ::trustwave::ILogger* logger = nullptr;
+int main() {
+
+    ::trustwave::ILogger *logger = nullptr;
     //
     //	configuration path.
     //	-------------------
@@ -44,40 +44,33 @@ int main()
 #else
     const std::string root_conf("/MSCProject/conf");
 #endif
-    //
-    //	get the logger and process username.
-    //	------------------------------------
-    if(!Initialize(logger, root_conf, ::trustwave::logger::agent)) {
-        std::cout << "failed to initialize the logger!!!" << std::endl;
-        return -1;
-    }
-    //
-    //	This log with different sources and different severity.
-    //	-------------------------------------------------------
-    logger->log_event(trustwave::logger::info, trustwave::logger::COLLECT_FROM_NONE, ERR_LOG,
-                      ::trustwave::LoggerSource::instance()->get_source(),
-                      ::trustwave::LoggerSource::instance()->get_user_name(), "Hello world");
-    logger->log_event(trustwave::logger::warning, trustwave::logger::COLLECT_FROM_NONE, MANAGER_LOG,
-                      ::trustwave::LoggerSource::instance()->get_user_name(), "Hello world1 %d", 1);
-    logger->log_event(trustwave::logger::error, trustwave::logger::COLLECT_FROM_NONE, TUNNEL_LOG,
-                      ::trustwave::LoggerSource::instance()->get_user_name(), "%s", "Hello world2");
-    //
-    //	This log also collect the errno.
-    //	--------------------------------
-    errno = 2;
-    logger->log_event(trustwave::logger::error, trustwave::logger::COLLECT_FROM_ERNO, ERR_LOG,
-                      ::trustwave::LoggerSource::instance()->get_source(),
-                      ::trustwave::LoggerSource::instance()->get_user_name(), "Hello world3 (%s=%d)", "stam", 2);
-    //
-    //	This log also collect the system error (only for windows).
-    //	----------------------------------------------------------
+	//
+	//	get the logger and process username.
+	//	------------------------------------
+	if (!Initialize(logger, root_conf, ::trustwave::logger::agent)) {
+		std::cout << "failed to initialize the logger!!!" << std::endl;
+		return -1;
+	}
+	//
+	//	This log with different sources and different severity.
+	//	-------------------------------------------------------
+	logger->log_event(trustwave::logger::info, trustwave::logger::COLLECT_FROM_NONE, ERR_LOG, ::trustwave::LoggerSource::instance()->get_source(), ::trustwave::LoggerSource::instance()->get_user_name(), "Hello world");
+	logger->log_event(trustwave::logger::warning, trustwave::logger::COLLECT_FROM_NONE, MANAGER_LOG, ::trustwave::LoggerSource::instance()->get_user_name(), "Hello world1 %d", 1);
+	logger->log_event(trustwave::logger::error, trustwave::logger::COLLECT_FROM_NONE, TUNNEL_LOG, ::trustwave::LoggerSource::instance()->get_user_name(), "%s", "Hello world2");
+	//
+	//	This log also collect the errno.
+	//	--------------------------------
+	errno = 2;
+	logger->log_event(trustwave::logger::error,trustwave::logger::COLLECT_FROM_ERNO, ERR_LOG, ::trustwave::LoggerSource::instance()->get_source(), ::trustwave::LoggerSource::instance()->get_user_name(), "Hello world3 (%s=%d)", "stam", 2);
+	//
+	//	This log also collect the system error (only for windows).
+	//	----------------------------------------------------------
 #ifdef _WIN32
-    if(!CopyFile("xxx.xxx", "yyy.yyy", TRUE)) {
-        logger->log_event(trustwave::logger::error, trustwave::logger::COLLECT_FROM_SYSTEM, AGENT_LOG,
-                          ::trustwave::LoggerSource::instance()->get_user_name(), "Failed to copy xxx.xxx");
-    }
+	if (!CopyFile("xxx.xxx", "yyy.yyy", TRUE)) {
+		logger->log_event(trustwave::logger::error, trustwave::logger::COLLECT_FROM_SYSTEM, AGENT_LOG, ::trustwave::LoggerSource::instance()->get_user_name(), "Failed to copy xxx.xxx");
+	}
 #endif // _WIN32
 
-    return 0;
+	return 0;
 }
-#endif // COMMON_LOGGER_TEST_H
+#endif //COMMON_LOGGER_TEST_H

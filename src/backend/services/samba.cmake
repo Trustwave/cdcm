@@ -1,5 +1,5 @@
-set(SAMBA_SRC ${DEPS_DIR}/samba-4.10.6)
-set(SMB_INCLUDES
+set (SAMBA_SRC ${DEPS_DIR}/samba-4.10.6)
+set (SMB_INCLUDES
         ${SAMBA_SRC}
         ${SAMBA_SRC}/include
         ${SAMBA_SRC}/param
@@ -19,7 +19,7 @@ set(SMB_INCLUDES
         ${SAMBA_SRC}/bin/default/include/public
         ${SAMBA_SRC}/bin/default/source4
         )
-set(SMB_LINKS
+set (SMB_LINKS
         ${SAMBA_SRC}/bin/shared/
         ${SAMBA_SRC}/bin/shared/private/
         ${SAMBA_SRC}/bin/default/libcli/util
