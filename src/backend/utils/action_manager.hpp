@@ -3,7 +3,7 @@
 //													    action_manager.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: 
+// DESCRIPTION:
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -20,14 +20,11 @@
 namespace trustwave {
     class Action_Base;
     class shared_library;
-    template <typename T>
-    class Dispatcher;
-    class action_manager final{
-      public:
-     static  std::vector<std::shared_ptr<shared_library>>
-     load(const boost::filesystem::path&,Dispatcher<Action_Base> &);
-
-
+    template<typename T> class Dispatcher;
+    class action_manager final {
+    public:
+        static std::vector<std::shared_ptr<shared_library>>
+        load(const boost::filesystem::path&, Dispatcher<Action_Base>&);
     };
-} //namespace trustwave
+} // namespace trustwave
 #endif // _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP

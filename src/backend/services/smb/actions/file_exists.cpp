@@ -3,7 +3,7 @@
 //														file_exists.cpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: 
+// DESCRIPTION:
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -27,10 +27,10 @@
 #include "pe_context.hpp"
 using trustwave::SMB_File_Exists;
 
-int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
+int SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+                         std::shared_ptr<result_msg> res)
 {
-
-    if (!sess || (sess && sess->id().is_nil())) {
+    if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
         return -1;
     }
@@ -40,16 +40,17 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
     base.append(sess->remote()).append("/").append(smb_action->param);
     trustwave::smb_client rc;
     auto connect_res = rc.connect(base.c_str());
-    if(!connect_res.first){
-
+    if(!connect_res.first) {
         AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
 
-        if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT ) {
+        if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT) {
             res->res(std::string("False"));
-        }else{
-            res->res(std::string("Error: " )+std::string((std::strerror(connect_res.second))));
         }
-    }else{
+        else {
+            res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
+        }
+    }
+    else {
         res->res(std::string("True"));
     }
     return 0;
@@ -58,9 +59,8 @@ int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<actio
 // instance of the our plugin
 static std::shared_ptr<SMB_File_Exists> instance = nullptr;
 
-
 // extern function, that declared in "action.hpp", for export the plugin from dll
-std::shared_ptr<trustwave::Action_Base> import_action() {
+std::shared_ptr<trustwave::Action_Base> import_action()
+{
     return instance ? instance : (instance = std::make_shared<SMB_File_Exists>());
 }
-
