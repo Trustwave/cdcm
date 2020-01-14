@@ -46,51 +46,48 @@ extern "C" {
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
-class session;
-class registry_value;
-class enum_key;
-struct reg_context
-{
-    struct registry_context *registry;
-    char *path;
-    char *predef;
-    struct registry_key *current;
-    struct registry_key *root;
-};
-using result = std::tuple<bool,WERROR>;
-
-class registry_client final: public cdcm_client,public configurable<registry_service_configuration>
-{
-    struct key_info
-    {
-        const char * classname=nullptr;
-        uint32_t num_subkeys=0, max_subkeylen=0;//, max_classlen;
-        NTTIME   last_changed_time=0;
-        uint32_t num_values=0, max_valnamelen=0, max_valbufsize=0;
+    class session;
+    class registry_value;
+    class enum_key;
+    struct reg_context {
+        struct registry_context* registry;
+        char* path;
+        char* predef;
+        struct registry_key* current;
+        struct registry_key* root;
     };
-public:
-    registry_client();
-    ~registry_client() override;
-    result connect(const session& sess);
-    result key_get_value_by_name(const char *name, registry_value& rv);
+    using result = std::tuple<bool, WERROR>;
 
-    result key_get_value_by_index(uint32_t idx, const char **name,
-                    registry_value& rv);
-    result key_get_subkey_by_index(TALLOC_CTX *mem_ctx, const struct registry_key *key, uint32_t idx, const char **name,
-                    const char **classname, NTTIME *last_mod_time);
-    result key_get_subkey_by_name(TALLOC_CTX *mem_ctx, const struct registry_key *key, const char *name,
-                    struct registry_key **subkey);
-    result enumerate_key(const std::string&,enum_key& );
-    result key_exists(const std::string&);
-    result value_exists(const char *valname);
-    result open_key(const char* full_path);
-private:
-    result key_get_info(key_info&);
+    class registry_client final: public cdcm_client, public configurable<registry_service_configuration> {
+        struct key_info {
+            const char* classname = nullptr;
+            uint32_t num_subkeys = 0, max_subkeylen = 0; //, max_classlen;
+            NTTIME last_changed_time = 0;
+            uint32_t num_values = 0, max_valnamelen = 0, max_valbufsize = 0;
+        };
 
-    reg_context *ctx_;
-    tevent_context *ev_ctx_;
-    DATA_BLOB data_blob_;
+    public:
+        registry_client();
+        ~registry_client() override;
+        result connect(const session& sess);
+        result key_get_value_by_name(const char* name, registry_value& rv);
 
-};
-}
+        result key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv);
+        result key_get_subkey_by_index(TALLOC_CTX* mem_ctx, const struct registry_key* key, uint32_t idx,
+                                       const char** name, const char** classname, NTTIME* last_mod_time);
+        result key_get_subkey_by_name(TALLOC_CTX* mem_ctx, const struct registry_key* key, const char* name,
+                                      struct registry_key** subkey);
+        result enumerate_key(const std::string&, enum_key&);
+        result key_exists(const std::string&);
+        result value_exists(const char* valname);
+        result open_key(const char* full_path);
+
+    private:
+        result key_get_info(key_info&);
+
+        reg_context* ctx_;
+        tevent_context* ev_ctx_;
+        DATA_BLOB data_blob_;
+    };
+} // namespace trustwave
 #endif /* TRUSTWAVE_REGISTRY_CLIENT_HPP_ */

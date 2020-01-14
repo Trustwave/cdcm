@@ -1,9 +1,9 @@
 
 
-get_property(dirs DIRECTORY  PROPERTY LINK_DIRECTORIES)
-foreach(dir ${dirs})
+get_property(dirs DIRECTORY PROPERTY LINK_DIRECTORIES)
+foreach (dir ${dirs})
     message(STATUS "dir='${dir}'")
-endforeach()
+endforeach ()
 set(SOURCE_FILES credentials.cpp session.cpp)
 add_library(tw-common SHARED ${SOURCE_FILES})
 
@@ -16,5 +16,5 @@ add_subdirectory(zmq)
 install(TARGETS tw-common LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
 
-install(TARGETS    tw-common  LIBRARY  DESTINATION lib
+install(TARGETS tw-common LIBRARY DESTINATION lib
         DESTINATION ${release_lib_dest})

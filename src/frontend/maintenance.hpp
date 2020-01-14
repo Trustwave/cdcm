@@ -3,7 +3,7 @@
 //														maintenance.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: 
+// DESCRIPTION:
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,13 +19,13 @@
 #include <boost/asio.hpp>
 #include <chrono>
 namespace trustwave {
-    class maintenance final
-    {
+    class maintenance final {
     public:
-       explicit maintenance(boost::asio::io_service& ios);
+        explicit maintenance(boost::asio::io_service& ios);
         void maintenance_function();
+
     private:
         boost::asio::steady_timer timer_;
     };
-}
-#endif //SRC_FRONTEND_MAINTENANCE_HPP
+} // namespace trustwave
+#endif // SRC_FRONTEND_MAINTENANCE_HPP

@@ -11,7 +11,7 @@
 // Revision: 01.00
 // By      : Assaf Cohen
 // Date    : 5 Aug 2019
-// Comments: 
+// Comments:
 
 #ifndef TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_
 #define TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_
@@ -25,19 +25,13 @@
 //                                                  namespaces
 //=====================================================================================================================
 namespace trustwave {
-class registry_client;
-class session;
-class Registry_Action: public Action_Base
-{
+    class registry_client;
+    class session;
+    class Registry_Action: public Action_Base {
+    public:
+        Registry_Action(const std::string_view command): Action_Base(command) {}
 
-public:
-    Registry_Action(const std::string_view command) :
-                    Action_Base(command)
-    {
-    }
-
-    static std::shared_ptr<registry_client> client(boost::shared_ptr<session>,
-                    std::shared_ptr <result_msg> res);
-};
-}
+        static std::shared_ptr<registry_client> client(boost::shared_ptr<session>, std::shared_ptr<result_msg> res);
+    };
+} // namespace trustwave
 #endif /* TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_ */

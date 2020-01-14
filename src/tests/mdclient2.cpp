@@ -2,13 +2,13 @@
 
 #include "mdcliapi2.hpp"
 #include <thread>
-         // streaming operators etc.
-#include <boost/uuid/random_generator.hpp>         // streaming operators etc.
-#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+// streaming operators etc.
+#include <boost/uuid/random_generator.hpp> // streaming operators etc.
+#include <boost/uuid/uuid_io.hpp> // streaming operators etc.
 #include <vector>
 
 #include "protocol/protocol.hpp"
-//static void enumf( std::string& msg)
+// static void enumf( std::string& msg)
 //{
 //    mdcli session("tcp://127.0.0.1:5555", 1);
 //
@@ -20,18 +20,17 @@
 //
 //}
 
-static void fc(int )
+static void fc(int)
 {
     mdcli session("tcp://127.0.0.1:5555", 1);
     auto act_id1 = boost::uuids::random_generator()();
     std::string get_session_m =
-                    R"(
+        R"(
           { 
                "H":
                {
                    "session_id" : ")"
-                                    + std::string("N/A")
-                                    + R"(" 
+        + std::string("N/A") + R"("
                },
                "msgs":
                    [
@@ -40,8 +39,7 @@ static void fc(int )
                            "start_session" :
                            {
                                "id": ")"
-                                    + boost::uuids::to_string(act_id1)
-                                    + R"(",
+        + boost::uuids::to_string(act_id1) + R"(",
                                "remote":"%{host}",
                                "domain":"%{domain}",
                                "username":"%{username}",
@@ -51,9 +49,9 @@ static void fc(int )
                        }
                    ]
            })";
-    zmsg *reply = session.send_and_recv(get_session_m);
+    zmsg* reply = session.send_and_recv(get_session_m);
 
-    if (reply) {
+    if(reply) {
         std::cout << reply->body() << std::endl;
         using namespace tao::json;
         std::string mstr(reply->body());
@@ -69,15 +67,13 @@ static void fc(int )
         delete reply;
         reply = nullptr;
 
-
         std::string actions =
-                        R"(
+            R"(
           {      
             "H":
                 {
                     "session_id" : ")"
-                                        + new_session_id
-                                        + R"("
+            + new_session_id + R"("
                 },
             "msgs":
                 [
@@ -86,8 +82,7 @@ static void fc(int )
                       "get_ile_info"  :
                             {
                                 "id": ")"
-                                        + act_id4
-                                        + R"(",
+            + act_id4 + R"(",
                                 "param":"ADMIN$//hh.exe"
 
 
@@ -99,8 +94,7 @@ static void fc(int )
                       "file_exists"  :
                             {
                                 "id": ")"
-                                          + act_id5
-                                          + R"(",
+            + act_id5 + R"(",
                                 "param":"ADMIN$//hh.exe"
 
 
@@ -111,8 +105,7 @@ static void fc(int )
 {"enumerate"  :
                             {
                                 "id": ")"
-                                            + act_id7
-                                            + R"(",
+            + act_id7 + R"(",
                                 "key":"\s /s SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 
 
@@ -123,8 +116,7 @@ static void fc(int )
                      { "get_file_info"  :
                             {
                                 "id": ")"
-                                            + act_id6
-                                            + R"(",
+            + act_id6 + R"(",
                                 "param":"ADMIN$//hhs.exe"
 
 
@@ -135,20 +127,18 @@ static void fc(int )
                 ]
         })";
         printf("Request is:\n%s\n", actions.c_str());
-        zmsg *reply = session.send_and_recv(actions);
+        zmsg* reply = session.send_and_recv(actions);
         (void)reply;
-
     }
 }
-int main(int , char **)
+int main(int, char**)
 {
     std::vector<std::thread> tp;
-    for (unsigned int i = 0; i < 1; ++i)        //context+broker
-                    {
+    for(unsigned int i = 0; i < 1; ++i) // context+broker
+    {
         tp.push_back(std::move(std::thread(fc, 1)));
-
     }
-    for (unsigned int i = 0; i < tp.size(); i++) {
+    for(unsigned int i = 0; i < tp.size(); i++) {
         tp.at(i).join();
     }
 

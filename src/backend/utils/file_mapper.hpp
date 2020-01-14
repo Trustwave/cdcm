@@ -3,7 +3,7 @@
 //														file_mapper.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: 
+// DESCRIPTION:
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -24,21 +24,22 @@
 
 namespace trustwave {
     class file_mapper {
-        using chunks_map= ::boost::icl::interval_set<size_t, std::less, bounded_chunk>;
+        using chunks_map = ::boost::icl::interval_set<size_t, std::less, bounded_chunk>;
+
     public:
-        explicit file_mapper(file_reader_interface & fr) : fr_(fr) {
-            if (fr_.validate_open()) {
+        explicit file_mapper(file_reader_interface& fr): fr_(fr)
+        {
+            if(fr_.validate_open()) {
                 allocated_size_ = fr_.file_size();
                 data_.reset(new char[allocated_size_]);
                 memset(data_.get(), 0, allocated_size_);
             }
         }
 
-
-        template<typename P>
-        bool map_chunk_by_pointer(const P *offset, size_t size) {
-            auto diff = reinterpret_cast<const char *>(offset) - data_.get();
-            if (diff >= 0) {
+        template<typename P> bool map_chunk_by_pointer(const P* offset, size_t size)
+        {
+            auto diff = reinterpret_cast<const char*>(offset) - data_.get();
+            if(diff >= 0) {
                 return map_chunk(diff, size);
             }
             return false;
@@ -46,13 +47,11 @@ namespace trustwave {
 
         bool map_chunk(size_t offset, size_t size);
 
-        [[nodiscard]] inline char *data() const {
-            return data_.get();
-        }
+        [[nodiscard]] inline char* data() const { return data_.get(); }
 
     private:
-
-        [[nodiscard]] inline bool in_bound(size_t offset, size_t size) const {
+        [[nodiscard]] inline bool in_bound(size_t offset, size_t size) const
+        {
             return size + offset <= allocated_size_;
         }
         [[nodiscard]] size_t minimum_read_size(size_t offset, size_t size) const;
@@ -61,5 +60,5 @@ namespace trustwave {
         std::unique_ptr<char[]> data_;
         chunks_map map_;
     };
-}//namespace trustwave
-#endif //UTILS_FILE_MAPPER_HPP
+} // namespace trustwave
+#endif // UTILS_FILE_MAPPER_HPP

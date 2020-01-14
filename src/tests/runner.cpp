@@ -3,7 +3,7 @@
 //														runner.cpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: 
+// DESCRIPTION:
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -13,28 +13,27 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
+#include "../backend/utils/file_reader.hpp"
 #include "../backend/utils/pe_context.hpp"
 #include <boost/filesystem.hpp>
-#include "../backend/utils/file_reader.hpp"
-#include <iostream>
 #include <codecvt>
-int main(int, char **) {
+#include <iostream>
+int main(int, char**)
+{
     //  test_map();
-    for(auto & p :  boost::filesystem::directory_iterator( "/opt/pes/" ))
-    {
-        std::cout  << p << std::endl;
+    for(auto& p: boost::filesystem::directory_iterator("/opt/pes/")) {
+        std::cout << p << std::endl;
         trustwave::file_reader fr(p.path().string());
         trustwave::pe_context pc(fr);
         pc.parse();
-        std::map<std::u16string,std::u16string> ret;
+        std::map<std::u16string, std::u16string> ret;
         pc.extract_info(ret);
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
-        for(const auto& a:ret) {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        for(const auto& a: ret) {
             std::cerr << convert.to_bytes(std::u16string(a.first)) << " : "
                       << convert.to_bytes(std::u16string(a.second)) << std::endl;
         }
     }
 
-        return 0;
-
+    return 0;
 }

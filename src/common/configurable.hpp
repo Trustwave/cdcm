@@ -3,7 +3,7 @@
 //														configurable.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
-// DESCRIPTION: 
+// DESCRIPTION:
 //
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -16,15 +16,12 @@
 #ifndef SRC_COMMON_CONFIGURABLE_HPP
 #define SRC_COMMON_CONFIGURABLE_HPP
 
-#include "dispatcher.hpp"
 #include "configuration.hpp"
+#include "dispatcher.hpp"
 #include "singleton_runner/settings.hpp"
-namespace trustwave
-{
+namespace trustwave {
 
-    template <typename T>
-    class configurable
-    {
+    template<typename T> class configurable {
     protected:
         [[nodiscard]] std::shared_ptr<configuration> conf()
         {
@@ -33,32 +30,31 @@ namespace trustwave
             }
             return conf_;
         }
-        void init_conf(Dispatcher <configuration>& service_conf_reppsitory)
+        void init_conf(Dispatcher<configuration>& service_conf_reppsitory)
         {
-            if(!conf_)
-            {
-                if(service_conf_reppsitory.has(T::srv_name))
-                {
-                    conf_ =std::dynamic_pointer_cast<T>( service_conf_reppsitory.find(T::srv_name));
-                } else{
+            if(!conf_) {
+                if(service_conf_reppsitory.has(T::srv_name)) {
+                    conf_ = std::dynamic_pointer_cast<T>(service_conf_reppsitory.find(T::srv_name));
+                }
+                else {
                     try {
-                        static const auto fn = std::string(service_conf_reppsitory.find_as<cdcm_settings>()->plugins_dir_) + std::string(
-                                T::srv_name) + std::string(".json");
+                        static const auto fn
+                            = std::string(service_conf_reppsitory.find_as<cdcm_settings>()->plugins_dir_)
+                              + std::string(T::srv_name) + std::string(".json");
                         const tao::json::value v = tao::json::from_file(fn);
                         conf_ = v.as<std::shared_ptr<T>>();
                         service_conf_reppsitory.register1(conf_);
                     }
-                    catch (const std::exception& e)
-                    {
-                        //fixme assaf handle exception
-                        std::cerr<<"Failed reading "<<T::srv_name.data()<<" configuration "<<e.what()<<std::endl;
+                    catch(const std::exception& e) {
+                        // fixme assaf handle exception
+                        std::cerr << "Failed reading " << T::srv_name.data() << " configuration " << e.what()
+                                  << std::endl;
                     }
                 }
             }
         }
 
-
         std::shared_ptr<T> conf_;
     };
-}
-#endif //SRC_COMMON_CONFIGURABLE_HPP
+} // namespace trustwave
+#endif // SRC_COMMON_CONFIGURABLE_HPP
