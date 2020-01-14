@@ -18,18 +18,12 @@
 #include <system_error>
 #include <iostream>
 
-using namespace trustwave;
+using trustwave::file_reader;
 
 file_reader::file_reader(const std::string &fname) : fname_(fname), stream_(fname, std::ios::out | std::ios::binary) {
     boost::system::error_code ec{};
     boost::filesystem::path p(fname_);
     fsize_ = boost::filesystem::file_size(p, ec);
-    if (ec) {
-        std::cout << "error when accessing test file, size is: "
-                  << fsize_ << " message: " << ec.message() << '\n';
-    } else {
-        std::cout << "size: " << fsize_ << '\n';
-    }
 }
 
 ssize_t file_reader::read(size_t offset, size_t size, char *dest) {
@@ -48,12 +42,11 @@ uintmax_t file_reader::file_size() const {
     return fsize_;
 }
 
-bool file_reader::validate_open() {
-    if (!stream_) {
-        std::cerr << "file not found" << std::endl;
-        return false;
-    }
-
-    return true;
-
-}
+//bool file_reader::validate_open() const{
+//    if (!stream_) {
+//        return false;
+//    }
+//
+//    return true;
+//
+//}

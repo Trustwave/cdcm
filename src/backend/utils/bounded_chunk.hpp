@@ -18,7 +18,7 @@
 namespace trustwave {
     class bounded_chunk final{
     public:
-        typedef size_t offset_type;
+        using offset_type= size_t;
         bounded_chunk(offset_type off, offset_type s) : offset_(off), end_(s) {
         }
 
@@ -42,14 +42,14 @@ namespace trustwave {
         offset_type offset_;
         offset_type end_;
     };
-}
+} //namespace trustwave
 namespace boost::icl {
         template<>
         struct interval_traits<trustwave::bounded_chunk>
         {
-            typedef trustwave::bounded_chunk interval_type;
-            typedef interval_type::offset_type domain_type;
-            typedef std::less<domain_type> domain_compare;
+            using interval_type=trustwave::bounded_chunk;
+            using domain_type = interval_type::offset_type ;
+            using domain_compare=std::less<domain_type>;
             static interval_type construct(const domain_type &lo, const domain_type &up) {
                 return interval_type(lo, up);
             }
@@ -59,9 +59,9 @@ namespace boost::icl {
         template<>
         struct interval_bound_type<trustwave::bounded_chunk>
         {
-            typedef interval_bound_type type;
+            using type=interval_bound_type;
             BOOST_STATIC_CONSTANT(bound_type, value = interval_bounds::static_right_open);
         };
 
-} // namespace boost icl
+} // namespace boost::icl
 #endif //UTILS_BOUNDED_CHUNK_HPP

@@ -55,13 +55,9 @@ class smb_client final: public cdcm_client,public file_reader_interface,public c
 {
 public:
     smb_client();
-    virtual ~smb_client() override
-    = default;
-    bool download( const char *base, const char *name, bool resume, bool toplevel,
-                    const char *outfile);
+    virtual ~smb_client() override = default;
     bool list( const std::string& ,std::vector<trustwave::dirent> &);
     bool download_portion_to_memory(const char *base, const char *name,off_t offset, off_t count);
-    bool download_portion_to_memory(const char *base, const char *name,off_t offset);
     ssize_t read(size_t offset, size_t size, char *dest) override ;
     [[nodiscard]] uintmax_t file_size() const override ;
     [[nodiscard]] time_t last_modified() const;

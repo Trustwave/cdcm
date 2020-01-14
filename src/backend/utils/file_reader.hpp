@@ -25,10 +25,9 @@ namespace trustwave {
     public:
 
         explicit file_reader(const std::string &fname);
-        ~file_reader()= default;
+        ~file_reader() override = default;
         ssize_t read(size_t offset, size_t size, char *dest) override ;
         uintmax_t file_size() const override ;
-        bool validate_open() override ;
     private:
         std::string fname_;
         uintmax_t fsize_;

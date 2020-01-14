@@ -25,7 +25,7 @@
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "pe_context.hpp"
-using namespace trustwave;
+using trustwave::SMB_File_Exists;
 
 int SMB_File_Exists::act(boost::shared_ptr <session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {

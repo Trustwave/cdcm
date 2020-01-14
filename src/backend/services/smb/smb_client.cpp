@@ -124,135 +124,6 @@ std::pair<bool,int> smb_client::connect(const char *path) {
     return std::make_pair(true,0);
 }
 
-bool smb_client::download(const char *base, const char *name, bool resume,
-                          bool toplevel, const char *outfile) {
-    char path[SMB_MAXPATHLEN];
-    snprintf(path, SMB_MAXPATHLEN - 1, "%s%s%s", base,
-             (*base && *name && name[0] != '/' && base[strlen(base) - 1] != '/') ? "/" : "", name);
-    if (!connect(path).first) {
-        return false;
-    }
-    char checkbuf[2][RESUME_CHECK_SIZE];
-
-    off_t offset_download = 0, offset_check = 0, curpos = 0;
-
-    const char *newpath;
-    if (outfile) {
-        newpath = outfile;
-    } else if (!name[0]) {
-        newpath = strrchr(base, '/');
-        if (newpath) {
-            newpath++;
-        } else {
-            newpath = base;
-        }
-    } else {
-        newpath = name;
-    }
-
-    if (!toplevel && (newpath[0] == '/')) {
-        newpath++;
-    }
-
-    local_fd_ = open(newpath, O_CREAT | O_NONBLOCK | O_RDWR | (!resume ? O_EXCL : 0), 0755);
-    if (local_fd_ < 0) {
-        AU_LOG_ERROR("Can't open %s: %s", newpath, strerror(errno));
-        smbc_close(remote_fd_);
-        return false;
-    }
-
-    if (fstat(local_fd_, &localstat_) != 0) {
-        AU_LOG_ERROR("Can't fstat %s: %s", newpath, strerror(errno));
-        smbc_close(remote_fd_);
-        close(local_fd_);
-        return false;
-    }
-
-    if (localstat_.st_size && localstat_.st_size == remotestat_.st_size) {
-        AU_LOG_ERROR("%s is already downloaded "
-                     "completely.", path);
-        AU_LOG_ERROR("%s", path);
-        smbc_close(remote_fd_);
-        close(local_fd_);
-        return true;
-    }
-
-    if (localstat_.st_size > RESUME_CHECK_OFFSET && remotestat_.st_size > RESUME_CHECK_OFFSET) {
-        offset_download = localstat_.st_size - RESUME_DOWNLOAD_OFFSET;
-        offset_check = localstat_.st_size - RESUME_CHECK_OFFSET;
-        AU_LOG_INFO("Trying to start resume of %s at %jd"
-                    "At the moment %jd of %jd bytes have "
-                    "been retrieved", newpath, (intmax_t) offset_check, (intmax_t) localstat_.st_size,
-                    (intmax_t) remotestat_.st_size);
-    }
-
-    if (offset_check) {
-        off_t off1, off2;
-        /* First, check all bytes from offset_check to
-         * offset_download */
-        off1 = lseek(local_fd_, offset_check, SEEK_SET);
-        if (off1 < 0) {
-            AU_LOG_ERROR("Can't seek to %jd in local file %s", (intmax_t) offset_check, newpath);
-            smbc_close(remote_fd_);
-            close(local_fd_);
-            return false;
-        }
-
-        off2 = smbc_lseek(remote_fd_, offset_check, SEEK_SET);
-        if (off2 < 0) {
-            AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t) offset_check, newpath);
-            smbc_close(remote_fd_);
-            close(local_fd_);
-            return false;
-        }
-
-        if (off1 != off2) {
-            AU_LOG_ERROR("Offset in local and remote "
-                         "files are different "
-                         "(local: %jd, remote: %jd)", (intmax_t) off1, (intmax_t) off2);
-            smbc_close(remote_fd_);
-            close(local_fd_);
-            return false;
-        }
-
-        if (smbc_read(remote_fd_, checkbuf[0], RESUME_CHECK_SIZE) != RESUME_CHECK_SIZE) {
-            AU_LOG_ERROR("Can't read %d bytes from "
-                         "remote file %s", RESUME_CHECK_SIZE, path);
-            smbc_close(remote_fd_);
-            close(local_fd_);
-            return false;
-        }
-
-        if (::read(local_fd_, checkbuf[1], RESUME_CHECK_SIZE) != RESUME_CHECK_SIZE) {
-            AU_LOG_ERROR("Can't read %d bytes from "
-                         "local file %s", RESUME_CHECK_SIZE, name);
-            smbc_close(remote_fd_);
-            close(local_fd_);
-            return false;
-        }
-
-        if (memcmp(checkbuf[0], checkbuf[1], RESUME_CHECK_SIZE) == 0) {
-            AU_LOG_INFO("Current local and remote file "
-                        "appear to be the same. "
-                        "Starting download from "
-                        "offset %jd", (intmax_t) offset_download);
-        } else {
-            AU_LOG_ERROR("Local and remote file appear "
-                         "to be different, not "
-                         "doing resume for %s", path);
-            smbc_close(remote_fd_);
-            close(local_fd_);
-            return false;
-        }
-    }
-    download_portion(curpos, remotestat_.st_size, true);
-
-
-    smbc_close(remote_fd_);
-    close(local_fd_);
-    return true;
-}
-
 bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
 {
     char *readbuf = new char[SMB_DEFAULT_BLOCKSIZE];
@@ -313,10 +184,7 @@ bool smb_client::download_portion_to_memory(const char *base, const char *name,o
     }
     return download_portion(off, off + count, false);
 }
-bool smb_client::download_portion_to_memory(const char *base, const char *name,off_t offset = 0)
-{
-    return download_portion_to_memory(base,name,offset,conf_->max_mem_segment);
-}
+
 bool smb_client::list(const std::string &path,std::vector<trustwave::dirent> &dirents) {
     int dh1, dsize, dirc;
     char dirbuf[SMB_DEFAULT_BLOCKSIZE];

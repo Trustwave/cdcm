@@ -23,18 +23,12 @@
 #include <dlfcn.h>
 
 namespace trustwave {
-
-  
     class shared_library final {
-    private:
-
-        void* so_;
-        std::string filename_;
-
     public:
-        shared_library(): so_(nullptr), filename_() {}
+        shared_library(): so_(nullptr) {}
 
         shared_library(const shared_library& rhs) = delete;
+        shared_library& operator=( shared_library ) = delete;
 
         explicit shared_library(const boost::filesystem::path& p):shared_library() {
             open(p);
@@ -85,6 +79,11 @@ namespace trustwave {
             std::cerr << "failed to open " << p.c_str() << ". dlerror: " << dlerror() << std::endl;
             return nullptr;
         }
+    private:
+
+        void* so_;
+        std::string filename_;
+
 
     };
 

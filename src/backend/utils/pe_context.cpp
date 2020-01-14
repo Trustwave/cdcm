@@ -22,7 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
-using namespace trustwave;
+using trustwave::pe_context;
 namespace {
     template<typename T>
     T *malloc_helper(const size_t count = 1) {
@@ -81,112 +81,6 @@ namespace {
     }version_info_header;
 #pragma pack(pop)
 
-//    output_node_t *showNode(const NODE_PERES *node, output_node_t *output) {
-//        switch (node->nodeType) {
-//            default:
-//                return nullptr;
-//            case RDT_RESOURCE_DIRECTORY: {
-//                const IMAGE_RESOURCE_DIRECTORY *resourceDirectory = node->resource.resourceDirectory;
-//                output->kind = RDT_RESOURCE_DIRECTORY;
-//                output->node_type.resourcesDirectory.NodeType = node->nodeLevel;
-//                output->node_type.resourcesDirectory.Characteristics = resourceDirectory->Characteristics;
-//                output->node_type.resourcesDirectory.TimeDateStamp = resourceDirectory->TimeDateStamp;
-//                output->node_type.resourcesDirectory.MajorVersion = resourceDirectory->MajorVersion;
-//                output->node_type.resourcesDirectory.MinorVersion = resourceDirectory->MinorVersion;
-//                output->node_type.resourcesDirectory.NumberOfNamedEntries = resourceDirectory->NumberOfNamedEntries;
-//                output->node_type.resourcesDirectory.NumberOfIdEntries = resourceDirectory->NumberOfIdEntries;
-//                break;
-//            }
-//            case RDT_DIRECTORY_ENTRY: {
-//                const IMAGE_RESOURCE_DIRECTORY_ENTRY *directoryEntry = node->resource.directoryEntry;
-//                output->kind = RDT_DIRECTORY_ENTRY;
-//                output->node_type.directoryEntry.NodeType = node->nodeLevel;
-//                output->node_type.directoryEntry.NameOffset = directoryEntry->DirectoryName.name.NameOffset;
-//                output->node_type.directoryEntry.NameIsString = directoryEntry->DirectoryName.name.NameIsString;
-//                output->node_type.directoryEntry.OffsetIsDirectory = directoryEntry->DirectoryData.data.OffsetToDirectory;
-//                output->node_type.directoryEntry.DataIsDirectory = directoryEntry->DirectoryData.data.DataIsDirectory;
-//
-//                break;
-//            }
-//            case RDT_DATA_STRING: {
-//                const IMAGE_RESOURCE_DATA_STRING *dataString = node->resource.dataString;
-//                output->kind = RDT_DATA_STRING;
-//                output->node_type.dataString.NodeType = node->nodeLevel;
-//                output->node_type.dataString.Strlen = dataString->length;
-//                output->node_type.dataString.String = dataString->string[0];
-//                break;
-//            }
-//            case RDT_DATA_ENTRY: {
-//                const IMAGE_RESOURCE_DATA_ENTRY *dataEntry = node->resource.dataEntry;
-//                output->kind = RDT_DATA_ENTRY;
-//                output->node_type.dataEntry.NodeType = node->nodeLevel;
-//                output->node_type.dataEntry.OffsetToData = dataEntry->offsetToData;
-//                output->node_type.dataEntry.Size = dataEntry->size;
-//                output->node_type.dataEntry.CodePage = dataEntry->codePage;
-//                output->node_type.dataEntry.CodePage = dataEntry->codePage;
-//                output->node_type.dataEntry.Reserved = dataEntry->reserved;
-//                break;
-//            }
-//        }
-//
-//        return output;
-//    }
-
-//    count_output_node_t countNode(NODE_PERES *node) {
-//        count_output_node_t count;
-//        memset(&count, 0, sizeof(count_output_node_t));
-//
-//        switch (node->nodeType) {
-//            default:
-//                return count;
-//            case RDT_RESOURCE_DIRECTORY:
-//                count.kind = RDT_RESOURCE_DIRECTORY;
-//                break;
-//            case RDT_DIRECTORY_ENTRY:
-//                count.kind = RDT_DIRECTORY_ENTRY;
-//                break;
-//            case RDT_DATA_STRING:
-//                count.kind = RDT_DATA_STRING;
-//                break;
-//            case RDT_DATA_ENTRY:
-//                count.kind = RDT_DATA_ENTRY;
-//                break;
-//        }
-//
-//        return count;
-//    }
-
-//    pe_resources_count_t get_count(NODE_PERES *node) {
-//        pe_resources_count_t count;
-//        int resourcesDirectory = 0;
-//        int directoryEntry = 0;
-//        int dataString = 0;
-//        int dataEntry = 0;
-//
-//        count_output_node_t output;
-//        while (node->lastNode != nullptr) {
-//            node = node->lastNode;
-//        }
-//
-//        while (node != nullptr) {
-//            output = countNode(node);
-//            if (output.kind == RDT_RESOURCE_DIRECTORY)
-//                resourcesDirectory++;
-//            if (output.kind == RDT_DIRECTORY_ENTRY)
-//                directoryEntry++;
-//            if (output.kind == RDT_DATA_STRING)
-//                dataString++;
-//            if (output.kind == RDT_DATA_ENTRY)
-//                dataEntry++;
-//            node = node->nextNode;
-//        }
-//        count.resourcesDirectory = resourcesDirectory;
-//        count.directoryEntry = directoryEntry;
-//        count.dataString = dataString;
-//        count.dataEntry = dataEntry;
-//        return count;
-//    }
-
     void freeNodes(NODE_PERES *currentNode) {
         if (currentNode == nullptr)
             return;
@@ -212,13 +106,17 @@ namespace {
         assert(currentNode != nullptr);
 
         if (currentNode->nodeType == nodeTypeSearch && currentNode->nodeLevel == nodeLevelSearch)
+        {
             return currentNode;
+        }
 
         while (currentNode != nullptr) {
             currentNode = currentNode->lastNode;
             if (currentNode != nullptr && currentNode->nodeType == nodeTypeSearch &&
                 currentNode->nodeLevel == nodeLevelSearch)
+             {
                 return currentNode;
+             }
         }
 
         return nullptr;
@@ -227,12 +125,16 @@ namespace {
     const NODE_PERES *lastNodeByType(const NODE_PERES *currentNode, NODE_TYPE_PERES nodeTypeSearch) {
         assert(currentNode != nullptr);
         if (currentNode->nodeType == nodeTypeSearch)
+        {
             return currentNode;
+        }
 
         while (currentNode != nullptr) {
             currentNode = currentNode->lastNode;
             if (currentNode != nullptr && currentNode->nodeType == nodeTypeSearch)
+             {
                 return currentNode;
+             }
         }
 
         return nullptr;
@@ -253,12 +155,13 @@ namespace {
         currentNode->nextNode = newNode;
         return newNode;
     }
-}
+}// anonymous
 
 
 
 int pe_context::parse() {
-    fm_.map_chunk(0, 64);
+    static constexpr uint16_t dos_header_size = 64;
+    fm_.map_chunk(0, dos_header_size);
     pe_.dos_hdr = reinterpret_cast<IMAGE_DOS_HEADER *>( fm_.data());
     if (pe_.dos_hdr->e_magic != MAGIC_MZ)
     {
@@ -281,7 +184,9 @@ int pe_context::parse() {
                                               LIBPE_SIZEOF_MEMBER(pe_file_t, signature));
 
     if (!fm_.map_chunk_by_pointer(pe_.coff_hdr, sizeof(IMAGE_COFF_HEADER)))
+    {
         return LIBPE_E_MISSING_COFF_HEADER;
+    }
 
     pe_.num_sections = pe_.coff_hdr->NumberOfSections;
 
@@ -292,7 +197,9 @@ int pe_context::parse() {
     // Figure out whether it's a PE32 or PE32+.
     auto *opt_type_ptr = reinterpret_cast<uint16_t *>( pe_.optional_hdr_ptr);
     if (!fm_.map_chunk_by_pointer(opt_type_ptr, LIBPE_SIZEOF_MEMBER(IMAGE_OPTIONAL_HEADER, type)))
+    {
         return LIBPE_E_MISSING_OPTIONAL_HEADER;
+    }
 
     pe_.optional_hdr.type = *opt_type_ptr;
     switch (pe_.optional_hdr.type) {
@@ -308,7 +215,9 @@ int pe_context::parse() {
         case MAGIC_PE64:
             if (!fm_.map_chunk_by_pointer(pe_.optional_hdr_ptr,
                                           sizeof(IMAGE_OPTIONAL_HEADER_64)))
+            {
                 return LIBPE_E_MISSING_OPTIONAL_HEADER;
+            }
             optional_header_parse<IMAGE_OPTIONAL_HEADER_64>(pe_,pe_.optional_hdr._64);
             break;
     }
@@ -326,13 +235,17 @@ int pe_context::parse() {
 
     if (!fm_.map_chunk_by_pointer(pe_.directories_ptr,
                                   sizeof(IMAGE_DATA_DIRECTORY) * pe_.num_directories))
+    {
         return LIBPE_E_ALLOCATION_FAILURE;
+    }
     uint32_t sections_offset = LIBPE_SIZEOF_MEMBER(pe_file_t, signature)
                                + sizeof(IMAGE_FILE_HEADER)
                                + pe_.coff_hdr->SizeOfOptionalHeader;
     pe_.sections_ptr = ptr_add<void>(signature_ptr, sections_offset);
     if (!fm_.map_chunk_by_pointer(pe_.sections_ptr, sizeof(IMAGE_SECTION_HEADER) * pe_.num_sections))
+    {
         return LIBPE_E_ALLOCATION_FAILURE;
+    }
 
     if (!allocate_elements<IMAGE_DATA_DIRECTORY>(pe_.num_directories,pe_.directories,pe_.directories_ptr))
     {
@@ -385,15 +298,18 @@ uint64_t pe_context::pe_rva2ofs(uint64_t rva) {
 
 IMAGE_DATA_DIRECTORY *pe_context::pe_directory_by_entry(ImageDirectoryEntry entry) {
     if (pe_.directories == nullptr || entry > pe_.num_directories - 1)
+    {
         return nullptr;
-
+    }
     return pe_.directories[entry];
 }
 
 NODE_PERES *pe_context::discoveryNodesPeres() {
     const IMAGE_DATA_DIRECTORY *resourceDirectory = pe_directory_by_entry(IMAGE_DIRECTORY_ENTRY_RESOURCE);
     if (resourceDirectory == nullptr || resourceDirectory->Size == 0)
+    {
         return nullptr;
+    }
 
     uint64_t resourceDirOffset = pe_rva2ofs(resourceDirectory->VirtualAddress);
 
@@ -418,7 +334,9 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                                                                        RDT_LEVEL1)->resource.resourceDirectory->NumberOfNamedEntries +
                                                 lastNodeByTypeAndLevel(node, RDT_RESOURCE_DIRECTORY,
                                                                        RDT_LEVEL1)->resource.resourceDirectory->NumberOfIdEntries); i++) {
-        offsetDirectory1 += (i == 1) ? 16 : 8;
+        static constexpr auto first_directory_offset = 8;
+        static constexpr auto not_first_directory_offset = 16;
+        offsetDirectory1 += (i == 1) ? not_first_directory_offset : first_directory_offset;
         offset = resourceDirOffset + offsetDirectory1;
         ptr = ptr_add<void>(fm_.data(), offset);
         if (!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY))) {
@@ -451,7 +369,7 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
                                                                                RDT_LEVEL2)->resource.resourceDirectory->NumberOfNamedEntries +
                                                         lastNodeByTypeAndLevel(node, RDT_RESOURCE_DIRECTORY,
                                                                                RDT_LEVEL2)->resource.resourceDirectory->NumberOfIdEntries); j++) {
-                offsetDirectory2 += (j == 1) ? 16 : 8;
+                offsetDirectory2 += (j == 1) ?  not_first_directory_offset : first_directory_offset;
                 offset = resourceDirOffset + lastNodeByTypeAndLevel(node, RDT_DIRECTORY_ENTRY,
                                                                     RDT_LEVEL1)->resource.directoryEntry->DirectoryData.data.OffsetToDirectory +
                          offsetDirectory2;
@@ -527,82 +445,6 @@ NODE_PERES *pe_context::discoveryNodesPeres() {
     return nullptr;
 }
 
-/*pe_final_output_t pe_context::pe_get_resources() {
-    pe_final_output_t sum_output;
-    sum_output.resourcesDirectory = nullptr;
-    sum_output.directoryEntry = nullptr;
-    sum_output.dataString = nullptr;
-    sum_output.dataEntry = nullptr;
-    NODE_PERES *node = discoveryNodesPeres();
-    if (node == nullptr) {
-        //fprintf(stderr, "this file has no resources\n");
-        sum_output.err = LIBPE_E_ALLOCATION_FAILURE;
-        freeNodes(node);
-        return sum_output;
-    }
-
-    output_node_t *output = malloc_helper<output_node_t>();
-    if (output == nullptr) {
-        sum_output.err = LIBPE_E_ALLOCATION_FAILURE;
-        freeNodes(node);
-        return sum_output;
-    }
-    memset(output, 0, sizeof(output_node_t));
-
-    while (node->lastNode != nullptr) {
-        node = node->lastNode;
-    }
-
-    pe_resources_count_t count = get_count(node);
-
-    int index_resourcesDirectory = 0;
-    int index_directoryEntry = 0;
-    int index_dataString = 0;
-    int index_dataEntry = 0;
-
-    type_RDT_RESOURCE_DIRECTORY *resourcesDirectory = malloc_helper<type_RDT_RESOURCE_DIRECTORY>(
-            count.resourcesDirectory);
-    type_RDT_DIRECTORY_ENTRY *directoryEntry = malloc_helper<type_RDT_DIRECTORY_ENTRY>(count.directoryEntry);
-    type_RDT_DATA_STRING *dataString = malloc_helper<type_RDT_DATA_STRING>(count.dataString);
-    type_RDT_DATA_ENTRY *dataEntry = malloc_helper<type_RDT_DATA_ENTRY>(count.dataEntry);
-
-    NODE_PERES *Todelete = node;
-    while (node != nullptr) {
-        output = showNode(node, output);
-        if (output == nullptr)
-            continue;
-
-        if (output->kind == RDT_RESOURCE_DIRECTORY) {
-            resourcesDirectory[index_resourcesDirectory] = output->node_type.resourcesDirectory;
-            index_resourcesDirectory++;
-        }
-
-        if (output->kind == RDT_DIRECTORY_ENTRY) {
-            directoryEntry[index_directoryEntry] = output->node_type.directoryEntry;
-            index_directoryEntry++;
-        }
-
-        if (output->kind == RDT_DATA_STRING) {
-            dataString[index_dataString] = output->node_type.dataString;
-            index_dataString++;
-        }
-
-        if (output->kind == RDT_DATA_ENTRY) {
-            dataEntry[index_dataEntry] = output->node_type.dataEntry;
-            index_dataEntry++;
-        }
-        node = node->nextNode;
-    }
-    sum_output.resourcesDirectory = resourcesDirectory;
-    sum_output.directoryEntry = directoryEntry;
-    sum_output.dataString = dataString;
-    sum_output.dataEntry = dataEntry;
-
-    free(output);
-    freeNodes(Todelete);
-    sum_output.err = LIBPE_E_OK;
-    return sum_output;
-}*/
 void pe_context::extract_info(std::map<std::u16string,std::u16string>& ret) {
     NODE_PERES *node = discoveryNodesPeres();
     assert(node != nullptr);
@@ -632,11 +474,14 @@ void pe_context::extract_info(std::map<std::u16string,std::u16string>& ret) {
     }
 
     if (!found)
+    {
         return;
-
+    }
+    static constexpr auto header_size = 32;
     const uint64_t offsetData = pe_rva2ofs(dataEntryNode->resource.dataEntry->offsetToData);
     const size_t dataEntrySize = dataEntryNode->resource.dataEntry->size;
-    const char *buffer = ptr_add<char>(fm_.data(), 32 + offsetData);
+
+    const char *buffer = ptr_add<char>(fm_.data(), header_size + offsetData);
 
     if (!fm_.map_chunk_by_pointer(buffer, dataEntrySize)) {
         return;

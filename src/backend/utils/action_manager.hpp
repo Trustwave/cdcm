@@ -13,8 +13,8 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#ifndef SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
-#define SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
+#ifndef _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
+#define _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
 #include <boost/filesystem.hpp>
 
 namespace trustwave {
@@ -24,9 +24,10 @@ namespace trustwave {
     class Dispatcher;
     class action_manager final{
       public:
-     static  std::vector<std::shared_ptr<shared_library>> load(const boost::filesystem::path&,Dispatcher<Action_Base> &);
+     static  std::vector<std::shared_ptr<shared_library>>
+     load(const boost::filesystem::path&,Dispatcher<Action_Base> &);
 
 
     };
-}
-#endif //SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
+} //namespace trustwave
+#endif // _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP

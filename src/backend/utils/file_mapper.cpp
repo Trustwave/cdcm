@@ -16,7 +16,7 @@
 #include "file_mapper.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 
-using namespace trustwave;
+using trustwave::file_mapper;
 
 
 
