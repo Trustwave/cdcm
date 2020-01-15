@@ -106,7 +106,7 @@ static void fc(int)
                             {
                                 "id": ")"
             + act_id7 + R"(",
-                                "key":"\s /s SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                                "key":"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 
 
 
@@ -130,6 +130,7 @@ static void fc(int)
         zmsg* reply = session.send_and_recv(actions);
         (void)reply;
     }
+    reply = session.recv();
 }
 int main(int, char**)
 {
