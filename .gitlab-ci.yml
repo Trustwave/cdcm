@@ -7,11 +7,19 @@ stages:
   - build_deps
   - build
   - test
+  - build_rpms
   - deploy
 
 before_script:
   - echo "Before script section"
   - yum install -y openldap-devel.x86_64
+  - tagversion=( ${CI_COMMIT_TAG//-/ } )
+    - product_version="${tagversion[1]}"
+    - semver=( ${product_version//./ } )
+    - export VERSION_MAJOR="${semver[0]}"
+    - export VERSION_MINOR="${semver[1]}"
+    - export VERSION_PATCH="${semver[2]}"
+    - echo "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
   - echo "For example you might run an update here or install a build dependency"
   - echo "Or perhaps you might print out some debugging details"
     
@@ -52,6 +60,15 @@ test:
   tags:
     - cdcm
 
+build_rpms:
+  stage: build_rpms
+  script:
+    - cd build
+    - rpmbuild -bb cdcm.spec
+    - rpmbuild -bb samba-libs.spec
+    - rpmbuild -bb tw-cdcm.spec
+  tags:
+    - cdcm
 
 deploy:
   stage: deploy
