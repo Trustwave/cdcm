@@ -39,7 +39,7 @@ build:
     - mkdir -p build_cdcm
     - cd build_cdcm
     - scl enable devtoolset-8 "cmake3 .."
-    - scl enable devtoolset-8 "make"
+    - scl enable devtoolset-8 "make -j4"
     - scl enable devtoolset-8 "make install"
   tags: 
     - cdcm
