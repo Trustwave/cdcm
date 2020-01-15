@@ -53,7 +53,7 @@ build:
 test:
   stage: test
   script:
-    - cd credentialed_data_collection_module/src/build/tests/
+    - cd build_cdcm/src/build/tests/
     - ./tests_run --log_format=XML --log_sink=results.xml --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   tags:
     - cdcm
