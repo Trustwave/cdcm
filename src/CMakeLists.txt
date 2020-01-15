@@ -25,7 +25,7 @@ if (DEFINED ENV{DEPS_DIR})
     set(DEPS_DIR $ENV{DEPS_DIR})
     message(STATUS "Build machine")
 else ()
-    set(DEPS_DIR /sandbox/src/deps)
+    set(DEPS_DIR ${CMAKE_SOURCE_DIR}/deps)
     message(STATUS "Development machine")
 endif ()
 

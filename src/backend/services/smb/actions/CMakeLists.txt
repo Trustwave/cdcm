@@ -4,7 +4,7 @@ project(cdcm)
 link_directories(${SMB_LINKS})
 link_directories(/usr/local/lib/)
 
-set(LIBPE_ROOT ${DEPS_DIR}/libpe-pev/lib/libpe)
+set(LIBPE_ROOT ${DEPS_DIR}/libpe)
 
 include_directories(${SMB_INCLUDES})
 include_directories(libfuzzy)
