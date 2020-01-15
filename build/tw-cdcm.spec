@@ -20,7 +20,7 @@
 
 Summary: Package that installs %scl
 Name: %scl_name
-Version: 1.0
+Version: %{getenv:VERSION}
 Release: 1%{?dist}
 License: GPLv2+
 Requires: %{scl_prefix}cdcm

@@ -20,9 +20,8 @@ before_script:
   - export VERSION_MAJOR="${semver[0]}"
   - export VERSION_MINOR="${semver[1]}"
   - export VERSION_PATCH="${semver[2]}"
-  - echo "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-  - echo "For example you might run an update here or install a build dependency"
-  - echo "Or perhaps you might print out some debugging details"
+  - export VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+
     
 after_script:
   - echo "After script section"
@@ -31,10 +30,8 @@ after_script:
 build_deps:
   stage: build_deps
   script:
-    - echo "Do your build_deps here"
     - cd build
     - scl enable devtoolset-8 'make deps'
-
   tags:
     - cdcm
 
@@ -56,8 +53,8 @@ build:
 test:
   stage: test
   script:
-    - echo "Do a test here"
-    - echo "For example run a test suite"
+    - cd credentialed_data_collection_module/src/build/tests/
+    - ./tests_run --log_format=XML --log_sink=results.xml --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   tags:
     - cdcm
 
