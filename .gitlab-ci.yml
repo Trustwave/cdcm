@@ -49,9 +49,13 @@ test:
   script:
     - echo "Do a test here"
     - echo "For example run a test suite"
+  tags:
+    - cdcm
 
 
 deploy:
   stage: deploy
   script:
     - echo "Do your deploy here"
+  tags:
+    - cdcm
