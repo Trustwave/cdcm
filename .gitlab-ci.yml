@@ -1,5 +1,3 @@
-
-
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
@@ -34,7 +32,7 @@ build_deps:
 build:
   stage: build
   variables:
-    DEPS_DIR: "CI_PROJECT_DIR/deps"
+    DEPS_DIR: $CI_PROJECT_DIR/deps
   script:
     - echo "Do your build here"
     - scl enable devtoolset-8 bash
