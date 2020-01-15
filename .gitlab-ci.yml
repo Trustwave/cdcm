@@ -36,10 +36,11 @@ build:
   script:
     - echo "Do your build here"
     - scl enable devtoolset-8 bash
-    - pwd
-    - ls deps/
-    - uname -a
-    - scl enable devtoolset-8 'g++'
+    - mkdir -p build_cdcm
+    - cd build_cdcm
+    - cmake3 ..
+    - make
+    - make install
   tags: 
     - cdcm
 
