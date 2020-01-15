@@ -1,0 +1,56 @@
+
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - deps/
+
+stages:
+  - build_deps
+  - build
+  - test
+  - deploy
+
+before_script:
+  - echo "Before script section"
+  - yum install -y openldap-devel.x86_64
+  - echo "For example you might run an update here or install a build dependency"
+  - echo "Or perhaps you might print out some debugging details"
+    
+after_script:
+  - echo "After script section"
+  - echo "For example you might do some cleanup here"
+
+build_deps:
+  stage: build_deps
+  script:
+    - echo "Do your build_deps here"
+    - cd build
+    - scl enable devtoolset-8 'make deps'
+
+  tags:
+    - cdcm
+
+build:
+  stage: build
+  script:
+    - echo "Do your build here"
+    - scl enable devtoolset-8 bash
+    - pwd
+    - ls deps/
+    - uname -a
+    - scl enable devtoolset-8 'g++'
+  tags: 
+    - cdcm
+
+test:
+  stage: test
+  script:
+    - echo "Do a test here"
+    - echo "For example run a test suite"
+
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Do your deploy here"
