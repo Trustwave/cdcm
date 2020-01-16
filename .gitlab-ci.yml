@@ -23,6 +23,11 @@ build_deps:
   script:
     - cd build
     - scl enable devtoolset-8 'make deps'
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - deps/
+    policy: pull-push
   tags:
     - cdcm
 
