@@ -80,5 +80,7 @@ deploy_snapshot:
   script:
     - cd build
     - python nexus_deploy.py -a cdcm -v $VERSION RPMS/x86_64/*.rpm
+  only:
+    - branches
   tags:
     - cdcm
