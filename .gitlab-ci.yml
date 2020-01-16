@@ -70,6 +70,6 @@ deploy:
   stage: deploy
   script:
     - cd build
-    - python nexus-deploy.py -a cdcm -v $VERSION build/RPMS/x86_64/*.rpm
+    - python nexus_deploy.py -a cdcm -v $VERSION RPMS/x86_64/*.rpm
   tags:
     - cdcm
