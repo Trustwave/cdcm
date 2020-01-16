@@ -42,6 +42,8 @@ build:
       - build_cdcm/
   cache:
     key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - deps/
     policy: pull
   tags: 
     - cdcm
