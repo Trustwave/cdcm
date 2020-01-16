@@ -1,5 +1,5 @@
 cache:
-  key: ${CI_COMMIT_SHA}
+  key: "$CI_COMMIT_REF_SLUG"
   paths:
     - deps/
 
@@ -40,6 +40,9 @@ build:
   artifacts:
     paths:
       - build_cdcm/
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    policy: pull
   tags: 
     - cdcm
 
