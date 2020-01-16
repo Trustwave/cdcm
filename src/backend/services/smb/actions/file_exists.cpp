@@ -31,7 +31,7 @@ int SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action
                          std::shared_ptr<result_msg> res)
 {
 
-    //fixme assaf remove me 
+    //fixme assaf remove me
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
         return -1;
