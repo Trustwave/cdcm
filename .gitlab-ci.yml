@@ -40,19 +40,22 @@ build:
   variables:
     DEPS_DIR: $CI_PROJECT_DIR/deps
   script:
-    - echo "Do your build here"
     - scl enable devtoolset-8 bash
     - mkdir -p build_cdcm
     - cd build_cdcm
     - scl enable devtoolset-8 "cmake3 .."
     - scl enable devtoolset-8 "make -j4"
     - scl enable devtoolset-8 "make install"
+  artifacts:
+    paths:
+      - build_cdcm/
   tags: 
     - cdcm
 
 test:
   stage: test
   script:
+    - ls
     - cd build_cdcm/tests/
     - ./tests_run --log_format=XML --log_sink=results.xml --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   tags:
