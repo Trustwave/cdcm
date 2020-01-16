@@ -63,7 +63,6 @@ check:
 	for rpm in $(REQ_RPMS);do rpm -q $$rpm;done
 	@echo "* fin $@ `date +%F.%H:%M:%S`"
 
-
 # Check that % known and supported
 validate.%:
 	@echo "* run $@ `date +%F.%H:%M:%S`"

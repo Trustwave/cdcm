@@ -21,7 +21,8 @@ before_script:
   - export VERSION_MAJOR="${semver[0]}"
   - export VERSION_MINOR="${semver[1]}"
   - export VERSION_PATCH="${semver[2]}"
-  - export VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+  - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 2)
+  - echo ${VERSION}
 
     
 after_script:
