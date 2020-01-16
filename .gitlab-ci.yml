@@ -13,17 +13,7 @@ stages:
 before_script:
   - echo "Before script section"
   - yum install -y openldap-devel.x86_64
-  - env
-  - tagversion=( ${CI_COMMIT_TAG//-/ } )
-  - echo ${tagversion}
-  - product_version="${tagversion[1]}"
-  - semver=( ${product_version//./ } )
-  - export VERSION_MAJOR="${semver[0]}"
-  - export VERSION_MINOR="${semver[1]}"
-  - export VERSION_PATCH="${semver[2]}"
-  - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 2)
-  - echo ${VERSION}
-
+  - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
     
 after_script:
   - echo "After script section"
@@ -76,6 +66,6 @@ build_rpms:
 deploy:
   stage: deploy
   script:
-    - echo "Do your deploy here"
+    - echo "python nexus-upload.py -a cdcm -v $VERSION build/RPMS/x86_64/*.rpm"
   tags:
     - cdcm
