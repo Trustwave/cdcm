@@ -60,6 +60,9 @@ build_rpms:
     - rpmbuild -bb cdcm.spec
     - rpmbuild -bb samba-libs.spec
     - rpmbuild -bb tw-cdcm.spec
+  artifacts:
+    paths:
+      - build/RPMS/x86_64/
   tags:
     - cdcm
 
