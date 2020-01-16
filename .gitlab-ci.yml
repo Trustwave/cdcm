@@ -17,7 +17,6 @@ before_script:
     
 after_script:
   - echo "After script section"
-  - echo "For example you might do some cleanup here"
 
 build_deps:
   stage: build_deps
@@ -66,7 +65,17 @@ build_rpms:
   tags:
     - cdcm
 
-deploy:
+deploy_release:
+  stage: deploy
+  script:
+    - cd build
+    - python nexus_deploy.py -a cdcm -v $VERSION -r release RPMS/x86_64/*.rpm
+  only:
+    - tags
+  tags:
+    - cdcm
+
+deploy_snapshot:
   stage: deploy
   script:
     - cd build
