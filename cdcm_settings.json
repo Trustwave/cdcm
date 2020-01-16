@@ -5,7 +5,7 @@
     "heartbeat_expiry": 3,
     "maintenance_interval": 3,
     "reconnect": 3000,
-    "session_idle_time": 10,
+    "session_idle_time": 300,
     "worker_processes": 1,
     "broker_worker_listening_ep": "tcp:\/\/*:5556",
     "broker_client_listening_ep": "tcp:\/\/*:5555",
