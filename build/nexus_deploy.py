@@ -46,6 +46,8 @@ class NexusUploader:
             'host': self.host,
             'group': group.replace('.', '/'),
             'artifact': artifact,
+            'branch': branch,
+            'release_type': release_type,
             'version': version,
             'fn': fn,
         }
