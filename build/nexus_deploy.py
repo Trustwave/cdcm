@@ -32,8 +32,8 @@ class NexusUploader:
         for fpath in files:
             fn = os.path.basename(fpath)
             digest = self.calc_hash(fpath)
-            self._upload(group, artifact, version, '%s.sha1' % fn, digest)
-            self._upload(group, artifact, version, fn, '@%s' % fpath)
+            self._upload(group, artifact, branch, release_type, version, '%s.sha1' % fn, digest)
+            self._upload(group, artifact, branch, release_type, version, fn, '@%s' % fpath)
 
     def _upload(self, group, artifact, branch, release_type, version, fn, source):
         args = [
