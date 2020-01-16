@@ -42,7 +42,7 @@ class NexusUploader:
             '-u', '%s:%s' % (self.username, self.password),
             '-F', 'file=%s' % source
         ]
-        url = 'https://%(host)s/content/repositories/%(release_type)s/%(group)s/%(artifact)s/%(branch)/%(version)s/%(fn)s' % {
+        url = 'https://%(host)s/content/repositories/%(release_type)ss/%(group)s/%(artifact)s/%(branch)s/%(version)s/%(fn)s' % {
             'host': self.host,
             'group': group.replace('.', '/'),
             'artifact': artifact,
