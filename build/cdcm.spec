@@ -9,7 +9,7 @@
 %define _unpackaged_files_terminate_build 0
 
 Name:       %{scl_prefix}cdcm
-Version:    %{getenv:VERSION}
+Version:    1.0.0
 Release:    1%{?dist}
 License:    Trustwave   
 Summary:    Package that installs %name
