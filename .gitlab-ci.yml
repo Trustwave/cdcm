@@ -62,7 +62,7 @@ test:
     - ls
   artifacts:
     reports:
-      junit: results.xml
+      junit: build_cdcm/src/tests/results.xml
   tags:
     - cdcm
 
