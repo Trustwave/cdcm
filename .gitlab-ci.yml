@@ -59,6 +59,7 @@ test:
     - ls
     - cd build_cdcm/src/tests/
     - ./tests_run --log_sink=results.xml --log_level=all --report_level=no -- --assets_path "$PWD/assets"
+    - ls
   artifacts:
     reports:
       junit: results.xml
