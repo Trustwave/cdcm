@@ -31,13 +31,14 @@ wrapper::start_external_test(std::string command, std::string params,
                              std::pair<std::future<std::string>, std::future<std::string>>&& streams,
                              std::future<std::error_code>&& ec_ret)
 {
-    const std::vector<boost::filesystem::path> cp = {boost::filesystem::path("./"), boost::filesystem::path("../"),
+    const std::vector<boost::filesystem::path> cp = {boost::filesystem::current_path().append("functional_tests"),boost::filesystem::path("./"), boost::filesystem::path("../"),
                                                      boost::filesystem::path("./functional_tests")};
     try {
         std::shared_ptr<std::promise<std::error_code>> promise = std::make_shared<std::promise<std::error_code>>();
         ec_ret = promise->get_future();
+        boost::filesystem::permissions( boost::filesystem::current_path().append("functional_tests").append("exe_test"),boost::filesystem::owner_exe|boost::filesystem::owner_read|boost::filesystem::owner_write);
         auto p = std::make_unique<bp::child>(
-            bp::search_path(command, cp), params, bp::on_exit([command, this, promise](int, const std::error_code& ec) {
+            boost::filesystem::current_path().append("functional_tests").append("exe_test"), params, bp::on_exit([command, this, promise](int, const std::error_code& ec) {
                 promise->set_value(std::move(ec));
             }),
             bp::std_in.close(), bp::std_out > streams.first, bp::std_err > streams.second, ios);
