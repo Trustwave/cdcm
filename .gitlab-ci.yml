@@ -58,6 +58,8 @@ test:
     - cd build_cdcm/src/tests/
     - ./tests_run --log_sink=results.xml --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   artifacts:
+    paths:
+      - build_cdcm/src/tests/results.xml
     reports:
       junit: build_cdcm/src/tests/results.xml
   tags:
