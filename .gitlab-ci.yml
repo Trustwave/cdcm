@@ -62,8 +62,8 @@ test:
       - build_cdcm/src/tests/results.xml
     reports:
       junit: build_cdcm/src/tests/results.xml
-  tags:
-    - cdcm
+    tags:
+      - cdcm
 
 build_rpms:
   stage: build_rpms
