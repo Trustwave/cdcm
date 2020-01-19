@@ -58,6 +58,7 @@ test:
     - cd build_cdcm/src/tests/
     - echo "one two ..."
     - ./tests_run --log_sink=results.xml --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
+    - echo $(date +%Y%m%dT%H%M%S)
   artifacts:
     paths:
       - build_cdcm/src/tests/results.xml
