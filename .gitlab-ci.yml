@@ -57,7 +57,7 @@ test:
   script:
     - cd build_cdcm/src/tests/
     - echo "one two ..."
-    - REPORT_FNAME = results.$(date +%d-%m-%Y-%H:%M:%S).xml
+    - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
     - ./tests_run --log_sink=$(REPORT_FNAME)--log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   artifacts:
     paths:
