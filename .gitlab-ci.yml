@@ -66,16 +66,6 @@ test:
   tags:
     - cdcm
 
-pages:
-  script:
-    - mkdir public
-    - cp build_cdcm/src/tests/results.xml public
-  artifacts:
-    paths:
-      - public
-  tags:
-    - cdcm
-
 build_rpms:
   stage: build_rpms
   script:
