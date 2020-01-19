@@ -61,6 +61,8 @@ test:
     - echo $REPORT_FNAME
     - ./tests_run --log_sink=$REPORT_FNAME --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
     - ls
+    - ls -la
+    - pwd
   artifacts:
     paths:
       - build_cdcm/src/tests/$REPORT_FNAME
