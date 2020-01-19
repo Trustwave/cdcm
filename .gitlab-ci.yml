@@ -13,6 +13,7 @@ stages:
 before_script:
   - yum install -y openldap-devel.x86_64
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
+  - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
     
 after_script:
   - echo "After script section"
@@ -57,7 +58,6 @@ test:
   script:
     - cd build_cdcm/src/tests/
     - echo "one two ..."
-    - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
     - echo $REPORT_FNAME
     - ./tests_run --log_sink=$REPORT_FNAME --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   artifacts:
