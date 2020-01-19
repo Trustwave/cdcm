@@ -73,6 +73,8 @@ pages:
   artifacts:
     paths:
       - public
+  tags:
+    - cdcm
 
 build_rpms:
   stage: build_rpms
