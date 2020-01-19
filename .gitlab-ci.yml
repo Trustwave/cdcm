@@ -58,12 +58,12 @@ test:
     - cd build_cdcm/src/tests/
     - echo "one two ..."
     - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
-    - ./tests_run --log_sink=$(REPORT_FNAME)--log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
+    - ./tests_run --log_sink=$REPORT_FNAME --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   artifacts:
     paths:
-      - build_cdcm/src/tests/$(REPORT_FNAME)
+      - build_cdcm/src/tests/$REPORT_FNAME
     reports:
-      junit: build_cdcm/src/tests/$(REPORT_FNAME)
+      junit: build_cdcm/src/tests/$REPORT_FNAME
   tags:
     - cdcm
 
