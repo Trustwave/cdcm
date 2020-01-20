@@ -1,3 +1,6 @@
+variables:
+  CI_PROJECT_DIR: $CI_PROJECT_DIR/$CI_COMMIT_REF_SLUG
+
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
@@ -15,7 +18,7 @@ before_script:
   - yum install -y openldap-devel.x86_64
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
-  - export CI_PROJECT_DIR=$CI_PROJECT_DIR/$CI_COMMIT_REF_SLUG
+  - echo $CI_PROJECT_DIR
     
 after_script:
   - echo "After script section"
