@@ -87,8 +87,7 @@ build_rpms:
 
 test_install:
   stage: test_install
-  tags:
-    - cdcm-centos7
+  image: ${CI_REGISTRY_IMAGE}
   script:
     - echo "will install rpm's and test"
     - cd build
