@@ -9,6 +9,7 @@ stages:
   - test
   - build_rpms
   - deploy
+  - test_install
 
 before_script:
   - yum install -y openldap-devel.x86_64
@@ -88,6 +89,12 @@ build_rpms:
     policy: pull
   tags:
     - cdcm
+
+test_install:
+  tags:
+    - cdcm-centos7
+  script:
+    - echo "will install rpm's and test"
 
 deploy_release:
   stage: deploy
