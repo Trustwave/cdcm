@@ -64,11 +64,11 @@ test:
     - ls
     - ls -la
     - pwd
-  artifacts:
-    paths:
-      - build_cdcm/src/tests/$REPORT_FNAME
-    reports:
-      junit: build_cdcm/src/tests/$REPORT_FNAME
+#  artifacts:
+#    paths:
+#      - build_cdcm/src/tests/$REPORT_FNAME
+#    reports:
+#      junit: build_cdcm/src/tests/$REPORT_FNAME
   tags:
     - cdcm
 
@@ -96,6 +96,8 @@ test_install:
     - cdcm-centos7
   script:
     - echo "will install rpm's and test"
+    - cd build
+    - yum localinstall -y RPMS/x86_64/*.rpm
 
 deploy_release:
   stage: deploy
