@@ -15,6 +15,7 @@ before_script:
   - yum install -y openldap-devel.x86_64
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
+  - export CI_PROJECT_DIR=$CI_PROJECT_DIR/$CI_COMMIT_REF_SLUG
     
 after_script:
   - echo "After script section"
@@ -75,9 +76,9 @@ test:
   artifacts:
     when: always
     paths:
-      - build_cdcm/src/tests/$REPORT_FNAME
+      - build_cdcm/src/tests/*.xml
     reports:
-      junit: build_cdcm/src/tests/$REPORT_FNAME
+      junit: build_cdcm/src/tests/*.xml
   tags:
     - cdcm
 
