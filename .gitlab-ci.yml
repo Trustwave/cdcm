@@ -8,8 +8,8 @@ stages:
   - build
   - test
   - build_rpms
-  - deploy
   - test_install
+  - deploy
 
 before_script:
   - yum install -y openldap-devel.x86_64
