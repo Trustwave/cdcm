@@ -24,6 +24,10 @@ build_deps:
   script:
     - cd build
     - scl enable devtoolset-8 'make deps'
+  rules:
+    - changes:
+        - build/Makefile
+        - tars/*
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
