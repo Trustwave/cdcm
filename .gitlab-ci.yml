@@ -28,6 +28,7 @@ build_deps:
     - changes:
         - build/Makefile
         - tars/*
+        - .gitlab-ci.yml
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -50,6 +51,7 @@ build:
   rules:
     - changes:
         - src
+        - .gitlab-ci.yml
   artifacts:
     paths:
       - build_cdcm/
@@ -66,6 +68,9 @@ test:
   script:
     - cd build_cdcm/src/tests/
     - touch r.xml
+  rules:
+    - exists:
+        - build_cdcm/src/tests
   artifacts:
     paths:
       - build_cdcm/src/tests/r.xml
