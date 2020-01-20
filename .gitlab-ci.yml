@@ -47,6 +47,9 @@ build:
     - scl enable devtoolset-8 "cmake3 .."
     - scl enable devtoolset-8 "make -j4"
     - scl enable devtoolset-8 "make install"
+  rules:
+    - changes:
+        - src
   artifacts:
     paths:
       - build_cdcm/
