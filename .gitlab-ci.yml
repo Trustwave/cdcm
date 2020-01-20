@@ -69,8 +69,9 @@ test:
     - cd build_cdcm/src/tests/
     - ./tests_run  --log_sink=r.xml  --log_format=JUNIT  --log_level=all
   rules:
-    - exists:
-        - build_cdcm/src/tests
+    - changes:
+        - src
+        - .gitlab-ci.yml
   artifacts:
     paths:
       - build_cdcm/src/tests/r.xml
