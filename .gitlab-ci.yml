@@ -91,6 +91,7 @@ build_rpms:
     - cdcm
 
 test_install:
+  stage: test_install
   tags:
     - cdcm-centos7
   script:
