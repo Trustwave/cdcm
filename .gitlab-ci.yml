@@ -87,7 +87,8 @@ build_rpms:
 
 test_install:
   stage: test_install
-  image: ${CI_REGISTRY_IMAGE}
+  tags:
+    - cdcm_install
   script:
     - echo "will install rpm's and test"
     - cd build
