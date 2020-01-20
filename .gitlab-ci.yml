@@ -58,12 +58,7 @@ test:
   stage: test
   script:
     - cd build_cdcm/src/tests/
-    - echo "one two ..."
-    - echo $REPORT_FNAME
-    - ./tests_run --log_sink=$REPORT_FNAME --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
-    - ls
-    - ls -la
-    - pwd
+    - ./tests_run -k $REPORT_FNAME --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
   artifacts:
     paths:
       - build_cdcm/src/tests/$REPORT_FNAME
