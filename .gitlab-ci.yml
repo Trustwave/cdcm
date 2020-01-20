@@ -67,7 +67,7 @@ test:
   stage: test
   script:
     - cd build_cdcm/src/tests/
-    - touch r.xml
+    - ./tests_run  --log_sink=r.xml  --log_format=JUNIT  --log_level=all
   rules:
     - exists:
         - build_cdcm/src/tests
