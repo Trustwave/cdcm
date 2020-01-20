@@ -67,16 +67,16 @@ test:
   stage: test
   script:
     - cd build_cdcm/src/tests/
-    - ./tests_run  --log_sink=r.xml  --log_format=JUNIT  --log_level=all
+    - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
   rules:
     - changes:
         - src
         - .gitlab-ci.yml
   artifacts:
     paths:
-      - build_cdcm/src/tests/r.xml
+      - build_cdcm/src/tests/$REPORT_FNAME
     reports:
-      junit: build_cdcm/src/tests/r.xml
+      junit: build_cdcm/src/tests/$REPORT_FNAME
   tags:
     - cdcm
 
