@@ -1,5 +1,5 @@
 
-#if(BUILD_COV)
+if(BUILD_DEV)
 set(COVERAGE_GCOVR_EXCLUDES
         '${PROJECT_BINARY_DIR}/*'
         '${PROJECT_SOURCE_DIR}/src/tests/*'
@@ -7,7 +7,7 @@ set(COVERAGE_GCOVR_EXCLUDES
         )
 
 SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME html_coverage EXECUTABLE ctest3 )
-#endif()
+endif()
 
 
 set(Boost_USE_STATIC_LIBS OFF)
