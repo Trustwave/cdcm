@@ -19,7 +19,7 @@ before_script:
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
   - echo $CI_PROJECT_DIR
-  - export CMAKE_FLAGS=''
+  - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
   - if [ -n "$CI_COMMIT_TAG" ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - echo $CMAKE_FLAGS
     
