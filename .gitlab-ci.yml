@@ -116,6 +116,8 @@ pages:
     expire_in: 15 days
   only:
     - master
+  tags:
+    - cdcm
 
 build_rpms:
   stage: build_rpms
