@@ -19,7 +19,7 @@ before_script:
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
   - echo $CI_PROJECT_DIR
-  - if [ -n "$CI_COMMIT_TAG" ] echo "SSS"
+  - if [ -n "$CI_COMMIT_TAG" ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
     
 after_script:
   - echo "After script section"
@@ -50,7 +50,7 @@ build:
     - scl enable devtoolset-8 bash
     - mkdir -p build_cdcm
     - cd build_cdcm
-    - scl enable devtoolset-8 "cmake3 .."
+    - scl enable devtoolset-8 "cmake3 $CMAKE_FLAGS .."
     - scl enable devtoolset-8 "make -j4"
     - scl enable devtoolset-8 "make install"
   rules:
