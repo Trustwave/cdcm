@@ -91,7 +91,8 @@ test:
 html_coverage:
   stage: test
   script:
-    - echo "AAA"
+    - cd build_cdcm
+    - make html_coverage
   artifacts:
     when: always
     paths:
@@ -105,7 +106,7 @@ html_coverage:
 pages:
   stage: deploy
   dependencies:
-    - test
+    - html_coverage
   script:
     - rm -rf public/*
     - cp -r html_coverage/lcov-report/* public/
