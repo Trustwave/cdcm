@@ -111,7 +111,7 @@ pages:
     - html_coverage
   script:
     - rm -rf public/*
-    - cp -r build_cdcm/src/html_coverage public/
+    - cp -r build_cdcm/src/html_coverage/* public/
   artifacts:
     paths:
       - public
