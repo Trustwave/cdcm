@@ -1,3 +1,6 @@
+variables:
+  GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_COMMIT_REF_SLUG
+
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
@@ -15,6 +18,7 @@ before_script:
   - yum install -y openldap-devel.x86_64
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H:%M:%S).xml
+  - echo $CI_PROJECT_DIR
     
 after_script:
   - echo "After script section"
@@ -24,6 +28,11 @@ build_deps:
   script:
     - cd build
     - scl enable devtoolset-8 'make deps'
+  rules:
+    - changes:
+        - build/Makefile
+        - tars/*
+        - .gitlab-ci.yml
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -43,6 +52,10 @@ build:
     - scl enable devtoolset-8 "cmake3 .."
     - scl enable devtoolset-8 "make -j4"
     - scl enable devtoolset-8 "make install"
+  rules:
+    - changes:
+        - src
+        - .gitlab-ci.yml
   artifacts:
     paths:
       - build_cdcm/
@@ -58,14 +71,20 @@ test:
   stage: test
   script:
     - cd build_cdcm/src/tests/
-    - ./tests_run -k $REPORT_FNAME --log_format=JUNIT --log_level=all --report_level=no -- --assets_path "$PWD/assets"
+    - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
+  rules:
+    - changes:
+        - src
+        - .gitlab-ci.yml
   artifacts:
+    when: always
     paths:
-      - build_cdcm/src/tests/$REPORT_FNAME
+      - build_cdcm/src/tests/*.xml
     reports:
-      junit: build_cdcm/src/tests/$REPORT_FNAME
+      junit: build_cdcm/src/tests/*.xml
   tags:
     - cdcm
+
 
 build_rpms:
   stage: build_rpms
@@ -88,7 +107,7 @@ build_rpms:
 test_install:
   stage: test_install
   tags:
-    - cdcm-centos7
+    - cdcm_install
   script:
     - echo "will install rpm's and test"
     - cd build
