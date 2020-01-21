@@ -89,6 +89,7 @@ test:
 html_coverage:
   stage: test
   script:
+    - echo "AAA"
   artifacts:
     when: always
     paths:
