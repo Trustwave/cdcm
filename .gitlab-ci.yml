@@ -10,6 +10,7 @@ stages:
   - build_deps
   - build
   - test
+  - coverage
   - build_rpms
   - test_install
   - deploy
@@ -89,7 +90,7 @@ test:
     - cdcm
 
 html_coverage:
-  stage: test
+  stage: coverage
   script:
     - cd build_cdcm
     - make html_coverage
