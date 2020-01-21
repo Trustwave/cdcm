@@ -1,23 +1,9 @@
 
-if(BUILD_DEV)
-set(COVERAGE_GCOVR_EXCLUDES
-        '${PROJECT_BINARY_DIR}/*'
-        '${PROJECT_SOURCE_DIR}/src/tests/*'
-        '${PROJECT_SOURCE_DIR}/deps/*'
-        )
-
-SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME html_coverage EXECUTABLE ctest3 )
-endif()
-
-
 set(Boost_USE_STATIC_LIBS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
-#Setup CMake to run tests
 enable_testing()
-
-#Prep ourselves for compiling boost
 
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -47,3 +33,12 @@ add_custom_command(TARGET tests_run POST_BUILD
 target_link_libraries(tests_run ${Boost_LIBRARIES} boost_regex tw-sessions-cache crypto pthread test_wrapper boost_filesystem tw-zmq zmq)
 add_dependencies(tests_run tests_externalData)
 target_link_libraries(client ${Boost_LIBRARIES} boost_regex tw-sessions-cache crypto pthread test_wrapper boost_filesystem tw-zmq zmq)
+if(BUILD_DEV)
+    set(COVERAGE_GCOVR_EXCLUDES
+            '${PROJECT_BINARY_DIR}/*'
+            '${PROJECT_SOURCE_DIR}/src/tests/*'
+            '${PROJECT_SOURCE_DIR}/deps/*'
+            )
+
+    SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME html_coverage EXECUTABLE ctest3 )
+endif()
