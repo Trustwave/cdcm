@@ -112,7 +112,7 @@ test_install:
     - echo "will install rpm's and test"
     - cd build
     - yum localinstall -y RPMS/x86_64/*.rpm
-    - scl enable tw-cdcm1 cdcm_broker
+    - scl enable tw-cdcm1 "cdcm_broker &"
 
 deploy_release:
   stage: deploy
