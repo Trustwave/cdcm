@@ -14,8 +14,13 @@ function(enable_cxx_compiler_flag_if_supported flag)
         unset(flag_supported CACHE)
     endif ()
 endfunction()
+option(BUILD_COV "Build project with coverage compiler flags." OFF)
+#if(BUILD_COV)
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 include(CodeCoverage.cmake)
+
 APPEND_COVERAGE_COMPILER_FLAGS()
+#endif()
 enable_cxx_compiler_flag_if_supported("-Wall")
 enable_cxx_compiler_flag_if_supported("-Wextra")
 #enable_cxx_compiler_flag_if_supported("-Werror")
@@ -77,6 +82,4 @@ configure_file(../cdcm_settings.json /var/cdcm/conf/cdcm_settings.json COPYONLY)
 configure_file(../Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
 
 install(FILES ../scripts/cdcm.sh DESTINATION ${release_bin_dest})
-
-
 
