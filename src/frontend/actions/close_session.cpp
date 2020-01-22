@@ -20,7 +20,7 @@
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 
-using namespace trustwave;
+using trustwave::Close_Session;
 
 int Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
@@ -35,5 +35,5 @@ int Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
     return 0;
 }
 
-Dispatcher<Action_Base>::Registrator
+trustwave::Dispatcher<trustwave::Action_Base>::Registrator
     Close_Session::m_registrator(new Close_Session, authenticated_scan_server::instance().public_dispatcher);
