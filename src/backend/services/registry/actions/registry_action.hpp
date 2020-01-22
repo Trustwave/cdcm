@@ -30,8 +30,7 @@ namespace trustwave {
     class Registry_Action: public Action_Base {
     public:
         Registry_Action(const std::string_view command): Action_Base(command) {}
-
-        static std::shared_ptr<registry_client> client(boost::shared_ptr<session>, std::shared_ptr<result_msg> res);
+        //rotem: asssaf, can i remove this class and the registry actions will inherit from action_base?
     };
 } // namespace trustwave
 #endif /* TRUSTWAVE_SERVICES_REGISTRY_REGISTRY_ACTION_HPP_ */

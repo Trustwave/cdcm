@@ -56,7 +56,7 @@ namespace trustwave {
         public configurable<smb_service_configuration> {
     public:
         smb_client();
-        virtual ~smb_client() override = default;
+        virtual ~smb_client() override; //rotem: assaf, why virtual if the class is final?
         bool list(const std::string&, std::vector<trustwave::dirent>&);
         bool download_portion_to_memory(const char* base, const char* name, off_t offset, off_t count);
         ssize_t read(size_t offset, size_t size, char* dest) override;
