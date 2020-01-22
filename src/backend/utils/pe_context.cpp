@@ -480,7 +480,7 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
     auto buffer_end = ptr_add<char>(buffer, dataEntrySize);
 
     std::unordered_set<std::u16string> s
-        = {u"CompanyName", u"FileDescription", u"FileVersion", u"ProductName", u"ProductVersion"};
+        = {u"companyName", u"fileDescription", u"fileVersion", u"froductName", u"productVersion"};
 
     while(str_vih->wLength > 0 && ptr_add<char>(str_vih, str_vih->wLength) <= buffer_end) {
         auto* kstart = ptr_add<char16_t>(str_vih, sizeof(version_info_header));
