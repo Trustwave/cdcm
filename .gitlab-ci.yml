@@ -59,7 +59,7 @@ build:
     - scl enable devtoolset-8 "make install"
   rules:
     - changes:
-        - src
+        - src/**/*
         - .gitlab-ci.yml
   artifacts:
     paths:
@@ -79,7 +79,7 @@ test:
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
   rules:
     - changes:
-        - src
+        - src/**/*
         - .gitlab-ci.yml
   artifacts:
     when: always
