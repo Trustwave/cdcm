@@ -104,6 +104,16 @@ static void smbc_auth_fn(const char* pServer, const char*, char* pWorkgroup, int
     krb5_set = 1;
 }
 
+smb_client::~smb_client()
+{
+    AU_LOG_DEBUG("rotem ~smb_client"); //rotem todo delete
+
+    smbc_close(remote_fd_);
+    remote_fd_ = -1;
+    close(local_fd_);
+    local_fd_ = -1;
+}
+
 std::pair<bool, int> smb_client::connect(const char* path)
 {
     AU_LOG_DEBUG("path: %s", path);
@@ -115,10 +125,17 @@ std::pair<bool, int> smb_client::connect(const char* path)
 
     current_open_path_ = path;
     if(remote_fd_ <= 0) {
+        remote_fd_ = -1;
+        close(local_fd_);
+        local_fd_ = -1;
         return std::make_pair(false, errno);
     }
     if(smbc_fstat(remote_fd_, &remotestat_) < 0) {
         AU_LOG_ERROR("Can't stat %s: %s", path, strerror(errno));
+        smbc_close(remote_fd_);
+        remote_fd_ = -1;
+        close(local_fd_);
+        local_fd_ = -1;
         return std::make_pair(false, -1);
     }
     return std::make_pair(true, 0);
@@ -137,8 +154,10 @@ bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
             AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t)curpos,
                          current_open_path_.data());
             smbc_close(remote_fd_);
+            remote_fd_ = -1;
             if(local_fd_ != STDOUT_FILENO) {
                 close(local_fd_);
+                local_fd_ = -1;
             }
             delete[] readbuf;
             return false;
@@ -156,8 +175,10 @@ bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
                          bytesread, current_open_path_.data(), (intmax_t)curpos);
             delete[] readbuf;
             smbc_close(remote_fd_);
+            remote_fd_ = -1;
             if(local_fd_ != -1) {
                 close(local_fd_);
+                local_fd_ = -1;
             }
             return false;
         }
@@ -165,7 +186,9 @@ bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
     delete[] readbuf;
 
     smbc_close(remote_fd_);
+    remote_fd_ = -1;
     close(local_fd_);
+    local_fd_ = -1;
     return true;
 }
 bool smb_client::download_portion_to_memory(const char* base, const char* name, off_t offset = 0, off_t count = 0)
@@ -180,7 +203,9 @@ bool smb_client::download_portion_to_memory(const char* base, const char* name, 
     if(off < 0) {
         AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t)offset, path);
         smbc_close(remote_fd_);
+        remote_fd_ = -1;
         close(local_fd_);
+        local_fd_ = -1;
         return false;
     }
     return download_portion(off, off + count, false);
@@ -223,7 +248,9 @@ ssize_t smb_client::read(size_t offset, size_t size, char* dest)
     if(off < 0) {
         AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t)offset, current_open_path_.data());
         smbc_close(remote_fd_);
+        remote_fd_ = -1;
         close(local_fd_);
+        local_fd_ = -1;
         return -1;
     }
     /* Now, download all bytes from offset_download to size */
@@ -235,6 +262,9 @@ ssize_t smb_client::read(size_t offset, size_t size, char* dest)
             AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t)curpos,
                          current_open_path_.data());
             smbc_close(remote_fd_);
+            remote_fd_ = -1;
+            close(local_fd_);
+            local_fd_ = -1;
             return -1;
         }
         curpos += bytesread;
