@@ -205,7 +205,7 @@ void message_broker::worker_send(trustwave::sp_worker_t worker_ptr, const char* 
     std::unique_ptr<zmsg> msg(_msg ? new zmsg(*_msg) : new zmsg());
 
     //  Stack protocol envelope to start of message
-    if(option.size() > 0) { //  Optional frame after command
+    if(!option.empty()) { //  Optional frame after command
         msg->push_front(option.c_str());
     }
     msg->push_front(command);
@@ -374,12 +374,12 @@ void message_broker::broker_loop()
         if(timeout.count() < 0) timeout.zero();
         zmq::poll(items, 2, timeout.count());
         //  Process next input message, if any
-        if(items[0].revents & ZMQ_POLLIN) {
+        if(0 != items[0].revents & ZMQ_POLLIN) {
             handle_message(
                 *internal_socket_, std::string(MDPW_WORKER),
                 std::bind(&message_broker::worker_process, this, std::placeholders::_1, std::placeholders::_2));
         }
-        if(items[1].revents & ZMQ_POLLIN) {
+        if(0 != items[1].revents & ZMQ_POLLIN) {
             handle_message(
                 *external_socket_, std::string(MDPC_CLIENT),
                 std::bind(&message_broker::client_process, this, std::placeholders::_1, std::placeholders::_2));

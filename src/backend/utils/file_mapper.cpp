@@ -24,12 +24,9 @@ bool file_mapper::map_chunk(size_t offset, size_t size)
         bounded_chunk new_chunk(offset, offset + minimum_read_size(offset, size));
         auto chunk_iter = map_.find(new_chunk);
         if(chunk_iter == map_.end() || !chunk_iter->contains(new_chunk)) {
-            if(fr_.read(new_chunk.offset(), new_chunk.size(), data_.get() + new_chunk.offset())) {
+            if(0 < fr_.read(new_chunk.offset(), new_chunk.size(), data_.get() + new_chunk.offset())) {
                 map_.add(new_chunk);
                 return true;
-            }
-            else {
-                return false;
             }
         }
         else {

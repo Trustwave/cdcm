@@ -26,7 +26,7 @@ namespace trustwave {
         configuration& operator=(const configuration&) = default;
         configuration& operator=(configuration&&) = delete;
         configuration() = delete;
-        const std::string_view name() const { return name_; }
+        [[nodiscard]] std::string_view name() const { return name_; }
         const std::string_view name_;
 
     protected:

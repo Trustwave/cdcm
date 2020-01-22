@@ -14,10 +14,10 @@
 //                          						Include files
 //=====================================================================================================================
 #include "action_manager.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
 #include "dispatcher.hpp"
 #include "action.hpp"
 #include "shared_library.hpp"
-#include "singleton_runner/authenticated_scan_server.hpp"
 using trustwave::action_manager;
 using trustwave::shared_library;
 using shared_lib_list = std::vector<std::shared_ptr<shared_library>>;
