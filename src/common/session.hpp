@@ -24,12 +24,6 @@
 
 namespace trustwave {
 
-    enum cdcm_client_type {
-        REGISTRY_CLIENT = 0,
-        //  SMB_CLIENT,//Irreleavant
-        CLIENTS_COUNT
-    };
-
     class cdcm_client;
     class session final {
     public:
@@ -41,17 +35,9 @@ namespace trustwave {
         const std::string& remote() const;
         credentials creds() const;
 
-        template<typename T> std::shared_ptr<cdcm_client> get_client(cdcm_client_type c)
-        {
-            if(!clients_[c]) {
-                clients_[c].reset(new T);
-            }
-            return clients_[c];
-        }
-
         explicit operator bool() const { return uuid_.is_nil(); }
 
-        bool id(const std::string& ids)
+        bool id(const std::string& ids) //rotem: assaf, can i move to cpp?
         {
             try {
                 uuid_ = boost::uuids::string_generator()(ids);
@@ -74,7 +60,6 @@ namespace trustwave {
         boost::uuids::uuid uuid_;
         std::string remote_;
         credentials creds_;
-        std::array<std::shared_ptr<cdcm_client>, CLIENTS_COUNT> clients_;
     };
 } // namespace trustwave
 
