@@ -45,7 +45,7 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
     base.append(sess->remote()).append("/").append(smb_action->param);
     trustwave::smb_client rc;
     auto connect_res = rc.connect(base.c_str());
-    if(connect_res.first == false) {
+    if(!connect_res.first) {
         res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
         return 0;
     }

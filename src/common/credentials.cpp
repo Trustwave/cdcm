@@ -14,7 +14,7 @@
 // Comments:
 #include "credentials.hpp"
 
-using namespace trustwave;
+using trustwave::credentials;
 credentials::credentials(const std::string& domain, const std::string& username, const std::string& password,
                          const std::string& workstation):
     domain_(domain),
