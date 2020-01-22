@@ -17,10 +17,10 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include <map>
-#include <string>
-#include <memory>
 #include <iostream>
+#include <map>
+#include <memory>
+#include <string>
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
@@ -36,7 +36,7 @@ namespace trustwave {
 
     public:
         using T_Ptr = std::shared_ptr<T>;
-        typedef std::map<std::string_view, T_Ptr> Ts_Map;
+        using Ts_Map = std::map<std::string_view, T_Ptr>;
 
         virtual ~Dispatcher() = default;
         void register1(T* t) { map_[t->name()] = std::shared_ptr<T>(t); }
