@@ -12,7 +12,7 @@ include_directories(libudis86)
 include_directories(${LIBPE_ROOT}/include)
 
 set(ACTION_NAMES read_file list_dir get_file_info file_exists)
-set(LD_ACTION_LIBS -s dl tw-smb-client pe_context)
+set(LD_ACTION_LIBS dl tw-smb-client pe_context)
 foreach (X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")
     add_library(smb_${X} SHARED ${X}.cpp)
