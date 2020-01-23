@@ -32,23 +32,21 @@ extern "C" {
 #include "session.hpp"
 #include "credentials.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-using namespace trustwave;
+using trustwave::registry_client;
+using trustwave::result;
 
 registry_client::registry_client(): ctx_(nullptr), ev_ctx_(nullptr), data_blob_{}
 {
     this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
-    ctx_ = talloc_zero(nullptr, struct reg_context);
+    mem_ctx_ = talloc_new(nullptr);
+    ctx_ = talloc_zero(mem_ctx_, struct reg_context);
 
-    ev_ctx_ = s4_event_context_init(ctx_);
-    data_blob_ = data_blob_talloc_zero(nullptr, conf_->data_blob_size);
+    ev_ctx_ = s4_event_context_init(mem_ctx_);
+    data_blob_ = data_blob_talloc_zero(mem_ctx_, conf_->data_blob_size);
 }
 
 registry_client::~registry_client()
-{
-    data_blob_clear_free(&data_blob_);
-    TALLOC_FREE(ev_ctx_);
-    TALLOC_FREE(ctx_);
-}
+{ talloc_free(mem_ctx_); }
 
 result registry_client::connect(const session& sess)
 {
@@ -57,13 +55,12 @@ result registry_client::connect(const session& sess)
     cli_credentials_set_username(creds, sess.creds().username().c_str(), CRED_SPECIFIED);
     cli_credentials_set_password(creds, sess.creds().password().c_str(), CRED_SPECIFIED);
     cli_credentials_set_workstation(creds, sess.creds().workstation().c_str(), CRED_SPECIFIED);
-    WERROR error = reg_open_remote(nullptr, &ctx_->registry, nullptr, creds, ::loadparm_init_global(false),
+    WERROR error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, ::loadparm_init_global(false),
                                    sess.remote().c_str(), ev_ctx_);
 
     if(!W_ERROR_IS_OK(error)) {
         return {false, error};
     }
-
     error = reg_get_predefined_key(ctx_->registry, reg_predefined_keys[2].handle, &ctx_->current);
     if(W_ERROR_IS_OK(error)) {
         ctx_->predef = talloc_strdup(ctx_, reg_predefined_keys[2].name);
