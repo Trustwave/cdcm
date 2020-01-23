@@ -88,6 +88,7 @@ namespace trustwave {
         reg_context* ctx_;
         tevent_context* ev_ctx_;
         DATA_BLOB data_blob_;
+        TALLOC_CTX* mem_ctx_;
     };
 } // namespace trustwave
 #endif /* TRUSTWAVE_REGISTRY_CLIENT_HPP_ */
