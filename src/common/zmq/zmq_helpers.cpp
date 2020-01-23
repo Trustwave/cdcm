@@ -35,7 +35,9 @@ std::string zmq_helpers::set_id(zmq::socket_t& socket)
 
 void zmq_helpers::version_assert(int want_major, int want_minor)
 {
-    int major, minor, patch;
+    int major;
+    int minor;
+    int patch;
     zmq_version(&major, &minor, &patch);
     if(major < want_major || (major == want_major && minor < want_minor)) {
         std::cout << "Current 0MQ version is " << major << "." << minor << std::endl;

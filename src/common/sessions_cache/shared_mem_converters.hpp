@@ -41,8 +41,8 @@ namespace trustwave {
     //////////////////////////////////////////////////////////////////////
 
     struct session_converter {
-        typedef boost::interprocess::allocator<void, boost::interprocess::managed_shared_memory::segment_manager>
-            void_allocator;
+        using void_allocator
+            = boost::interprocess::allocator<void, boost::interprocess::managed_shared_memory::segment_manager>;
 
         static sp_session_t convert(const shared_mem_session&);
         static shared_mem_session convert(const sp_session_t&, const void_allocator&);

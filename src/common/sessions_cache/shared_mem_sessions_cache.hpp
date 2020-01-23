@@ -46,7 +46,7 @@ namespace trustwave {
     using sp_session_t = boost::shared_ptr<session>;
     using void_allocator = bip::managed_shared_memory::allocator<void>::type;
     using char_allocator = bip::managed_shared_memory::allocator<char>::type;
-    typedef bip::basic_string<char, std::char_traits<char>, char_allocator> String;
+    using String = bip::basic_string<char, std::char_traits<char>, char_allocator>;
 
     std::ostream& operator<<(std::ostream& os, const shared_mem_session_element&);
     std::ostream& operator<<(std::ostream& os, const shared_mem_sessions_cache&);
@@ -155,7 +155,9 @@ namespace trustwave {
                 //   printf("Failed finding Entry with ID ( ID: %s )", kv.c_str());
                 return false;
             }
-            this->update<Tag>(s);
+            else {
+                this->update<Tag>(s);
+            }
             return true;
         }
         bool remove_by_id(const std::string&);

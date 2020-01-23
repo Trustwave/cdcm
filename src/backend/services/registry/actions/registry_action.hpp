@@ -29,7 +29,7 @@ namespace trustwave {
     class session;
     class Registry_Action: public Action_Base {
     public:
-        Registry_Action(const std::string_view command): Action_Base(command) {}
+        explicit Registry_Action(const std::string_view command): Action_Base(command) {}
         //rotem: asssaf, can i remove this class and the registry actions will inherit from action_base?
     };
 } // namespace trustwave

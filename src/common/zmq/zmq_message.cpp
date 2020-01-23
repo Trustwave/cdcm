@@ -244,8 +244,11 @@ void zmsg::dump()
     for(const auto& data: m_part_data) {
         // Dump the message as text or binary
         bool is_text = true;
-        for(unsigned char char_nbr: data)
-            if(char_nbr < 32 || char_nbr > 127) is_text = false;
+        for(unsigned char char_nbr: data) {
+            if(char_nbr < 32 || char_nbr > 127) {
+                is_text = false;
+            }
+        }
 
         std::cerr << "[" << std::setw(3) << std::setfill('0') << data.size() << "] ";
         for(unsigned char char_nbr: data) {
@@ -267,10 +270,11 @@ std::string zmsg::to_str(bool with_header, bool with_body, bool full)
         return std::string();
     }
     auto check_is_text = [](const ustring& data) -> bool {
-        for(unsigned char char_nbr: data)
+        for(unsigned char char_nbr: data) {
             if(char_nbr < 32 || char_nbr > 127) {
                 return false;
             }
+        }
         return true;
     };
     std::stringstream ss;

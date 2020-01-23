@@ -21,7 +21,7 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
     boost::asio::io_service ios;
     namespace bp = boost::process;
     LoggerSource::instance()->set_source(::trustwave::logger::broker);
-    if(!Initialize(logger_ptr, conf_root)) {
+    if(!Initialize(logger_ptr_, conf_root)) {
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }

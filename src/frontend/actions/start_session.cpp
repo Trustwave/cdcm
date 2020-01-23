@@ -42,4 +42,4 @@ int Start_Session::act(boost::shared_ptr<session>, std::shared_ptr<action_msg> a
 }
 
 Dispatcher<Action_Base>::Registrator
-    Start_Session::m_registrator(new Start_Session, authenticated_scan_server::instance().public_dispatcher);
+    Start_Session::m_registrator(new Start_Session, authenticated_scan_server::instance().public_dispatcher());

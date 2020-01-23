@@ -243,7 +243,7 @@ void message_broker::do_act(trustwave::res_msg& result_message, std::shared_ptr<
                             boost::shared_ptr<session> sess)
 {
     AU_LOG_DEBUG1("Looking for %s", action_message->name().c_str());
-    auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(action_message->name());
+    auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher().find(action_message->name());
     auto res = std::make_shared<trustwave::result_msg>();
     result_message.msgs.push_back(res);
     if(-1 == act1->act(sess, action_message, res)) {
@@ -294,7 +294,7 @@ void message_broker::client_process(const std::string& sender, std::unique_ptr<z
             auto action_obj = act_msg.get_object();
             const auto act_key = action_obj.cbegin()->first;
             AU_LOG_DEBUG1("Looking for %s", act_key.c_str());
-            auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher.find(act_key);
+            auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher().find(act_key);
             if(act1) {
                 AU_LOG_DEBUG("%s found", act_key.c_str());
                 auto act_m = act1->get_message(act_msg);
@@ -374,12 +374,12 @@ void message_broker::broker_loop()
         if(timeout.count() < 0) timeout.zero();
         zmq::poll(items, 2, timeout.count());
         //  Process next input message, if any
-        if(0 != items[0].revents & ZMQ_POLLIN) {
+        if(0 != (items[0].revents & ZMQ_POLLIN)) {
             handle_message(
                 *internal_socket_, std::string(MDPW_WORKER),
                 std::bind(&message_broker::worker_process, this, std::placeholders::_1, std::placeholders::_2));
         }
-        if(0 != items[1].revents & ZMQ_POLLIN) {
+        if(0 != (items[1].revents & ZMQ_POLLIN)) {
             handle_message(
                 *external_socket_, std::string(MDPC_CLIENT),
                 std::bind(&message_broker::client_process, this, std::placeholders::_1, std::placeholders::_2));

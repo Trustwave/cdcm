@@ -53,7 +53,7 @@ namespace trustwave {
             return ((so_ = open_intenal(p)) != nullptr);
         }
 
-        bool has(const std::string& s) const noexcept { return (!so_ || !dlsym(so_, s.c_str())) ? false : true; }
+        bool has(const std::string& s) const noexcept { return (nullptr != so_) && dlsym(so_, s.c_str()); }
 
         template<typename T> std::function<T> get(const std::string& s) noexcept
         {
