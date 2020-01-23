@@ -37,9 +37,6 @@ namespace bmi = boost::multi_index;
 namespace chr = std::chrono;
 
 namespace trustwave {
-    //===================================================================
-    //                      Forward declarations
-    //===================================================================
     //  This defines one worker, idle or active
     struct worker {
         std::string identity_; //  Address of worker
@@ -158,8 +155,9 @@ namespace trustwave {
         {
             auto& idle_idx = cont_.get<idle_id>();
             auto it2 = idle_idx.find(std::make_tuple(identity, !modify_to));
-            if(it2 != idle_idx.end())
+            if(it2 != idle_idx.end()) {
                 return idle_idx.modify(it2, [this, modify_to](sp_worker_t x) { x->idle_ = modify_to; });
+            }
             else {
                 auto& id_idx = cont_.get<id>();
                 auto s = id_idx.find(identity);
@@ -196,11 +194,13 @@ namespace trustwave {
             [[nodiscard]] bool compare(const std::string& l1, const std::string& l2) const { return l1 < l2; }
             [[nodiscard]] bool compare(const std::string& l1, bool f1, const std::string& l2, bool f2) const
             {
-                if(l1 != l2) return l1 < l2;
+                if(l1 != l2) {
+                    return l1 < l2;
+                }
                 return f1 < f2;
             }
         };
-        typedef bmi::multi_index_container<
+        using workers_t = bmi::multi_index_container<
             sp_worker_t,
             bmi::indexed_by<
                 bmi::ordered_unique<bmi::tag<id>, bmi::member<worker, std::string, &worker::identity_>>,
@@ -210,8 +210,7 @@ namespace trustwave {
                 bmi::ordered_non_unique<bmi::tag<idle>, bmi::member<worker, bool, &worker::idle_>>,
                 bmi::ordered_unique<bmi::tag<idle_id>, bmi::identity<worker>, idle_ids_compare>,
                 bmi::ordered_non_unique<bmi::tag<session>,
-                                        bmi::member<worker, std::string, &worker::last_worked_session_>>>>
-            workers_t;
+                                        bmi::member<worker, std::string, &worker::last_worked_session_>>>>;
 
         workers_t cont_;
         std::chrono::milliseconds heartbeat_expiry_;

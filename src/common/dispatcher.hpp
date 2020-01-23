@@ -26,7 +26,6 @@
 //=====================================================================================================================
 namespace trustwave {
     template<typename T> class Dispatcher final {
-    protected:
     public:
         Dispatcher() = default;
         Dispatcher(const Dispatcher&) = delete;
@@ -83,7 +82,7 @@ namespace trustwave {
             Registrator(T* t, Dispatcher* d) { d->register1(t); }
         };
 
-    protected:
+    private:
         Ts_Map map_;
     };
 

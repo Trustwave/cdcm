@@ -113,7 +113,7 @@ zmsg* message_worker::recv(zmsg*& reply_p)
 
         zmq::poll(items, 1, heartbeat_.count());
 
-        if(0 != items[0].revents & ZMQ_POLLIN) {
+        if(0 != (items[0].revents & ZMQ_POLLIN)) {
             auto msg = std::make_unique<zmsg>();
             if(msg->recv(*worker_)) {
                 AU_LOG_DEBUG("I: received message from broker body: %s", msg->body());
@@ -163,7 +163,9 @@ zmsg* message_worker::recv(zmsg*& reply_p)
             heartbeat_at_ += heartbeat_;
         }
     }
-    if(zmq_helpers::interrupted) AU_LOG_DEBUG("W: interrupt received, killing worker...\n");
+    if(zmq_helpers::interrupted) {
+        AU_LOG_DEBUG("W: interrupt received, killing worker...\n");
+    }
     return nullptr;
 }
 
@@ -199,7 +201,7 @@ int message_worker::worker_loop()
                 const auto act_key = action_msg_obj.cbegin()->first;
                 AU_LOG_DEBUG("Looking for %s", act_key.c_str());
                 auto action_result = std::make_shared<result_msg>();
-                auto action = authenticated_scan_server::instance().public_dispatcher.find(act_key);
+                auto action = authenticated_scan_server::instance().public_dispatcher().find(act_key);
                 if(action) {
                     AU_LOG_DEBUG("%s found", act_key.c_str());
                     auto act_m = action->get_message(action_message);

@@ -36,4 +36,4 @@ int Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
 }
 
 trustwave::Dispatcher<trustwave::Action_Base>::Registrator
-    Close_Session::m_registrator(new Close_Session, authenticated_scan_server::instance().public_dispatcher);
+    Close_Session::m_registrator(new Close_Session, authenticated_scan_server::instance().public_dispatcher());

@@ -25,11 +25,11 @@
 namespace trustwave {
 
     // Typedefs of allocators and containers
-    typedef boost::interprocess::allocator<void, boost::interprocess::managed_shared_memory::segment_manager>
-        void_allocator;
-    typedef boost::interprocess::allocator<char, boost::interprocess::managed_shared_memory::segment_manager>
-        CharAllocator;
-    typedef boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator> String;
+    using void_allocator
+        = boost::interprocess::allocator<void, boost::interprocess::managed_shared_memory::segment_manager>;
+    using CharAllocator
+        = boost::interprocess::allocator<char, boost::interprocess::managed_shared_memory::segment_manager>;
+    using String = boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator>;
     //===================================================================
     //                      Forward declarations
     //===================================================================

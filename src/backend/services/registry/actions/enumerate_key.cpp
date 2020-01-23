@@ -90,7 +90,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<a
 }
 //
 // Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
-//                authenticated_scan_server::instance().public_dispatcher);
+//                authenticated_scan_server::instance().public_dispatcher_);
 
 // instance of the our plugin
 static std::shared_ptr<Enumerate_Key_Action> instance = nullptr;

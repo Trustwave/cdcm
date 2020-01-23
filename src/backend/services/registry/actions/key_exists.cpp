@@ -62,7 +62,7 @@ int Key_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
 }
 //
 // Dispatcher <Action_Base>::Registrator Key_Exists_Action::m_registrator(new Key_Exists_Action,
-//                authenticated_scan_server::instance().public_dispatcher);
+//                authenticated_scan_server::instance().public_dispatcher_);
 
 // instance of the our plugin
 static std::shared_ptr<Key_Exists_Action> instance = nullptr;
