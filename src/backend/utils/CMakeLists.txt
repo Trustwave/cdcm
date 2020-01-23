@@ -12,4 +12,4 @@ set_property(TARGET pe_context PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(pe_context pe boost_system boost_filesystem tw-singleton-runner)
 
 add_library(plugin_core STATIC action_manager.cpp)
-target_link_libraries(plugin_core -s dl boost_system boost_filesystem tw-singleton-runner)
+target_link_libraries(plugin_core dl boost_system boost_filesystem tw-singleton-runner)
