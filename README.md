@@ -1,6 +1,5 @@
-`HSL(540,70%,50%)`<span style="background-color:green">![Trustwave Logo]( https://www.trustwave.com/img/logo/logo-trustwave-white.svg)
-</span>
-`HSLA(540,70%,50%,0.3)`
+![Trustwave Logo]( https://www.trustwave.com/img/logo/logo-trustwave-white.svg)
+
 # CDCM
 This is the ??? of the
 ???.
