@@ -24,7 +24,7 @@ before_script:
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - echo $CMAKE_FLAGS
-    
+
 after_script:
   - echo "After script section"
 
@@ -69,7 +69,7 @@ build:
     paths:
       - deps/
     policy: pull
-  tags: 
+  tags:
     - cdcm
 
 test:
@@ -103,11 +103,11 @@ html_coverage:
     expire_in: 10 days
   tags:
     - cdcm
-  only:
-    changes:
-      - src/**/*
-      - .gitlab-ci.yml
-    - master
+  rules:
+    - changes:
+        - src/**/*
+        - .gitlab-ci.yml
+
 
 pages:
   stage: pages_deploy
