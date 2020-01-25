@@ -23,7 +23,7 @@ namespace trustwave {
         struct worker;
     };
 
-    static constexpr std::string_view conf_root("/var/cdcm/conf/");
+    static constexpr std::string_view conf_root("/etc/cdcm/");
 
 } // namespace trustwave
 

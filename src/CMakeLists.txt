@@ -78,8 +78,8 @@ add_subdirectory(common)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 add_subdirectory(tests)
-configure_file(../cdcm_settings.json /var/cdcm/conf/cdcm_settings.json COPYONLY)
-configure_file(../Logger/module.xml /var/cdcm/conf/Logger/module.xml COPYONLY)
+configure_file(../cdcm_settings.json /etc/cdcm/cdcm_settings.json COPYONLY)
+configure_file(../Logger/module.xml /etc/cdcm/Logger/module.xml COPYONLY)
 
 install(FILES ../scripts/cdcm.sh DESTINATION ${release_bin_dest})
 
