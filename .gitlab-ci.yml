@@ -95,6 +95,10 @@ html_coverage:
   script:
     - cd build_cdcm
     - make html_coverage
+  rules:
+    - changes:
+        - src/**/*
+        - .gitlab-ci.yml
   artifacts:
     name: pages
     when: always
