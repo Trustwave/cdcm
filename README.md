@@ -41,4 +41,12 @@ changes need to be discussed with the development team via the [issues section
 at GitHub](https://github.com/trustwave/cdcm/issues) first.
 
 ## License
-*GNU GENERAL PUBLIC LICENSE version 3* by [Free Software Foundation, Inc.](http://fsf.org/) converted to Markdown. Read the [original GPL v3](http://www.gnu.org/licenses/).
+*GNU GENERAL PUBLIC LICENSE version 3* by [Free Software Foundation, Inc.](http://fsf.org/) . Read the [original GPL v3](http://www.gnu.org/licenses/).
+
+Third party libraries that we use with our source:
+
+[CPPZMQ](https://github.com/zeromq/cppzmq) - MDP.
+[samba](https://github.com/samba-team/samba) - RPC.
+[JSON](https://github.com/taocpp/json) - Proprietari protocol.
+[libpe](https://github.com/merces/libpe) - File version.
+[BOOST](https://www.boost.org) - Process, IPC(Shared memory), multi index, Testin framework  and some other trivial libs.
