@@ -104,10 +104,10 @@ html_coverage:
   tags:
     - cdcm
   only:
-    - changes:
-        - src/**/*
-        - .gitlab-ci.yml
-    - master
+    changes:
+      - src/**/*
+      - .gitlab-ci.yml
+      - master
 
 pages:
   stage: pages_deploy
