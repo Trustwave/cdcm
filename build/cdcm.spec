@@ -27,7 +27,7 @@ rm -rf %{buildroot}
 
 %install
 [ -d %{buildroot} ] && rm -rf %{buildroot}
-%define cdcm_conf /var/cdcm/conf
+%define cdcm_conf /etc/cdcm/
 for dir in %{_libdir} %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib ;do
     [ -d %{buildroot}$dir ] || mkdir -p %{buildroot}$dir 
 done
@@ -52,7 +52,7 @@ for f in $libs;do
 done
 
 # copy conf
-cp -r /var/cdcm/conf/*  %{buildroot}%{cdcm_conf}
+cp -r /etc/cdcm/conf/*  %{buildroot}%{cdcm_conf}
 
 %files
 %defattr(-,root,root,-)
@@ -61,6 +61,7 @@ cp -r /var/cdcm/conf/*  %{buildroot}%{cdcm_conf}
 %attr(755, root, root) %{_bindir}/cdcm.sh
 %{_libdir}/*.so
 /var/cdcm
+/etc/cdcm
 
 %changelog
 * Sun Sep 23 2019 <ychislov@trustwave.com> - 1.0-1
