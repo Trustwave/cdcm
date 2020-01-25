@@ -1,9 +1,5 @@
-<rect width="100%" height="100%" fill="red">
-![Trustwave Logo]( https://www.trustwave.com/img/logo/logo-trustwave-white.svg)
-</rect>
-### GitLab Orange Heading
-{: .gitlab-orange}
-
+<span style="background-color:green">![Trustwave Logo]( https://www.trustwave.com/img/logo/logo-trustwave-white.svg)
+</span>
 # CDCM
 This is the ??? of the
 ???.
