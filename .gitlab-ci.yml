@@ -122,10 +122,9 @@ pages:
     paths:
       - public/
     expire_in: 15 days
-  only:
+  rules:
     exists:
       - build_cdcm/src/html_coverage/*
-      - master
   tags:
     - cdcm
 
