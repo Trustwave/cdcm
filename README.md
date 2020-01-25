@@ -41,8 +41,4 @@ changes need to be discussed with the development team via the [issues section
 at GitHub](https://github.com/trustwave/cdcm/issues) first.
 
 ## License
-
-This module is licensed under the [GNU General Public License v2.0
-only](COPYING.GPLv2). Single files, however, are licensed either the GNU General
-Public License v2.0 only or under GNU General Public License v2.0 or later,
-please see the [COPYING](COPYING) file for details.
+*GNU GENERAL PUBLIC LICENSE version 3* by [Free Software Foundation, Inc.](http://fsf.org/) converted to Markdown. Read the [original GPL v3](http://www.gnu.org/licenses/).
