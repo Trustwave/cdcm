@@ -52,7 +52,7 @@ for f in $libs;do
 done
 
 # copy conf
-cp -r /etc/cdcm/conf/*  %{buildroot}%{cdcm_conf}
+cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
 
 %files
 %defattr(-,root,root,-)
