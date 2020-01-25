@@ -1,5 +1,8 @@
 ![Trustwave Logo]( https://www.trustwave.com/img/logo/logo-trustwave-white.svg)
 
+### GitLab Orange Heading
+{: .gitlab-orange}
+
 # CDCM
 This is the ??? of the
 ???.
