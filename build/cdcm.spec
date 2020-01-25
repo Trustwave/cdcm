@@ -13,7 +13,7 @@ Version:    1.0.0
 Release:    1%{?dist}
 License:    GPLv3
 Summary:    Package that installs %name
-Requires:   %{scl_prefix}samba-libs
+Requires:   %{scl_prefix}samba-libs = 4.10.6
 
  
 
