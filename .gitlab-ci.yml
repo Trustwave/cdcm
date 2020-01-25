@@ -135,6 +135,11 @@ build_rpms:
     - rpmbuild -bb cdcm.spec
     - rpmbuild -bb samba-libs.spec
     - rpmbuild -bb tw-cdcm.spec
+  rules:
+    - changes:
+        - cdcm_settings.json
+        - src/**/*
+        - .gitlab-ci.yml
   artifacts:
     paths:
       - build/RPMS/x86_64/
