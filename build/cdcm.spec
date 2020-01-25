@@ -11,7 +11,7 @@
 Name:       %{scl_prefix}cdcm
 Version:    1.0.0
 Release:    1%{?dist}
-License:    Trustwave   
+License:    GPLv3
 Summary:    Package that installs %name
 Requires:   %{scl_prefix}samba-libs
 

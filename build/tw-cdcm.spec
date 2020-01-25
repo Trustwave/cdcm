@@ -22,7 +22,7 @@ Summary: Package that installs %scl
 Name: %scl_name
 Version: 1.0
 Release: 1%{?dist}
-License: GPLv2+
+License: GPLv3
 Requires: %{scl_prefix}cdcm
 BuildRequires: scl-utils-build
 

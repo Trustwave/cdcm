@@ -17,7 +17,7 @@
 Name:       %{scl_prefix}samba-libs
 Version:    4.10.6
 Release:    1%{?dist}
-License:    GPLv3+ and LGPLv3+
+License:    GPLv3 and LGPLv3
 Summary:    Package that installs %name
 Provides:   samba-common	
 Provides:   samba-common-libs	
