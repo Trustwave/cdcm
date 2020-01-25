@@ -107,7 +107,7 @@ html_coverage:
     changes:
       - src/**/*
       - .gitlab-ci.yml
-      - master
+    - master
 
 pages:
   stage: pages_deploy
@@ -123,7 +123,9 @@ pages:
       - public/
     expire_in: 15 days
   only:
-    - master
+    exists:
+      - build_cdcm/src/html_coverage/*
+      - master
   tags:
     - cdcm
 
