@@ -56,9 +56,9 @@ namespace tao::json {
 
 namespace trustwave {
 
-    class Query_Value_Action final: public Registry_Action {
+    class Query_Value_Action final: public Action_Base {
     public:
-        Query_Value_Action(): Registry_Action(trustwave::reg_action_query_value_msg::act_name) {}
+        Query_Value_Action(): Action_Base(trustwave::reg_action_query_value_msg::act_name) {}
 
         int act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
         [[nodiscard]] std::shared_ptr<action_msg> get_message(const tao::json::value& v) const override
