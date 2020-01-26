@@ -5,16 +5,9 @@ include(../../samba.cmake)
 include_directories(${SMB_INCLUDES})
 link_directories(${SMB_LINKS})
 
-set(SOURCE_FILES
-        registry_action.cpp
-        )
-add_library(tw-registry-action OBJECT ${SOURCE_FILES})
-target_compile_definitions(tw-registry-action PUBLIC OBJ)
-set_property(TARGET tw-registry-action PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(tw-registry-action tw-registry-client)
-set(LD_ACTION_LIBS dl tw-registry-action)
+set(LD_ACTION_LIBS dl tw-registry-client)
 set(ACTION_NAMES enumerate_key value_exists key_exists query_value)
-#set(ACTION_NAMES enumerate_key )
+
 foreach (X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")
     add_library(registry_${X} SHARED ${X}.cpp)
