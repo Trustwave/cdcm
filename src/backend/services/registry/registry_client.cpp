@@ -61,6 +61,7 @@ result registry_client::connect(const session& sess)
     if(!W_ERROR_IS_OK(error)) {
         return {false, error};
     }
+
     error = reg_get_predefined_key(ctx_->registry, reg_predefined_keys[2].handle, &ctx_->current);
     if(W_ERROR_IS_OK(error)) {
         ctx_->predef = talloc_strdup(ctx_, reg_predefined_keys[2].name);

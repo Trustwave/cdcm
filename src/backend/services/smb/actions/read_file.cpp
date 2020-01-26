@@ -108,7 +108,7 @@ int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
     if(0 == sz) {
         sz = rc.file_size() - off;
     }
-    AU_LOG_ERROR("Received offset: %zu size: %zu", off, sz);
+    AU_LOG_DEBUG("Received offset: %zu size: %zu", off, sz);
     auto buff = new(std::nothrow) char[sz];
     if(nullptr == buff) {
         res->res("Error: Memory allocation failed");
