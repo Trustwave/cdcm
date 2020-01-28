@@ -19,9 +19,11 @@
 //=====================================================================================================================
 //                                                  Include files
 //=====================================================================================================================
-#include "registry_action.hpp"
 #include "protocol/msg_types.hpp"
 #include "protocol/protocol.hpp"
+#include "action.hpp"
+#include <boost/shared_ptr.hpp>
+#include <iostream>
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
@@ -53,9 +55,10 @@ namespace tao::json {
 } // namespace tao::json
 namespace trustwave {
 
-    class Enumerate_Key_Action final: public Registry_Action {
+    class Enumerate_Key_Action final: public Action_Base {
     public:
-        Enumerate_Key_Action(): Registry_Action(trustwave::reg_action_enum_key_msg::act_name) {}
+
+        Enumerate_Key_Action(): Action_Base(trustwave::reg_action_enum_key_msg::act_name) {}
 
         int act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
         [[nodiscard]] std::shared_ptr<action_msg> get_message(const tao::json::value& v) const override
