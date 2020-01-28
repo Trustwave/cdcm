@@ -69,7 +69,7 @@ status(){
 case $TODO in
     start)
         unset LANG
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/cdcm-1.0
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/cdcm/lib
         clean
         start
     ;;

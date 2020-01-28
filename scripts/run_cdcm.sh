@@ -33,7 +33,7 @@ unset_locales()
 {
     env | grep -E '^LC_|^LANGUAGE' | cut -d '=' -f 1 | while read line;do unset $line;done
 }
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/cdcm-1.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/cdcm/lib
  if ! [ -a $procpath ]
       then
          echo "process is stopped" >> $filename
