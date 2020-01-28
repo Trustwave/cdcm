@@ -133,8 +133,6 @@ build_rpms:
   script:
     - cd build
     - rpmbuild -bb cdcm.spec
-    - rpmbuild -bb samba-libs.spec
-    - rpmbuild -bb tw-cdcm.spec
   rules:
     - changes:
         - cdcm_settings.json
@@ -159,7 +157,7 @@ test_install:
     - echo "will install rpm's and test"
     - cd build
     - yum localinstall -y RPMS/x86_64/*.rpm
-    - scl enable tw-cdcm1 "cdcm_broker &"
+    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/cdcm/lib cdcm_broker &
 
 deploy_release:
   stage: deploy
