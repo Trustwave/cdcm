@@ -69,6 +69,8 @@ namespace trustwave {
         bool download_portion(off_t curpos, off_t count, bool to_file);
         int remote_fd_ = -1;
         int local_fd_ = -1;
+        SMBCCTX* ctx_;
+        SMBCCTX* old_;
         struct stat localstat_ {
         };
         struct stat remotestat_ {

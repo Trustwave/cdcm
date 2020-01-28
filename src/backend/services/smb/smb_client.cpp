@@ -26,6 +26,7 @@ extern "C" {
 #include "libsmbclient.h"
 #include "system/time.h"
 #include "credentials.h"
+#include "param.h"
 #ifdef __cplusplus
 }
 #endif
@@ -70,13 +71,13 @@ extern "C" {
  *
  */
 
-using namespace trustwave;
+using trustwave::smb_client;
 
 static void smbc_auth_fn(const char* pServer, const char*, char* pWorkgroup, int maxLenWorkgroup, char* pUsername,
                          int maxLenUsername, char* pPassword, int maxLenPassword)
 {
-    auto sess = authenticated_scan_server::instance().sessions->get_session_by<shared_mem_sessions_cache::remote>(
-        std::string(pServer));
+    auto sess = trustwave::authenticated_scan_server::instance()
+                    .sessions->get_session_by<trustwave::shared_mem_sessions_cache::remote>(std::string(pServer));
     //  AU_LOG_DEBUG("server is %s ", pServer);
     static int krb5_set = 1;
     const char* wg = "WORKGROUP";
@@ -103,12 +104,14 @@ static void smbc_auth_fn(const char* pServer, const char*, char* pWorkgroup, int
 
     krb5_set = 1;
 }
-
+smb_client::smb_client() { this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory); }
 smb_client::~smb_client()
 {
-    AU_LOG_DEBUG("rotem ~smb_client"); //rotem todo delete
+    AU_LOG_DEBUG("rotem ~smb_client"); // rotem todo delete
 
     smbc_close(remote_fd_);
+    smbc_set_context(old_);
+    smbc_free_context(ctx_, 0);
     remote_fd_ = -1;
     close(local_fd_);
     local_fd_ = -1;
@@ -117,12 +120,14 @@ smb_client::~smb_client()
 std::pair<bool, int> smb_client::connect(const char* path)
 {
     AU_LOG_DEBUG("path: %s", path);
-    if(smbc_init(smbc_auth_fn, 1) < 0) {
+    if(smbc_init(smbc_auth_fn, 50) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return std::make_pair(false, -1);
     }
+    ctx_ = smbc_new_context();
+    smbc_init_context(ctx_);
+    old_ = smbc_set_context(ctx_);
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
-
     current_open_path_ = path;
     if(remote_fd_ <= 0) {
         remote_fd_ = -1;
@@ -275,4 +280,3 @@ uintmax_t smb_client::file_size() const { return static_cast<uintmax_t>(remotest
 
 time_t smb_client::last_modified() const { return remotestat_.st_mtim.tv_sec; }
 bool smb_client::validate_open() { return connect(current_open_path_.data()).first; }
-smb_client::smb_client() { this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory); }
