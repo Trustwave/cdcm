@@ -19,9 +19,6 @@ Version:    4.10.6
 Release:    1%{?dist}
 License:    GPLv3 and LGPLv3
 Summary:    Package that installs %name
-Provides:   samba-common = 	4.10.6
-Provides:   samba-common-lbs = 4.10.6
-Provides:   samba-client-libs = 4.10.6
 
 %description
 This is the samba-libs package for %scl Software Collection.
