@@ -41,7 +41,7 @@ int SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
     trustwave::smb_client rc;
-    auto connect_res = rc.connect(base.c_str());
+    auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
         AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
 

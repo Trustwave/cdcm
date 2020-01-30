@@ -49,7 +49,7 @@ int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_ms
     std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     std::vector<trustwave::dirent> dir_entries;
-    if(!rc.list(base.c_str(), dir_entries)) {
+    if(!rc.list_dir(base.c_str(), dir_entries)) {
         res->res("Error: List Failed");
         return -1;
     }
