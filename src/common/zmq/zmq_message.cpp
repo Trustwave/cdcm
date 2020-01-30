@@ -45,7 +45,7 @@ namespace trustwave {
         return first;
     }
 
-}; // namespace trustwave
+} // namespace trustwave
 
 namespace {
     static constexpr uint16_t uuid_str_len = 17;
