@@ -72,61 +72,79 @@ extern "C" {
  */
 
 using trustwave::smb_client;
+namespace {
+    void smbc_auth_fn(const char* pServer, const char*, char* pWorkgroup, int maxLenWorkgroup, char* pUsername,
+                      int maxLenUsername, char* pPassword, int maxLenPassword)
+    {
+        auto sess = trustwave::authenticated_scan_server::instance()
+                        .sessions->get_session_by<trustwave::shared_mem_sessions_cache::remote>(std::string(pServer));
+        //  AU_LOG_DEBUG("server is %s ", pServer);
+        static int krb5_set = 1;
+        const char* wg = "WORKGROUP";
+        if(!sess->id().is_nil()) {
+            AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
 
-static void smbc_auth_fn(const char* pServer, const char*, char* pWorkgroup, int maxLenWorkgroup, char* pUsername,
-                         int maxLenUsername, char* pPassword, int maxLenPassword)
-{
-    auto sess = trustwave::authenticated_scan_server::instance()
-                    .sessions->get_session_by<trustwave::shared_mem_sessions_cache::remote>(std::string(pServer));
-    //  AU_LOG_DEBUG("server is %s ", pServer);
-    static int krb5_set = 1;
-    const char* wg = "WORKGROUP";
-    if(!sess->id().is_nil()) {
-        AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
+            if(sess->creds().username().empty()) {
+                strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1));
+            }
+            else {
+                strncpy(pWorkgroup, sess->creds().domain().c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
+            }
 
-        if(sess->creds().username().empty()) {
-            strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1));
+            strncpy(pUsername, sess->creds().username().c_str(), static_cast<size_t>(maxLenUsername - 1));
+            strncpy(pPassword, sess->creds().password().c_str(), static_cast<size_t>(maxLenPassword - 1));
+            AU_LOG_INFO("smbc_auth_fn session for %s found and set", pServer);
+            return;
         }
-        else {
-            strncpy(pWorkgroup, sess->creds().domain().c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
+
+        if(krb5_set && getenv("KRB5CCNAME")) {
+            krb5_set = 0;
+            return;
         }
 
-        strncpy(pUsername, sess->creds().username().c_str(), static_cast<size_t>(maxLenUsername - 1));
-        strncpy(pPassword, sess->creds().password().c_str(), static_cast<size_t>(maxLenPassword - 1));
-        AU_LOG_INFO("smbc_auth_fn session for %s found and set", pServer);
-        return;
+        krb5_set = 1;
     }
 
-    if(krb5_set && getenv("KRB5CCNAME")) {
-        krb5_set = 0;
-        return;
+    SMBCCTX* create_smbctx(void)
+    {
+        SMBCCTX* ctx;
+
+        if((ctx = smbc_new_context()) == NULL) return NULL;
+
+        smbc_setDebug(ctx, 1);
+
+        if(smbc_init_context(ctx) == NULL) {
+            smbc_free_context(ctx, 1);
+            return NULL;
+        }
+
+        return ctx;
+    }
+    void delete_smbctx(SMBCCTX* ctx)
+    {
+        smbc_getFunctionPurgeCachedServers(ctx)(ctx);
+        smbc_free_context(ctx, 0);
     }
 
-    krb5_set = 1;
-}
+} // namespace
 smb_client::smb_client() { this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory); }
 smb_client::~smb_client()
 {
-    AU_LOG_DEBUG("rotem ~smb_client"); // rotem todo delete
-
     smbc_close(remote_fd_);
-    smbc_set_context(old_);
-    smbc_free_context(ctx_, 0);
+    delete_smbctx(ctx_);
     remote_fd_ = -1;
     close(local_fd_);
     local_fd_ = -1;
 }
 
-std::pair<bool, int> smb_client::connect(const char* path)
+std::pair<bool, int> smb_client::open_file(const char* path)
 {
     AU_LOG_DEBUG("path: %s", path);
-    if(smbc_init(smbc_auth_fn, 50) < 0) {
+    if(smbc_init(smbc_auth_fn, 1) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return std::make_pair(false, -1);
     }
-    ctx_ = smbc_new_context();
-    smbc_init_context(ctx_);
-    old_ = smbc_set_context(ctx_);
+    ctx_ = create_smbctx();
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
     current_open_path_ = path;
     if(remote_fd_ <= 0) {
@@ -201,7 +219,7 @@ bool smb_client::download_portion_to_memory(const char* base, const char* name, 
     char path[SMB_MAXPATHLEN];
     snprintf(path, SMB_MAXPATHLEN - 1, "%s%s%s", base,
              (*base && *name && name[0] != '/' && base[strlen(base) - 1] != '/') ? "/" : "", name);
-    if(!connect(path).first) {
+    if(!open_file(path).first) {
         return false;
     }
     off_t off = smbc_lseek(remote_fd_, offset, SEEK_SET);
@@ -216,7 +234,7 @@ bool smb_client::download_portion_to_memory(const char* base, const char* name, 
     return download_portion(off, off + count, false);
 }
 
-bool smb_client::list(const std::string& path, std::vector<trustwave::dirent>& dirents)
+bool smb_client::list_dir(const std::string& path, std::vector<trustwave::dirent>& dirents)
 {
     int dh1, dsize, dirc;
     char dirbuf[SMB_DEFAULT_BLOCKSIZE];
@@ -225,6 +243,7 @@ bool smb_client::list(const std::string& path, std::vector<trustwave::dirent>& d
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return false;
     }
+    ctx_ = create_smbctx();
     if((dh1 = smbc_opendir(path.c_str())) < 1) {
         AU_LOG_ERROR("Could not open directory: %s: %s\n", path.c_str(), strerror(errno));
 
@@ -244,6 +263,7 @@ bool smb_client::list(const std::string& path, std::vector<trustwave::dirent>& d
         dirp += dsize;
         dirc -= dsize;
     }
+    smbc_close_dir(dh1);
     return true;
 }
 
@@ -279,4 +299,4 @@ ssize_t smb_client::read(size_t offset, size_t size, char* dest)
 uintmax_t smb_client::file_size() const { return static_cast<uintmax_t>(remotestat_.st_size); }
 
 time_t smb_client::last_modified() const { return remotestat_.st_mtim.tv_sec; }
-bool smb_client::validate_open() { return connect(current_open_path_.data()).first; }
+bool smb_client::validate_open() { return open_file(current_open_path_.data()).first; }
