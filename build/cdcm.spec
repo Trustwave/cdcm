@@ -44,8 +44,12 @@ for f in $libs;do
     cp /opt/output/libs/$f %{buildroot}/usr/share/cdcm/lib
 done
 
+# copy plugins
+cp -r /opt/output/libs/plugins %{buildroot}/usr/share/cdcm/lib/
+
 # copy conf
 cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
+
 
 set +e
 find %{_specdir}/../deps/samba-4.10.6/bin/ -name '*.so*' | while read line;do
@@ -87,6 +91,7 @@ rm -rf /var/log/cdcm
 %attr(755, root, root) %{_bindir}/cdcm_worker
 %attr(755, root, root) %{_bindir}/cdcm.sh
 /usr/share/cdcm/lib/*.so*
+/usr/share/cdcm/lib/plugins/*
 /var/cdcm
 /etc/cdcm
 %{_unitdir}/%{name}.service
