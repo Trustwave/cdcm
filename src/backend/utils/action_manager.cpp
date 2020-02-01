@@ -30,6 +30,10 @@ shared_lib_list action_manager::load(const boost::filesystem::path& p_dir, Dispa
     directory_iterator end_iter;
     shared_lib_list sl_vec;
     for(; p != end_iter; ++p) {
+        const std::regex name_lib_filter("lib\\S+\\.so");
+        if(!std::regex_match(p->path().filename().generic_string(), name_lib_filter)) {
+            continue;
+        }
         auto sl = std::make_shared<shared_library>(p->path());
         auto actionl = sl->get<import_action_cb_t>("import_action");
         if(actionl) {
