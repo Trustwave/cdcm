@@ -88,7 +88,7 @@ $(TOP)/deps/$(TAOCPP_JSON)/.done: $(TOP)/tars/$(TAOCPP_JSON).tar
 	if [ -d $(TOP)/deps/ ];then rm -rf $(TOP)/deps/$(TAOCPP_JSON);fi
 	tar -xvf $(TOP)/tars/$(TAOCPP_JSON).tar -C $(TOP)/deps/
 	-mkdir -p $(TOP)/deps/$(TAOCPP_JSON)/build
-	(cd $(TOP)/deps/$(TAOCPP_JSON)/build; cmake3 -G "Unix Makefiles" ..)
+	(cd $(TOP)/deps/$(TAOCPP_JSON)/build; cmake3 -G "Unix Makefiles" -DTAOCPP_JSON_BUILD_TESTS=OFF -DTAOCPP_JSON_BUILD_EXAMPLES=OFF ..)
 	(cd $(TOP)/deps/$(TAOCPP_JSON)/build; make)
 	touch $(TOP)/deps/$(TAOCPP_JSON)/.done
 	@echo "* fin $@ `date +%F.%H:%M:%S`"
