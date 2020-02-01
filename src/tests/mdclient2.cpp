@@ -79,51 +79,18 @@ static void fc(int)
                 [
    
                     {
-                      "get_ile_info"  :
+                      "winrm_enumerate"  :
                             {
                                 "id": ")"
             + act_id4 + R"(",
-                                "param":"ADMIN$//hh.exe"
-
+"uri":"http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cimv2/*",
+"filter":"SELECT * FROM Win32_NetworkAdapterConfiguration WHERE IpEnabled=TRUE"
 
 
                                 
                             }
-                    },
-{
-                      "file_exists"  :
-                            {
-                                "id": ")"
-            + act_id5 + R"(",
-                                "param":"ADMIN$//hh.exe"
-
-
-
-
-                            }
-                    },
-{"enumerate"  :
-                            {
-                                "id": ")"
-            + act_id7 + R"(",
-                                "key":"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-
-
-
-
-                            }
-                    },
-                     { "get_file_info"  :
-                            {
-                                "id": ")"
-            + act_id6 + R"(",
-                                "param":"ADMIN$//hhs.exe"
-
-
-
-
-                            }
                     }
+
                 ]
         })";
         printf("Request is:\n%s\n", actions.c_str());
@@ -132,8 +99,30 @@ static void fc(int)
     }
     reply = session.recv();
 }
+struct type_1 {
+    int i = 8000;
+    std::string s;
+
+    std::map<std::string, std::string> m;
+};
+namespace tao::json {
+    template<>
+    struct traits<::type_1>:
+        binding::object<TAO_JSON_BIND_REQUIRED("i", &type_1::i), TAO_JSON_BIND_OPTIONAL("s", &type_1::s),
+                        TAO_JSON_BIND_REQUIRED("m", &type_1::m)> {
+        TAO_JSON_DEFAULT_KEY("z");
+    };
+} // namespace tao::json
+
 int main(int, char**)
 {
+    type_1 t{1, "XXX", {{"a", "1"}, {"b", "2"}, {"c", "3"}}};
+
+    tao::json::value v = t;
+    auto stm = tao::json::to_string(v);
+    std::cerr << stm << std::endl;
+    const auto g = v.as<type_1>();
+
     std::vector<std::thread> tp;
     for(unsigned int i = 0; i < 1; ++i) // context+broker
     {
