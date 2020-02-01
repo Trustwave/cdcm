@@ -28,10 +28,10 @@ executables="cdcm_broker \
 cdcm.sh \
 cdcm_worker"
 
-%define output_dir /opt/output/%{getenv:CI_COMMIT_BRANCH}/libs
+%define output_dir /opt/output/%{getenv:CI_COMMIT_BRANCH}/
 
 for f in $executables;do
-    [ -f %{output_dir}/$f ] && install -m 755 %{output_dir}/$f %{buildroot}%{_bindir}
+    [ -f %{output_dir}/bin/$f ] && install -m 755 %{output_dir}/bin/$f %{buildroot}%{_bindir}
 done
 
 libs="libtw-zmq.so \
@@ -43,11 +43,11 @@ libtw-common.so"
 
 # copy libs
 for f in $libs;do
-    cp %{output_dir}/$f %{buildroot}/usr/share/cdcm/lib
+    cp %{output_dir}/libs/$f %{buildroot}/usr/share/cdcm/lib
 done
 
 # copy plugins
-cp -r %{output_dir}/plugins/* %{buildroot}/usr/share/cdcm/lib/plugins/
+cp -r %{output_dir}/libs/plugins/* %{buildroot}/usr/share/cdcm/lib/plugins/
 
 # copy conf
 cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
