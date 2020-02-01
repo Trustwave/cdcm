@@ -21,7 +21,7 @@ rm -rf %{buildroot}
 
 [ -d %{buildroot} ] && rm -rf %{buildroot}
 %define cdcm_conf /etc/cdcm/
-for dir in /usr/share/cdcm/lib %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib ;do
+for dir in /usr/share/cdcm/lib /usr/share/cdcm/lib/plugins %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib ;do
     [ -d %{buildroot}$dir ] || mkdir -p %{buildroot}$dir 
 done
 executables="cdcm_broker \
@@ -45,7 +45,7 @@ for f in $libs;do
 done
 
 # copy plugins
-cp -r /opt/output/libs/plugins %{buildroot}/usr/share/cdcm/lib/
+cp -r /opt/output/libs/plugins/* %{buildroot}/usr/share/cdcm/lib/plugins/
 
 # copy conf
 cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
