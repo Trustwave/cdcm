@@ -1,0 +1,10 @@
+[Unit]
+Description=Credentialed Data Collection Module
+
+
+[Service]
+Type=forking
+ExecStart=@prefix@/sbin/openwsmand -S
+
+[Install]
+WantedBy=multi-user.target
