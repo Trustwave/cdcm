@@ -28,8 +28,10 @@ executables="cdcm_broker \
 cdcm.sh \
 cdcm_worker"
 
+%define output_dir /opt/output/%{getenv:CI_COMMIT_BRANCH}/libs
+
 for f in $executables;do
-    [ -f /opt/output/bin/$f ] && install -m 755 /opt/output/bin/$f %{buildroot}%{_bindir}
+    [ -f %{output_dir}/$f ] && install -m 755 %{output_dir}/$f %{buildroot}%{_bindir}
 done
 
 libs="libtw-zmq.so \
@@ -41,29 +43,17 @@ libtw-common.so"
 
 # copy libs
 for f in $libs;do
-    cp /opt/output/libs/$f %{buildroot}/usr/share/cdcm/lib
+    cp %{output_dir}/$f %{buildroot}/usr/share/cdcm/lib
 done
 
 # copy plugins
-cp -r /opt/output/libs/plugins/* %{buildroot}/usr/share/cdcm/lib/plugins/
+cp -r %{output_dir}/plugins/* %{buildroot}/usr/share/cdcm/lib/plugins/
 
 # copy conf
 cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
 
 
 set +e
-find %{_specdir}/../deps/samba-4.10.6/bin/ -name '*.so*' | while read line;do
-l=$line
-if [ -L "$l" ];then
-    link_base=`basename $l`
-    real_file=`readlink $l`
-    real_base=`basename $real_file`
-    [ ! -f %{buildroot}/usr/share/cdcm/lib/${real_base} ] && [ -f $real_file ]  && cp $real_file  %{buildroot}/usr/share/cdcm/lib/
-    [ ! -L %{buildroot}/usr/share/cdcm/lib/${link_base} ] && [ ! -f %{buildroot}/usr/share/cdcm/lib/${link_base} ] && ln -s /usr/share/cdcm/lib/${real_base} %{buildroot}/usr/share/cdcm/lib/${link_base}
-else
-    cp $l %{buildroot}/usr/share/cdcm/lib/
-fi
-done
 find %{_specdir}/../deps/samba-4.10.6/bin/ -name '*.so*' | while read line;do
 l=$line
 if [ -L "$l" ];then
