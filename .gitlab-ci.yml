@@ -137,6 +137,7 @@ build_rpms:
     - changes:
         - cdcm_settings.json
         - src/**/*
+        - build/cdcm.spec
         - .gitlab-ci.yml
   artifacts:
     paths:
