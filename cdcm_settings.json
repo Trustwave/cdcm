@@ -11,6 +11,6 @@
     "broker_client_listening_ep": "tcp:\/\/*:5555",
     "worker_connect_ep": "tcp://127.0.0.1:5556",
     "downloaded_file_path": "/var/cdcm/downloaded_files",
-    "plugins_dir": "/opt/output/libs/plugins"
+    "plugins_dir": "/usr/share/cdcm/lib/plugins"
   }
 }
