@@ -56,6 +56,8 @@ build:
     - cd build_cdcm
     - scl enable devtoolset-8 "cmake3 $CMAKE_FLAGS .."
     - scl enable devtoolset-8 "make -j4"
+    - rm -fr /opt/output/libs/*
+    - rm -fr /opt/output/bin/*
     - scl enable devtoolset-8 "make install"
   rules:
     - changes:
