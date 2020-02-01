@@ -5,9 +5,13 @@ Version:    1.0.0
 Release:    1%{?dist}
 License:    Various
 Summary:    Credentialed Data Collection Module
+BuildRequires: systemd
 
 %description
 Credentialed Data Collection Module
+
+%prep
+
 
 %clean
 rm -rf %{buildroot}
@@ -57,6 +61,25 @@ else
 fi
 done
 set -e
+%{__mkdir} -p %{buildroot}%{_unitdir}
+%{__mkdir} -p %{buildroot}/%{_sbindir}
+%{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
+ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
+%pre
+if [ -f /var/lib/systemd/migrated/%{name} ]; then
+%service_add_pre %{name}.service
+fi
+%post
+/sbin/ldconfig
+%service_add_post %{name}.service
+
+%preun
+%service_del_preun %{name}.service
+
+%postun
+rm -rf /var/log/cdcm
+/sbin/ldconfig
+%service_del_postun %{name}.service
 
 %files
 %defattr(-,root,root,-)
@@ -66,6 +89,8 @@ set -e
 /usr/share/cdcm/lib/*.so*
 /var/cdcm
 /etc/cdcm
+%{_unitdir}/%{name}.service
+%{_sbindir}/rc%{name}
 
 %changelog
 * Sun Sep 23 2019 <ychislov@trustwave.com> - 1.0-1
