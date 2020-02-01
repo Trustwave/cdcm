@@ -69,8 +69,10 @@ done
 set -e
 
 install -m 644  %{_specdir}/../deps/libpe/libpe.so  %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-ln -sf  %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0 %{buildroot}/usr/share/cdcm/lib/libpe.so
-ln -sf  %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0 %{buildroot}/usr/share/cdcm/lib/libpe.so.1
+cd %{buildroot}/usr/share/cdcm/lib/
+ln -sf  libpe.so.1.0 %{buildroot}/usr/share/cdcm/lib/libpe.so
+cd %{buildroot}/usr/share/cdcm/lib/
+ln -sf  libpe.so.1.0 %{buildroot}/usr/share/cdcm/lib/libpe.so.1
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
