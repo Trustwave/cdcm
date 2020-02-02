@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM centos/systemd
 SHELL ["/bin/bash", "-c"]
 ENV container docker
 ENV PYTHON_VERSION "3.6.3"
