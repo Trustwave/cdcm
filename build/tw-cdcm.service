@@ -4,8 +4,8 @@ Requires=network.target
 After=network.target
 
 [Service]
-Type=exec
-ExecStart=cdcm_broker
+Environment=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/share/cdcm/lib
+ExecStart= /usr/bin/cdcm_broker
 Restart=on-failure
 
 [Install]
