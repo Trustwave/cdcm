@@ -72,12 +72,7 @@ cd %{buildroot}/tmp/
 tar -xvf %{_specdir}/../tars/libpe.tar
 cd  %{buildroot}/tmp/libpe
 make
-install -m 644  %{buildroot}/tmp/libpe/libpe.so  %{buildroot}%{cdcm_lib}/libpe.so.1.0
-
-cd %{buildroot}%{cdcm_lib}/
-ln -sf  libpe.so.1.0 libpe.so
-cd %{buildroot}%{cdcm_lib}/
-ln -sf  libpe.so.1.0 libpe.so.1
+cp %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
