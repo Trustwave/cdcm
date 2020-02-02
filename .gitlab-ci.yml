@@ -163,6 +163,8 @@ test_install:
     - yum localinstall -y RPMS/x86_64/*.rpm
     - systemctl start tw-cdcm
     - systemctl status tw-cdcm
+  dependencies:
+    - build_rpms
 
 deploy_release:
   stage: deploy
