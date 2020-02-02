@@ -160,9 +160,9 @@ test_install:
   script:
     - echo "will install rpm's and test"
     - cd build
-    - sudo yum localinstall -y RPMS/x86_64/*.rpm
-    - sudo systemctl start tw-cdcm
-    - sudo systemctl status tw-cdcm
+    - yum localinstall -y RPMS/x86_64/*.rpm
+    - systemctl start tw-cdcm
+    - systemctl status tw-cdcm
 
 deploy_release:
   stage: deploy
