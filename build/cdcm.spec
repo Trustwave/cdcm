@@ -7,20 +7,20 @@ License:    Various
 Summary:    Credentialed Data Collection Module
 BuildRequires: systemd
 
-
 %description
 Credentialed Data Collection Module
 
 %clean
-#rm -rf %{buildroot}
+rm -rf %{buildroot}
 
 
 %install
-#rm -rf %{buildroot}
+rm -rf %{buildroot}
 
-#[ -d %{buildroot} ] && rm -rf %{buildroot}
+[ -d %{buildroot} ] && rm -rf %{buildroot}
+%define cdcm_lib /usr/share/cdcm/lib
 %define cdcm_conf /etc/cdcm/
-for dir in /usr/share/cdcm/lib /usr/share/cdcm/lib/plugins %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib /tmp ;do
+for dir in %{cdcm_lib} %{cdcm_lib}/plugins %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib /tmp ;do
     [ -d %{buildroot}$dir ] || mkdir -p %{buildroot}$dir 
 done
 executables="cdcm_broker \
@@ -42,11 +42,11 @@ libtw-common.so"
 
 # copy libs
 for f in $libs;do
-    cp %{output_dir}/libs/$f %{buildroot}/usr/share/cdcm/lib
+    cp %{output_dir}/libs/$f %{buildroot}%{cdcm_lib}
 done
 
 # copy plugins
-cp -r %{output_dir}/libs/plugins/* %{buildroot}/usr/share/cdcm/lib/plugins/
+cp -r %{output_dir}/libs/plugins/* %{buildroot}%{cdcm_lib}/plugins/
 
 # copy conf
 cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
@@ -59,10 +59,10 @@ if [ -L "$l" ];then
     link_base=`basename $l`
     real_file=`readlink $l`
     real_base=`basename $real_file`
-    [ ! -f %{buildroot}/usr/share/cdcm/lib/${real_base} ] && [ -f $real_file ]  && cp $real_file  %{buildroot}/usr/share/cdcm/lib/
-    [ ! -L %{buildroot}/usr/share/cdcm/lib/${link_base} ] && [ ! -f %{buildroot}/usr/share/cdcm/lib/${link_base} ] && ln -s /usr/share/cdcm/lib/${real_base} %{buildroot}/usr/share/cdcm/lib/${link_base}
+    [ ! -f %{buildroot}%{cdcm_lib}/${real_base} ] && [ -f $real_file ]  && cp $real_file  %{buildroot}%{cdcm_lib}/
+    [ ! -L %{buildroot}%{cdcm_lib}/${link_base} ] && [ ! -f %{buildroot}%{cdcm_lib}/${link_base} ] && ln -s %{cdcm_lib}/${real_base} %{buildroot}%{cdcm_lib}/${link_base}
 else
-    cp $l %{buildroot}/usr/share/cdcm/lib/
+    cp $l %{buildroot}%{cdcm_lib}/
 fi
 done
 set -e
@@ -72,8 +72,12 @@ cd %{buildroot}/tmp/
 tar -xvf %{_specdir}/../tars/libpe.tar
 cd  %{buildroot}/tmp/libpe
 make
+install -m 644  %{buildroot}/tmp/libpe/libpe.so  %{buildroot}%{cdcm_lib}/libpe.so.1.0
 
-cp %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/
+cd %{buildroot}%{cdcm_lib}/
+ln -sf  libpe.so.1.0 libpe.so
+%{buildroot}%{cdcm_lib}/
+ln -sf  libpe.so.1.0 libpe.so.1
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
@@ -100,8 +104,8 @@ rm -rf /var/log/cdcm
 %attr(755, root, root) %{_bindir}/cdcm_broker
 %attr(755, root, root) %{_bindir}/cdcm_worker
 %attr(755, root, root) %{_bindir}/cdcm.sh
-/usr/share/cdcm/lib/*.so*
-/usr/share/cdcm/lib/plugins/*
+%{cdcm_lib}/*.so*
+%{cdcm_lib}/plugins/*
 /var/cdcm
 /etc/cdcm
 %{_unitdir}/%{name}.service

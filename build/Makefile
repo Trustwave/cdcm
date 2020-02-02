@@ -115,7 +115,7 @@ $(TOP)/deps/$(SAMBA)/.done: $(TOP)/tars/$(SAMBA).tar
                                                                 --disable-rpath        \
                                                                 --disable-python)
 
-	(cd $(TOP)/deps/$(SAMBA); make)
+	(cd $(TOP)/deps/$(SAMBA); make -j4)
 	touch $(TOP)/deps/$(SAMBA)/.done
 	@echo "* fin $@ `date +%F.%H:%M:%S`"
 
