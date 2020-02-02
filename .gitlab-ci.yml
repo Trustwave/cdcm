@@ -161,6 +161,8 @@ test_install:
     - echo "will install rpm's and test"
     - cd build
     - yum localinstall -y RPMS/x86_64/*.rpm
+    - /lib/systemd/systemd --system  &
+    - sleep 5
     - systemctl start tw-cdcm
     - systemctl status tw-cdcm
   dependencies:
