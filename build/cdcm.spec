@@ -7,21 +7,20 @@ License:    Various
 Summary:    Credentialed Data Collection Module
 BuildRequires: systemd
 
+
 %description
 Credentialed Data Collection Module
 
-%prep
-
-
 %clean
-rm -rf %{buildroot}
+#rm -rf %{buildroot}
+
 
 %install
-rm -rf %{buildroot}
+#rm -rf %{buildroot}
 
-[ -d %{buildroot} ] && rm -rf %{buildroot}
+#[ -d %{buildroot} ] && rm -rf %{buildroot}
 %define cdcm_conf /etc/cdcm/
-for dir in /usr/share/cdcm/lib /usr/share/cdcm/lib/plugins %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib ;do
+for dir in /usr/share/cdcm/lib /usr/share/cdcm/lib/plugins %{_bindir} %{cdcm_conf} /var/cdcm/log /var/cdcm/downloaded_files /usr/lib /tmp ;do
     [ -d %{buildroot}$dir ] || mkdir -p %{buildroot}$dir 
 done
 executables="cdcm_broker \
@@ -68,11 +67,13 @@ fi
 done
 set -e
 
-install -m 644  %{_specdir}/../deps/libpe/libpe.so  %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-cd %{buildroot}/usr/share/cdcm/lib/
-ln -sf  libpe.so.1.0 %{buildroot}/usr/share/cdcm/lib/libpe.so
-cd %{buildroot}/usr/share/cdcm/lib/
-ln -sf  libpe.so.1.0 %{buildroot}/usr/share/cdcm/lib/libpe.so.1
+%{__mkdir} -p %{buildroot}/tmp/
+cd %{buildroot}/tmp/
+tar -xvf %{_specdir}/../tars/libpe.tar
+cd  %{buildroot}/tmp/libpe
+make
+
+cp %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
