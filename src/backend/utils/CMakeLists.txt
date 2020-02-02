@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
 
-link_directories(/usr/local/lib/)
 set(LIBPE_ROOT ${DEPS_DIR}/libpe)
+link_directories(${LIBPE_ROOT})
 include_directories(libfuzzy)
 include_directories(libudis86)
 include_directories(${LIBPE_ROOT}/include)
