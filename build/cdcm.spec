@@ -76,7 +76,7 @@ install -m 644  %{buildroot}/tmp/libpe/libpe.so  %{buildroot}%{cdcm_lib}/libpe.s
 
 cd %{buildroot}%{cdcm_lib}/
 ln -sf  libpe.so.1.0 libpe.so
-%{buildroot}%{cdcm_lib}/
+cd %{buildroot}%{cdcm_lib}/
 ln -sf  libpe.so.1.0 libpe.so.1
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
