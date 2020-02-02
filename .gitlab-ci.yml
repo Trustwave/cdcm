@@ -161,7 +161,8 @@ test_install:
     - echo "will install rpm's and test"
     - cd build
     - yum localinstall -y RPMS/x86_64/*.rpm
-    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/cdcm/lib cdcm_broker &
+    - systemctl start tw-cdcm
+    - systemctl status tw-cdcm
 
 deploy_release:
   stage: deploy
