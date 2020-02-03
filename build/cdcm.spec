@@ -88,15 +88,15 @@ if [ -f /var/lib/systemd/migrated/%{name} ]; then
 fi
 %post
 /sbin/ldconfig
-%systemd_add_post %{name}.service
+systemctl --no-reload preset %{name}.service
 
 %preun
-%systemd_del_preun %{name}.service
+systemctl --no-reload disable --now %{name}.service
 
 %postun
 rm -rf /var/log/cdcm
 /sbin/ldconfig
-%systemd_del_postun %{name}.service
+
 
 %files
 %defattr(-,root,root,-)
