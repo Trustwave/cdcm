@@ -32,7 +32,7 @@ namespace trustwave {
             free(pe_.directories);
             free(pe_.sections);
         }
-        int parse();
+        [[nodiscard]] int parse();
         void extract_info(std::map<std::u16string, std::u16string>&);
 
     private:

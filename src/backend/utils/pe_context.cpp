@@ -150,7 +150,9 @@ namespace {
 int pe_context::parse()
 {
     static constexpr uint16_t dos_header_size = 64;
-    fm_.map_chunk(0, dos_header_size);
+    if(!fm_.map_chunk(0, dos_header_size)) {
+        return -1;
+    }
     pe_.dos_hdr = reinterpret_cast<IMAGE_DOS_HEADER*>(fm_.data());
     if(pe_.dos_hdr->e_magic != MAGIC_MZ) {
         return LIBPE_E_NOT_A_PE_FILE;
@@ -479,8 +481,8 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
 
     auto buffer_end = ptr_add<char>(buffer, dataEntrySize);
 
-    std::unordered_set<std::u16string> s
-        = {u"companyName", u"fileDescription", u"fileVersion", u"froductName", u"productVersion"};
+    static const std::unordered_set<std::u16string> s
+        = {u"CompanyName", u"FileDescription", u"FileVersion", u"FroductName", u"ProductVersion"};
 
     while(str_vih->wLength > 0 && ptr_add<char>(str_vih, str_vih->wLength) <= buffer_end) {
         auto* kstart = ptr_add<char16_t>(str_vih, sizeof(version_info_header));

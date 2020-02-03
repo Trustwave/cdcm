@@ -51,7 +51,10 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
     }
 
     pe_context pc(rc);
-    pc.parse();
+    if(0 != pc.parse()) {
+        res->res("Error: parse file failed");
+        return -1;
+    }
     std::map<std::u16string, std::u16string> ret;
 
     pc.extract_info(ret);

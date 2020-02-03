@@ -45,7 +45,7 @@ namespace trustwave {
             return false;
         }
 
-        bool map_chunk(size_t offset, size_t size);
+        [[nodiscard]] bool map_chunk(size_t offset, size_t size);
 
         [[nodiscard]] inline char* data() const { return data_.get(); }
 
