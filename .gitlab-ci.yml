@@ -18,7 +18,7 @@ stages:
 
 before_script:
   - whoami
-  - yum install -y openldap-devel.x86_64
+  - sudo yum install -y openldap-devel.x86_64
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
   - echo $CI_PROJECT_DIR
@@ -159,9 +159,8 @@ test_install:
   tags:
     - cdcm_install
   script:
-    - echo "will install rpm's and test"
     - cd build
-    - yum localinstall -y RPMS/x86_64/*.rpm
+    - sudo yum localinstall -y RPMS/x86_64/*.rpm
     - /lib/systemd/systemd --system  &
     - sleep 5
     - whoami
