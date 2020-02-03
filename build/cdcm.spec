@@ -6,7 +6,7 @@ Release:    1%{?dist}
 License:    Various
 Summary:    Credentialed Data Collection Module
 BuildRequires: systemd
-
+Requires(preun): systemd
 %description
 Credentialed Data Collection Module
 
