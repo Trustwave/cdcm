@@ -17,7 +17,6 @@ stages:
   - deploy
 
 before_script:
-  - whoami
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
   - echo $CI_PROJECT_DIR
@@ -162,7 +161,6 @@ test_install:
     - sudo yum localinstall -y RPMS/x86_64/*.rpm
     - /lib/systemd/systemd --system  &
     - sleep 5
-    - whoami
     - sudo systemctl start tw-cdcm
     - sudo systemctl status tw-cdcm
     - sudo systemctl stop tw-cdcm
