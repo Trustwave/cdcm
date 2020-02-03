@@ -109,13 +109,13 @@ namespace {
     {
         SMBCCTX* ctx;
 
-        if((ctx = smbc_new_context()) == NULL) return NULL;
+        if((ctx = smbc_new_context()) == nullptr) return nullptr;
 
-        smbc_setDebug(ctx, 1);
-
-        if(smbc_init_context(ctx) == NULL) {
+        smbc_setDebug(ctx, 100);
+        smbc_setFunctionAuthData(ctx, smbc_auth_fn);
+        if(smbc_init_context(ctx) == nullptr) {
             smbc_free_context(ctx, 1);
-            return NULL;
+            return nullptr;
         }
 
         return ctx;
@@ -127,10 +127,14 @@ namespace {
     }
 
 } // namespace
-smb_client::smb_client() { this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory); }
+smb_client::smb_client(): ctx_(nullptr)
+{
+    this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
+}
 smb_client::~smb_client()
 {
     smbc_close(remote_fd_);
+    smbc_set_context(old_);
     delete_smbctx(ctx_);
     remote_fd_ = -1;
     close(local_fd_);
@@ -140,11 +144,14 @@ smb_client::~smb_client()
 std::pair<bool, int> smb_client::open_file(const char* path)
 {
     AU_LOG_DEBUG("path: %s", path);
-    if(smbc_init(smbc_auth_fn, 1) < 0) {
+    if(smbc_init(smbc_auth_fn, 100) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return std::make_pair(false, -1);
     }
     ctx_ = create_smbctx();
+    old_ = smbc_set_context(ctx_);
+    // smbc_setConfiguration(ctx_, smbc_getConfiguration(old_));
+
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
     current_open_path_ = path;
     if(remote_fd_ <= 0) {
@@ -210,11 +217,12 @@ bool smb_client::list_dir(const std::string& path, std::vector<trustwave::dirent
     int dh1, dsize, dirc;
     char dirbuf[SMB_DEFAULT_BLOCKSIZE];
     char* dirp;
-    if(smbc_init(smbc_auth_fn, 1) < 0) {
+    if(smbc_init(smbc_auth_fn, 100) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return false;
     }
     ctx_ = create_smbctx();
+    old_ = smbc_set_context(ctx_);
     if((dh1 = smbc_opendir(path.c_str())) < 1) {
         AU_LOG_ERROR("Could not open directory: %s: %s\n", path.c_str(), strerror(errno));
 
@@ -262,4 +270,10 @@ ssize_t smb_client::read(size_t offset, size_t size, char* dest)
 uintmax_t smb_client::file_size() const { return static_cast<uintmax_t>(remotestat_.st_size); }
 
 time_t smb_client::last_modified() const { return remotestat_.st_mtim.tv_sec; }
-bool smb_client::validate_open() { return open_file(current_open_path_.data()).first; }
+bool smb_client::validate_open()
+{
+    if(ctx_ && !current_open_path_.empty()) {
+        return true;
+    }
+    return open_file(current_open_path_.data()).first;
+}
