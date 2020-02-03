@@ -78,7 +78,7 @@ namespace {
     {
         auto sess = trustwave::authenticated_scan_server::instance()
                         .sessions->get_session_by<trustwave::shared_mem_sessions_cache::remote>(std::string(pServer));
-        //  AU_LOG_DEBUG("server is %s ", pServer);
+        AU_LOG_DEBUG("server is %s ", pServer);
         static int krb5_set = 1;
         const char* wg = "WORKGROUP";
         if(!sess->id().is_nil()) {
@@ -122,7 +122,6 @@ namespace {
     }
     void delete_smbctx(SMBCCTX* ctx)
     {
-        smbc_getFunctionPurgeCachedServers(ctx)(ctx);
         smbc_free_context(ctx, 0);
     }
 
