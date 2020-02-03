@@ -166,7 +166,7 @@ test_install:
     - sudo systemctl start tw-cdcm
     - sudo systemctl status tw-cdcm
     - sudo systemctl stop tw-cdcm
-    - sudo yum erase tw-cdcm-$VERSION-1.el7.x86_64
+    - sudo yum -y erase tw-cdcm-$VERSION-1.el7.x86_64
   dependencies:
     - build_rpms
 
