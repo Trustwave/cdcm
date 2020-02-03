@@ -84,19 +84,19 @@ make
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 %pre
 if [ -f /var/lib/systemd/migrated/%{name} ]; then
-%service_add_pre %{name}.service
+%systemd_add_pre %{name}.service
 fi
 %post
 /sbin/ldconfig
-%service_add_post %{name}.service
+%systemd_add_post %{name}.service
 
 %preun
-%service_del_preun %{name}.service
+%systemd_del_preun %{name}.service
 
 %postun
 rm -rf /var/log/cdcm
 /sbin/ldconfig
-%service_del_postun %{name}.service
+%systemd_del_postun %{name}.service
 
 %files
 %defattr(-,root,root,-)
