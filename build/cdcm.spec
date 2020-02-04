@@ -72,18 +72,18 @@ set -e
 %{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
-if [ -f /var/lib/systemd/migrated/%{name} ]; then
-%service_add_pre %{name}.service
-fi
+
 %post
 /sbin/ldconfig
-/bin/systemctl --system daemon-reload &> /dev/null || :
-/bin/systemctl --system enable  %{name} &> /dev/null || :
+
+systemctl daemon-reload
+%systemd_post scan-driver.service
+
+%preun
+%systemd_preun scan-driver.service
 
 %postun
-rm -rf /var/log/cdcm
-/sbin/ldconfig
-/bin/systemctl --system daemon-reload &> /dev/null || :
+%systemd_postun scan-driver.service
 
 
 %files
