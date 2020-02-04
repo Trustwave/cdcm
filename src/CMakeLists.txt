@@ -83,3 +83,13 @@ configure_file(../Logger/module.xml /etc/cdcm/Logger/module.xml COPYONLY)
 
 install(FILES ../scripts/cdcm.sh DESTINATION ${release_bin_dest})
 
+# uninstall target
+if (NOT TARGET uninstall)
+    configure_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/uninstall.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
+            IMMEDIATE @ONLY)
+
+    add_custom_target(uninstall
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
+endif ()
