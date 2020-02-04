@@ -111,7 +111,7 @@ namespace {
 
         if((ctx = smbc_new_context()) == nullptr) return nullptr;
 
-        smbc_setDebug(ctx, 100);
+        //smbc_setDebug(ctx, 100); //rotem todo: delete when finish debugging
         smbc_setFunctionAuthData(ctx, smbc_auth_fn);
         if(smbc_init_context(ctx) == nullptr) {
             smbc_free_context(ctx, 1);
