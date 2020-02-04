@@ -85,7 +85,7 @@ else
     cp $l %{buildroot}%{cdcm_lib}/
 fi
 done
-%{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
+
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
