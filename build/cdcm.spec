@@ -74,8 +74,9 @@ cd  %{buildroot}/tmp/libpe
 make
 
 %{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-ln -sf %{cdcm_lib}/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-ln -sf %{cdcm_lib}/libpe.so.1 %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
+cd %{buildroot}/usr/share/cdcm/lib/
+ln -sf libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
+ln -sf libpe.so.1 %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
