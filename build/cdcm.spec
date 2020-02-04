@@ -82,10 +82,12 @@ make
 %{__mkdir} -p %{buildroot}/%{_sbindir}
 %{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
+
 %pre
 if [ -f /var/lib/systemd/migrated/%{name} ]; then
-%systemd_add_pre %{name}.service
+#%systemd_add_pre %{name}.service
 fi
+
 %post
 /sbin/ldconfig
 systemctl --no-reload preset %{name}.service
