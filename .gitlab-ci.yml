@@ -160,9 +160,13 @@ test_install:
     - cd build
     - sudo yum localinstall -y RPMS/x86_64/*.rpm
     - sleep 5
+    - sudo systemctl start tw-cdcm
+    - sleep 5
     - sudo systemctl status tw-cdcm
     - sleep 5
-    - sudo yum -y erase tw-cdcm-$VERSION-1.el7.x86_64
+    - sudo systemctl stop tw-cdcm
+    - sleep 5
+    - sudo yum -y erase tw-cdcm
   dependencies:
     - build_rpms
   allow_failure: true
