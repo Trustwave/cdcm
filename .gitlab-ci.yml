@@ -170,7 +170,10 @@ test_install:
   dependencies:
     - build_rpms
   allow_failure: true
-  only: schedules
+  only:
+    - schedules
+
+
 
 deploy_release:
   stage: deploy
