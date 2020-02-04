@@ -168,6 +168,7 @@ test_install:
     - sudo yum -y erase tw-cdcm-$VERSION-1.el7.x86_64
   dependencies:
     - build_rpms
+  allow_failure: true
 
 deploy_release:
   stage: deploy
