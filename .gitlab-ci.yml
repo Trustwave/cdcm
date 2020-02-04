@@ -17,8 +17,6 @@ stages:
   - deploy
 
 before_script:
-  - whoami
-  - yum install -y openldap-devel.x86_64
   - export VERSION=$(grep -m 1 'Version:' ./build/cdcm.spec | cut -d ' ' -f 5)
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
   - echo $CI_PROJECT_DIR
@@ -159,16 +157,18 @@ test_install:
   tags:
     - cdcm_install
   script:
-    - echo "will install rpm's and test"
     - cd build
-    - yum localinstall -y RPMS/x86_64/*.rpm
+    - sudo yum localinstall -y RPMS/x86_64/*.rpm
     - /lib/systemd/systemd --system  &
     - sleep 5
-    - whoami
-    - systemctl start tw-cdcm
-    - systemctl status tw-cdcm
+    - sudo systemctl start tw-cdcm
+    - sudo systemctl status tw-cdcm
+    - sudo systemctl stop tw-cdcm
+    - sleep 5
+    - sudo yum -y erase tw-cdcm-$VERSION-1.el7.x86_64
   dependencies:
     - build_rpms
+  allow_failure: true
 
 deploy_release:
   stage: deploy
