@@ -72,21 +72,20 @@ set -e
 %{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
-%pre
-#if [ -f /var/lib/systemd/migrated/%{name} ]; then
-#%systemd_add_pre %{name}.service
-#fi
-
+if [ -f /var/lib/systemd/migrated/%{name} ]; then
+%service_add_pre %{name}.service
+fi
 %post
 /sbin/ldconfig
-systemctl --no-reload preset %{name}.service
+%service_add_post %{name}.service
 
 %preun
-systemctl --no-reload disable --now %{name}.service
+%service_del_preun %{name}.service
 
 %postun
 rm -rf /var/log/cdcm
 /sbin/ldconfig
+%service_del_postun %{name}.service
 
 
 %files
