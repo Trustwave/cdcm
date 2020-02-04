@@ -170,6 +170,7 @@ test_install:
   dependencies:
     - build_rpms
   allow_failure: true
+  only: schedules
 
 deploy_release:
   stage: deploy
@@ -180,6 +181,8 @@ deploy_release:
     - tags
   tags:
     - cdcm
+  dependencies:
+    - build_rpms
 
 deploy_snapshot:
   stage: deploy
@@ -190,3 +193,5 @@ deploy_snapshot:
     - branches
   tags:
     - cdcm
+  dependencies:
+    - build_rpms
