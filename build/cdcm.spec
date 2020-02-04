@@ -73,10 +73,9 @@ tar -xvf %{_specdir}/../tars/libpe.tar
 cd  %{buildroot}/tmp/libpe
 make
 
-%{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so
-%{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1
 %{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-
+ln -sf %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0%{buildroot}/usr/share/cdcm/lib/libpe.so.1
+ln -sf %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0%{buildroot}/usr/share/cdcm/lib/libpe.so
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
