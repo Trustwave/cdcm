@@ -77,15 +77,13 @@ if [ -f /var/lib/systemd/migrated/%{name} ]; then
 fi
 %post
 /sbin/ldconfig
-%service_add_post %{name}.service
-
-%preun
-%service_del_preun %{name}.service
+/bin/systemctl --system daemon-reload &> /dev/null || :
+/bin/systemctl --system enable  %{name} &> /dev/null || :
 
 %postun
 rm -rf /var/log/cdcm
 /sbin/ldconfig
-%service_del_postun %{name}.service
+/bin/systemctl --system daemon-reload &> /dev/null || :
 
 
 %files
