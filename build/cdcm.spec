@@ -72,8 +72,20 @@ cd %{buildroot}/tmp/
 tar -xvf %{_specdir}/../tars/libpe.tar
 cd  %{buildroot}/tmp/libpe
 make
+make install
+find /usr/local/lib -name 'libpe.so*' | while read line;do
+l=$line
+if [ -L "$l" ];then
+    link_base=`basename $l`
+    real_file=`readlink $l`
+    real_base=`basename $real_file`
+    [ ! -f %{buildroot}%{cdcm_lib}/${real_base} ] && [ -f $real_file ]  && cp $real_file  %{buildroot}%{cdcm_lib}/
+    [ ! -L %{buildroot}%{cdcm_lib}/${link_base} ] && [ ! -f %{buildroot}%{cdcm_lib}/${link_base} ] && ln -s %{cdcm_lib}/${real_base} %{buildroot}%{cdcm_lib}/${link_base}
+else
+    cp $l %{buildroot}%{cdcm_lib}/
+fi
+done
 
-%{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
@@ -86,8 +98,6 @@ if [ -f /var/lib/systemd/migrated/%{name} ]; then
 fi
 
 %post
-ln -sf  /usr/share/cdcm/lib/libpe.so.1.0 libpe.so
-ln -sf  /usr/share/cdcm/lib/libpe.so.1.0 libpe.so.1
 /sbin/ldconfig
 systemctl --no-reload preset %{name}.service
 
