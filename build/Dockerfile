@@ -12,5 +12,8 @@ RUN yum  install --nogpgcheck -y \
 	    which \
         gnutls.x86_64 \
         wget
-
-
+RUN curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh |  bash
+RUN yum install -y gitlab-runner sudo
+RUN echo "gitlab-runner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+CMD gitlab-runner register --non-interactive -r XXXXXXXXXXXXXXXXXXXX -u https://GITLAB.EXAMPLE.COM/  --custom_build_dir-enabled  --executor=shell   --tag-list=cdcm_install -name testrunner1234
+CMD gitlab-runner run
