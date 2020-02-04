@@ -73,9 +73,9 @@ set -e
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
 %pre
-if [ -f /var/lib/systemd/migrated/%{name} ]; then
+#if [ -f /var/lib/systemd/migrated/%{name} ]; then
 #%systemd_add_pre %{name}.service
-fi
+#fi
 
 %post
 /sbin/ldconfig
