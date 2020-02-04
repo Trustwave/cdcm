@@ -77,13 +77,13 @@ ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 /sbin/ldconfig
 
 systemctl daemon-reload
-%systemd_post scan-driver.service
+%systemd_post %{name}.service
 
 %preun
-%systemd_preun scan-driver.service
+%systemd_preun %{name}.service
 
 %postun
-%systemd_postun scan-driver.service
+%systemd_postun %{name}.service
 
 
 %files
