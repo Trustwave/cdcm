@@ -74,9 +74,6 @@ cd  %{buildroot}/tmp/libpe
 make
 
 %{__install} -m644 %{buildroot}/tmp/libpe/libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-cd %{buildroot}/usr/share/cdcm/lib/
-ln -sf libpe.so %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
-ln -sf libpe.so.1 %{buildroot}/usr/share/cdcm/lib/libpe.so.1.0
 
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
@@ -89,6 +86,8 @@ if [ -f /var/lib/systemd/migrated/%{name} ]; then
 fi
 
 %post
+ln -sf  /usr/share/cdcm/lib/libpe.so.1.0 libpe.so
+ln -sf  /usr/share/cdcm/lib/libpe.so.1.0 libpe.so.1
 /sbin/ldconfig
 systemctl --no-reload preset %{name}.service
 
