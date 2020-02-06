@@ -190,7 +190,7 @@ push_tag:
   stage: deploy
   script:
     - git tag $(date +%b-%d-%y)
-    - push origin --tags
+    - git push origin --tags
   rules:
     - if: '$PeriodicTag!=null'
   tags:
