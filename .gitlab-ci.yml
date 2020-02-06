@@ -190,7 +190,7 @@ push_tag:
   stage: deploy
   script:
     - git remote set-url origin https://git_push_tag:${secret}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
-    - git tag $(date +%b-%d-%y)
+    - git tag $(date +%b-%d-%y) -m 'Periodic Release '$(date +%b-%d-%y)
     - git push origin $(date +%b-%d-%y)
   rules:
     - if: '$PeriodicTag!=null'
