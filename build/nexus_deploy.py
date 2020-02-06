@@ -8,6 +8,7 @@ details on its structure.
 """ Copied from GAS Ops nexus-upload.py."""
 from optparse import OptionParser
 import os.path
+import os
 import subprocess
 try:
     from ConfigParser import SafeConfigParser
@@ -42,7 +43,7 @@ class NexusUploader:
             '-u', '%s:%s' % (self.username, self.password),
             '-F', 'file=%s' % source
         ]
-        url = 'https://%(host)s/content/repositories/%(release_type)ss/%(group)s/%(artifact)s/%(branch)s/%(version)s/%(fn)s' % {
+        url = 'https://%(host)s/content/repositories/%(release_type)ss/%(group)s/%(artifact)s/%(branch)s/%(version)s/%(tag)s%(fn)s' % {
             'host': self.host,
             'group': group.replace('.', '/'),
             'artifact': artifact,
@@ -50,7 +51,9 @@ class NexusUploader:
             'release_type': release_type,
             'version': version,
             'fn': fn,
+            'tag': os.environ['CI_COMMIT_TAG'] if "CI_COMMIT_TAG" in os.environ else ''
         }
+        print(url)
         args.append(url)
         ret = subprocess.call(args)
         if ret != 0:
