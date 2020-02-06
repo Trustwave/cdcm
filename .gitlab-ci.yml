@@ -189,7 +189,7 @@ test_install:
 push_tag:
   stage: deploy
   script:
-    - git remote set-url origin https://oauth2:$secret@${CI_SERVER_HOST}/${CI_PROJECT_PATH}
+    - git remote set-url origin https://git_push_tag:$secret@${CI_SERVER_HOST}/${CI_PROJECT_PATH}
     - git tag $(date +%b-%d-%y)
     - git push origin $(date +%b-%d-%y)
   rules:
