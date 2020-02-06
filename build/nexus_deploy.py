@@ -51,7 +51,7 @@ class NexusUploader:
             'release_type': release_type,
             'version': version,
             'fn': fn,
-            'tag': os.environ['CI_COMMIT_TAG'] if "CI_COMMIT_TAG" in os.environ else ''
+            'tag': os.environ['CI_COMMIT_TAG'] + '-' if "CI_COMMIT_TAG" in os.environ else ''
         }
         print(url)
         args.append(url)
