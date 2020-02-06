@@ -33,7 +33,8 @@ build_deps:
     - cd build
     - scl enable devtoolset-8 'make deps'
   rules:
-    - changes:
+    - if: '$PeriodicTag==null'
+      changes:
         - build/Makefile
         - tars/*
         - .gitlab-ci.yml
@@ -59,7 +60,8 @@ build:
     - rm -fr /opt/output/bin/*
     - scl enable devtoolset-8 "make install"
   rules:
-    - changes:
+    - if: '$PeriodicTag==null'
+      changes:
         - src/**/*
         - .gitlab-ci.yml
   artifacts:
@@ -79,7 +81,8 @@ test:
     - cd build_cdcm/src/tests/
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
   rules:
-    - changes:
+    - if: '$PeriodicTag==null'
+      changes:
         - src/**/*
         - .gitlab-ci.yml
   artifacts:
@@ -138,7 +141,8 @@ build_rpms:
     - cd build
     - rpmbuild -bb cdcm.spec
   rules:
-    - changes:
+    - if: '$PeriodicTag==null'
+      changes:
         - cdcm_settings.json
         - src/**/*
         - build/cdcm.spec
@@ -170,21 +174,35 @@ test_install:
     - sudo systemctl stop tw-cdcm
     - sleep 5
     - sudo yum -y erase tw-cdcm
+  rules:
+    - if: '$PeriodicTag==null'
+      changes:
+        - cdcm_settings.json
+        - src/**/*
+        - build/cdcm.spec
+        - build/tw-cdcm.service
+        - .gitlab-ci.yml
   dependencies:
     - build_rpms
   allow_failure: true
-  only:
-    - schedules
 
-
+push_tag:
+  stage: deploy
+  script:
+    - git tag $(date +%b-%d-%y)
+    - push origin --tags
+  rules:
+    - if: '$PeriodicTag!=null'
+  tags:
+    - cdcm
 
 deploy_release:
   stage: deploy
   script:
     - cd build
     - python nexus_deploy.py -a cdcm -v $VERSION -r release RPMS/x86_64/*.rpm
-  only:
-    - tags
+  rules:
+    - if: '$PeriodicTag==null && $CI_COMMIT_TAG!=null'
   tags:
     - cdcm
   dependencies:
@@ -195,8 +213,8 @@ deploy_snapshot:
   script:
     - cd build
     - python nexus_deploy.py -a cdcm -b $CI_COMMIT_BRANCH -v $VERSION RPMS/x86_64/*.rpm
-  only:
-    - branches
+  rules:
+    - if: '$PeriodicTag==null && $CI_COMMIT_TAG==null'
   tags:
     - cdcm
   dependencies:
