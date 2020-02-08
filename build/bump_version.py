@@ -21,8 +21,6 @@ def tag_repo(tag):
 
 
 def bump(latest, bump_type):
-    print(bump_type)
-    print(latest)
     if bump_type == 'patch':
         return semver.bump_patch(latest)
     if bump_type == 'minor':
@@ -54,7 +52,7 @@ def main():
 
         version = bump(latest, options.bump)
 
-    # qtag_repo(version)
+    qtag_repo(version)
     print(version)
 
     return 0
