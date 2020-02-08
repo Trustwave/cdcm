@@ -139,7 +139,7 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
-    - rpmbuild  --define "$VERSION" -bb cdcm.spec
+    - rpmbuild  --define "pkg_version $VERSION" -bb cdcm.spec
   rules:
     - if: '$PeriodicTag==null'
       changes:
