@@ -35,6 +35,8 @@ class NexusUploader:
             digest = self.calc_hash(fpath)
             self._upload(group, artifact, branch, release_type, version, '%s.sha1' % fn, digest)
             self._upload(group, artifact, branch, release_type, version, fn, '@%s' % fpath)
+            self._upload(group, artifact, branch, release_type, 'latest', '%s.sha1' % fn, digest)
+            self._upload(group, artifact, branch, release_type, 'latest', fn, '@%s' % fpath)
 
     def _upload(self, group, artifact, branch, release_type, version, fn, source):
         args = [
@@ -43,15 +45,14 @@ class NexusUploader:
             '-u', '%s:%s' % (self.username, self.password),
             '-F', 'file=%s' % source
         ]
-        url = 'https://%(host)s/content/repositories/%(release_type)ss/%(group)s/%(artifact)s/%(branch)s/%(version)s/%(tag)s%(fn)s' % {
+        url = 'https://%(host)s/content/repositories/%(release_type)ss/%(group)s/%(artifact)s/%(branch)s/%(version)s/%(fn)s' % {
             'host': self.host,
             'group': group.replace('.', '/'),
             'artifact': artifact,
             'branch': branch,
             'release_type': release_type,
             'version': version,
-            'fn': fn,
-            'tag': os.environ['CI_COMMIT_TAG'] + '-' if "CI_COMMIT_TAG" in os.environ else ''
+            'fn': fn
         }
         print(url)
         args.append(url)
