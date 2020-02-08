@@ -150,6 +150,8 @@ build_rpms:
         - build/cdcm.spec
         - build/tw-cdcm.service
         - .gitlab-ci.yml
+        - build/bump_version.py
+        - build/nexus_deploy.py
   artifacts:
     paths:
       - build/RPMS/x86_64/
