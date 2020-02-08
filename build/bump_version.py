@@ -52,7 +52,7 @@ def main():
 
         version = bump(latest, options.bump)
 
-    qtag_repo(version)
+    tag_repo(version)
     print(version)
 
     return 0
