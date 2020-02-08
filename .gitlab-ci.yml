@@ -20,7 +20,7 @@ before_script:
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
   - echo $CI_PROJECT_DIR
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
-  - if [ -n $CI_COMMIT_TAG ]; then export VERSION=$CI_COMMIT_TAG ;else export VERSION=''; fi;
+  - if [ -n $CI_COMMIT_TAG ]; then export VERSION=$CI_COMMIT_TAG ;else export VERSION='1.0.0'; fi;
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - echo $CMAKE_FLAGS
 
@@ -190,7 +190,7 @@ push_tag:
   stage: deploy
   script:
     - cd build
-    - ./bump_version.py -b pre
+    - ./bump_version.py -b $BumpTag
   rules:
     - if: '$PeriodicTag!=null'
   tags:
