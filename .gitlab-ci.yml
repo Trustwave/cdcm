@@ -8,7 +8,7 @@ cache:
 
 stages:
   - build_deps
-  - buildgit
+  - build
   - test
   #  - coverage
   - build_rpms
