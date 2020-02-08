@@ -1,7 +1,7 @@
 %define _unpackaged_files_terminate_build 0
-
+%{!?pkg_version:%define pkg_version 1.0.0}
 Name:       tw-cdcm
-Version:    1.0.0
+Version:    %{pkg_version}
 Release:    1%{?dist}
 License:    Various
 Summary:    Credentialed Data Collection Module
