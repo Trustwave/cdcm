@@ -28,9 +28,9 @@ def bump(latest, bump_type):
     if bump_type == 'major':
         return semver.bump_major(latest)
     if bump_type == 'pre':
-        return semver.bump_prerelease(latest)
+        return semver.bump_prerelease(latest, 'pre')
     if bump_type == 'build':
-        return semver.bump_build(latest)
+        return semver.bump_build(latest, 'build')
 
 
 def main():
