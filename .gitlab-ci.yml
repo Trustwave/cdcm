@@ -23,6 +23,7 @@ before_script:
   - if [ -n $CI_COMMIT_TAG ]; then export VERSION=$CI_COMMIT_TAG ;else export VERSION='1.0.0'; fi;
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - echo $CMAKE_FLAGS
+  - echo $VERSION
 
 after_script:
   - echo "After script section"
@@ -203,6 +204,8 @@ deploy_release:
     - python nexus_deploy.py -a cdcm -v $VERSION -r release RPMS/x86_64/*.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG!=null'
+    - exists:
+        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
@@ -215,6 +218,8 @@ deploy_snapshot:
     - python nexus_deploy.py -a cdcm -b $CI_COMMIT_BRANCH -v $VERSION RPMS/x86_64/*.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG==null'
+    - exists:
+        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
