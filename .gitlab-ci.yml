@@ -20,7 +20,7 @@ before_script:
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
   - echo $CI_PROJECT_DIR
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
-  - export VERSION=$(./semver.sh get release `git describe --tags --always`)
+  - export VERSION=$(build/semver.sh get release `git describe --tags --always`)
   - if [ -n $VERSION ]; then export VERSION=1.0.0; fi;
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - echo $CMAKE_FLAGS
