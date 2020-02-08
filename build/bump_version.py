@@ -21,6 +21,7 @@ def tag_repo(tag):
 
 
 def bump(latest, bump_type):
+    print('latest ' + latest)
     if bump_type == 'patch':
         return semver.bump_patch(latest)
     if bump_type == 'minor':
