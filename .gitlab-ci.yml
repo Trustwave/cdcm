@@ -194,7 +194,7 @@ push_tag:
   stage: deploy
   script:
     - cd build
-    - ./bump_version.py -b $BumpTag
+    - bump2version build --verbose --config-file ./bumpversion.cfg
   rules:
     - if: '$PeriodicTag!=null'
   tags:
