@@ -149,6 +149,7 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
+    - export VERSION=$(cat version.txt)
     - rpmbuild  --define "pkg_version $VERSION" -bb cdcm.spec
   rules:
     - if: '$PeriodicTag==null'
@@ -212,6 +213,7 @@ deploy_release:
   stage: deploy
   script:
     - cd build
+    - export VERSION=$(cat version.txt)
     - python nexus_deploy.py -a cdcm -v $VERSION -r release RPMS/x86_64/*.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG!=null'
@@ -226,6 +228,7 @@ deploy_snapshot:
   stage: deploy
   script:
     - cd build
+    - export VERSION=$(cat version.txt)
     - python nexus_deploy.py -a cdcm -b $CI_COMMIT_BRANCH -v $VERSION RPMS/x86_64/*.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG==null'
