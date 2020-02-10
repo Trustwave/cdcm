@@ -10,7 +10,7 @@ stages:
   - build_deps
   - build
   - test
-  #  - coverage
+  - coverage
   - build_rpms
   - test_install
   #  - pages_deploy
