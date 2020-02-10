@@ -196,9 +196,9 @@ push_tag:
   stage: deploy
   script:
     - cd build
-    - bump2version build --verbose --config-file ./bumpversion.cfg
+    - bump2version $BumpTag --verbose --config-file ./bumpversion.cfg
   rules:
-    - if: '$PeriodicTag!=null'
+    - if: '$PeriodicTag!=null && $BumpTag != null'
   tags:
     - cdcm
 
