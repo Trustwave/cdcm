@@ -86,7 +86,7 @@ test:
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
     - pkill -9 cdcm
-    - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/share/cdcm/lib
+    - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/output/{CI_COMMIT_BRANCH}/libs
     - cdcm_broker &
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - pkill -9 cdcm
