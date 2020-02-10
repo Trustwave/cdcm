@@ -82,9 +82,13 @@ build:
 test:
   stage: test
   script:
-    - cd build_cdcm/src/tests/
-    - ls functional_tests
+    - build_cdcm/
+    - scl enable devtoolset-8 "make install"
+    - cd src/tests/
+    - pkill -9 cdcm
+    - cdcm_broker &
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
+    - pkill -9 cdcm
   rules:
     - if: '$PeriodicTag==null'
       changes:
