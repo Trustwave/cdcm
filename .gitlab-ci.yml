@@ -76,6 +76,8 @@ build:
     policy: pull
   tags:
     - cdcm
+  dependencies:
+    - build_deps
 
 test:
   stage: test
