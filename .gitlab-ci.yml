@@ -83,6 +83,7 @@ test:
   stage: test
   script:
     - cd build_cdcm/src/tests/
+    - ls functional_tests
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
   rules:
     - if: '$PeriodicTag==null'
@@ -98,27 +99,25 @@ test:
   tags:
     - cdcm
 
-#html_coverage:
-#  stage: coverage
-#  script:
-#    - cd build_cdcm
-#    - make html_coverage
-#  artifacts:
-#    name: pages
-#    when: always
-#    paths:
-#      - build_cdcm/src/html_coverage
-#    expire_in: 10 days
-#  rules:
-#    - changes:
-#        - src/**/*
-#        - .gitlab-ci.yml
-#  tags:
-#    - cdcm
-#  only:
-#    refs:
-#      - branches
-#
+html_coverage:
+  stage: coverage
+  script:
+    - cd build_cdcm
+    - make html_coverage
+  artifacts:
+    name: pages
+    when: always
+    paths:
+      - build_cdcm/src/html_coverage
+    expire_in: 10 days
+  rules:
+    - if: $CI_COMMIT_BRANCH=="master"
+      changes:
+        - src/**/*
+        - .gitlab-ci.yml
+  tags:
+    - cdcm
+
 #
 #pages:
 #  stage: pages_deploy
