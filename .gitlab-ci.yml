@@ -86,7 +86,9 @@ test:
     - cd build_cdcm/
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
+    - cp /var/cdcm/conf/cdcm_settings.json /var/cdcm/conf/cdcm_settings.json.bak
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
+    - cp /var/cdcm/conf/cdcm_settings.json.bak /var/cdcm/conf/cdcm_settings.json
     - cd ../..
     - make uninstall
   rules:

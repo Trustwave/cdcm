@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(standard)
     std::future<std::error_code> e_cdcm;
     // get a handle to the current environment
     auto env = boost::this_process::environment();
-    auto ld_path = std::string(":/opt/output/") + env["CI_COMMIT_BRANCH"].to_string() + std::string("/libs");
+    auto ld_path = std::string("/opt/output/") + env["CI_COMMIT_BRANCH"].to_string() + std::string("/libs");
 
     std::string a1 = std::string(":")
                      + boost::filesystem::current_path()
@@ -53,6 +53,15 @@ BOOST_AUTO_TEST_CASE(standard)
     env["LD_LIBRARY_PATH"] += a2;
     auto fff = env["LD_LIBRARY_PATH"].to_string();
     boost::process::system("pkill cdcm", env);
+    const char* s1 = R"foo(sed -i s/\/usr\/share\/cdcm\/lib\/plugins/)foo";
+    const char* s2 = R"foo(/g /var/cdcm/conf/cdcm_settings.json)foo";
+    auto ld_path1 = R"foo(\/opt\/output\/)foo";
+    auto ld_path2 = env["CI_COMMIT_BRANCH"].to_string();
+    auto ld_path3 = R"foo(\/libs)foo";
+
+    auto abc = std::string(s1) + ld_path1 + ld_path2 + ld_path3 + s2;
+    boost::process::system(abc, env);
+    BOOST_TEST_MESSAGE(abc);
     boost::process::spawn("cdcm_broker", env);
     std::future<std::error_code> e;
     auto pa = std::make_pair(std::future<std::string>(), std::future<std::string>());
