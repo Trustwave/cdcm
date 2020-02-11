@@ -33,35 +33,21 @@ BOOST_AUTO_TEST_CASE(standard)
     // get a handle to the current environment
     auto env = boost::this_process::environment();
     auto ld_path = std::string("/opt/output/") + env["CI_COMMIT_BRANCH"].to_string() + std::string("/libs");
-
-    std::string a1 = std::string(":")
-                     + boost::filesystem::current_path()
-                           .parent_path()
-                           .parent_path()
-                           .append("deps/samba-4.10.6/bin/shared")
-                           .string();
-    std::string a2 = std::string(":")
-                     + boost::filesystem::current_path()
-                           .parent_path()
-                           .parent_path()
-                           .parent_path()
-                           .append("deps/samba-4.10.6/bin/shared/private")
-                           .string();
+    constexpr std::string_view samba_dir = "deps/samba-4.10.6/bin/shared";
+    auto samba_path = boost::filesystem::current_path().parent_path().parent_path().append(
+        samba_dir); // ../../deps/samba-4.10.6/bin/shared
 
     env["LD_LIBRARY_PATH"] += ld_path;
-    env["LD_LIBRARY_PATH"] += a1;
-    env["LD_LIBRARY_PATH"] += a2;
-    auto fff = env["LD_LIBRARY_PATH"].to_string();
+    env["LD_LIBRARY_PATH"] += samba_path.string();
+    env["LD_LIBRARY_PATH"] += samba_path.append("private").string();
     boost::process::system("pkill cdcm", env);
-    const char* s1 = R"foo(sed -i s/\/usr\/share\/cdcm\/lib\/plugins/)foo";
-    const char* s2 = R"foo(/g /var/cdcm/conf/cdcm_settings.json)foo";
+    const char* sed1 = R"foo(sed -i s/\/usr\/share\/cdcm\/lib\/plugins/)foo";
+    const char* sed2 = R"foo(/g /etc/cdcm/conf/cdcm_settings.json)foo";
     auto ld_path1 = R"foo(\/opt\/output\/)foo";
     auto ld_path2 = env["CI_COMMIT_BRANCH"].to_string();
     auto ld_path3 = R"foo(\/libs)foo";
-
-    auto abc = std::string(s1) + ld_path1 + ld_path2 + ld_path3 + s2;
-    boost::process::system(abc, env);
-    BOOST_TEST_MESSAGE(abc);
+    auto sed_cmd = std::string(sed1) + ld_path1 + ld_path2 + ld_path3 + sed2;
+    boost::process::system(sed_cmd, env);
     boost::process::spawn("cdcm_broker", env);
     std::future<std::error_code> e;
     auto pa = std::make_pair(std::future<std::string>(), std::future<std::string>());
@@ -71,9 +57,6 @@ BOOST_AUTO_TEST_CASE(standard)
     auto err = pa.second.get();
     auto ec = e.get();
     boost::process::system("pkill cdcm", env);
-    std::cerr << out << std::endl;
-    std::cerr << err << std::endl;
-    std::cerr << ec << std::endl;
     BOOST_TEST_REQUIRE(!ec, "failed to run wrapper");
     std::vector<std::string> cont;
     boost::split(cont, out, boost::is_any_of("\n"));
