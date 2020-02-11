@@ -206,15 +206,11 @@ int message_worker::worker_loop()
                     AU_LOG_DEBUG("%s found", act_key.c_str());
                     auto act_m = action->get_message(action_message);
                     action_result->id(act_m->id());
-                    // result.msgs.push_back(action_result);
+                    result.msgs.push_back(action_result);
                     auto sess = authenticated_scan_server::instance().get_session(result.hdr.session_id);
                     if(-1 == action->act(sess, act_m, action_result)) {
                         AU_LOG_DEBUG("action %s returned with an error", act_key.c_str());
                     }
-                    tao::json::value v = action_result->res();
-                    auto action_result2 = std::make_shared<result_msg_json>();
-                    action_result2->res(v);
-                    result.msgs.push_back(action_result2);
                 }
                 else {
                     AU_LOG_DEBUG("%s not found", act_key.c_str());
