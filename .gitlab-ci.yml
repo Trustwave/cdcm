@@ -86,8 +86,7 @@ test:
     - cd build_cdcm/
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
-    - pkill -9 cdcm
-    - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/output/${CI_COMMIT_BRANCH}/libs nohup cdcm_broker
+    - pkill  cdcm
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - pkill -9 cdcm
     - cd ../..
@@ -149,7 +148,7 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
-    - export VERSION=$(cat version.txt)
+    - export VERSION=$(cat version.txt | cut -d'-' -f1 )
     - rpmbuild  --define "pkg_version $VERSION" -bb cdcm.spec
   rules:
     - if: '$PeriodicTag==null'
