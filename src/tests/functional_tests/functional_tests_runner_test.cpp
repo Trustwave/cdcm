@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(standard)
     env["LD_LIBRARY_PATH"] += samba_path.append("private").string();
     boost::process::system("pkill cdcm", env);
     const char* sed1 = R"foo(sed -i s/\/usr\/share\/cdcm\/lib\/plugins/)foo";
-    const char* sed2 = R"foo(/g /etc/cdcm/conf/cdcm_settings.json)foo";
+    const char* sed2 = R"foo(/g /etc/cdcm/cdcm_settings.json)foo";
     auto ld_path1 = R"foo(\/opt\/output\/)foo";
     auto ld_path2 = env["CI_COMMIT_BRANCH"].to_string();
     auto ld_path3 = R"foo(\/libs)foo";
