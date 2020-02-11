@@ -147,7 +147,7 @@ build_rpms:
   script:
     - cd build
     - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
-    - export RELEASE=$(cat version.txt | cut -d'.' -f 2 )
+    - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
     - rpmbuild  --define "pkg_version $VERSION"  --define "release $RELEASE" -bb cdcm.spec
   rules:
     - if: '$PeriodicTag==null'
