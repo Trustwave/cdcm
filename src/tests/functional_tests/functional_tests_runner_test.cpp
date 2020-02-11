@@ -29,6 +29,30 @@ BOOST_AUTO_TEST_CASE(standard)
 {
     boost::asio::io_service ios;
     trustwave::wrapper w(ios);
+    std::future<std::error_code> e_cdcm;
+    // get a handle to the current environment
+    auto env = boost::this_process::environment();
+    auto ld_path = std::string(":/opt/output/") + env["CI_COMMIT_BRANCH"].to_string() + std::string("/libs");
+
+    std::string a1 = std::string(":")
+                     + boost::filesystem::current_path()
+                           .parent_path()
+                           .parent_path()
+                           .append("deps/samba-4.10.6/bin/shared")
+                           .string();
+    std::string a2 = std::string(":")
+                     + boost::filesystem::current_path()
+                           .parent_path()
+                           .parent_path()
+                           .parent_path()
+                           .append("deps/samba-4.10.6/bin/shared/private")
+                           .string();
+
+    env["LD_LIBRARY_PATH"] += ld_path;
+    env["LD_LIBRARY_PATH"] += a1;
+    env["LD_LIBRARY_PATH"] += a2;
+    auto fff = env["LD_LIBRARY_PATH"].to_string();
+    boost::process::spawn("cdcm_broker", env);
     std::future<std::error_code> e;
     auto pa = std::make_pair(std::future<std::string>(), std::future<std::string>());
     auto p = w.start_external_test("exe_test", "./functional_tests/actions.xml", std::move(pa), std::move(e));
