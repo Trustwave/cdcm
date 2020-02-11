@@ -84,7 +84,7 @@ test:
   allow_failure: true
   script:
     - cd build_cdcm/
-    - scl enable devtoolset-8 "make install"
+    - scl enable devtoolset-8 "make -j4 install"
     - cd src/tests/
     - cp /var/cdcm/conf/cdcm_settings.json /var/cdcm/conf/cdcm_settings.json.bak
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
