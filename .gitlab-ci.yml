@@ -205,7 +205,7 @@ push_tag:
     - bump2version $BumpTag --verbose --config-file ./bumpversion.cfg
     - git remote set-url origin https://git_push_tag:${secret}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - if ["$BumpTag" != "snapshot"]; then git tag $(date +%b-%d-%y) -m 'Periodic Release '$(date +%b-%d-%y) ; fi;
-    - git push all
+    - git push --all
   rules:
     - if: '$PeriodicTag!=null && $BumpTag != null'
   tags:
