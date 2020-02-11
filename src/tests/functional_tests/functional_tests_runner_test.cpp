@@ -52,6 +52,7 @@ BOOST_AUTO_TEST_CASE(standard)
     env["LD_LIBRARY_PATH"] += a1;
     env["LD_LIBRARY_PATH"] += a2;
     auto fff = env["LD_LIBRARY_PATH"].to_string();
+    boost::process::system("pkill cdcm", env);
     boost::process::spawn("cdcm_broker", env);
     std::future<std::error_code> e;
     auto pa = std::make_pair(std::future<std::string>(), std::future<std::string>());
@@ -60,6 +61,7 @@ BOOST_AUTO_TEST_CASE(standard)
     auto out = pa.first.get();
     auto err = pa.second.get();
     auto ec = e.get();
+    boost::process::system("pkill cdcm", env);
     std::cerr << out << std::endl;
     std::cerr << err << std::endl;
     std::cerr << ec << std::endl;
