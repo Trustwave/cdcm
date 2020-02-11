@@ -204,8 +204,8 @@ push_tag:
     - cd build
     - bump2version $BumpTag --verbose --config-file ./bumpversion.cfg
     - git remote set-url origin https://git_push_tag:${secret}@git.trustwave.com/engineering/credentialed_data_collection_module.git
-    - if [$BumpTag != null]; then git tag $(date +%b-%d-%y) -m 'Periodic Release '$(date +%b-%d-%y) ; fi;
-    - git push origin
+    - if [$BumpTag != "snapshot"]; then git tag $(date +%b-%d-%y) -m 'Periodic Release '$(date +%b-%d-%y) ; fi;
+    - git push
   rules:
     - if: '$PeriodicTag!=null && $BumpTag != null'
   tags:
