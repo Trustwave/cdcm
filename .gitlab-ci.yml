@@ -81,13 +81,13 @@ build:
 
 test:
   stage: test
+  allow_failure: true
   script:
     - cd build_cdcm/
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
     - pkill -9 cdcm
-    - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/output/{CI_COMMIT_BRANCH}/libs nohup cdcm_broker
-    - cdcm_broker &
+    - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/output/${CI_COMMIT_BRANCH}/libs nohup cdcm_broker
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - pkill -9 cdcm
     - cd ../..
