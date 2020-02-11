@@ -121,6 +121,8 @@ html_coverage:
         - .gitlab-ci.yml
   tags:
     - cdcm
+  dependencies:
+    - build
 
 #
 #pages:
