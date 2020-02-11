@@ -20,11 +20,8 @@ before_script:
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
   - echo $CI_PROJECT_DIR
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
-  - export VERSION=$(cat version.txt)
-  - if [ -n $VERSION ]; then export VERSION=1.0.0; fi;
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - echo $CMAKE_FLAGS
-  - echo $VERSION
 
 after_script:
   - echo "After script section"
@@ -159,7 +156,6 @@ build_rpms:
         - build/cdcm.spec
         - build/tw-cdcm.service
         - .gitlab-ci.yml
-        - build/bump_version.py
         - build/nexus_deploy.py
   artifacts:
     paths:
@@ -213,7 +209,7 @@ deploy_release:
   stage: deploy
   script:
     - cd build
-    - export VERSION=$(cat version.txt)
+    - export VERSION=$(cat version.txt | cut -d'.' -f{1,2,3} )
     - python nexus_deploy.py -a cdcm -v $VERSION -r release RPMS/x86_64/*.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG!=null'
@@ -228,7 +224,7 @@ deploy_snapshot:
   stage: deploy
   script:
     - cd build
-    - export VERSION=$(cat version.txt)
+    - export VERSION=$(cat version.txt | cut -d'.' -f{1,2,3} )
     - python nexus_deploy.py -a cdcm -b $CI_COMMIT_BRANCH -v $VERSION RPMS/x86_64/*.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG==null'
