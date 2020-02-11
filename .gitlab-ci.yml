@@ -115,7 +115,7 @@ html_coverage:
       - build_cdcm/src/html_coverage
     expire_in: 10 days
   rules:
-    - if: $CI_COMMIT_BRANCH=="master"
+    - if: '$CI_COMMIT_BRANCH=="master" && $PeriodicTag==null && $CI_COMMIT_TAG!=null'
       changes:
         - src/**/*
         - .gitlab-ci.yml
