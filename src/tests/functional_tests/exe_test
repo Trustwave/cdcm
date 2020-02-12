@@ -6,6 +6,8 @@
 # Based on Python example by Min RK
 folder = File.expand_path('.',__dir__)
 $:.unshift(folder) unless $:.include?(folder)
+folder = File.expand_path('./functional_tests',__dir__)
+$:.unshift(folder) unless $:.include?(folder)
 require 'mdcliapi2.rb'
 require 'testRunner.rb'
 require 'myLogger.rb'

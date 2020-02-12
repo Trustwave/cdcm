@@ -7,9 +7,9 @@
     "reconnect": 3000,
     "session_idle_time": 300,
     "worker_processes": 1,
-    "broker_worker_listening_ep": "tcp:\/\/*:5556",
-    "broker_client_listening_ep": "tcp:\/\/*:5555",
-    "worker_connect_ep": "tcp://127.0.0.1:5556",
+    "broker_worker_listening_ep": "tcp:\/\/*:7614",
+    "broker_client_listening_ep": "tcp:\/\/*:7613",
+    "worker_connect_ep": "tcp://127.0.0.1:7614",
     "downloaded_file_path": "/var/cdcm/downloaded_files",
     "plugins_dir": "/usr/share/cdcm/lib/plugins"
   }

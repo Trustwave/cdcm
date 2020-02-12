@@ -118,7 +118,7 @@
             <session_item action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true"/>
             <!--<session_item  action="file_exists" param="C:\\\\WINDOWS\\\\hh.exe" verification_method="boolean" expected="true" />-->
             <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
-                          regex="^(.*)Size(.*)Path(.*)$"/>
+                          regex="^(.*)size(.*)path(.*)$"/>
             <session_item action="read_file" path="ADMIN$/hh.exe" size="104" offset="100"
                           verification_method="do_not_verify"/>
             <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"

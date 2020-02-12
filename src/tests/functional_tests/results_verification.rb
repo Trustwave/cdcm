@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
 
-
+folder = File.expand_path('.',__dir__)
+$:.unshift(folder) unless $:.include?(folder)
+folder = File.expand_path('./functional_tests',__dir__)
+$:.unshift(folder) unless $:.include?(folder)
 require "logger"
-require './myLogger.rb'
+require 'myLogger.rb'
 
 def log
     MyLogger.instance.log

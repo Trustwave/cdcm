@@ -2,9 +2,6 @@ MKDIR 		:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP 		:= $(subst /build/,,$(MKDIR))
 export TOP
 export MKDIR
-
-include $(MKDIR)/version.mk
-include $(MKDIR)/repos.mk
 include $(MKDIR)/conf.mk
 
 export PRJ

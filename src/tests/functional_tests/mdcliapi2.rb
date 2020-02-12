@@ -233,7 +233,7 @@ class MajorDomoClient
   #
   ########################################
   def short_after_run_dump (session, session_item)
-      dump_str = "result:" + session_item.verification_ctx.vm_result + " ip:" + session.asset_details.remote + " action_name:" + session_item.action + " session_name:" + session.session_name + " req_id:" + session_item.req_id + " reason:" + session_item.verification_ctx.verification_result.vm_result_message + "\n"
+      dump_str = "result:" + session_item.verification_ctx.vm_result + " ip:" + session.asset_details.remote + " action_name:" + session_item.action + " session_name:" + session.session_name + " req_id:" + session_item.req_id + " reason:[" + session_item.verification_ctx.verification_result.vm_result_message + "]\n"
       return dump_str
   end
 
