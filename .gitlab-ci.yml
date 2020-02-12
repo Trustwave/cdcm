@@ -218,7 +218,7 @@ deploy_release:
     - cd build
     - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
     - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
-    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -Drelease=$RELEASE -DgeneratePom=false -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dfile=RPMS/x86_64/tw-cdcm-$VERSION.x86_64.rpm
+    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -Drelease=$RELEASE -DgeneratePom=false -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dfile=RPMS/x86_64/tw-cdcm-$VERSION.el7.x86_64.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG!=null'
     - exists:
@@ -234,7 +234,7 @@ deploy_snapshot:
     - cd build
     - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
     - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
-    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -Drelease=$RELEASE -DgeneratePom=false -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dfile=RPMS/x86_64/tw-cdcm-$VERSION-$RELEASE.x86_64.rpm
+    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -Drelease=$RELEASE -DgeneratePom=false -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dfile=RPMS/x86_64/tw-cdcm-$VERSION-$RELEASE.el7.x86_64.rpm
   rules:
     - if: '$PeriodicTag==null && $CI_COMMIT_TAG==null'
     - exists:
