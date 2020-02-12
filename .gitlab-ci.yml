@@ -235,10 +235,10 @@ deploy_snapshot:
     - cd build
     - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
     - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
-    - export DIST=$(rpm --eval '%{dist}' | cut -d'.' -f 2  )
-    - if [ $VERSION = $RELEASE ]; then export FNAME="tw-cdcm-$VERSION.$DIST.x86_64.rpm" ; else export FNAME="tw-cdcm-$VERSION-$RELEASE.$DIST.x86_64.rpm" ; fi
-    - if [ $VERSION = $RELEASE ]; then export CLASSIFIER="-Dclassifiers=$DIST.x86_64" ; else export CLASSIFIER="-Dclassifiers=$RELEASE.$DIST.x86_64" ; fi
-    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave $CLASSIFIER -DartifactId=cdcm -Dversion=$VERSION  -DgeneratePom=false -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dfile=RPMS/x86_64/$FNAME
+    - export DIST=$(rpm --eval '%{dist}')
+    - if [ $VERSION = $RELEASE ]; then export FNAME=tw-cdcm-$VERSION.$DIST.x86_64.rpm ; else export FNAME=tw-cdcm-$VERSION-$RELEASE.$DIST.x86_64.rpm ; fi
+    - echo $FNAME
+    - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$(cat version.txt)  -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dpackaging=x86_64.rpm -Dfile=RPMS/x86_64/$FNAME
   rules:
     - if: '$BumpTag == null  && $CI_COMMIT_TAG==null'
     - exists:
