@@ -121,8 +121,6 @@ int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
     }
 
     auto c64_str = base64_encode(buff, r);
-    //tao::json::value v = c64_str;
-    //res->res(v); // fixme assaf figure aou whi strin assignment doesn't  work
     res->res(c64_str);
     return 0;
 }
