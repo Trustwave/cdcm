@@ -242,7 +242,8 @@ deploy:
     - export RELEASE=$(cat version.txt | cut -d'-' -f 1 | cut -d'.' -f 4)
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=$CI_COMMIT_BRANCH- ;fi
     - if [ "$(echo $SNAPSHOT|cut -d'_' -f 1)" = "SNAPSHOT" ]; then export VERSION=$BRANCH$VERSION-SNAPSHOT; export REPO=snapshots ; else export REPO=releases ;fi
-    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=$(ls  RPMS/x86_64/)
+    - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=$(ls -d RPMS/x86_64/*)
+    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=$(ls -d RPMS/x86_64/*)
   rules:
     - if: '$BumpTag == null '
     - exists:
