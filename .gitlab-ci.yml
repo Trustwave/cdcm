@@ -207,33 +207,14 @@ push_tag:
   script:
     - cd build
     - git remote set-url origin https://git_push_tag:${secret}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git config --global push.default simple
     - bump2version $BumpTag --verbose --config-file ./bumpversion.cfg
-    #    - if ["$BumpTag" != "snapshot"]; then git tag $(date +%b-%d-%y) -m 'Periodic Release '$(date +%b-%d-%y) ; fi;
     - git push origin
     - git push origin --tags
   rules:
     - if: ' $BumpTag != null'
   tags:
     - cdcm
-
-#deploy_release:
-#  stage: deploy
-#  script:
-#    - cd build
-#    - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
-#    - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
-#    - export DIST=$(rpm --eval '%{dist}'|cut -d'.' -f 2)
-#    - if [ $VERSION = $RELEASE ]; then export FNAME=tw-cdcm-$VERSION.$DIST.x86_64.rpm ; else export FNAME=tw-cdcm-$VERSION-$RELEASE.$DIST.x86_64.rpm ; fi
-#    - echo $FNAME
-#    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION  -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/releases -Dpackaging=x86_64.rpm -Dfile=RPMS/x86_64/$FNAME
-#  rules:
-#    - if: '$BumpTag == null && $CI_COMMIT_BRANCH=="master"'
-#    - exists:
-#        - build/RPMS/x86_64/*.rpm
-#  tags:
-#    - cdcm
-#  dependencies:
-#    - build_rpms
 
 deploy:
   stage: deploy
