@@ -5,6 +5,8 @@ Name:       tw-cdcm
 Version:    %{pkg_version}
 Release:    %{release}
 License:    Various
+Vendor: Trustwave Inc.
+URL: https://www.trustwave.com/
 Summary:    Credentialed Data Collection Module
 BuildRequires: systemd
 Requires: systemd
