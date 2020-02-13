@@ -111,7 +111,7 @@ namespace {
 
         if((ctx = smbc_new_context()) == nullptr) return nullptr;
 
-        //smbc_setDebug(ctx, 100); //rotem todo: delete when finish debugging
+        //smbc_setDebug(ctx, 100);
         smbc_setFunctionAuthData(ctx, smbc_auth_fn);
         if(smbc_init_context(ctx) == nullptr) {
             smbc_free_context(ctx, 1);
@@ -143,7 +143,7 @@ smb_client::~smb_client()
 std::pair<bool, int> smb_client::open_file(const char* path)
 {
     AU_LOG_DEBUG("path: %s", path);
-    if(smbc_init(smbc_auth_fn, 100) < 0) {
+    if(smbc_init(smbc_auth_fn, 0) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
         return std::make_pair(false, -1);
     }
