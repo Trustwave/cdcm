@@ -78,7 +78,6 @@ int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<a
     trustwave::enum_key ek{};
     auto ret = c.enumerate_key(ekact->key_, ek);
     if(std::get<0>(ret)) {
-        //const tao::json::value v1 = ek;
         res->res(ek);
     }
     else {
