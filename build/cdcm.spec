@@ -73,7 +73,7 @@ set -e
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
 %{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
-%{__install} -m644 %{_specdir}/%{name}.preset %{buildroot}/%{_presetdir}/%{name}.preset
+%{__install} -m644 %{_specdir}/50-%{name}.preset %{buildroot}/%{_presetdir}/50-%{name}.preset
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
 
@@ -100,7 +100,7 @@ systemctl daemon-reload
 /var/cdcm
 /etc/cdcm
 %{_unitdir}/%{name}.service
-%{_presetdir}/%{name}.preset
+%{_presetdir}/50-%{name}.preset
 %{_sbindir}/rc%{name}
 
 %changelog
