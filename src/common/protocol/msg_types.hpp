@@ -25,7 +25,7 @@ namespace trustwave {
     struct result_msg {
     public:
         std::string id_;
-        std::string res_;
+        tao::json::value res_;
 
     public:
         virtual ~result_msg() = default;
@@ -36,8 +36,8 @@ namespace trustwave {
         result_msg() = default;
         std::string id() const { return id_; }
         void id(const std::string& ids) { id_ = ids; }
-        std::string res() const { return res_; }
-        void res(const std::string& ress) { res_.assign(ress); }
+        tao::json::value res() const { return res_; }
+        void res(const tao::json::value& ress) { res_ = ress; }
     };
 
     struct action_msg {

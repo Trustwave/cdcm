@@ -71,7 +71,8 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
     }
     c.end_array();
 
-    res->res(to_string(c.value));
+    //res->res(to_string(c.value));
+    res->res(c.value);
     return 0;
 }
 static std::shared_ptr<SMB_Get_File_Info> instance = nullptr;
