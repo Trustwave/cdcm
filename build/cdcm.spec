@@ -100,6 +100,7 @@ systemctl daemon-reload
 /var/cdcm
 /etc/cdcm
 %{_unitdir}/%{name}.service
+%{_presetdir}/%{name}.preset
 %{_sbindir}/rc%{name}
 
 %changelog
