@@ -148,8 +148,8 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
-    - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
-    - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
+    - export VERSION=$(cat version.txt | cut -d'-' -f 1 | cut -d'.' -f1,2,3)
+    - export RELEASE=$(cat version.txt | cut -d'-' -f 1 | cut -d'.' -f 4)
     - rpmbuild  --define "pkg_version $VERSION"  --define "release $RELEASE" -bb cdcm.spec
   rules:
     - if: '$BumpTag == null'
@@ -238,11 +238,10 @@ deploy:
   script:
     - cd build
     - export VERSION=$(cat version.txt | cut -d'-' -f 1 )
-    - export RELEASE=$(cat version.txt | cut -d'-' -f 2 )
-    - export DIST=$(rpm --eval '%{dist}'|cut -d'.' -f 2 )
+    - export SNAPSHOT=$(cat version.txt | cut -d'-' -f 2 )
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=$CI_COMMIT_BRANCH- ;fi
-    - if [ $VERSION = $RELEASE ]; then export FNAME=tw-cdcm-$VERSION.$DIST.x86_64.rpm ; else export FNAME=tw-cdcm-$VERSION-$RELEASE.$DIST.x86_64.rpm ; fi
-    - if [ "$(echo $RELEASE|cut -d'_' -f 1)" = "SNAPSHOT" ]; then  export VERSION=$BRANCH$VERSION-SNAPSHOT; export REPO=snapshots ; else export REPO=releases ;fi
+    - if [ $VERSION = $SNAPSHOT ]; then export FNAME=tw-cdcm-$VERSION.x86_64.rpm ; else export FNAME=tw-cdcm-$VERSION-$SNAPSHOT.x86_64.rpm ; fi
+    - if [ "$(echo $SNAPSHOT|cut -d'_' -f 1)" = "SNAPSHOT" ]; then export VERSION=$BRANCH$VERSION-SNAPSHOT; export REPO=snapshots ; else export REPO=releases ;fi
     - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=RPMS/x86_64/$FNAME
   rules:
     - if: '$BumpTag == null '
