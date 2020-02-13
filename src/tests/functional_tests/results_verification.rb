@@ -7,6 +7,7 @@ $:.unshift(folder) unless $:.include?(folder)
 require "logger"
 require 'myLogger.rb'
 
+
 def log
     MyLogger.instance.log
 end
@@ -43,7 +44,8 @@ def verify_key_exist(session_item)
     log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"looking for the key: " + key_value}
     response_key = extract_response_key(session_item)
 
-    if response_key.downcase.include? key_value.downcase
+    #if response_key.downcase.include? key_value.downcase
+    if response_key.to_s.downcase.include? key_value.downcase    
         log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"key was found in text"}
         ver_result = Verification_Result.new(true, "key was found in text")
         return ver_result
@@ -68,7 +70,8 @@ def compare_result_to_bool(session_item)
     log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"copmare result with expected value of: " + key_value}
     response_key = extract_response_key(session_item)
 
-    if response_key.downcase ==key_value.downcase
+    #if response_key.downcase == key_value.downcase
+    if response_key.to_s.downcase == key_value.downcase
         log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"response is as expected"}
         ver_result = Verification_Result.new(true, "response is as expected: " + key_value.downcase)
         return ver_result
@@ -96,7 +99,8 @@ def reg_match(session_item)
     log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"looking for the key: " + key_value}
     response_key = extract_response_key(session_item)
 
-    regex_match_res = response_key.match(key_value)
+    #regex_match_res = response_key.match(key_value)
+    regex_match_res = response_key.to_s.match(key_value)
 
     if regex_match_res.nil?
         log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"regex does not match the response"}
