@@ -62,7 +62,7 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
     c.begin_array();
     push_back(c, "size", std::to_string(rc.file_size()));
     push_back(c, "path", "FIXME");
-    push_back(c, "lastModified", std::to_string(rc.last_modified()));
+    push_back(c, "last_modified", std::to_string(rc.last_modified()));
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     for(const auto& e: ret) {
         auto key = convert.to_bytes(std::u16string(e.first));
