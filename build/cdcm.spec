@@ -73,6 +73,7 @@ set -e
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__mkdir} -p %{buildroot}/%{_sbindir}
 %{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
+%{__install} -m644 %{_specdir}/%{name}.preset %{buildroot}/%{_presetdir}/%{name}.preset
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
 

@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Environment=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/share/cdcm/lib
 ExecStart= /usr/bin/cdcm_broker
-Restart=on-failure
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
