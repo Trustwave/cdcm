@@ -148,9 +148,8 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
-    - export VERSION=$(cat version.txt | cut -d'_' -f 1 )
+    - export VERSION=$(cat version.txt )
     - export SNAPSHOT=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 4)
-    - export CI_COMMIT_BRANCH='master'
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_$CI_COMMIT_BRANCH ;fi
     - if [ -n $SNAPSHOT ];then export VERSION=${VERSION}${BRANCH} ;fi
     - rpmbuild  --define "pkg_version $VERSION"   -bb cdcm.spec
@@ -246,6 +245,7 @@ deploy:
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=$CI_COMMIT_BRANCH_ ;fi
     - export REPO=releases
     - if [ -n $SNAPSHOT  ]; then export VERSION=$BRANCH$VERSION_FULL; export REPO=snapshots ;fi
+    - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=$(ls -d RPMS/x86_64/*)
     - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=$(ls -d RPMS/x86_64/*)
   rules:
     - if: '$BumpTag == null '
