@@ -3,7 +3,7 @@
 %{!?release:%define release 1}
 Name:       tw-cdcm
 Version:    %{pkg_version}
-Release:    %{release}%{?dist}
+Release:    %{release}
 License:    Various
 Summary:    Credentialed Data Collection Module
 BuildRequires: systemd
