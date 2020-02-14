@@ -189,7 +189,7 @@ test_install:
     - sleep 5
     - sudo yum -y erase tw-cdcm
   rules:
-    - if: '$RunFast==null && $CI_COMMIT_BRANCH=="master" && $BumpTag == null'
+    - if:  '$RunFast==null && ($CI_COMMIT_BRANCH=="master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master") && $BumpTag == null'
       changes:
         - cdcm_settings.json
         - src/**/*
