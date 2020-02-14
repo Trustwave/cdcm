@@ -150,7 +150,7 @@ build_rpms:
     - cd build
     - export VERSION=$(cat version.txt )
     - export SNAPSHOT=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 4)
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_$CI_COMMIT_BRANCH ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
     - if [ -n $SNAPSHOT ];then export VERSION=${VERSION}${BRANCH} ;fi
     - rpmbuild  --define "pkg_version $VERSION"   -bb cdcm.spec
   rules:
@@ -209,7 +209,7 @@ push_tag:
     - git remote set-url origin https://git_push_tag:${secret}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - git config --global push.default simple
     - bump2version $BumpTag --verbose --config-file ./bumpversion.cfg
-    - git push origin
+    - git status
     - git push origin --tags
   rules:
     - if: ' $BumpTag != null'
@@ -223,7 +223,7 @@ deploy:
     - export VERSION=$(cat version.txt | cut -d'_' -f 1 )
     - export VERSION_FULL=$(cat version.txt )
     - export SNAPSHOT=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 4)
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=$CI_COMMIT_BRANCH_ ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ;fi
     - export REPO=releases
     - if [ -n $SNAPSHOT  ]; then export VERSION=$BRANCH$VERSION-SNAPSHOT ; export REPO=snapshots ;fi
     - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=x86_64.rpm -Dfile=$(ls -d RPMS/x86_64/*)
