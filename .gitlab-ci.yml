@@ -21,7 +21,7 @@ before_script:
   - echo $CI_PROJECT_DIR
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
-  - echo $CMAKE_FLAGS
+  - env
 
 after_script:
   - echo "After script section"
@@ -32,7 +32,7 @@ build_deps:
     - cd build
     - scl enable devtoolset-8 'make deps'
   rules:
-    - if: '$BumpTag == null'
+    - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
         - build/Makefile
         - tars/*
@@ -59,10 +59,11 @@ build:
     - rm -fr /opt/output/bin/*
     - scl enable devtoolset-8 "make install"
   rules:
-    - if: '$BumpTag == null'
+    - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
         - src/**/*
         - .gitlab-ci.yml
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
   artifacts:
     paths:
       - build_cdcm/
@@ -94,6 +95,7 @@ test:
       changes:
         - src/**/*
         - .gitlab-ci.yml
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
   artifacts:
     when: always
     paths:
@@ -154,7 +156,7 @@ build_rpms:
     - if [ -n $SNAPSHOT ];then export VERSION=${VERSION}${BRANCH} ;fi
     - rpmbuild  --define "pkg_version $VERSION"   -bb cdcm.spec
   rules:
-    - if: '$BumpTag == null'
+    - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
         - cdcm_settings.json
         - src/**/*
@@ -203,6 +205,7 @@ test_install:
         - build/cdcm.spec
         - build/tw-cdcm.service
         - .gitlab-ci.yml
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
     - exists:
         - build/RPMS/x86_64/*.rpm
   dependencies:
