@@ -189,7 +189,14 @@ test_install:
     - sleep 5
     - sudo yum -y erase tw-cdcm
   rules:
-    - if:  '$RunFast==null && ($CI_COMMIT_BRANCH=="master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master") && $BumpTag == null'
+    - if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
+      changes:
+        - cdcm_settings.json
+        - src/**/*
+        - build/cdcm.spec
+        - build/tw-cdcm.service
+        - .gitlab-ci.yml
+    - if: '$RunFast==null && $BumpTag == null && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
         - cdcm_settings.json
         - src/**/*
