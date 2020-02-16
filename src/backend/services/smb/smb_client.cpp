@@ -214,7 +214,6 @@ bool smb_client::download_portion_to_memory(const char* base, const char* name, 
 bool smb_client::list_dir(const std::string& path, std::vector<trustwave::dirent>& dirents)
 {
     int dh1, dsize, dirc;
-    char dirbuf[SMB_DEFAULT_BLOCKSIZE];
     char* dirp;
     if(smbc_init(smbc_auth_fn, 100) < 0) {
         AU_LOG_ERROR("Unable to initialize libsmbclient");
@@ -224,22 +223,30 @@ bool smb_client::list_dir(const std::string& path, std::vector<trustwave::dirent
     old_ = smbc_set_context(ctx_);
     if((dh1 = smbc_opendir(path.c_str())) < 1) {
         AU_LOG_ERROR("Could not open directory: %s: %s\n", path.c_str(), strerror(errno));
-
         return false;
     }
-    dirp = (char*)dirbuf;
-    if((dirc = smbc_getdents(static_cast<unsigned int>(dh1), (struct smbc_dirent*)dirp, sizeof(dirbuf))) < 0) {
-        AU_LOG_ERROR("Problems getting directory entries: %s\n", strerror(errno));
-        return false;
-    }
-    while(dirc > 0) {
-        dsize = ((struct smbc_dirent*)dirp)->dirlen;
-        if(((struct smbc_dirent*)dirp)->smbc_type == 7 || ((struct smbc_dirent*)dirp)->smbc_type == 8) {
-            dirents.push_back({std::string(((struct smbc_dirent*)dirp)->name),
-                               ((struct smbc_dirent*)dirp)->smbc_type == 7 ? std::string("DIR") : std::string("FILE")});
+    std::vector<std::unique_ptr<char[]>> bufs;
+    bufs.emplace_back(std::make_unique<char[]>(SMB_DEFAULT_BLOCKSIZE));
+    std::vector<char*>::size_type curr = 0;
+    dirp = (char*)bufs[curr].get();
+    while((dirc = smbc_getdents(static_cast<unsigned int>(dh1), (struct smbc_dirent*)dirp, SMB_DEFAULT_BLOCKSIZE))
+          != 0) {
+        if(dirc < 0) {
+            AU_LOG_ERROR("Problems getting directory entries: %s\n", strerror(errno));
+            return false;
         }
-        dirp += dsize;
-        dirc -= dsize;
+        while(dirc > 0) {
+            dsize = ((struct smbc_dirent*)dirp)->dirlen;
+            if(((struct smbc_dirent*)dirp)->smbc_type == 7 || ((struct smbc_dirent*)dirp)->smbc_type == 8) {
+                dirents.push_back(
+                    {std::string(((struct smbc_dirent*)dirp)->name),
+                     ((struct smbc_dirent*)dirp)->smbc_type == 7 ? std::string("DIR") : std::string("FILE")});
+            }
+            dirp += dsize;
+            dirc -= dsize;
+        }
+        bufs.emplace_back(std::make_unique<char[]>(SMB_DEFAULT_BLOCKSIZE));
+        dirp = bufs[++curr].get();
     }
     smbc_closedir(dh1);
     return true;
