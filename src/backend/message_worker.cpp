@@ -237,7 +237,7 @@ int message_worker::worker_loop()
         }
         try {
             const tao::json::value v1 = result;
-            auto reply_body_str = to_string<tao::json::events::key_camel_case_to_snake_case>(v1);
+            auto reply_body_str = to_string(v1);
             reply = new zmsg; // will be deleted in recv
             reply->append(reply_body_str.c_str());
         }
