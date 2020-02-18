@@ -16,7 +16,6 @@ Credentialed Data Collection Module
 %clean
 rm -rf %{buildroot}
 
-
 %install
 rm -rf %{buildroot}
 
@@ -80,16 +79,17 @@ ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
 %post
 /sbin/ldconfig
-
-systemctl daemon-reload
 %systemd_post %{name}.service
+%systemd_user_post %{name}.service
+systemctl start %{name}
 
 %preun
 %systemd_preun %{name}.service
+%systemd_user_preun %{name}.service
 
 %postun
 %systemd_postun %{name}.service
-
+%systemd_user_postun %{name}.service
 
 %files
 %defattr(-,root,root,-)
