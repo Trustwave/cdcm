@@ -404,11 +404,11 @@ namespace detail {
 
         //remove passwords by replacing the pattern "password":"SOME_PASSWORD" with "password":"" (white spaces ignored)
         if((collect & ::trustwave::logger::COLLECT_FROM_SENSITIVE) != 0) {
-            std::regex e  ("\"password\"(\\s*?):(\\s*?)\"(.*?)\"");
-            std::string replacement ("\"password\":\"\""); //replace with empty password
-            auto message_without_sensitive_data  = std::regex_replace (message, e, replacement);
+            static const std::regex e("\"password\"(\\s*?):(\\s*?)\"(.*?)\"");
+            static const std::string replacement("\"password\":\"\""); // replace with empty password
+            auto message_without_sensitive_data = std::regex_replace(message, e, replacement);
             memset(message, '\0', sizeof(message));
-            memcpy(message,message_without_sensitive_data.c_str(), message_without_sensitive_data.size());
+            memcpy(message, message_without_sensitive_data.c_str(), message_without_sensitive_data.size());
         }
 
         //
