@@ -81,15 +81,20 @@ ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 /sbin/ldconfig
 %systemd_post %{name}.service
 %systemd_user_post %{name}.service
+systemctl daemon-reload >/dev/null 2>&1 || :
 systemctl start %{name}
 
 %preun
 %systemd_preun %{name}.service
 %systemd_user_preun %{name}.service
+systemctl stop %{name}
 
 %postun
 %systemd_postun %{name}.service
-%systemd_user_postun %{name}.service
+systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+        systemctl restart  %{name}.service >/dev/null 2>&1 || :
+fi
 
 %files
 %defattr(-,root,root,-)
