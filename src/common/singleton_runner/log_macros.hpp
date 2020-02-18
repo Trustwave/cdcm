@@ -57,6 +57,20 @@
                       ::trustwave::LoggerSource::instance()->get_source(), __VA_ARGS__)
 //         ::trustwave::LoggerSource::instance()->get_source_id(),
 
+#define AU_LOG_SENSITIVE_DATA_DEBUG(...) \
+    LOGGER->log_event(trustwave::logger::debug2, trustwave::logger::COLLECT_FROM_SENSITIVE, ERR_LOG, \
+                      ::trustwave::LoggerSource::instance()->get_source(), __VA_ARGS__)
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
+
+#define AU_LOG_SENSITIVE_DATA_INFO(...) \
+    LOGGER->log_event(trustwave::logger::info, trustwave::logger::COLLECT_FROM_SENSITIVE, ERR_LOG, \
+                      ::trustwave::LoggerSource::instance()->get_source(), __VA_ARGS__)
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
+
+#define AU_LOG_SENSITIVE_DATA_ERROR(...) \
+    LOGGER->log_event(trustwave::logger::error, trustwave::logger::COLLECT_FROM_SENSITIVE, ERR_LOG, \
+                      ::trustwave::LoggerSource::instance()->get_source(), __VA_ARGS__)
+//         ::trustwave::LoggerSource::instance()->get_source_id(),
 //#define AU_LOG_DEBUG(...) printf(__VA_ARGS__)
 //#define AU_LOG_ERROR(...) printf(__VA_ARGS__)
 //#define AU_LOG_INFO(...) printf(__VA_ARGS__)
