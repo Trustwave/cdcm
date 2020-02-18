@@ -150,11 +150,11 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
-    - export VERSION=$(cat version.txt )
+    - export VERSION=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 1,2,3)
     - export SNAPSHOT=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 4)
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
     - if [ -n $SNAPSHOT ];then export VERSION=${VERSION}${BRANCH} ;fi
-    - rpmbuild  --define "pkg_version $VERSION"   -bb cdcm.spec
+    - rpmbuild  --define "pkg_version $VERSION" --define "release SNAPSHOT_$SNAPSHOT"  -bb cdcm.spec
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
@@ -181,15 +181,10 @@ test_install:
     - cdcm_install
   script:
     - cd build
-    - sudo yum localinstall -y RPMS/x86_64/*.rpm
-    - sleep 5
-    - sudo systemctl start tw-cdcm
-    - sleep 5
+    - sudo yum install -y RPMS/x86_64/*.rpm
     - sudo systemctl status tw-cdcm
-    - sleep 5
-    - sudo systemctl stop tw-cdcm
-    - sleep 5
     - sudo yum -y erase tw-cdcm
+    - sudo systemctl status tw-cdcm
   rules:
     - if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
       changes:
@@ -236,8 +231,8 @@ deploy:
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ;fi
     - export REPO=releases
     - if [ -n $SNAPSHOT  ]; then export VERSION=$BRANCH$VERSION-SNAPSHOT ; export REPO=snapshots ;fi
-    - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=.rpm -Dfile=$(ls -d RPMS/x86_64/*)
-    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=.rpm -Dfile=$(ls -d RPMS/x86_64/*)
+    - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
+    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
   rules:
     - if: '$BumpTag == null '
     - exists:
