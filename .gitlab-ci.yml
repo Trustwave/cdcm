@@ -35,6 +35,7 @@ build_deps:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
         - build/Makefile
+        - build/version.txt
         - tars/*
         - .gitlab-ci.yml
   cache:
@@ -61,6 +62,7 @@ build:
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
+        - build/version.txt
         - src/**/*
         - .gitlab-ci.yml
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
@@ -93,6 +95,7 @@ test:
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
       changes:
+        - build/version.txt
         - src/**/*
         - .gitlab-ci.yml
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
@@ -161,6 +164,7 @@ build_rpms:
         - cdcm_settings.json
         - src/**/*
         - build/cdcm.spec
+        - build/version.txt
         - build/tw-cdcm.service
         - .gitlab-ci.yml
         - build/nexus_deploy.py
@@ -188,6 +192,7 @@ test_install:
   rules:
     - if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
       changes:
+        - build/version.txt
         - cdcm_settings.json
         - src/**/*
         - build/cdcm.spec
