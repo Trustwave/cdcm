@@ -164,7 +164,7 @@ build_rpms:
         - src/**/*
         - build/cdcm.spec
         - build/version.txt
-        - build/tw-cdcm.service
+        - build/cdcm.service
         - .gitlab-ci.yml
         - build/nexus_deploy.py
   artifacts:
@@ -195,14 +195,14 @@ test_install:
         - cdcm_settings.json
         - src/**/*
         - build/cdcm.spec
-        - build/tw-cdcm.service
+        - build/cdcm.service
         - .gitlab-ci.yml
     - if: '$RunFast==null && $BumpTag == null && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
         - cdcm_settings.json
         - src/**/*
         - build/cdcm.spec
-        - build/tw-cdcm.service
+        - build/cdcm.service
         - .gitlab-ci.yml
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
     - exists:

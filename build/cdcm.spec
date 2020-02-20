@@ -1,7 +1,7 @@
 %define _unpackaged_files_terminate_build 0
 %{!?pkg_version:%define pkg_version 1.0.0}
 %{!?release:%define release 1}
-Name:       tw-cdcm
+Name:       cdcm
 Version:    %{pkg_version}
 Release:    %{release}
 License:    Various
@@ -26,7 +26,6 @@ for dir in %{cdcm_lib} %{cdcm_lib}/plugins %{_bindir} %{cdcm_conf} /var/cdcm/log
     [ -d %{buildroot}$dir ] || mkdir -p %{buildroot}$dir 
 done
 executables="cdcm_broker \
-cdcm.sh \
 cdcm_worker"
 
 %define output_dir /opt/output/%{getenv:CI_COMMIT_BRANCH}/
