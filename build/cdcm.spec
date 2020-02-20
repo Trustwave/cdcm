@@ -99,7 +99,6 @@ fi
 %defattr(-,root,root,-)
 %attr(755, root, root) %{_bindir}/cdcm_broker
 %attr(755, root, root) %{_bindir}/cdcm_worker
-%attr(755, root, root) %{_bindir}/cdcm.sh
 %{cdcm_lib}/*.so*
 %{cdcm_lib}/plugins/*
 /var/cdcm
