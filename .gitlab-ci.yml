@@ -165,6 +165,7 @@ build_rpms:
         - build/cdcm.spec
         - build/version.txt
         - build/cdcm.service
+        - build/50-cdcm.preset
         - .gitlab-ci.yml
         - build/nexus_deploy.py
   artifacts:
