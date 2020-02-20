@@ -153,11 +153,10 @@ build_rpms:
   stage: build_rpms
   script:
     - cd build
-    - export VERSION=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 1,2,3)
-    - export SNAPSHOT=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 4)
+    - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
-    - if [ -n "$SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE='--define "release SNAPSHOT_$SNAPSHOT"' ;fi
-    - rpmbuild --define "pkg_version $VERSION" $RELEASE  -bb cdcm.spec
+    - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF='--define release SNAPSHOT_'$SNAPSHOT ;else export RELEASE_DEF='--define "release $SNAPSHOT"';fi
+    - rpmbuild --define "pkg_version $VERSION" "$RELEASE_DEF"  -bb cdcm.spec
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
@@ -230,12 +229,10 @@ deploy:
   stage: deploy
   script:
     - cd build
-    - export VERSION=$(cat version.txt | cut -d'_' -f 1 )
-    - export VERSION_FULL=$(cat version.txt )
-    - export SNAPSHOT=$(cat version.txt | cut -d'_' -f 1 | cut -d'.' -f 4)
+    - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ;fi
     - export REPO=releases
-    - if [ -n "$SNAPSHOT"  ]; then export VERSION=$BRANCH$VERSION-SNAPSHOT ; export REPO=snapshots ;fi
+    - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; export REPO=snapshots ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - echo deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
     - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
   rules:
