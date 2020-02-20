@@ -155,8 +155,8 @@ build_rpms:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
-    - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF='--define release SNAPSHOT_'$SNAPSHOT ;else export RELEASE_DEF='--define "release $SNAPSHOT"';fi
-    - rpmbuild --define "pkg_version $VERSION" "$RELEASE_DEF"  -bb cdcm.spec
+    - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF="SNAPSHOT_$SNAPSHOT" ;else export RELEASE_DEF="$SNAPSHOT";fi
+    - echo --define pkg_version "$VERSION" --define release "$RELEASE_DEF"  -bb cdcm.spec
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
