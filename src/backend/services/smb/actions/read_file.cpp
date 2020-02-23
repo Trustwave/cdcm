@@ -121,7 +121,7 @@ int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
     }
 
     auto c64_str = base64_encode(buff, r);
-    res->res(c64_str.c_str()); // fixme assaf figure aou whi strin assignment doesn't  work
+    res->res(c64_str);
     return 0;
 }
 static std::shared_ptr<SMB_Read_File> instance = nullptr;

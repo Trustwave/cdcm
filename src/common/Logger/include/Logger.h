@@ -12,8 +12,9 @@
 //  2.)	should a source filter a message type
 //  3.)	In - general which message type are allowed to be written
 //  4.)	understand which sinks should we write to(currently supporting file and
-//  DebugView for windows) 5.)	filter messages by sink
-// Loger users should usally use Initialize function in order to use the logger.
+//  DebugView for windows)
+//  5.)	filter messages by sink
+// Logger users should usually use Initialize function in order to use the logger.
 //---------------------------------------------------------------------------
 // CHANGES LOG: @{HREV}
 // -----------
@@ -69,13 +70,14 @@ namespace trustwave {
 //	----------------------
 #define collect_from_system_LIST(m) \
     m(collect_from_system, COLLECT_FROM_NONE, 1 << 0) m(collect_from_system, COLLECT_FROM_SYSTEM, 1 << 1) \
-        m(collect_from_system, COLLECT_FROM_ERNO, 1 << 2)
+        m(collect_from_system, COLLECT_FROM_ERNO, 1 << 2) m(collect_from_system, COLLECT_FROM_SENSITIVE, 1 << 3)
                 SmartEnum(collect_from_system)
 
         // enum collect_from_system {
         //    COLLECT_FROM_NONE   = 0,
         //    COLLECT_FROM_SYSTEM = 1,
-        //    COLLECT_FROM_ERNO   = 2
+        //    COLLECT_FROM_ERNO   = 2,
+        //    COLLECT_FROM_SENSITIVE   = 3
         //};
 
 #define sinks_LIST(m) m(sinks, file, 1 << 0) m(sinks, event_log, 1 << 1) m(sinks, output_debug_string, 1 << 2)
@@ -90,7 +92,7 @@ namespace trustwave {
 
             constexpr unsigned long all_severity_levels = debug1 | debug2 | info | warning | error;
         constexpr unsigned long all_sources = broker | worker;
-        constexpr unsigned long all_collect_from_system = COLLECT_FROM_NONE | COLLECT_FROM_SYSTEM | COLLECT_FROM_ERNO;
+        constexpr unsigned long all_collect_from_system = COLLECT_FROM_NONE | COLLECT_FROM_SYSTEM | COLLECT_FROM_ERNO | COLLECT_FROM_SENSITIVE ;
         constexpr unsigned long all_sinks = file | event_log | output_debug_string;
     } // namespace logger
     //===========================================================================

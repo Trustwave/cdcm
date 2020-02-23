@@ -64,8 +64,8 @@ int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_ms
                            }),
             dir_entries.end());
     }
-    const tao::json::value v1 = dir_entries;
-    res->res(to_string(v1, 2));
+
+    res->res(dir_entries);
 
     return 0;
 }
