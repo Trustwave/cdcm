@@ -4,6 +4,15 @@ require 'myLogger.rb'
 require 'mdcliapi2'
 require 'results_verification.rb'
 
+class Statistics
+    attr_accessor :total_run, :total_passed, :total_failed
+    def initialize 
+        @total_run =0
+        @total_passed = 0
+        @total_failed = 0
+    end
+end #end of class statistics
+
 ###########################################################################
 # Class: Test_Runner
 #
@@ -19,6 +28,7 @@ class Test_Runner
         @verification_methods_list  = Hash.new { | vm_name , vm_params |}
         @verifier = Verifier.new
         @response_timeout = nil
+        @statistics = Statistics.new
     end
 
     ########################################
@@ -44,15 +54,20 @@ class Test_Runner
                 end
             }
         }
-        log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"run " + total_num_of_session_items.to_s + " session items. \npassed [" + num_passed.to_s + "] \nfailed [" + num_failed.to_s + "] \nother\/error [" + num_other.to_s + "]"}
+        @statistics.total_run += total_num_of_session_items
+        @statistics.total_passed += num_passed
+        @statistics.total_failed += num_failed
+        log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"\n===================================\nrun " + total_num_of_session_items.to_s + " session items. \npassed [" + num_passed.to_s + "] \nfailed [" + num_failed.to_s + "] \nother\/error [" + num_other.to_s + "]\n===================================\n" + "statistics (since testRunner started): total run: " + @statistics.total_run.to_s + " total passed: " + @statistics.total_passed.to_s + " total failed: " + @statistics.total_failed.to_s + "\n==================================="}
+    
         puts "===================================\nrun " + total_num_of_session_items.to_s + " session items. \npassed [" + num_passed.to_s + "] \nfailed [" + num_failed.to_s + "] \nother\/error [" + num_other.to_s + "]\n==================================="
-
+        puts "statistics (since testRunner started): total run: " + @statistics.total_run.to_s + " total passed: " + @statistics.total_passed.to_s + " total failed: " + @statistics.total_failed.to_s + "\n===================================" 
     end
     ########################################
     #
     ########################################
     def run_test_from_file(path)
         log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"\n\n\nstart of run_test_from_file"}
+        @sessions.clear
         load_sessions_from_xml_file(path)
         @client.load_sessions(@sessions)
         #run all sessions
@@ -155,7 +170,6 @@ class Test_Runner
             asset_name = xml_session.attributes["asset_name"]
             tmp_session.asset_details = @assets_list[asset_name]
 
-            #todo: rotem, think if needed
             session_name = xml_session.attributes["session_name"]
             tmp_session.session_name = session_name
 

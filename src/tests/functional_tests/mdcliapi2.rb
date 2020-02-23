@@ -159,11 +159,16 @@ class MajorDomoClient
     log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"executing session item: \n" + session_item.dump_before_reply}
     action_str = Message_Formater.instance.action_str(session, session_item)
     log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"sending: \n" + action_str}
-    log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"rotem finish sending \n" } #rotem to delete
     session_item.req_msg = action_str
     send("echo", action_str)
 
+    #measure response time 
+    sent_done_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
     reply = recv()
+    reply_received_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"response time: " + (reply_received_time - sent_done_time).to_s + " seconds" } 
+
     if (reply[0].nil? || reply[0].empty? )
         log.error ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"recieved empty response"}
         @verifier.set_failed_verification(session_item)
