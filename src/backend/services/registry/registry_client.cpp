@@ -99,7 +99,7 @@ result registry_client::key_get_value_by_index(uint32_t idx, const char** name, 
     }
     rv.type(type);
     rv.value(reg_val_data_string(ctx_, type, data_blob_));
-    AU_LOG_ERROR("%s%s", str_regtype(type), reg_val_data_string(ctx_, type, data_blob_));
+    //AU_LOG_ERROR("%s%s", str_regtype(type), reg_val_data_string(ctx_, type, data_blob_));
     return {true, error};
 }
 
