@@ -55,13 +55,15 @@ result registry_client::connect(const session& sess)
     cli_credentials_set_username(creds, sess.creds().username().c_str(), CRED_SPECIFIED);
     cli_credentials_set_password(creds, sess.creds().password().c_str(), CRED_SPECIFIED);
     cli_credentials_set_workstation(creds, sess.creds().workstation().c_str(), CRED_SPECIFIED);
-    WERROR error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, ::loadparm_init_global(false),
-                                   sess.remote().c_str(), ev_ctx_);
-
+    auto parm = ::loadparm_init_global(false);
+    WERROR error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, parm, sess.remote().c_str(), ev_ctx_);
+    for(size_t i = 0;
+        i < conf_->reconnect_attempt_on_pipe_busy && (!W_ERROR_IS_OK(error) && WERR_PIPE_BUSY.w == error.w); ++i) {
+        error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, parm, sess.remote().c_str(), ev_ctx_);
+    }
     if(!W_ERROR_IS_OK(error)) {
         return {false, error};
     }
-
     error = reg_get_predefined_key(ctx_->registry, reg_predefined_keys[2].handle, &ctx_->current);
     if(W_ERROR_IS_OK(error)) {
         ctx_->predef = talloc_strdup(ctx_, reg_predefined_keys[2].name);
