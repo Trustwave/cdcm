@@ -30,7 +30,7 @@ build_deps:
   stage: build_deps
   script:
     - cd build
-    - scl enable devtoolset-8 'sudo make deps'
+    - scl enable devtoolset-8 'make deps'
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       changes:
