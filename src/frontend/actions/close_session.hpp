@@ -36,9 +36,11 @@ namespace tao::json {
         binding::object<binding::inherit<traits<trustwave::action_msg>>> {
         TAO_JSON_DEFAULT_KEY(trustwave::local_close_session_msg::act_name.data());
         template<template<typename...> class Traits>
-        static trustwave::local_close_session_msg as(const tao::json::basic_value<Traits>&)
+        static trustwave::local_close_session_msg as(const tao::json::basic_value<Traits>& v)
         {
             trustwave::local_close_session_msg result;
+            const auto& object = v.at(trustwave::local_close_session_msg::act_name);
+            result.id_ = object.at("id").template as<std::string>();
             return result;
         }
     };
