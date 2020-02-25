@@ -1,5 +1,6 @@
 {
   "registry": {
-    "data_blob_size": 1048576
+    "data_blob_size": 1048576,
+    "reconnect_attempt_on_pipe_busy": 3
   }
 }
