@@ -59,9 +59,12 @@ result registry_client::connect(const session& sess)
     WERROR error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, parm, sess.remote().c_str(), ev_ctx_);
     for(size_t i = 0; i < conf_->reconnect_attempt_on_pipe_busy; ++i) {
         if((!W_ERROR_IS_OK(error) && WERR_PIPE_BUSY.w == error.w)) {
+            AU_LOG_ERROR("connect '%d'", i);
             error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, parm, sess.remote().c_str(), ev_ctx_);
         }
-        AU_LOG_ERROR("connect '%d'", i);
+        else {
+            break;
+        }
     }
     if(!W_ERROR_IS_OK(error)) {
         return {false, error};

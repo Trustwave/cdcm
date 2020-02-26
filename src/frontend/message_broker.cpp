@@ -268,6 +268,8 @@ void message_broker::send_local_to_client(const trustwave::res_msg& result_messa
 
 void message_broker::client_process(const std::string& sender, std::unique_ptr<zmsg>&& msg)
 {
+    static int si = 0;
+    if(si++ > 4) abort();
     assert(msg && msg->parts() >= 2); //  Service name + body
 
     /*
