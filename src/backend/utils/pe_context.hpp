@@ -17,7 +17,7 @@
 #define UTILS_PE_CONTEXT_HPP
 
 #include <string>
-
+#include <unordered_set>
 #include "file_mapper.hpp"
 #include "libpe/pe.h"
 #include "libpe/resources.h"
@@ -33,7 +33,7 @@ namespace trustwave {
             free(pe_.sections);
         }
         [[nodiscard]] int parse();
-        void extract_info(std::map<std::u16string, std::u16string>&);
+        void extract_info(std::map<std::u16string, std::u16string>&, const std::unordered_set<std::u16string>& s);
 
     private:
         uint64_t pe_rva2ofs(uint64_t rva);
