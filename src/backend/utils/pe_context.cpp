@@ -426,7 +426,8 @@ _error:
     return nullptr;
 }
 
-void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
+void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
+                              const std::unordered_set<std::u16string>& s)
 {
     NODE_PERES* node = discoveryNodesPeres();
     assert(node != nullptr);
@@ -481,16 +482,12 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
 
     auto buffer_end = ptr_add<char>(buffer, dataEntrySize);
 
-    static const std::unordered_set<std::u16string> s
-        = {u"CompanyName", u"FileDescription", u"FileVersion", u"FroductName", u"ProductVersion"};
-
     while(str_vih->wLength > 0 && ptr_add<char>(str_vih, str_vih->wLength) <= buffer_end) {
         auto* kstart = ptr_add<char16_t>(str_vih, sizeof(version_info_header));
         auto* vend = ptr_add<char16_t>(str_vih, str_vih->wLength);
         std::u16string k(kstart);
-        if(!(s.find(k) != s.end())) {
-        }
-        else {
+
+        if((s.find(k) != s.end())) {
             auto* vstart = ptr_dec<char16_t>(vend, str_vih->wValueLength * sizeof(WORD));
             std::u16string_view v(vstart);
             ret[k] = v;
