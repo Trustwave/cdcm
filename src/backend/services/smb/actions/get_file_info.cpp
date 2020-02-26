@@ -15,6 +15,7 @@
 //=====================================================================================================================
 #include "get_file_info.hpp"
 #include <string>
+#include <unordered_set>
 #include <codecvt>
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "../smb_client.hpp"
@@ -56,20 +57,29 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
         return -1;
     }
     std::map<std::u16string, std::u16string> ret;
-
-    pc.extract_info(ret);
+    static const std::unordered_set<std::u16string> s
+        = {u"CompanyName", u"FileDescription", u"FileVersion", u"ProductName", u"ProductVersion"};
+    pc.extract_info(ret, s);
     tao::json::events::to_value c;
-    c.begin_array();
-    push_back(c, "size", std::to_string(rc.file_size()));
-    push_back(c, "path", "FIXME");
-    push_back(c, "last_modified", std::to_string(rc.last_modified()));
+    c.begin_object();
+    c.key("size");
+    c.string(std::to_string(rc.file_size()));
+    c.member();
+    c.key("path");
+    c.string("NULL");
+    c.member();
+    c.key("last_modified");
+    c.string(std::to_string(rc.last_modified()));
+    c.member();
+
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     for(const auto& e: ret) {
-        auto key = convert.to_bytes(std::u16string(e.first));
-        key[0] = std::tolower(key[0]);
-        push_back(c, key, convert.to_bytes(std::u16string(e.second)));
+        c.key(convert.to_bytes(std::u16string(e.first)));
+        c.string(convert.to_bytes(std::u16string(e.second)).empty() ? std::string("NULL")
+                                                                    : convert.to_bytes(std::u16string(e.second)));
+        c.member();
     }
-    c.end_array();
+    c.end_object();
 
     res->res(c.value);
     return 0;
