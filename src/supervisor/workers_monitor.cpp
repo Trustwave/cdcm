@@ -10,7 +10,6 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "zmq/zmq_helpers.hpp"
 
-namespace bp = boost::process;
 using namespace std;
 using namespace trustwave;
 workers_monitor::workers_monitor(boost::asio::io_service& ios_):
@@ -24,12 +23,12 @@ workers_monitor::~workers_monitor()
     // std::cerr << "worker monitor destructor" << std::endl;
     AU_LOG_DEBUG("worker monitor destructor");
 
-    for(auto iter = workers_pull.begin(); iter != workers_pull.end(); ++iter) {
+    for(auto iter = workers_pool.begin(); iter != workers_pool.end(); ++iter) {
         AU_LOG_DEBUG("about to terminate worker name: %s", iter->first.c_str());
         // std::cerr << "about to terminate worker name: " << iter->first << std::endl;
         iter->second->terminate();
     }
-    workers_pull.erase(workers_pull.begin(), workers_pull.end());
+    workers_pool.erase(workers_pool.begin(), workers_pool.end());
 }
 void workers_monitor::run()
 {
@@ -44,8 +43,8 @@ void workers_monitor::monitor(const std::string& worker_name)
 {
     AU_LOG_DEBUG("in monitor, worker name: %s", worker_name.c_str());
     //  cout << "in monitor, worker name: " << worker_name << endl;
-    auto worker_pair = workers_pull.find(worker_name);
-    if(worker_pair != workers_pull.end()) {
+    auto worker_pair = workers_pool.find(worker_name);
+    if(worker_pair != workers_pool.end()) {
         AU_LOG_DEBUG("worker %s  was found in the map", worker_name.c_str());
         //  cout << "worker " << worker_name << " was found in the map" << std::endl;
         auto worker = start_worker(worker_name);
@@ -69,7 +68,7 @@ void workers_monitor::monitor(const std::string& worker_name)
         //    cout << "worker " << worker_name << " was NOT found in the map" << std::endl;
         auto worker = start_worker(worker_name);
         if(worker != nullptr) {
-            workers_pull.emplace(worker_name, std::move(worker));
+            workers_pool.emplace(worker_name, std::move(worker));
         }
         //   else {
         //      AU_LOG_ERROR("worker process cannot be created");
@@ -78,16 +77,17 @@ void workers_monitor::monitor(const std::string& worker_name)
     }
 }
 
-std::unique_ptr<bp::child> workers_monitor::start_worker(std::string worker_name)
+std::unique_ptr<boost::process::child> workers_monitor::start_worker(std::string worker_name)
 {
     try {
-        auto worker = std::make_unique<bp::child>(bp::search_path(worker_bin_path), worker_name,
-                                                  bp::on_exit([worker_name, this](int, const std::error_code&) {
-                                                      if(!zmq_helpers::interrupted) {
-                                                          monitor(worker_name);
-                                                      }
-                                                  }),
-                                                  ios);
+        auto worker = std::make_unique<boost::process::child>(
+            boost::process::search_path(worker_bin_path), worker_name,
+            boost::process::on_exit([worker_name, this](int, const std::error_code&) {
+                if(!zmq_helpers::interrupted) {
+                    monitor(worker_name);
+                }
+            }),
+            ios);
         return std::move(worker);
     }
     catch(std::exception& exception) {
