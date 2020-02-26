@@ -19,7 +19,7 @@
         <supported_sinks>
             <sink name="file">
                 <id>1</id>
-                <path>/var/log/cdcm</path>
+                <path>/var/log/cdcm/</path>
                 <name>cdcm</name>
                 <filter>debug1</filter>
                 <enable>true</enable>
