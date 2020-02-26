@@ -28,7 +28,7 @@ private:
 
 private:
     boost::asio::io_service& ios;
-    std::map<std::string, std::unique_ptr<boost::process::child>> workers_pull;
+    std::map<std::string, std::unique_ptr<boost::process::child>> workers_pool;
     size_t num_workers;
     std::string worker_bin_path;
 };
