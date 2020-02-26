@@ -21,6 +21,7 @@ namespace trustwave {
     struct process_type {
         struct broker;
         struct worker;
+        struct supervisor;
     };
 
     static constexpr std::string_view conf_root("/etc/cdcm/");

@@ -56,7 +56,8 @@ namespace trustwave {
         //    num_of_severity_levels
         //};
 
-#define sources_LIST(m) m(sources, broker, 1 << 0) m(sources, worker, 1 << 1) m(sources, tester, 1 << 2)
+#define sources_LIST(m) \
+    m(sources, broker, 1 << 0) m(sources, worker, 1 << 1) m(sources, supervisor, 1 << 2) m(sources, tester, 1 << 3)
             SmartEnum(sources)
 
 // enum sources {
