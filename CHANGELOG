@@ -1,0 +1,10 @@
+
+v0.0.4
+Fixed issues
+ - CDCM-65 - Return Null Values / Flatten Output
+ - CDCM-64 - In close_session response the request id is missing
+
+v0.0.3
+Fixed issues
+ - CDCM-63 - Passwords should be hidden in cdcm logs
+ - CDCM-61 - The response from cdcm to client is converted from json to string twice instead of once
