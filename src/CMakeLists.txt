@@ -3,7 +3,7 @@ project(cdcm)
 enable_testing()
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(CheckCXXCompilerFlag)
 function(enable_cxx_compiler_flag_if_supported flag)
