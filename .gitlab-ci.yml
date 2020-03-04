@@ -187,9 +187,9 @@ test_install:
   script:
     - cd build
     - sudo yum install -y RPMS/x86_64/*.rpm
-    - sudo systemctl status tw-cdcm
-    - sudo yum -y erase tw-cdcm
-    - sudo systemctl status tw-cdcm
+    - sudo systemctl status cdcm
+    - sudo yum -y erase cdcm
+    - sudo systemctl status cdcm
   rules:
     - if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
       changes:
