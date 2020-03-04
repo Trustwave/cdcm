@@ -1,3 +1,9 @@
+v0.0.5
+Fixed issues
+ - CDCM-66 - Remove Extraneous data for "get_file_info" fileVersion
+Improvment issue
+ - CDCM-67 - Needed reconnect mechanism to problematic assets
+
 
 v0.0.4
 Fixed issues
