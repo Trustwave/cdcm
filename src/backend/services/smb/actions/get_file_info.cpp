@@ -19,7 +19,7 @@
 #include <codecvt>
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "../smb_client.hpp"
-
+#include <regex>
 #include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
@@ -74,9 +74,19 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
 
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     for(const auto& e: ret) {
-        c.key(convert.to_bytes(std::u16string(e.first)));
-        c.string(convert.to_bytes(std::u16string(e.second)).empty() ? std::string("NULL")
-                                                                    : convert.to_bytes(std::u16string(e.second)));
+        auto key = convert.to_bytes(std::u16string(e.first));
+        auto val = convert.to_bytes(std::u16string(e.second));
+
+        if(key == "FileVersion") // fix for CDCM-66
+        {
+            static const std::regex re("([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)\\s+.*");
+            std::smatch what;
+            if(std::regex_match(val, what, re)) {
+                val = what.str(1);
+            }
+        }
+        c.key(key);
+        c.string(val.empty() ? std::string("NULL") : val);
         c.member();
     }
     c.end_object();
