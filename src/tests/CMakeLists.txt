@@ -32,12 +32,13 @@ include(ExternalData)
 #target_link_libraries(tests_run ${Boost_LIBRARIES} boost_regex tw-sessions-cache crypto pthread test_wrapper boost_filesystem tw-zmq zmq)
 #add_dependencies(tests_run tests_externalData)
 #target_link_libraries(client ${Boost_LIBRARIES} boost_regex tw-sessions-cache crypto pthread test_wrapper boost_filesystem tw-zmq zmq)
+
 add_test(NAME TestName COMMAND tests_run)
-#if (BUILD_DEV)
+if (BUILD_DEV)
     set(COVERAGE_GCOVR_EXCLUDES
             '${PROJECT_BINARY_DIR}/*'
             '${PROJECT_SOURCE_DIR}/tests/*'
             )
 
     SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME html_coverage EXECUTABLE ctest3)
-#endif ()
+endif ()
