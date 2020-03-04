@@ -32,6 +32,8 @@ namespace trustwave {
         std::chrono::seconds heartbeat_interval_;
         uint32_t reconnect_;
         std::chrono::seconds heartbeat_expiry_;
+        std::chrono::milliseconds action_postpone_dur_;
+        uint32_t action_retries_on_postpone_;
         uint32_t worker_processes_;
         std::string broker_client_listen_ep_;
         std::string broker_worker_listen_ep_;
@@ -52,6 +54,9 @@ namespace tao::json {
             TAO_JSON_BIND_OPTIONAL("heartbeat_interval", &trustwave::cdcm_settings::heartbeat_interval_),
             TAO_JSON_BIND_OPTIONAL("reconnect", &trustwave::cdcm_settings::reconnect_),
             TAO_JSON_BIND_OPTIONAL("heartbeat_expiry", &trustwave::cdcm_settings::heartbeat_expiry_),
+            TAO_JSON_BIND_OPTIONAL("action_postpone_dur", &trustwave::cdcm_settings::action_postpone_dur_),
+            TAO_JSON_BIND_OPTIONAL("action_retries_on_postpone",
+                                   &trustwave::cdcm_settings::action_retries_on_postpone_),
             TAO_JSON_BIND_OPTIONAL("worker_processes", &trustwave::cdcm_settings::worker_processes_),
             TAO_JSON_BIND_OPTIONAL("broker_client_listen_ep", &trustwave::cdcm_settings::broker_client_listen_ep_),
             TAO_JSON_BIND_OPTIONAL("broker_worker_listen_ep", &trustwave::cdcm_settings::broker_worker_listen_ep_),
@@ -77,6 +82,13 @@ namespace tao::json {
             if(tv) {
                 c.heartbeat_expiry_ = std::chrono::seconds(tv.value());
             }
+            tv = o.template optional<std::chrono::milliseconds::rep>("action_postpone_dur");
+            if(tv) {
+                c.action_postpone_dur_ = std::chrono::milliseconds(tv.value());
+            }
+            c.action_retries_on_postpone_
+                = o.template optional<uint32_t>("action_retries_on_postpone").value_or(c.action_retries_on_postpone_);
+
             c.worker_processes_ = o.template optional<uint32_t>("worker_processes").value_or(c.worker_processes_);
             c.broker_client_listen_ep_
                 = o.template optional<std::string>("broker_client_listening_ep").value_or(c.broker_client_listen_ep_);

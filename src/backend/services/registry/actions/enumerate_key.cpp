@@ -50,14 +50,14 @@ namespace tao ::json {
     };
 } // namespace tao::json
 
-using namespace trustwave;
-
-int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                              std::shared_ptr<result_msg> res)
+using trustwave::Enumerate_Key_Action;
+using action_status = trustwave::Action_Base::action_status;
+action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+                                        std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto c = trustwave::registry_client();
@@ -66,13 +66,17 @@ int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<a
     if(!ekact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error: Internal error");
-        return -1;
+        return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
+        if(WERR_PIPE_BUSY.w == std::get<1>(r).w) {
+            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+            return action_status::POSTPONED;
+        }
         res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
-        return -1;
+        return action_status::FAILED;
     }
 
     trustwave::enum_key ek{};
@@ -85,7 +89,7 @@ int Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<a
         AU_LOG_DEBUG("%s", nt_errstr(status));
         res->res(std::string("Error: ") + nt_errstr(status));
     }
-    return 0;
+    return action_status::SUCCEEDED;
 }
 //
 // Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,

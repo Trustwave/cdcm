@@ -60,7 +60,8 @@ namespace trustwave {
 
         Enumerate_Key_Action(): Action_Base(trustwave::reg_action_enum_key_msg::act_name) {}
 
-        int act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
+        action_status
+        act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
         [[nodiscard]] std::shared_ptr<action_msg> get_message(const tao::json::value& v) const override
         {
             return v.as<std::shared_ptr<trustwave::reg_action_enum_key_msg>>();
