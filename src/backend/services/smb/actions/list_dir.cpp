@@ -34,13 +34,13 @@ namespace tao::json {
     };
 } // namespace tao::json
 using trustwave::SMB_List_Dir;
-
-int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                      std::shared_ptr<result_msg> res)
+using action_status = trustwave::Action_Base::action_status;
+action_status
+SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_list_dir_msg>(action);
@@ -51,7 +51,7 @@ int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_ms
     std::vector<trustwave::dirent> dir_entries;
     if(!rc.list_dir(base.c_str(), dir_entries)) {
         res->res("Error: List Failed");
-        return -1;
+        return action_status::FAILED;
     }
     AU_LOG_INFO("list returned");
     if(!smb_action->pattern.empty()) {
@@ -67,7 +67,7 @@ int SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_ms
 
     res->res(dir_entries);
 
-    return 0;
+    return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_List_Dir> instance = nullptr;
 

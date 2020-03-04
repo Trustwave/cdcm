@@ -26,14 +26,15 @@
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
-using namespace trustwave;
+using trustwave::Query_Value_Action;
+using action_status = trustwave::Action_Base::action_status;
 
-int Query_Value_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                            std::shared_ptr<result_msg> res)
+action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+                                      std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto c = trustwave::registry_client();
@@ -42,19 +43,23 @@ int Query_Value_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<act
     if(!qvact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error: Internal error");
-        return -1;
+        return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
+        if(WERR_PIPE_BUSY.w == std::get<1>(r).w) {
+            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+            return action_status::POSTPONED;
+        }
         res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
-        return -1;
+        return action_status::FAILED;
     }
 
     if(!std::get<0>(c.open_key(qvact->key_.c_str()))) {
         AU_LOG_DEBUG("Failed opening  %s", qvact->key_.c_str());
         res->res("Error: Failed to open key");
-        return -1;
+        return action_status::FAILED;
     }
     trustwave::registry_value rv;
     c.key_get_value_by_name(qvact->value_.c_str(), rv);
@@ -66,7 +71,7 @@ int Query_Value_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<act
         res->res(rv.value());
         AU_LOG_INFO(rv.value().c_str());
     }
-    return 0;
+    return action_status::SUCCEEDED;
 }
 
 // Dispatcher <Action_Base>::Registrator Query_Value_Action::m_registrator(new Query_Value_Action,
