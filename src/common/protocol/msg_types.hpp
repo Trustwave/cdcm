@@ -74,6 +74,11 @@ namespace trustwave {
     };
 
     struct header {
+        header(const header&) = default;
+        header(header&&) = default;
+        header& operator=(const header&) = default;
+        header& operator=(header&&) = default;
+        header() = default;
         std::string session_id;
     };
     struct msg {

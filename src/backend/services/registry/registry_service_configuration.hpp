@@ -39,8 +39,7 @@ namespace tao::json {
             trustwave::registry_service_configuration result;
             const auto o = v.at(trustwave::registry_service_configuration::srv_name);
             result.data_blob_size = o.template optional<off_t>("data_blob_size").value_or(result.data_blob_size);
-            result.reconnect_attempt_on_pipe_busy = o.template optional<size_t>("reconnect_attempt_on_pipe_busy")
-                                                        .value_or(result.reconnect_attempt_on_pipe_busy);
+
             return result;
         }
     };

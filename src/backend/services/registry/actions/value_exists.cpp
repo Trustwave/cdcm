@@ -24,14 +24,14 @@
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
-using namespace trustwave;
-
-int Value_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                             std::shared_ptr<result_msg> res)
+using trustwave::Value_Exists_Action;
+using action_status = trustwave::Action_Base::action_status;
+action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+                                       std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto c = trustwave::registry_client();
@@ -41,19 +41,23 @@ int Value_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<ac
     if(!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error: Internal error");
-        return -1;
+        return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
+        if(WERR_PIPE_BUSY.w == std::get<1>(r).w) {
+            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+            return action_status::POSTPONED;
+        }
         res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
-        return -1;
+        return action_status::FAILED;
     }
     if(!std::get<0>(c.open_key(veact->key_.c_str()))) {
         AU_LOG_DEBUG("Failed opening  %s", veact->key_.c_str());
         res->res("False");
         //  res->res("Key doesn't exist");
-        return -1;
+        return action_status::FAILED;
     }
     trustwave::registry_value rv;
     if(!std::get<0>(c.key_get_value_by_name(veact->value_.c_str(), rv))) {
@@ -63,7 +67,7 @@ int Value_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<ac
     else {
         res->res("True");
     }
-    return 0;
+    return action_status::SUCCEEDED;
 }
 
 // instance of the our plugin
