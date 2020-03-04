@@ -21,18 +21,20 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 
 using trustwave::Close_Session;
+using action_status = trustwave::Action_Base::action_status;
 
-int Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
+action_status
+Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     authenticated_scan_server::instance().sessions->remove_by_id(sess->idstr());
     res->id(am->id());
     res->res("Session closed");
-    return 0;
+    return action_status::SUCCEEDED;
 }
 
 trustwave::Dispatcher<trustwave::Action_Base>::Registrator

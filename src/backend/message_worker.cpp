@@ -19,6 +19,7 @@
 
 #include <zmq.hpp>
 #include <iostream>
+#include <action.hpp>
 
 #include "client.hpp"
 #include "session.hpp"
@@ -31,9 +32,25 @@
 
 using namespace trustwave;
 
+std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::postponed_action& pa)
+{
+    return os << pa.id_ << " " << pa.remaining_runs_ << " " << pa.expiration_time_ << std::endl;
+}
+std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::postponed_actions_queue& q)
+{
+    os << '\n';
+    auto end = q.paq_.end();
+    for(auto it = q.paq_.begin(); it != end; ++it) {
+        os << *it << '\n';
+    }
+    return os;
+}
+
 message_worker::message_worker(zmq::context_t& ctx):
     context_(ctx), heartbeat_at_(), liveness_(authenticated_scan_server::instance().settings()->heartbeat_liveness_),
     heartbeat_(authenticated_scan_server::instance().settings()->heartbeat_interval_),
+    action_postpone_dur_(authenticated_scan_server::instance().settings()->action_postpone_dur_),
+    action_retries_on_postpone_(authenticated_scan_server::instance().settings()->action_retries_on_postpone_),
     reconnect_(authenticated_scan_server::instance().settings()->reconnect_), expect_reply_(false), replied_(0)
 {
 }
@@ -91,14 +108,57 @@ void message_worker::connect_to_broker()
 
 //  ---------------------------------------------------------------------
 //  Send reply, if any, to broker and wait for next request.
+void message_worker::handle_postponed_actions()
+{
+    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    while(!postponed_actions_.empty() && postponed_actions_.top().expiration_time() <= now) {
+        auto top = postponed_actions_.top();
+        auto action_message = top.msg();
+        auto action_msg_obj = action_message.get_object();
+        const auto act_key = action_msg_obj.cbegin()->first;
+        AU_LOG_DEBUG("Looking for %s", act_key.c_str());
+        auto action = authenticated_scan_server::instance().public_dispatcher().find(act_key);
+        if(action) {
+            AU_LOG_DEBUG("%s found", act_key.c_str());
+            auto act_m = action->get_message(action_message);
+            auto action_result = std::make_shared<result_msg>();
+            action_result->id(act_m->id());
+            auto sess = authenticated_scan_server::instance().get_session(top.get_hdr().session_id);
+            auto act_status = action->act(sess, act_m, action_result);
+            if(trustwave::Action_Base::action_status::POSTPONED == act_status && top.remaining_runs() > 0) {
+                AU_LOG_DEBUG("action %s returned with postponed status updating ", act_key.c_str());
+                if(!postponed_actions_.decrement_runs_and_update_expiration(act_m->id())) {
+                    AU_LOG_ERROR("action %s doesnt exist ", act_key.c_str());
+                }
+                //    std::cerr << "Updated "<< postponed_actions_;
+            }
+            else {
+                res_msg result;
+                result.hdr = top.get_hdr();
+                result.msgs.push_back(action_result);
+                const tao::json::value v1 = result;
+                auto reply_body_str = to_string(v1);
+                auto postponed_reply = std::make_unique<zmsg>(); // will be deleted in recv
+                postponed_reply->append(reply_body_str.c_str());
+                postponed_reply->wrap(top.reply_to().c_str(), "");
+                send_to_broker(MDPW_REPLY, "", postponed_reply.get());
 
+                if(!postponed_actions_.remove_by_id(act_m->id())) {
+                    AU_LOG_ERROR("Failed removing action %s -> %s  from postponed queue ", act_key.c_str(),
+                                 act_m->id());
+                }
+                //       std::cerr << "Rermoved "<< postponed_actions_;
+                ++replied_;
+            }
+        }
+    }
+}
 zmsg* message_worker::recv(zmsg*& reply_p)
 {
     //  Format and send the reply if we were provided one
     zmsg* reply = reply_p;
     assert(reply || !expect_reply_);
     if(nullptr != reply && !reply_to_.empty()) {
-        // assert(!reply_to_.empty());
         reply->wrap(reply_to_.c_str(), "");
         reply_to_.clear();
         send_to_broker(MDPW_REPLY, "", reply);
@@ -107,25 +167,24 @@ zmsg* message_worker::recv(zmsg*& reply_p)
         reply_p = nullptr;
     }
     expect_reply_ = true;
-
     while(!zmq_helpers::interrupted) {
         zmq::pollitem_t items[] = {{worker_->operator void*(), 0, ZMQ_POLLIN, 0}};
-
-        zmq::poll(items, 1, heartbeat_.count());
-
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        auto timeout_ms = heartbeat_.count();
+        handle_postponed_actions();
+        if(!postponed_actions_.empty() && postponed_actions_.top().expiration_time() > now) {
+            timeout_ms = action_postpone_dur_.count();
+        }
+        zmq::poll(items, 1, timeout_ms);
         if(0 != (items[0].revents & ZMQ_POLLIN)) {
             auto msg = std::make_unique<zmsg>();
             if(msg->recv(*worker_)) {
                 AU_LOG_DEBUG("I: received message from broker body: %s", msg->body());
-
                 liveness_ = authenticated_scan_server::instance().settings()->heartbeat_liveness_;
-
                 //  Don't try to handle errors, just assert noisily
                 assert(msg->parts() >= 3);
-
                 auto empty = msg->pop_front();
                 assert(empty.compare(reinterpret_cast<const unsigned char*>("")) == 0);
-
                 auto header = msg->pop_front();
                 AU_LOG_DEBUG("I: input message (%s)", header.c_str());
                 assert(header.compare(reinterpret_cast<const unsigned char*>(MDPW_WORKER)) == 0);
@@ -206,10 +265,24 @@ int message_worker::worker_loop()
                     AU_LOG_DEBUG("%s found", act_key.c_str());
                     auto act_m = action->get_message(action_message);
                     action_result->id(act_m->id());
-                    result.msgs.push_back(action_result);
+
                     auto sess = authenticated_scan_server::instance().get_session(result.hdr.session_id);
-                    if(-1 == action->act(sess, act_m, action_result)) {
-                        AU_LOG_DEBUG("action %s returned with an error", act_key.c_str());
+                    auto act_status = action->act(sess, act_m, action_result);
+
+                    if(trustwave::Action_Base::action_status::POSTPONED == act_status) {
+                        AU_LOG_DEBUG("action %s returned with postponed status", act_key.c_str());
+                        if(!mw.postponed_actions_.add(postponed_action(
+                               action_message, mw.reply_to_, act_m->id(), mw.action_retries_on_postpone_,
+                               std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()
+                                                                    + mw.action_postpone_dur_),
+                               result.hdr))) {
+                            AU_LOG_ERROR("Failed adding %s to postponed queue", act_key.c_str());
+                        }
+                        // std::cerr << "Added "<< mw.postponed_actions_;
+                    }
+                    else {
+                        AU_LOG_DEBUG("action %s returned ", act_key.c_str());
+                        result.msgs.push_back(action_result);
                     }
                 }
                 else {
@@ -236,10 +309,16 @@ int message_worker::worker_loop()
             continue;
         }
         try {
-            const tao::json::value v1 = result;
-            auto reply_body_str = to_string(v1);
-            reply = new zmsg; // will be deleted in recv
-            reply->append(reply_body_str.c_str());
+            if(!result.msgs.empty()) {
+                const tao::json::value v1 = result;
+                auto reply_body_str = to_string(v1);
+                reply = new zmsg; // will be deleted in recv
+                reply->append(reply_body_str.c_str());
+            }
+            else {
+                mw.expect_reply_ = false;
+                mw.reply_to_.clear();
+            }
         }
         catch(std::exception& e) {
             AU_LOG_ERROR("Failed building response message %s", e.what());
