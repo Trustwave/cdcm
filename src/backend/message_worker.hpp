@@ -19,6 +19,8 @@
 #include <memory>
 #include <chrono>
 #include <string>
+#include <queue>
+#include "utils/postponed_actions.hpp"
 namespace zmq {
     class context_t;
     class socket_t;
@@ -46,6 +48,7 @@ namespace trustwave {
         zmsg* recv(zmsg*& reply_p);
 
     private:
+        void handle_postponed_actions();
         void send_to_broker(const char* command, const std::string& option, zmsg* _msg);
 
         zmq::context_t& context_;
@@ -55,11 +58,14 @@ namespace trustwave {
         std::chrono::time_point<std::chrono::system_clock> heartbeat_at_; //  When to send HEARTBEAT
         size_t liveness_; //  How many attempts left
         std::chrono::milliseconds heartbeat_; //  Heartbeat delay, msecs
+        std::chrono::milliseconds action_postpone_dur_; //  action postpone, msecs
+        u_int32_t action_retries_on_postpone_;
         std::chrono::milliseconds reconnect_; //  Reconnect delay, msecs
         //  Internal state
         bool expect_reply_; //  Zero only at start
         //  Return address, if any
         std::string reply_to_;
+        postponed_actions_queue postponed_actions_;
         size_t replied_;
     };
 } // namespace trustwave
