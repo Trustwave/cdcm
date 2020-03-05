@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <locale>
+#include <memory>
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
@@ -429,7 +430,8 @@ _error:
 void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
                               const std::unordered_set<std::u16string>& s)
 {
-    NODE_PERES* node = discoveryNodesPeres();
+    auto node_ptr = std::unique_ptr<NODE_PERES, decltype(freeNodes)*>(discoveryNodesPeres(), freeNodes);
+    auto node = node_ptr.get();
     assert(node != nullptr);
 
     const NODE_PERES* dataEntryNode = nullptr;

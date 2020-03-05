@@ -50,7 +50,7 @@ registry_client::~registry_client()
 
 result registry_client::connect(const session& sess)
 {
-    auto creds = ::cli_credentials_init(nullptr);
+    auto creds = ::cli_credentials_init(mem_ctx_);
     cli_credentials_set_domain(creds, sess.creds().domain().c_str(), CRED_SPECIFIED);
     cli_credentials_set_username(creds, sess.creds().username().c_str(), CRED_SPECIFIED);
     cli_credentials_set_password(creds, sess.creds().password().c_str(), CRED_SPECIFIED);
