@@ -18,6 +18,7 @@
 //=====================================================================================================================
 #include <unistd.h>
 #include <string>
+#include <memory>
 
 #include "../smb_client.hpp"
 #include "read_file.hpp"
@@ -110,18 +111,18 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
         sz = rc.file_size() - off;
     }
     AU_LOG_DEBUG("Received offset: %zu size: %zu", off, sz);
-    auto buff = new(std::nothrow) char[sz];
-    if(nullptr == buff) {
+    auto buff = std::make_unique<char[]>(sz);
+    if(!buff) {
         res->res("Error: Memory allocation failed");
         return action_status::FAILED;
     }
-    ssize_t r = rc.read(off, sz, buff);
+    ssize_t r = rc.read(off, sz, buff.get());
     if(-1 == r) {
         res->res("Error: read_file failed");
         return action_status::FAILED;
     }
 
-    auto c64_str = base64_encode(buff, r);
+    auto c64_str = base64_encode(buff.get(), r);
     res->res(c64_str);
     return action_status::SUCCEEDED;
 }
