@@ -100,9 +100,10 @@ $(TOP)/deps/$(LIBPE_PEV)/.done: $(TOP)/tars/$(LIBPE_PEV).tar
 	@echo "* fin $@ `date +%F.%H:%M:%S`"
 
 
-$(TOP)/deps/$(SAMBA)/.done: $(TOP)/tars/$(SAMBA).tar
+$(TOP)/deps/$(SAMBA)/.done: $(TOP)/tars/$(SAMBA).tar.partaa
 	@echo "* run $@ `date +%F.%H:%M:%S`"
 	if [ -d $(TOP)/deps/ ];then rm -rf $(TOP)/deps/$(SAMBA);fi
+	cat $(TOP)/tars/$(SAMBA).tar.parta* > $(TOP)/tars/$(SAMBA).tar
 	tar -xvf $(TOP)/tars/$(SAMBA).tar -C $(TOP)/deps/
 	(cd $(TOP)/deps/$(SAMBA); ./buildtools/bin/waf configure 	--without-ad-dc        \
     															--with-system-mitkrb   \
