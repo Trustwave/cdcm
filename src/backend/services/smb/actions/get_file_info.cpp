@@ -50,13 +50,13 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
         res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
-        return action_status::SUCCEEDED;
+        return action_status::FAILED;
     }
 
     pe_context pc(rc);
     if(0 != pc.parse()) {
         res->res("Error: parse file failed");
-        action_status::FAILED;
+        return action_status::FAILED;
     }
     std::map<std::u16string, std::u16string> ret;
     static const std::unordered_set<std::u16string> s
