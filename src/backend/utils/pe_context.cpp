@@ -472,6 +472,13 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
 
     // VS_FIXEDFILEINFO *info = reinterpret_cast<VS_FIXEDFILEINFO *>(const_cast<char *> (buffer));
     auto vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO) + 8);
+    static constexpr auto sfi = u"StringFileInfo";
+    auto* pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
+    while(std::u16string(pad) != sfi) {
+        vih = ptr_add<version_info_header>(vih, vih->wLength);
+        pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
+    }
+
     // first
     static constexpr auto string_file_version_len = 28;
     auto padding = ptr_add<WORD>(vih, sizeof(version_info_header) + string_file_version_len);
@@ -491,6 +498,7 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
 
         if((s.find(k) != s.end())) {
             auto* vstart = ptr_dec<char16_t>(vend, str_vih->wValueLength * sizeof(WORD));
+            vstart = ptr_dec<char16_t>(vstart, calculate_padding(vstart, fm_.data()));
             std::u16string_view v(vstart);
             ret[k] = v;
         }
