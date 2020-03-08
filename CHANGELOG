@@ -1,3 +1,10 @@
+v0.0.6
+Fixed issues
+ - CDCM-69 - broker should listen on localhost
+   Attention - On development enviorment listening address for client connections should be changed
+   from to tcp://127.0.0.1:7613 tcp://*:7613
+ - CDCM-68 - Get File Info extract values fails sometimes
+
 v0.0.5
 Fixed issues
  - CDCM-66 - Remove Extraneous data for "get_file_info" fileVersion
