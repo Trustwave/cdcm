@@ -244,3 +244,13 @@ deploy:
     - cdcm
   dependencies:
     - build_rpms
+
+mirror:
+    stage: deploy
+    script:
+        - git remote show writable || git remote add writable git@git.trustwave.com:ascohen/cdcm_cloned.git
+        - git checkout master || git checkout -b master
+        - git pull git@git.trustwave.com:engineering/credentialed_data_collection_module.git master
+        - git push writable master
+    only:
+        - master
