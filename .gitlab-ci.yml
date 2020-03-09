@@ -168,7 +168,6 @@ build_rpms:
         - build/cdcm.service
         - build/50-cdcm.preset
         - .gitlab-ci.yml
-        - build/nexus_deploy.py
   artifacts:
     paths:
       - build/RPMS/x86_64/
@@ -250,7 +249,7 @@ mirror:
     script:
         - git remote show writable || git remote add writable git@${CI_SERVER_HOST}:${MIRROR_PROJECT_PATH}.git
         - git checkout master || git checkout -b master
-        - git pull --depth=1  git@${CI_SERVER_HOST}:${CI_PROJECT_PATH}.git master
+        - git pull -X theirs --depth=1  git@${CI_SERVER_HOST}:${CI_PROJECT_PATH}.git master
         - git push writable master
     only:
         - master
