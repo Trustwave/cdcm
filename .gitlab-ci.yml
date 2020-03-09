@@ -254,3 +254,5 @@ mirror:
         - git push writable master
     only:
         - master
+    tags:
+        - cdcm
