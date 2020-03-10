@@ -20,7 +20,7 @@
 #include <string_view>
 #include <locale>
 #include <memory>
-
+#include <codecvt>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 using trustwave::pe_context;
@@ -470,7 +470,16 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
         return;
     }
 
-    // VS_FIXEDFILEINFO *info = reinterpret_cast<VS_FIXEDFILEINFO *>(const_cast<char *> (buffer));
+    VS_FIXEDFILEINFO* info = reinterpret_cast<VS_FIXEDFILEINFO*>(const_cast<char*>(buffer));
+    static constexpr size_t MAX_MSG = 256;
+    char version_from_fixed[MAX_MSG];
+
+    int rc = snprintf(version_from_fixed, MAX_MSG, "%u.%u.%u.%u",
+                      (unsigned int)(info->dwProductVersionMS & 0xffff0000) >> 16,
+                      (unsigned int)info->dwProductVersionMS & 0x0000ffff,
+                      (unsigned int)(info->dwProductVersionLS & 0xffff0000) >> 16,
+                      (unsigned int)info->dwProductVersionLS & 0x0000ffff);
+
     auto vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO) + 8);
     static constexpr auto sfi = u"StringFileInfo";
     auto* pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
@@ -503,5 +512,10 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
             ret[k] = v;
         }
         str_vih = ptr_add<version_info_header>(vend, calculate_padding(vend, fm_.data()));
+    }
+    if(rc >= 0 && rc < MAX_MSG) {
+        static constexpr auto fv_str = u"FileVersion";
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        ret[fv_str] = convert.from_bytes(version_from_fixed);
     }
 }
