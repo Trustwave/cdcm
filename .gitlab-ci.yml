@@ -244,14 +244,3 @@ deploy:
   dependencies:
     - build_rpms
 
-mirror:
-    stage: deploy
-    script:
-        - git remote show writable || git remote add writable git@${CI_SERVER_HOST}:${MIRROR_PROJECT_PATH}.git
-        - git checkout master || git checkout -b master
-        - git pull -X theirs --depth=1  git@${CI_SERVER_HOST}:${CI_PROJECT_PATH}.git master
-        - git push writable master
-    only:
-        - master
-    tags:
-        - cdcm
