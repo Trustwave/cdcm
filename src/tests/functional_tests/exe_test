@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 
-# Majordomo Protocol client example. Uses the mdcliapi2 API to hide all MDP aspects
-#
-# Author : Tom van Leeuwen <tom@vleeuwen.eu>
-# Based on Python example by Min RK
 folder = File.expand_path('.',__dir__)
 $:.unshift(folder) unless $:.include?(folder)
 folder = File.expand_path('./functional_tests',__dir__)
@@ -15,7 +11,7 @@ require 'json'
 
 xml_path = ARGV[0]
 if  xml_path.nil? || xml_path.empty?
-    xml_path="actions.xml"
+    xml_path="full.xml"
     puts "please specify the path of tests xml. currently using default: " + xml_path
 end
 

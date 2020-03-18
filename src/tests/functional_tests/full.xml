@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <cdcm_client_settings response_timeout="5"/>
+    <assets>
+        <asset name="asset1" address="192.168.140.32" user="administrator" pass="finjan123" domain="workgroup"
+               workstation="commander_aka"/>
+
+    </assets>
+    <verification_methods>
+        <!-- vm_params are expected to be found as atributes of the seesion_item element -->
+        <verification_method vm_name="substr_exist" vm_params="substr"/>
+        <verification_method vm_name="regex_match" vm_params="regex"/>
+        <verification_method vm_name="boolean" vm_params="expected"/>
+        <verification_method vm_name="do_not_verify" vm_params=""/>
+    </verification_methods>
+
+    <actions>
+        <action name="start_session" params=""/>
+        <action name="enumerate" params="key"/>
+        <action name="value_exists" params="key,value"/>
+        <action name="key_exists" params="key"/>
+        <action name="query_value" params="key,value"/>
+
+        <action name="read_file" params="path,size,offset"/>
+        <action name="list_dir" params="param, pattern"/>
+        <action name="file_exists" params="param"/>
+        <action name="get_file_info" params="param"/>
+        <action name="close_session" params=""/>
+    </actions>
+
+
+    <test_sets>
+        <test_set test_set_name="registry enumerate exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                          verification_method="substr_exist" substr="class_name"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="registry key_exists exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                          verification_method="boolean" expected="True"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="registry key_exists not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                          verification_method="boolean" expected="False"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="registry value_exists  exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot"
+                          verification_method="boolean" expected="true"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="registry value_exists not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SemRoot"
+                          verification_method="boolean" expected="false"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="registry query_value exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot"
+                          verification_method="substr_exist" substr="Windows"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="registry query_value not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="XXX"
+                          verification_method="regex_match" regex="^Error: (.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb file_exists exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb file_exists not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="file_exists" param="ADMIN$/xxxhh.exe" verification_method="boolean" expected="false"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb get_file_info exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
+                          regex="^(.*)size(.*)path(.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb get_file_info not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="get_file_info" param="ADMIN$/XXX.exe" verification_method="regex_match" regex="^Error: (.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb read_file exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="read_file" path="ADMIN$/hh.exe" size="104" offset="100"
+                          verification_method="do_not_verify"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb read_file not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="read_file" path="ADMIN$/xxx.exe" size="104" offset="100"
+                          verification_method="regex_match" regex="^Error: (.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb list_dir exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
+                          regex="^(.*)name(.*)\n(.*)type(.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb list_dir not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="list_dir" param="ADMIN$/XXKSJK" pattern="" verification_method="regex_match"
+                          regex="^Error: (.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+
+        <test_set test_set_name="smb all exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true"/>
+            <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
+                          regex="^(.*)size(.*)path(.*)$"/>
+            <session_item action="read_file" path="ADMIN$/hh.exe" size="104" offset="100"
+                          verification_method="do_not_verify"/>
+            <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
+                          regex="^(.*)name(.*)\n(.*)type(.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+
+        <test_set test_set_name="smb all not exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="read_file" path="ADMIN$/xxx.exe" size="104" offset="100"
+                          verification_method="regex_match" regex="^Error: (.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+        <test_set test_set_name="smb list_dir exists">
+            <session_item action="start_session" verification_method="regex_match"
+                          regex="^res: [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
+            <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
+                          regex="^(.*)name(.*)\n(.*)type(.*)$"/>
+            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        </test_set>
+    </test_sets>
+
+    <sessions>
+        <session session_name="session_1" test_set_name="01" asset_name="asset1"
+                 description="test with existing values"/>
+
+    </sessions>
+</root>
