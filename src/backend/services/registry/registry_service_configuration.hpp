@@ -22,6 +22,7 @@ namespace trustwave {
         static constexpr std::string_view srv_name{"registry"};
         registry_service_configuration(): configuration(srv_name) {}
         off_t data_blob_size = 1024 * 1024;
+        size_t reconnect_attempt_on_pipe_busy = 1;
     };
 } // namespace trustwave
 namespace tao::json {
@@ -38,6 +39,7 @@ namespace tao::json {
             trustwave::registry_service_configuration result;
             const auto o = v.at(trustwave::registry_service_configuration::srv_name);
             result.data_blob_size = o.template optional<off_t>("data_blob_size").value_or(result.data_blob_size);
+
             return result;
         }
     };

@@ -37,6 +37,11 @@ namespace trustwave {
     struct result_msg;
     class Action_Base {
     public:
+        enum class action_status : int8_t {
+            FAILED = -1,
+            SUCCEEDED = 0,
+            POSTPONED = 1,
+        };
         explicit Action_Base(const std::string_view name): name_(name) {}
 
         virtual ~Action_Base() = default;
@@ -46,7 +51,9 @@ namespace trustwave {
         Action_Base& operator=(const Action_Base&&) = delete;
         [[nodiscard]] std::string_view name() const { return name_; }
 
-        virtual int act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) = 0;
+        virtual action_status
+        act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>)
+            = 0;
         [[nodiscard]] virtual std::shared_ptr<action_msg> get_message(const tao::json::value& v) const = 0;
 
     private:

@@ -19,7 +19,8 @@
 #include <string>
 #include <string_view>
 #include <locale>
-
+#include <memory>
+#include <codecvt>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 using trustwave::pe_context;
@@ -426,9 +427,11 @@ _error:
     return nullptr;
 }
 
-void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
+void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
+                              const std::unordered_set<std::u16string>& s)
 {
-    NODE_PERES* node = discoveryNodesPeres();
+    auto node_ptr = std::unique_ptr<NODE_PERES, decltype(freeNodes)*>(discoveryNodesPeres(), freeNodes);
+    auto node = node_ptr.get();
     assert(node != nullptr);
 
     const NODE_PERES* dataEntryNode = nullptr;
@@ -467,8 +470,24 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
         return;
     }
 
-    // VS_FIXEDFILEINFO *info = reinterpret_cast<VS_FIXEDFILEINFO *>(const_cast<char *> (buffer));
+    VS_FIXEDFILEINFO* info = reinterpret_cast<VS_FIXEDFILEINFO*>(const_cast<char*>(buffer));
+    static constexpr size_t MAX_MSG = 256;
+    char version_from_fixed[MAX_MSG];
+
+    int rc = snprintf(version_from_fixed, MAX_MSG, "%u.%u.%u.%u",
+                      (unsigned int)(info->dwProductVersionMS & 0xffff0000) >> 16,
+                      (unsigned int)info->dwProductVersionMS & 0x0000ffff,
+                      (unsigned int)(info->dwProductVersionLS & 0xffff0000) >> 16,
+                      (unsigned int)info->dwProductVersionLS & 0x0000ffff);
+
     auto vih = ptr_add<version_info_header>(buffer, sizeof(VS_FIXEDFILEINFO) + 8);
+    static constexpr auto sfi = u"StringFileInfo";
+    auto* pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
+    while(std::u16string(pad) != sfi) {
+        vih = ptr_add<version_info_header>(vih, vih->wLength);
+        pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
+    }
+
     // first
     static constexpr auto string_file_version_len = 28;
     auto padding = ptr_add<WORD>(vih, sizeof(version_info_header) + string_file_version_len);
@@ -481,20 +500,22 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret)
 
     auto buffer_end = ptr_add<char>(buffer, dataEntrySize);
 
-    static const std::unordered_set<std::u16string> s
-        = {u"CompanyName", u"FileDescription", u"FileVersion", u"FroductName", u"ProductVersion"};
-
     while(str_vih->wLength > 0 && ptr_add<char>(str_vih, str_vih->wLength) <= buffer_end) {
         auto* kstart = ptr_add<char16_t>(str_vih, sizeof(version_info_header));
         auto* vend = ptr_add<char16_t>(str_vih, str_vih->wLength);
         std::u16string k(kstart);
-        if(!(s.find(k) != s.end())) {
-        }
-        else {
+
+        if((s.find(k) != s.end())) {
             auto* vstart = ptr_dec<char16_t>(vend, str_vih->wValueLength * sizeof(WORD));
+            vstart = ptr_dec<char16_t>(vstart, calculate_padding(vstart, fm_.data()));
             std::u16string_view v(vstart);
             ret[k] = v;
         }
         str_vih = ptr_add<version_info_header>(vend, calculate_padding(vend, fm_.data()));
+    }
+    if(rc >= 0 && rc < MAX_MSG) {
+        static constexpr auto fv_str = u"FileVersion";
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        ret[fv_str] = convert.from_bytes(version_from_fixed);
     }
 }
