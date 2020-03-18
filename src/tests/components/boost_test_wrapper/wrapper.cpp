@@ -34,6 +34,7 @@ wrapper::start_external_test(std::string command, std::string params,
     try {
         std::shared_ptr<std::promise<std::error_code>> promise = std::make_shared<std::promise<std::error_code>>();
         ec_ret = promise->get_future();
+        std::cerr << boost::filesystem::current_path();
         boost::filesystem::permissions(boost::filesystem::current_path().append("functional_tests").append("exe_test"),
                                        boost::filesystem::owner_exe | boost::filesystem::owner_read
                                            | boost::filesystem::owner_write);
