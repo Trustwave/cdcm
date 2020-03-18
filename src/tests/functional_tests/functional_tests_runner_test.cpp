@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_CASE(standard)
     auto ld_path2 = env["CI_COMMIT_BRANCH"].to_string();
     auto ld_path3 = R"foo(\/libs\/plugins)foo";
     auto sed_cmd = std::string(sed1) + ld_path1 + ld_path2 + ld_path3 + sed2;
+    std::cerr<< sed_cmd << std::endl;
     boost::process::system(sed_cmd, env);
     boost::process::spawn("cdcm_supervisor", env);
     std::future<std::error_code> e;
