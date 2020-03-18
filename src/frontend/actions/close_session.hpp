@@ -36,9 +36,11 @@ namespace tao::json {
         binding::object<binding::inherit<traits<trustwave::action_msg>>> {
         TAO_JSON_DEFAULT_KEY(trustwave::local_close_session_msg::act_name.data());
         template<template<typename...> class Traits>
-        static trustwave::local_close_session_msg as(const tao::json::basic_value<Traits>&)
+        static trustwave::local_close_session_msg as(const tao::json::basic_value<Traits>& v)
         {
             trustwave::local_close_session_msg result;
+            const auto& object = v.at(trustwave::local_close_session_msg::act_name);
+            result.id_ = object.at("id").template as<std::string>();
             return result;
         }
     };
@@ -50,7 +52,8 @@ namespace trustwave {
 
     public:
         Close_Session(): Action_Base(trustwave::local_close_session_msg::act_name) {}
-        int act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
+        action_status
+        act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
         [[nodiscard]] std::shared_ptr<action_msg> get_message(const tao::json::value& v) const override
         {
             return v.as<std::shared_ptr<local_close_session_msg>>();

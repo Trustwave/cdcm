@@ -50,7 +50,7 @@ registry_client::~registry_client()
 
 result registry_client::connect(const session& sess)
 {
-    auto creds = ::cli_credentials_init(nullptr);
+    auto creds = ::cli_credentials_init(mem_ctx_);
     cli_credentials_set_domain(creds, sess.creds().domain().c_str(), CRED_SPECIFIED);
     cli_credentials_set_username(creds, sess.creds().username().c_str(), CRED_SPECIFIED);
     cli_credentials_set_password(creds, sess.creds().password().c_str(), CRED_SPECIFIED);
@@ -77,7 +77,7 @@ result registry_client::open_key(const char* full_path)
 {
     WERROR error = reg_open_key(ctx_->registry, ctx_->root, full_path, &ctx_->current);
     if(!W_ERROR_IS_OK(error)) {
-        AU_LOG_ERROR("open key failed '%s'", full_path);
+        //  AU_LOG_ERROR("open key failed '%s'", full_path);
         return {false, error};
     }
     return {true, error};
@@ -89,12 +89,12 @@ result registry_client::key_get_value_by_index(uint32_t idx, const char** name, 
     data_blob_clear(&data_blob_);
     WERROR error = reg_key_get_value_by_index(ctx_, ctx_->current, idx, name, &type, &data_blob_);
     if(!W_ERROR_IS_OK(error)) {
-        AU_LOG_ERROR("No such index '%z'", idx);
+        //   AU_LOG_ERROR("No such index '%z'", idx);
         return {false, error};
     }
     rv.type(type);
     rv.value(reg_val_data_string(ctx_, type, data_blob_));
-    AU_LOG_ERROR("%s%s", str_regtype(type), reg_val_data_string(ctx_, type, data_blob_));
+    //   AU_LOG_ERROR("%s%s", str_regtype(type), reg_val_data_string(ctx_, type, data_blob_));
     return {true, error};
 }
 
@@ -104,7 +104,7 @@ result registry_client::key_get_value_by_name(const char* name, registry_value& 
     data_blob_clear(&data_blob_);
     WERROR error = reg_key_get_value_by_name(ctx_, ctx_->current, name, &type, &data_blob_);
     if(!W_ERROR_IS_OK(error)) {
-        AU_LOG_ERROR("No such value '%s'", name);
+        //    AU_LOG_ERROR("No such value '%s'", name);
         return {false, error};
     }
     rv.type(type);
@@ -119,7 +119,7 @@ result registry_client::key_get_info(key_info& ki)
                                     std::addressof(ki.max_subkeylen), std::addressof(ki.max_valnamelen),
                                     std::addressof(ki.max_valbufsize));
     if(!W_ERROR_IS_OK(error)) {
-        AU_LOG_ERROR("reg_key_get_info failed");
+        //    AU_LOG_ERROR("No such value '%s'", name);
         return {false, error};
     }
 

@@ -57,7 +57,8 @@ namespace trustwave {
     public:
         SMB_List_Dir(): Action_Base(trustwave::smb_list_dir_msg::act_name) {}
 
-        int act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
+        action_status
+        act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
         [[nodiscard]] std::shared_ptr<action_msg> get_message(const tao::json::value& v) const override
         {
             return v.as<std::shared_ptr<trustwave::smb_list_dir_msg>>();

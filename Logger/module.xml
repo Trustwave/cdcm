@@ -14,11 +14,12 @@
         <modules>
             <module name="broker" id="1" level="30" enable="true"/>
             <module name="worker" id="2" level="30" enable="true"/>
+            <module name="supervisor" id="3" level="30" enable="true"/>
         </modules>
         <supported_sinks>
             <sink name="file">
                 <id>1</id>
-                <path>/var/cdcm/log/</path>
+                <path>/var/log/cdcm/</path>
                 <name>cdcm</name>
                 <filter>debug1</filter>
                 <enable>true</enable>

@@ -155,6 +155,7 @@ build_rpms:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
+    - if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then  export BRANCH=_MR_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME//\//_}  ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF="SNAPSHOT_$SNAPSHOT" ;else export RELEASE_DEF="$SNAPSHOT";fi
     - rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
   rules:
@@ -167,7 +168,6 @@ build_rpms:
         - build/cdcm.service
         - build/50-cdcm.preset
         - .gitlab-ci.yml
-        - build/nexus_deploy.py
   artifacts:
     paths:
       - build/RPMS/x86_64/
@@ -186,9 +186,8 @@ test_install:
   script:
     - cd build
     - sudo yum install -y RPMS/x86_64/*.rpm
-    - sudo systemctl status tw-cdcm
-    - sudo yum -y erase tw-cdcm
-    - sudo systemctl status tw-cdcm
+    - sudo systemctl status cdcm
+    - sudo yum -y erase cdcm
   rules:
     - if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
       changes:
@@ -244,3 +243,4 @@ deploy:
     - cdcm
   dependencies:
     - build_rpms
+

@@ -18,6 +18,7 @@
 //=====================================================================================================================
 #include <unistd.h>
 #include <string>
+#include <memory>
 
 #include "../smb_client.hpp"
 #include "read_file.hpp"
@@ -25,7 +26,8 @@
 #include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-using namespace trustwave;
+using trustwave::SMB_Read_File;
+using action_status = trustwave::Action_Base::action_status;
 namespace {
     namespace {
         const char base64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -85,12 +87,12 @@ namespace {
         return ret;
     }
 } // namespace
-int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                       std::shared_ptr<result_msg> res)
+action_status
+SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_read_file_msg>(action);
@@ -101,7 +103,7 @@ int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
     if(!connect_result.first) {
         AU_LOG_DEBUG("got smb error: %i - %s", connect_result.second, std::strerror(connect_result.second));
         res->res(std::string("Error: ") + std::string(std::strerror(connect_result.second)));
-        return -1;
+        return action_status::FAILED;
     }
     auto off = smb_action->offset_.empty() ? 0 : std::stoul(smb_action->offset_);
     auto sz = smb_action->size_.empty() ? 0 : std::stoul(smb_action->size_);
@@ -109,20 +111,20 @@ int SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_m
         sz = rc.file_size() - off;
     }
     AU_LOG_DEBUG("Received offset: %zu size: %zu", off, sz);
-    auto buff = new(std::nothrow) char[sz];
-    if(nullptr == buff) {
+    auto buff = std::make_unique<char[]>(sz);
+    if(!buff) {
         res->res("Error: Memory allocation failed");
-        return -1;
+        return action_status::FAILED;
     }
-    ssize_t r = rc.read(off, sz, buff);
+    ssize_t r = rc.read(off, sz, buff.get());
     if(-1 == r) {
         res->res("Error: read_file failed");
-        return -1;
+        return action_status::FAILED;
     }
 
-    auto c64_str = base64_encode(buff, r);
+    auto c64_str = base64_encode(buff.get(), r);
     res->res(c64_str);
-    return 0;
+    return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_Read_File> instance = nullptr;
 

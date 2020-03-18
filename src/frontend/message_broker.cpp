@@ -246,7 +246,7 @@ void message_broker::do_act(trustwave::res_msg& result_message, std::shared_ptr<
     auto act1 = trustwave::authenticated_scan_server::instance().public_dispatcher().find(action_message->name());
     auto res = std::make_shared<trustwave::result_msg>();
     result_message.msgs.push_back(res);
-    if(-1 == act1->act(sess, action_message, res)) {
+    if(trustwave::Action_Base::action_status::FAILED == act1->act(sess, action_message, res)) {
         AU_LOG_DEBUG("action %s returned with an error", action_message->name().c_str());
     }
     replied_++;
