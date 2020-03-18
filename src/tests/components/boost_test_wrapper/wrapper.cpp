@@ -38,7 +38,7 @@ wrapper::start_external_test(std::string command, std::string params,
                                        boost::filesystem::owner_exe | boost::filesystem::owner_read
                                            | boost::filesystem::owner_write);
         auto p = std::make_unique<bp::child>(
-            boost::filesystem::current_path().append("functional_tests").append("exe_test"), params,
+            boost::filesystem::current_path().append("functional_tests").append("exe_test"), boost::filesystem::current_path().append("functional_tests").append(params),
             bp::on_exit(
                 [command, this, promise](int, const std::error_code& ec) { promise->set_value(std::move(ec)); }),
             bp::std_in.close(), bp::std_out > streams.first, bp::std_err > streams.second, ios);
