@@ -86,7 +86,7 @@ test:
     - cd build_cdcm/
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$CI_COMMIT_BRANCH/deps/samba-4.10.6/bin/shared/private/:$CI_COMMIT_BRANCH/deps/samba-4.10.6/bin/shared:$CI_COMMIT_BRANCH/deps/openvas-smb/build/wmi/
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared:$GIT_CLONE_PATH/deps/openvas-smb/build/wmi/
     - echo $LD_LIBRARY_PATH
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - cd ../..
