@@ -84,14 +84,14 @@ test:
   allow_failure: true
   script:
     - cd build_cdcm/
+    - cat /dev/null > /var/log/cdcm/testsRunner/cdcm_client.log
+    - ln -s /var/log/cdcm/testsRunner/cdcm_client.log cdcm_client.log
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
-    - cat /dev/null > /var/log/cdcm/testsRunner/cdcm_client.log
     - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared:$GIT_CLONE_PATH/deps/openvas-smb/build/wmi/
     - echo $LD_LIBRARY_PATH
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - cd ../..
-    - cp /var/log/cdcm/testsRunner/cdcm_client.log .
     - make uninstall
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
