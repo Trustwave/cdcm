@@ -91,6 +91,7 @@ test:
     - echo $LD_LIBRARY_PATH
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - cd ../..
+    - cp /var/log/cdcm/testsRunner/cdcm_client.log .
     - make uninstall
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
@@ -103,7 +104,7 @@ test:
     when: always
     paths:
       - build_cdcm/src/tests/*.xml
-      - /var/log/cdcm/testsRunner/cdcm_client.log
+      - build_cdcm/cdcm_client.log
     reports:
       junit: build_cdcm/src/tests/*.xml
   tags:
