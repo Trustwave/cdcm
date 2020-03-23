@@ -4,11 +4,11 @@ require 'fileutils'
 # TODO: write destructor that close the log file: @logger.close https://stackoverflow.com/questions/5956067/ruby-destructors
 class MyLogger
     include Singleton
-    def initialize
-        response = FileUtils.mkdir_p('/var/log/cdcm/testsRunner')
+    def initialize(log_location='./log/')
+        response = FileUtils.mkdir_p(log_location)
 
         #log_file = File.open('cdcm_client.log', File::WRONLY |  File::CREAT | File::APPEND )
-        log_file = File.open("/var/log/cdcm/testsRunner/cdcm_client#{$client_id}.log", File::WRONLY | File::CREAT | File::TRUNC)
+        log_file = File.open("#{$log_location}/cdcm_client#{$client_id}.log", File::WRONLY | File::CREAT | File::TRUNC)
         log_file.sync = true
         @logger = Logger.new( log_file )
         @logger.datetime_format = '%d-%m-%Y %H:%M:%S::%3N'

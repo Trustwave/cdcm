@@ -104,7 +104,7 @@ test:
     when: always
     paths:
       - build_cdcm/src/tests/*.xml
-      - /var/log/cdcm/testsRunner/cdcm_client.log
+      - build_cdcm/src/tests/functional_tests/log/cdcm_client.log
     reports:
       junit: build_cdcm/src/tests/*.xml
   tags:
