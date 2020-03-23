@@ -88,7 +88,7 @@ test:
     - ln -s /var/log/cdcm/testsRunner/cdcm_client.log cdcm_client.log
     - scl enable devtoolset-8 "make install"
     - cd src/tests/
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared:$GIT_CLONE_PATH/deps/openvas-smb/build/wmi/
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared
     - echo $LD_LIBRARY_PATH
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
     - cd ../..
@@ -104,7 +104,7 @@ test:
     when: always
     paths:
       - build_cdcm/src/tests/*.xml
-      - build_cdcm/src/tests/functional_tests/log/cdcm_client.log
+      - build_cdcm/src/tests/log/cdcm_client.log
     reports:
       junit: build_cdcm/src/tests/*.xml
   tags:
