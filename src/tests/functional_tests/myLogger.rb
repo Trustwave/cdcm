@@ -8,6 +8,7 @@ class MyLogger
         response = FileUtils.mkdir_p(log_location)
 
         #log_file = File.open('cdcm_client.log', File::WRONLY |  File::CREAT | File::APPEND )
+        puts "Log location: #{$log_location}/cdcm_client#{$client_id}.log"
         log_file = File.open("#{$log_location}/cdcm_client#{$client_id}.log", File::WRONLY | File::CREAT | File::TRUNC)
         log_file.sync = true
         @logger = Logger.new( log_file )
