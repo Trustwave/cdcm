@@ -19,12 +19,14 @@
 #include <codecvt>
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "../smb_client.hpp"
-
+#include <regex>
 #include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "pe_context.hpp"
-using namespace trustwave;
+using trustwave::SMB_Get_File_Info;
+using action_status = trustwave::Action_Base::action_status;
+
 auto push_back = [](tao::json::events::to_value& c, const std::string& k, const std::string& v) {
     c.begin_object();
     c.key(k);
@@ -33,12 +35,12 @@ auto push_back = [](tao::json::events::to_value& c, const std::string& k, const 
     c.end_object();
     c.element();
 };
-int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                           std::shared_ptr<result_msg> res)
+action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+                                     std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_get_file_info_msg>(action);
@@ -48,13 +50,13 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
         res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
-        return 0;
+        return action_status::FAILED;
     }
 
     pe_context pc(rc);
     if(0 != pc.parse()) {
         res->res("Error: parse file failed");
-        return -1;
+        return action_status::FAILED;
     }
     std::map<std::u16string, std::u16string> ret;
     static const std::unordered_set<std::u16string> s
@@ -74,15 +76,25 @@ int SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::shared_ptr<acti
 
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     for(const auto& e: ret) {
-        c.key(convert.to_bytes(std::u16string(e.first)));
-        c.string(convert.to_bytes(std::u16string(e.second)).empty() ? std::string("NULL")
-                                                                    : convert.to_bytes(std::u16string(e.second)));
+        auto key = convert.to_bytes(std::u16string(e.first));
+        auto val = convert.to_bytes(std::u16string(e.second));
+
+        if(key == "FileVersion") // fix for CDCM-66
+        {
+            static const std::regex re("([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)\\s+.*");
+            std::smatch what;
+            if(std::regex_match(val, what, re)) {
+                val = what.str(1);
+            }
+        }
+        c.key(key);
+        c.string(val.empty() ? std::string("NULL") : val);
         c.member();
     }
     c.end_object();
 
     res->res(c.value);
-    return 0;
+    return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_Get_File_Info> instance = nullptr;
 

@@ -204,9 +204,12 @@ namespace detail {
         auto fname = std::string(
             s.path + s.name + ::trustwave::logger::sourcesArray[::trustwave::LoggerSource::instance()->get_source()]
             + std::string(::trustwave::LoggerSource::instance()->get_source_id()) + ".log.%N");
+
         boost::shared_ptr<sinks::synchronous_sink<sinks::text_file_backend>> sink = logging::add_file_log(
-            keywords::file_name = fname.c_str(), keywords::auto_flush = true,
-            keywords::rotation_size = 100 * 1024 * 1024,
+            keywords::file_name = fname.c_str(),
+            keywords::auto_flush = true,
+            keywords::rotation_size = 32 * 1024 ,
+            keywords::max_files = 16 ,
             keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
             keywords::open_mode = (std::ios::out | std::ios::app),
             keywords::format
@@ -220,6 +223,12 @@ namespace detail {
                                                         keywords::iteration = expr::reverse)
                             << expr::smessage));
         sink->set_filter(severity >= s.filter);
+        sink->locked_backend()->set_file_collector(sinks::file::make_collector(
+            
+        keywords::max_size = 32 * 1024,
+        keywords::max_files = 16
+        ));
+        sink->locked_backend()->scan_for_files();
     }
     //===========================================================================
     // @{FUNH}

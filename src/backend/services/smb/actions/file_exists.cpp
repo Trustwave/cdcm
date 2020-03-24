@@ -26,15 +26,13 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "pe_context.hpp"
 using trustwave::SMB_File_Exists;
-
-int SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                         std::shared_ptr<result_msg> res)
+using action_status = trustwave::Action_Base::action_status;
+action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+                                   std::shared_ptr<result_msg> res)
 {
-
-    //fixme assaf remove me
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
-        return -1;
+        return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_file_exists_msg>(action);
@@ -43,7 +41,7 @@ int SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
-        AU_LOG_ERROR("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
+        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
 
         if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT) {
             res->res(std::string("False"));
@@ -55,7 +53,7 @@ int SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action
     else {
         res->res(std::string("True"));
     }
-    return 0;
+    return action_status::SUCCEEDED;
 }
 
 // instance of the our plugin
