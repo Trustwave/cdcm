@@ -249,7 +249,7 @@ service_update:
     - sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json
     - systemctl restart cdcm
   rules:
-    if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master" && $RELEASE == "SNAPSHOT" '
+    - if: '$RunFast == null && $BumpTag == null && $CI_COMMIT_BRANCH == "master" && $RELEASE == "SNAPSHOT" '
   tags:
     - cdcm_service
   dependencies:
