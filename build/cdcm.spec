@@ -29,7 +29,7 @@ executables="cdcm_broker \
 cdcm_supervisor \
 cdcm_worker"
 
-%define output_dir /opt/output/%{getenv:CI_COMMIT_BRANCH}/
+%define output_dir /opt/output/%{getenv:CI_COMMIT_REF_SLUG}/
 
 for f in $executables;do
     [ -f %{output_dir}/bin/$f ] && install -m 755 %{output_dir}/bin/$f %{buildroot}%{_bindir}

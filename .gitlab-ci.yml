@@ -56,8 +56,8 @@ build:
     - cd build_cdcm
     - scl enable devtoolset-8 "cmake3 $CMAKE_FLAGS .."
     - scl enable devtoolset-8 "make -j4"
-    - rm -fr /opt/output/libs/*
-    - rm -fr /opt/output/bin/*
+    - rm -fr /opt/output/$CI_COMMIT_REF_SLUG/libs/*
+    - rm -fr /opt/output/$CI_COMMIT_REF_SLUG/bin/*
     - scl enable devtoolset-8 "make install"
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
@@ -88,8 +88,6 @@ test:
     - cd src/tests/
     - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared
     - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
-    - cd ../..
-    - make uninstall
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
       changes:
