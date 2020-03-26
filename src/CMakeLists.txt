@@ -83,6 +83,7 @@ configure_file(../cdcm_settings.json /etc/cdcm/cdcm_settings.json COPYONLY)
 configure_file(../Logger/module.xml /etc/cdcm/Logger/module.xml COPYONLY)
 install(FILES ../Logger/module.xml DESTINATION /etc/cdcm/Logger/)
 install(FILES ../cdcm_settings.json DESTINATION /etc/cdcm/)
+install(FILES ../scripts/cdcm.sh DESTINATION ${release_bin_dest})
 
 # uninstall target
 if (NOT TARGET uninstall)

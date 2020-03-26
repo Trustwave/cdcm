@@ -22,7 +22,7 @@ rm -rf %{buildroot}
 [ -d %{buildroot} ] && rm -rf %{buildroot}
 %define cdcm_lib /usr/share/cdcm/lib
 %define cdcm_conf /etc/cdcm/
-for dir in %{cdcm_lib} %{cdcm_lib}/plugins %{_bindir} %{cdcm_conf} %{cdcm_conf}/Logger /var/log/cdcm /var/cdcm/downloaded_files /usr/lib /tmp ;do
+for dir in %{cdcm_lib} %{cdcm_lib}/plugins %{_bindir} %{cdcm_conf} /var/log/cdcm /var/cdcm/downloaded_files /usr/lib /tmp ;do
     [ -d %{buildroot}$dir ] || mkdir -p %{buildroot}$dir 
 done
 executables="cdcm_broker \
@@ -51,8 +51,8 @@ done
 cp -r %{output_dir}/libs/plugins/* %{buildroot}%{cdcm_lib}/plugins/
 
 # copy conf
-cp -r ../Logger/*  %{buildroot}%{cdcm_conf}
-cp -r ../cdcm_settings.json  %{buildroot}%{cdcm_conf}
+cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
+
 
 set +e
 find %{_specdir}/../deps/samba-4.10.6/bin/ -name '*.so*' | while read line;do
@@ -74,7 +74,6 @@ set -e
 %{__mkdir} -p %{buildroot}/%{_presetdir}
 %{__install} -m644 %{_specdir}/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
 %{__install} -m644 %{_specdir}/50-%{name}.preset %{buildroot}/%{_presetdir}/50-%{name}.preset
-%{__install} -m644 %{_specdir}/
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
 
