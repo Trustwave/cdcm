@@ -244,12 +244,15 @@ deploy:
 service_update:
   stage: service_update
   script:
-    - curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm
-    - yum install -y cdcm.rpm
-    - sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json
-    - systemctl restart cdcm
+    - cd build
+    - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
+    - if [ "$RELEASE" = "SNAPSHOT" ] ; then curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm ; yum install -y cdcm.rpm sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json; systemctl restart cdcm; fi
+#    - curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm
+#    - yum install -y cdcm.rpm
+#    - sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json
+#    - systemctl restart cdcm
   rules:
-    - if: '$RunFast == null && $BumpTag == null && $CI_COMMIT_BRANCH == "master" && $RELEASE == "SNAPSHOT" '
+    - if: '$RunFast == null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
   tags:
     - cdcm_service
   dependencies:
