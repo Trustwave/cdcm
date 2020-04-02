@@ -23,6 +23,10 @@
                 <name>cdcm</name>
                 <filter>debug1</filter>
                 <enable>true</enable>
+                <max_files     >16</max_files>
+                <min_free_space>200</min_free_space>
+                <rotation_size >16</rotation_size>
+
             </sink>
 
         </supported_sinks>
