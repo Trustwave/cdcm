@@ -21,7 +21,7 @@
                 <id>1</id>
                 <path>/var/log/cdcm/</path>
                 <name>cdcm</name>
-                <filter>debug1</filter>
+                <filter>info</filter>
                 <enable>true</enable>
                 <max_files     >16</max_files>
                 <min_free_space>200</min_free_space>
