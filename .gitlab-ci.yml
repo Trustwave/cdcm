@@ -229,8 +229,8 @@ deploy:
   script:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ;fi
     - export REPO=releases
+    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; export REPO=snapshots ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
   rules:
@@ -247,7 +247,8 @@ service_update:
   script:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - if [ "$RELEASE" = "RELEASE" ] ; then curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm ; yum reinstall -y cdcm.rpm ;sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json; systemctl restart cdcm; fi
+    - if [ $(rpm -qa | grep cdcm) = $(rpm -qp cdcm.rpm) ]; then INST_ACTION='reinstall'; else INST_ACTION='install' ; fi
+    - if [ "$RELEASE" = "RELEASE" ] ; then curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm ; yum $INST_ACTION -y cdcm.rpm ;sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json; systemctl restart cdcm; fi
 #    - curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm
 #    - yum install -y cdcm.rpm
 #    - sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json
