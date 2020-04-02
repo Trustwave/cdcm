@@ -117,6 +117,11 @@ bool trustwave::LoggerConfiguration::load(const std::string& file_name)
             s.path = v.second.get<std::string>("path");
             s.name = v.second.get<std::string>("name");
             s.id = v.second.get<unsigned long>("id");
+            //
+            s.max_files       = v.second.get<size_t>("max_files")  ;
+            s.min_free_space  = v.second.get<size_t>("min_free_space")  ;
+            s.rotation_size   = v.second.get<size_t>("rotation_size")  ;
+
             try {
                 s.filter = severity_levels_to_string.at(v.second.get<std::string>("filter"));
             }
