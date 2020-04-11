@@ -31,7 +31,7 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }
-    std::cerr << "Looking for plugins in " << conf_->plugins_dir_ << std::endl;
+    AU_LOG_INFO("Looking for plugins in  %s", conf_->plugins_dir_.c_str());
     auto sl_vec = action_manager::load(conf_->plugins_dir_, public_dispatcher_);
     std::thread worker_thread(message_worker::worker_loop);
     worker_thread.join();
