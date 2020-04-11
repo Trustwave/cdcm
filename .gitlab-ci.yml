@@ -233,6 +233,7 @@ deploy:
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
+    - echo mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
     - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
   rules:
     - if: '$BumpTag == null '
