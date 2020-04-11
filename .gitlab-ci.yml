@@ -156,6 +156,7 @@ build_rpms:
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
     - if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then  export BRANCH=_MR_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME//\//_}  ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF="SNAPSHOT_$SNAPSHOT" ;else export RELEASE_DEF="$SNAPSHOT";fi
+    - echo rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
     - rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
   rules:
     - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
