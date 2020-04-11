@@ -35,7 +35,9 @@ message_broker::message_broker(zmq::context_t& ctx):
 //  ---------------------------------------------------------------------
 //  Destructor for broker object
 
-message_broker::~message_broker() { std::cerr << replied_ << " client msgs replied" << std::endl; }
+message_broker::~message_broker() {
+    AU_LOG_INFO("%zu client msgs replied",replied_);
+    std::cerr << replied_ << " client msgs replied" << std::endl; }
 
 //  ---------------------------------------------------------------------
 //  Bind broker to endpoint, can call this multiple times
