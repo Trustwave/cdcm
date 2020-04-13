@@ -208,7 +208,7 @@ namespace detail {
         boost::shared_ptr<sinks::synchronous_sink<sinks::text_file_backend>> sink = logging::add_file_log(
             keywords::file_name = fname.c_str(),
             keywords::auto_flush = true,
-            keywords::rotation_size = s.rotation_size ,
+            keywords::rotation_size = s.rotation_size  ,
             keywords::max_size = s.rotation_size * s.max_files * MB ,
             keywords::max_files = s.max_files ,
             keywords::min_free_space = s.min_free_space * MB ,
