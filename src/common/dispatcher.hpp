@@ -41,7 +41,6 @@ namespace trustwave {
         void register1(T* t) { map_[t->name()] = std::shared_ptr<T>(t); }
         void register1(T_Ptr t)
         {
-            std::cerr << t->name() << " Resgistered" << std::endl;
             map_[t->name()] = t;
         }
         T_Ptr find(const std::string_view t_name) const
