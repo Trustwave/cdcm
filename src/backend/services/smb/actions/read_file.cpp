@@ -96,6 +96,12 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_read_file_msg>(action);
+    if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
+    {
+        res->res("Error: Bad parameter");
+        return action_status::FAILED;
+    }
+   
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->path_);
     trustwave::smb_client rc;

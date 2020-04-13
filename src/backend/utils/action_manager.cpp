@@ -29,6 +29,7 @@ shared_lib_list action_manager::load(const boost::filesystem::path& p_dir, Dispa
     directory_iterator p(p_dir, ec);
     directory_iterator end_iter;
     shared_lib_list sl_vec;
+    std::string registered_plugins;
     for(; p != end_iter; ++p) {
         const std::regex name_lib_filter("lib\\S+\\.so");
         if(!std::regex_match(p->path().filename().generic_string(), name_lib_filter)) {
@@ -40,12 +41,15 @@ shared_lib_list action_manager::load(const boost::filesystem::path& p_dir, Dispa
             auto action = actionl();
             d.register1(action);
             sl_vec.push_back(sl);
-            AU_LOG_DEBUG("%s loaded.", p->path().filename().string().c_str());
+            AU_LOG_INFO("%s loaded.", p->path().filename().string().c_str());
+            registered_plugins.append(action->name()).append(std::string(" "));
         }
         else {
-            AU_LOG_ERROR("%s failed to load.", p->path().filename().string().c_str());
+            AU_LOG_INFO("%s failed to load.", p->path().filename().string().c_str());
             sl->close();
         }
     }
+    registered_plugins.append(std::string("Resgistered"));
+    std::cerr <<registered_plugins <<std::endl;
     return std::move(sl_vec);
 }
