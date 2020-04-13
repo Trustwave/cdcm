@@ -58,7 +58,9 @@ message_worker::message_worker(zmq::context_t& ctx):
 //  ---------------------------------------------------------------------
 //  Destructor
 
-message_worker::~message_worker() { std::cerr << replied_ << " client msgs replied" << std::endl; }
+message_worker::~message_worker() {
+    AU_LOG_INFO("%zu client msgs replied",replied_);
+    std::cerr << replied_ << " client msgs replied" << std::endl; }
 
 //  ---------------------------------------------------------------------
 //  Send message to broker
@@ -306,7 +308,6 @@ int message_worker::worker_loop()
             action_result->id("unknown");
             action_result->res("Error: Malformed message ");
             result.msgs.push_back(action_result);
-            continue;
         }
         try {
             if(!result.msgs.empty()) {
