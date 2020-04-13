@@ -108,7 +108,23 @@ result registry_client::key_get_value_by_name(const char* name, registry_value& 
         return {false, error};
     }
     rv.type(type);
-    rv.value(reg_val_data_string(ctx_, type, data_blob_));
+    if(REG_MULTI_SZ == type)
+    {
+        const char** a = nullptr;
+        pull_reg_multi_sz(mem_ctx_,&data_blob_,&a);
+        const char** p = nullptr;
+        std::string s;
+        p=a;
+        while (*p)               // while not at the end of strings
+        {
+            s.append(*p).append("\n");        // add string to array
+            p += s.length()  ;  // find next string
+        }
+        rv.value(s);
+    }
+    else {
+        rv.value(reg_val_data_string(ctx_, type, data_blob_));
+    }
     return {true, error};
 }
 
