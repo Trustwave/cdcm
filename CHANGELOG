@@ -1,3 +1,15 @@
+v1.0.2
+Fixed issues
+ - CDCM-77
+   Action read_file when size is negative cause core.
+ - CDCM-80
+   Add support to REG_MULTI_SZ.
+ - CDCM-81
+   Add some info messages to logs.
+ - CDCM-83
+   Log rotation size calculated bad.
+
+
 v1.0.1
 Fixed issues
  - CDCM-76
