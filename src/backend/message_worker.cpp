@@ -306,7 +306,6 @@ int message_worker::worker_loop()
             action_result->id("unknown");
             action_result->res("Error: Malformed message ");
             result.msgs.push_back(action_result);
-            continue;
         }
         try {
             if(!result.msgs.empty()) {
