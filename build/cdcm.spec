@@ -51,7 +51,7 @@ done
 cp -r %{output_dir}/libs/plugins/* %{buildroot}%{cdcm_lib}/plugins/
 
 # copy conf
-cp -r /etc/cdcm/*  %{buildroot}%{cdcm_conf}
+cp -r %{output_dir}/conf/*  %{buildroot}%{cdcm_conf}
 
 
 set +e
