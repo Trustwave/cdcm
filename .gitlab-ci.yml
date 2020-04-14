@@ -18,7 +18,7 @@ stages:
   - service_update
 
 before_script:
-  - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S).xml
+  - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S)
   - echo $CI_PROJECT_DIR
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
@@ -89,7 +89,8 @@ test:
     - cd src/tests/
     - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" functional_tests/testsRunner_settings.json
     - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared
-    - ./tests_run  --log_sink=$REPORT_FNAME  --log_format=JUNIT  --log_level=all
+    - ./tests_run  --log_sink=$REPORT_FNAME.xml  --log_format=JUNIT  --log_level=all
+    - java -jar /opt/xunit-to-html/saxon9he.jar -o:$REPORT_FNAME.html -s:$REPORT_FNAME.xml -xsl:/opt/xunit-to-html/xunit_to_html.xsl
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
       changes:
@@ -101,6 +102,7 @@ test:
     when: always
     paths:
       - build_cdcm/src/tests/*.xml
+      - build_cdcm/src/tests/*.html
       - build_cdcm/src/tests/log/cdcm_client.log
     reports:
       junit: build_cdcm/src/tests/*.xml
