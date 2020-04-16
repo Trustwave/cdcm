@@ -1,3 +1,23 @@
+v1.0.2
+Fixed issues
+ - CDCM-77
+   Action read_file when size is negative cause core.
+ - CDCM-80
+   Add support to REG_MULTI_SZ.
+ - CDCM-81
+   Add some info messages to logs.
+ - CDCM-83
+   Log rotation size calculated bad.
+
+
+v1.0.1
+Fixed issues
+ - CDCM-76
+   Added max_files,min_free_space,and rotation_size to sink conf.
+   Added log collector.
+ - CDCM-78
+   Changed default log severity to info
+
 v0.0.6
 Fixed issues
  - CDCM-69 - broker should listen on localhost
