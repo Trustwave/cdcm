@@ -50,6 +50,10 @@ namespace trustwave {
         bool enable;
         unsigned long id; // FIXME: remove id
         unsigned long filter; // FIXME: rename to severity
+        size_t max_files;
+        size_t min_free_space;
+        size_t rotation_size;
+
     };
     //===========================================================================
     //					definition of multiple sources and

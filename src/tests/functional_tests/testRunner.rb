@@ -191,13 +191,33 @@ class Test_Runner
                         action_params_names_vec = @actions_list[action_name]
                         # build a vector that hold pair of [param , param_value]
                         action_params = Array.new
+                        # map for <param_name, vector of all the pairs related to the param name> (in case param value will be "[]", means it have sub params xml elements)
+                        sub_params_map = Hash.new { | sub_param_name , sub_param_key_value_pairs | }                                
                         action_params_names_vec.each {
                             |param|
                             param_val = xml_session_item.attributes[param]
-                            param_pair = [param , param_val]
-                            action_params.push(param_pair)
-                        }
+                            # if the value of some param is [], look for sub xml elements, tagged with the param name
+                            # each element should hold the attributes 'key' and 'value', such as key="somekey" value="some_value" 
+                            if param_val =="[]"
+                                # an array to hold all the pairs for a specific param name
+                                sub_param_key_value_pairs = Array.new  
+                                xml_session_item.elements.each(param) {
+                                    |sub_param|
+                                    sub_param_key = sub_param.attributes["key"]
+                                    sub_param_value = sub_param.attributes["value"]
+                                    sub_param_key_value_pair  = [ sub_param_key , sub_param_value ]
+                                    sub_param_key_value_pairs.push(sub_param_key_value_pair) 
+                                }
+                                sub_params_map[param] = (sub_param_key_value_pairs)
+                                param_pair = [param , param_val]
+                                action_params.push(param_pair)
+                            else
+                                param_pair = [param , param_val]
+                                action_params.push(param_pair)
+                            end
 
+                            
+                        }
                         ver_method = xml_session_item.attributes["verification_method"]
                         # get the list of params required for the specific action
                         vm_params_names_vec = @verification_methods_list[ver_method]
@@ -210,7 +230,7 @@ class Test_Runner
                             verification_params.push(param_pair)
                         }
                         tmp_verification_ctx = Verification_Ctx.new(ver_method, verification_params)
-                        tmp_session.add_session_item(action_name, action_params, tmp_verification_ctx)
+                        tmp_session.add_session_item(action_name, action_params, sub_params_map, tmp_verification_ctx)
                     }
                     @sessions.push(tmp_session)
                     break

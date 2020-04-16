@@ -132,7 +132,7 @@ class MajorDomoClient
         return
     end
     start_session_str = Message_Formater.instance.start_session_str(session)
-    log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"sending: \n" + start_session_str}
+    log.info ("#{File.basename(__FILE__)}::#{__LINE__} #{self.class.name}::#{__callee__}") {"sending: \n" + start_session_str.gsub(/\"password\"(\s*?):(\s*?)\"(.*?)\"/,"\"password\":\"xxx\"")}
     session.session_items[0].req_msg = start_session_str
     send("echo", start_session_str)
 
@@ -276,8 +276,8 @@ class Session
     ########################################
     # adding new session item to the session_items container
     ########################################
-    def add_session_item(action, action_params, verification_ctx=nil)
-        new_sesion_item = Session_Item.new(action, action_params, verification_ctx)
+    def add_session_item(action, action_params, sub_params_pairs, verification_ctx=nil)
+        new_sesion_item = Session_Item.new(action, action_params, sub_params_pairs, verification_ctx)
         @session_items.push(new_sesion_item)
         return new_sesion_item.req_id
     end
@@ -316,13 +316,14 @@ end  #end of class Session
 #
 ###########################################################################
 class Session_Item
-    attr_accessor :verification_ctx, :action_params, :resp_msg, :req_msg
+    attr_accessor :verification_ctx, :action_params, :sub_params_pairs, :resp_msg, :req_msg
     attr_reader :req_id, :action
 
-    def initialize(action, action_params, verification_ctx=nil)
+    def initialize(action, action_params, sub_params_pairs=nil, verification_ctx=nil)
         @req_id = SecureRandom.uuid
         @action = action
         @action_params = action_params #array of pairs. param_name, param_value
+        @sub_params_pairs =  sub_params_pairs #map, key is param name and value is vector holding pair of key-value
         @req_msg = ""
         @resp_msg = ""
         if verification_ctx.nil?
@@ -337,7 +338,11 @@ class Session_Item
     ########################################
     def dump
       dump_str = "\n==============================================\n"
-      dump_str += "req_id: " + @req_id + "\naction: " + @action + "\naction_params: " + @action_params.to_s + "\nreq_msg: " + @req_msg + "\nresp_msg: " + @resp_msg
+      dump_str += "req_id: " + @req_id + "\naction: " + @action + "\naction_params: " + @action_params.to_s 
+      if !@sub_params_pairs.empty? 
+        dump_str += "\nsub_params_pairs: " + @sub_params_pairs.to_s
+      end
+      dump_str += "\nreq_msg: " + @req_msg + "\nresp_msg: " + @resp_msg
       dump_str += "\nverification context:\n" + @verification_ctx.dump
       dump_str +="\n==============================================\n"
 
@@ -408,21 +413,40 @@ class Message_Formater
       return start_session_str.to_json
     end
 
+
     ########################################
     # return the request boby for general action formatted as json
     ########################################
     def action_str(session, session_item)
         action_str = '{"H": {"session_id":"' + session.session_id + '"}, "msgs":[ { "' + session_item.action + '" : { "id" : "' + session_item.req_id + '"'
+        sub_str =""
         session_item.action_params.each {
             |param_pair|
-            # if the param value is empty (valid use case, for example pattern value is empty for )
-            sub_str = ', "' + param_pair[0] + '" : "' + (param_pair[1].nil? ? "" : param_pair[1]) + '" '
-            action_str +=  sub_str
+            # if we need to add sub elements with key-value structure
+            if param_pair[1] == "[]"
+              sub_str = ', "' + param_pair[0] + '" : {'
+              i=0
+              # look for the param name in the hash map. this will return array of key-value pairs
+              session_item.sub_params_pairs[param_pair[0]].each {
+                |sub_param_pair|
+                if i>0
+                  sub_str += ','
+                end
+                sub_str += ' "' + sub_param_pair[0] + '" : "' + (sub_param_pair[1].nil? ? "" : sub_param_pair[1]) + '" '
+                i = i+1
+              }
+              sub_str += '}'
+              action_str +=  sub_str
+
+            else
+              # if the param value is empty (valid use case, for example pattern value is empty for )
+              sub_str = ', "' + param_pair[0].to_s + '" : "' + (param_pair[1].nil? ? "" : param_pair[1]) + '" '
+              action_str +=  sub_str
+            end
         }
         action_str += '} } ]}'
 
       return action_str
     end
-
 
 end #end of class Message_Formater

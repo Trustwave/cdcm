@@ -1,0 +1,6 @@
+{
+  "logger" : {
+    "logs_dir" : "/var/log/cdcm/testsRunner/"
+  }
+
+}

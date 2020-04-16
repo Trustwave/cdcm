@@ -201,25 +201,32 @@ namespace detail {
     //===========================================================================
     void Logger::add_file_sink(const ::trustwave::sink_conf& s)
     {
+        static constexpr auto MB = 1024*1024;
         auto fname = std::string(
-            s.path + s.name + ::trustwave::logger::sourcesArray[::trustwave::LoggerSource::instance()->get_source()]
+            s.path +"/"+ s.name + ::trustwave::logger::sourcesArray[::trustwave::LoggerSource::instance()->get_source()]
             + std::string(::trustwave::LoggerSource::instance()->get_source_id()) + ".log.%N");
         boost::shared_ptr<sinks::synchronous_sink<sinks::text_file_backend>> sink = logging::add_file_log(
-            keywords::file_name = fname.c_str(), keywords::auto_flush = true,
-            keywords::rotation_size = 100 * 1024 * 1024,
-            keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
+            keywords::file_name = fname.c_str(),
+            keywords::auto_flush = true,
+            keywords::rotation_size = s.rotation_size * MB,
+            keywords::max_size = s.rotation_size * s.max_files * MB ,
+            keywords::max_files = s.max_files ,
+            keywords::min_free_space = s.min_free_space * MB ,
             keywords::open_mode = (std::ios::out | std::ios::app),
             keywords::format
             = (expr::stream << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S")
                             << "]"
-                            //<< expr::attr< ::trustwave::logger::severity_levels
-                            //>("Severity")
-                            //<< " [" << std::setw(7) << std::left<<
-                            //::trustwave::logger::severity_levelsArray[severity]<<  "] "
                             << expr::format_named_scope("Scope", keywords::format = "%n",
                                                         keywords::iteration = expr::reverse)
                             << expr::smessage));
         sink->set_filter(severity >= s.filter);
+        sink->locked_backend()->set_file_collector(sinks::file::make_collector(
+            keywords::target =  s.path+"/logs/",
+            keywords::rotation_size = s.rotation_size * MB ,
+            keywords::max_size = s.rotation_size * s.max_files * MB ,
+            keywords::max_files = s.max_files
+        ));
+        sink->locked_backend()->scan_for_files();
     }
     //===========================================================================
     // @{FUNH}

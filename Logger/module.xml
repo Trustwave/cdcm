@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
+
 <Logger>
     <version>1</version>
     <Project>
         <name>Credentialed_Scanner</name>
         <level>30</level>
         <severity_levels>
-            <debug1 value="1"/>
-            <debug2 value="2"/>
-            <info value="4"/>
-            <warning value="8"/>
-            <error value="16"/>
+            <debug1 value="1"/> <!-- all log messages including worker <->  broker heartbeats -->
+            <debug2 value="2"/> <!-- all log messages without worker <->  broker heartbeats -->
+            <info value="4"/> <!-- service start/stop, configuration assumptions, etc -->
+            <warning value="8"/> <!-- potential miss behaviors -->
+            <error value="16"/> <!-- errors regarding to CDCM operation -->
         </severity_levels>
         <modules>
             <module name="broker" id="1" level="30" enable="true"/>
@@ -21,11 +22,14 @@
                 <id>1</id>
                 <path>/var/log/cdcm/</path>
                 <name>cdcm</name>
-                <filter>debug1</filter>
+                <filter>info</filter> <!-- severity -->
                 <enable>true</enable>
+                <max_files>16</max_files><!-- rotation files-->
+                <min_free_space>200</min_free_space> <!-- stop writing logs if disk have ??? free space -->
+                <rotation_size>16</rotation_size> <!-- rotation threshold -->
+
             </sink>
 
         </supported_sinks>
     </Project>
 </Logger>
-

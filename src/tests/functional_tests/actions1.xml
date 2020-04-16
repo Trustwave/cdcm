@@ -1,67 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <cdcm_client_settings response_timeout="5"/>
+    <cdcm_client_settings response_timeout="360" />
     <assets>
-        <asset name="asset1" address="192.168.140.32" user="administrator" pass="finjan123" domain="workgroup"
-               workstation="commander_aka"/>
-        <asset name="asset2" address="192.168.91.121" user="Administrator" pass="Finjan123" domain="workgroup"
-               workstation="wii_bdalak"/>
+        <asset name="asset1" address="192.168.140.32" user="administrator" pass="finjan123" domain="workgroup" workstation="commander_aka" /> <!-- all open and response -->
     </assets>
     <verification_methods>
         <!-- vm_params are expected to be found as atributes of the seesion_item element -->
-        <verification_method vm_name="substr_exist" vm_params="substr"/>
-        <verification_method vm_name="regex_match" vm_params="regex"/>
-        <verification_method vm_name="boolean" vm_params="expected"/>
-        <verification_method vm_name="do_not_verify" vm_params=""/>
+        <verification_method vm_name="substr_exist" vm_params="substr" />
+        <verification_method vm_name="regex_match" vm_params="regex" />
+        <verification_method vm_name="boolean" vm_params="expected" />
+        <verification_method vm_name="do_not_verify" vm_params="" />
     </verification_methods>
 
     <actions>
-        <action name="start_session" params=""/>
-        <action name="enumerate" params="key"/>
-        <action name="value_exists" params="key,value"/>
-        <action name="key_exists" params="key"/>
-        <action name="query_value" params="key,value"/>
-        <action name="get_remote_file_version" params="param"/>
-        <action name="get_os" params=""/>
-        <action name="close_session" params=""/>
+        <action name="start_session"  params="" />
+        <action name="enumerate"  params="key" />
+        <action name="value_exists" params="key,value" />
+        <action name="key_exists"  params="key" />
+        <action name="query_value"  params="key,value" />
+        <action name="read_file"  params="path,size,offset" />
+        <action name="list_dir"  params="param, pattern" />
+        <action name="file_exists"  params="param" />
+        <action name="get_file_info"  params="param" />
+        <action name="wmi_wql"  params="wql,wmi_namespace" />
+        <action name="wmi_reg_enum_key"  params="hive,key,wmi_namespace" />
+        <action name="winrm_identify"  params="" />
+        <action name="winrm_get"  params="uri,selectors" />
+        <action name="winrm_enumerate"  params="uri,filter" />
+        <action name="close_session"  params="" />
     </actions>
 
     <test_sets>
-        <test_set test_set_name="01">
-            <session_item action="start_session" verification_method="do_not_verify"/>
-            <session_item action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-                          verification_method="substr_exist" substr="class_name"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+
+        <test_set test_set_name="registry_tests_with_existing_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+		    <!--<session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="substr_exist" substr="class_name" />-->
+            <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="boolean" expected="true" />
+    	    <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot" verification_method="boolean" expected="true" />
+		    <!--<session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"  value="SystemRoot" verification_method="substr_exist" substr="Windows" />-->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
 
-        <test_set test_set_name="02">
-            <session_item action="start_session" verification_method="do_not_verify"/>
-            <session_item action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning"
-                          verification_method="boolean" expected="false"/>
-            <session_item action="value_exists" key="key_with_no_meaning" value="Debugger" verification_method="boolean"
-                          expected="false"/>
-            <session_item action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-                          value="value_with_no_meaning" verification_method="boolean" expected="false"/>
-            <session_item action="query_value" key="key_with_no_meaning" value="Debugger"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug"
-                          value="value_with_no_meaning" verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="get_remote_file_version" param="ADMIN$/file_not_exist.exe"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="get_remote_file_version" param="BDALEK$/winhlp32.exe"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-
-            <!--<session_item  action="get_os"  verification_method="substr_exist" substr="CurrentBuild" />-->
-
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="registry_tests_with_fault_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+            <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning" verification_method="boolean" expected="false" />
+            <session_item  action="value_exists" key="key_with_no_meaning" value="Debugger" verification_method="boolean" expected="false" />
+            <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="value_with_no_meaning" verification_method="boolean" expected="false" />
+            <session_item  action="query_value" key="key_with_no_meaning" value="Debugger" verification_method="regex_match" regex="^Error: (.*)$" />
+            <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug" value="value_with_no_meaning" verification_method="regex_match" regex="^Error: (.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
+
+        <test_set test_set_name="smb_tests_with_existing_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <!--<session_item  action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="C$/WINDOWS/hh.exe" verification_method="boolean" expected="true" />
+            <session_item  action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/WINDOWS/hh.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="read_file" path="ADMIN$/hh.exe" size="104" offset="0" verification_method="do_not_verify" />
+    	    <session_item  action="list_dir" param="C$" pattern="" verification_method="regex_match" regex="^(.*)name(.*)(.*)type(.*)$" />
+	        <session_item  action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match" regex="^(.*)name(.*)(.*)type(.*)$" />
+	        <session_item  action="list_dir" param="ADMIN$//system32" pattern="" verification_method="regex_match" regex="^(.*)name(.*)(.*)type(.*)$" />            -->
+
+            <session_item  action="get_file_info" param="ADMIN$/system32/ntoskrnl.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="ADMIN$//system32//ntoskrnl.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="ADMIN$/system32\\ntoskrnl.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="list_dir" param="C$/gal" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />
+            <session_item  action="list_dir" param="C$/cdcm1" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />
+            <!--<session_item  action="list_dir" param="C$/Windows" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />-->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+        <test_set test_set_name="smb_tests_with_fault_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="ADMIN$/hh1.exe" verification_method="boolean" expected="false" /> <!-- file not exist -->
+            <session_item  action="file_exists" param="C$/WINDOWS/hh1.exe" verification_method="boolean" expected="false" />  <!-- file not exist -->
+            <session_item  action="file_exists" param="C$/" verification_method="regex_match" regex="^Error: (.*)$" /> <!-- is a directory and not a file -->
+            <!--<session_item  action="file_exists" param="C$\WINDOWS\hh.exe" verification_method="boolean" expected="true" />--> <!-- slash is in wrong direction --> <!-- cause stuck in broker -->
+            <session_item  action="get_file_info" param="ADMIN$/winhlp32aaa.exe" verification_method="regex_match" regex="^Error: (.*)$" /> <!-- file not exist -->
+            <session_item  action="get_file_info" param="C$/WINDOWS/hh.exe1" verification_method="regex_match" regex="^Error: (.*)$" /> <!-- file not exist -->
+            <session_item  action="get_file_info" param="C$" verification_method="regex_match" regex="^Error: (.*)$" />  <!-- is a directory and not a file -->
+            <session_item  action="read_file" path="ADMIN$/hh1.exe" size="104" offset="100" verification_method="regex_match" regex="^Error: (.*)$" /> <!-- file not exist -->
+            <session_item  action="read_file" path="ADMIN$/hh.exe" size="104" offset="-1" verification_method="regex_match" regex="^Error: (.*)$" /> <!-- file exist but offset of -1 -->
+            <session_item  action="read_file" path="ADMIN$" size="104" offset="100" verification_method="regex_match" regex="^Error: (.*)$" />  <!-- is a directory and not a file -->
+            <session_item  action="list_dir" param="C$/aaaaa" pattern="" verification_method="regex_match" regex="^Error: (.*)$" />  <!-- directory not exist -->
+            <session_item  action="list_dir" param="ADMIN$/winhlp32.exe" pattern="" verification_method="regex_match" regex="^Error: (.*)$" /> <!-- is a file and not a directory -->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+
+        <test_set test_set_name="wmi_tests_with_existing_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <!--<session_item  action="wmi_wql" wql="select * from Win32_LoggedOnUser" wmi_namespace="root\\cimv2"  verification_method="substr_exist" substr="Antecedent" />
+            <session_item  action="wmi_wql" wql="select Antecedent from Win32_LoggedOnUser" wmi_namespace="" verification_method="substr_exist" substr="Antecedent" />
+            <session_item  action="wmi_wql" wql="select name from Win32_SystemDriver" wmi_namespace="" verification_method="substr_exist" substr="Name" />
+            <session_item  action="wmi_wql" wql="SELECT * FROM Win32_LogicalDisk" wmi_namespace="" verification_method="substr_exist" substr="DriveType" />
+            <session_item  action="wmi_wql" wql="SELECT Name, VolumeName FROM Win32_LogicalDisk WHERE DriveType=3" wmi_namespace="" verification_method="substr_exist" substr="DeviceID" />
+            <session_item  action="wmi_wql" wql="select * from Win32_CurrentTime" wmi_namespace="" verification_method="substr_exist" substr="DayOfWeek" />-->
+            <session_item  action="wmi_wql" wql="SELECT * FROM Win32_Directory" wmi_namespace="" verification_method="substr_exist" substr="AccessMask" />
+            <!--<session_item  action="wmi_wql" wql="SELECT * FROM Win32_Directory WHERE Name LIKE '%micro%'" wmi_namespace="" verification_method="substr_exist" substr="AccessMask" />
+            <session_item  action="wmi_wql" wql="SELECT * FROM Win32_Directory WHERE Name like 'c:\\\\windows\\\\winsxs\\\\%'" wmi_namespace="" verification_method="substr_exist" substr="AccessMask" />
+            <session_item  action="wmi_wql" wql="Select * from CIM_Datafile where Drive = 'C:' AND Path = '\\\\windows\\\\system32\\\\' AND Filename='win32k' AND Extension='sys'" wmi_namespace="" verification_method="substr_exist" substr="AccessMask" />-->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+
+        <test_set test_set_name="wmi_reg_tests_with_existing_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="wmi_reg_enum_key" hive="0x80000002" key="SOFTWARE\\Microsoft\\Windows\\CurrentVersion" verification_method="do_not_verify" />
+            <session_item  action="wmi_reg_enum_key" hive="0" key="SOFTWARE\\Microsoft\\Windows\\CurrentVersion" wmi_namespace="root\\default"  verification_method="do_not_verify" />
+            <session_item  action="wmi_reg_enum_key" hive="0" key="SOFTWARE\\Microsoft\\Windows\\CurrentVersion" wmi_namespace=""  verification_method="do_not_verify" />
+
+            <session_item  action="wmi_reg_enum_key" hive="0x80000002" key="SOFTWARE\\Microsoft\\Windows\\CurrentVersion" wmi_namespace=""  verification_method="do_not_verify" />
+            <!--<session_item  action="wmi_reg_enum_key" hive="0x80000002" key="SOFTWARE\\Microsoft\\Windows\\CurrentVersion" wmi_namespace=""  verification_method="do_not_verify" />-->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+
+        <test_set test_set_name="wmi_tests_with_fault_values" > <!-- rotem to complete -->
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+
+        <test_set test_set_name="winrm_tests_with_existing_values" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="winrm_identify" verification_method="boolean" expected="true"  />
+            <!--<session_item  action="winrm_get" uri="http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cimv2/Win32_Service" selectors="" verification_method="do_not_verify" />-->
+            <!--<session_item  action="winrm_enumerate" uri="http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cimv2/*" filter="SELECT * FROM Win32_NetworkAdapterConfiguration WHERE IpEnabled=TRUE" verification_method="do_not_verify" />-->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
     </test_sets>
 
     <sessions>
-        <session session_name="session_1" test_set_name="01" asset_name="asset1"
-                 description="test with existing values"/>
-
+        <session session_name="registry_tests_with_existing_values_asset1" test_set_name="registry_tests_with_existing_values" asset_name="asset1"  description="registry_tests_with_existing_values" />
+        <!--<session session_name="registry_tests_with_fault_values_asset1" test_set_name="registry_tests_with_fault_values" asset_name="asset1"  description="registry_tests_with_fault_values" />-->
+	 <!--<session session_name="smb_tests_with_existing_values_asset1" test_set_name="smb_tests_with_existing_values" asset_name="asset1"  description="smb_tests_with_existing_values" />-->
+        <!--<session session_name="smb_tests_with_fault_values_asset1" test_set_name="smb_tests_with_fault_values" asset_name="asset1"  description="smb_tests_with_fault_values" />-->
+        <!--<session session_name="wmi_tests_with_existing_values_asset1" test_set_name="wmi_tests_with_existing_values" asset_name="asset1"  description="wmi_tests_with_existing_values" />-->
+        <!--<session session_name="wmi_tests_with_fault_values_asset1" test_set_name="wmi_tests_with_fault_values" asset_name="asset1"  description="wmi_tests_with_fault_values" />-->
+        <!--<session session_name="winrm_tests_with_existing_values_asset1" test_set_name="winrm_tests_with_existing_values" asset_name="asset1"  description="winrm_tests_with_existing_values" />-->
     </sessions>
 </root>

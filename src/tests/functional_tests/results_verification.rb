@@ -159,7 +159,7 @@ class Verifier
     end
 
     def set_failed_verification(session_item)
-        session_item.verification_ctx.verification_result = Verification_Result.new(false, "malformed request")
+        session_item.verification_ctx.verification_result = Verification_Result.new(false, "malformed response")
         session_item.verification_ctx.vm_result = "failed"
     end
 end #end of class Verifier

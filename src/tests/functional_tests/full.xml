@@ -95,7 +95,7 @@
             <session_item action="start_session" verification_method="regex_match"
                           regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
             <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
-                          regex="^(.*)size(.*)path(.*)$"/>
+                          regex="^(.*)path(.*)size(.*)$"/>
             <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
         </test_set>
         <test_set test_set_name="smb get_file_info not exists">
@@ -122,7 +122,7 @@
             <session_item action="start_session" verification_method="regex_match"
                           regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
             <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
-                          regex="^(.*)name(.*)\n(.*)type(.*)$"/>
+                          regex="^(.*)name(.*)(.*)type(.*)$"/>
             <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
         </test_set>
         <test_set test_set_name="smb list_dir not exists">
@@ -137,11 +137,11 @@
                           regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
             <session_item action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true"/>
             <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
-                          regex="^(.*)size(.*)path(.*)$"/>
+                          regex="^(.*)path(.*)size(.*)$"/>
             <session_item action="read_file" path="ADMIN$/hh.exe" size="104" offset="100"
                           verification_method="do_not_verify"/>
             <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
-                          regex="^(.*)name(.*)\n(.*)type(.*)$"/>
+                          regex="^(.*)name(.*)(.*)type(.*)$"/>
             <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
         </test_set>
         <test_set test_set_name="smb all not exists">
@@ -155,7 +155,7 @@
             <session_item action="start_session" verification_method="regex_match"
                           regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
             <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
-                          regex="^(.*)name(.*)\n(.*)type(.*)$"/>
+                          regex="^(.*)name(.*)(.*)type(.*)$"/>
             <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
         </test_set>
     </test_sets>
