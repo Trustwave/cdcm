@@ -51,7 +51,7 @@ namespace {
         size_t charCount = 0; // Count byte tripples
         size_t outPos = 0; // Current letter in the output stream
 
-        std::string ret(base64_encoded_length(inLen) + 1, '\0');
+        std::string ret(base64_encoded_length(inLen) , '\0');
         while(inLen--) // Scan the input bit stream
         {
             currByte = *(inBuf++);
