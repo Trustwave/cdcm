@@ -225,7 +225,7 @@ zmsg* message_worker::recv(zmsg*& reply_p)
         }
     }
     if(zmq_helpers::interrupted) {
-        AU_LOG_DEBUG("W: interrupt received, killing worker...\n");
+        AU_LOG_INFO("W: interrupt received, killing worker...\n");
     }
     return nullptr;
 }
@@ -302,7 +302,7 @@ int message_worker::worker_loop()
                 }
             }
         }
-        catch(std::exception& e) {
+        catch(const std::exception& e) {
             AU_LOG_ERROR("Malformed message %s", e.what());
             auto action_result = std::make_shared<result_msg>();
             action_result->id("unknown");
@@ -321,7 +321,7 @@ int message_worker::worker_loop()
                 mw.reply_to_.clear();
             }
         }
-        catch(std::exception& e) {
+        catch(const std::exception& e) {
             AU_LOG_ERROR("Failed building response message %s", e.what());
         }
     }
