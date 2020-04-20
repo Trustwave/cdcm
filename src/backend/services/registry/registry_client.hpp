@@ -84,6 +84,8 @@ namespace trustwave {
 
     private:
         result key_get_info(key_info&);
+        void normalize(registry_value& rv);
+
 
         reg_context* ctx_;
         tevent_context* ev_ctx_;

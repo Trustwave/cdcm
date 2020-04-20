@@ -36,6 +36,15 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_file_exists_msg>(action);
+    if(!smb_action) {
+        AU_LOG_ERROR("Failed dynamic cast");
+        res->res("Error: Internal error");
+        return action_status::FAILED;
+    }
+    if( smb_action->param.empty())
+    {
+        res->res("Error: param is mandatory");
+    }
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
     trustwave::smb_client rc;
