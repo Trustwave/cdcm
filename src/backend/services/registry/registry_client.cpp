@@ -82,33 +82,9 @@ result registry_client::open_key(const char* full_path)
     }
     return {true, error};
 }
-
-result registry_client::key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv)
+void registry_client::normalize(registry_value& rv)
 {
-    uint32_t type;
-    data_blob_clear(&data_blob_);
-    WERROR error = reg_key_get_value_by_index(ctx_, ctx_->current, idx, name, &type, &data_blob_);
-    if(!W_ERROR_IS_OK(error)) {
-        //   AU_LOG_ERROR("No such index '%z'", idx);
-        return {false, error};
-    }
-    rv.type(type);
-    rv.value(reg_val_data_string(ctx_, type, data_blob_));
-    //   AU_LOG_ERROR("%s%s", str_regtype(type), reg_val_data_string(ctx_, type, data_blob_));
-    return {true, error};
-}
-
-result registry_client::key_get_value_by_name(const char* name, registry_value& rv)
-{
-    uint32_t type;
-    data_blob_clear(&data_blob_);
-    WERROR error = reg_key_get_value_by_name(ctx_, ctx_->current, name, &type, &data_blob_);
-    if(!W_ERROR_IS_OK(error)) {
-        //    AU_LOG_ERROR("No such value '%s'", name);
-        return {false, error};
-    }
-    rv.type(type);
-    if(REG_MULTI_SZ == type)
+    if(REG_MULTI_SZ == rv.type())
     {
         const char** a = nullptr;
         pull_reg_multi_sz(mem_ctx_,&data_blob_,&a);
@@ -123,8 +99,33 @@ result registry_client::key_get_value_by_name(const char* name, registry_value& 
         rv.value(s);
     }
     else {
-        rv.value(reg_val_data_string(ctx_, type, data_blob_));
+        rv.value(reg_val_data_string(ctx_, rv.type(), data_blob_));
     }
+}
+result registry_client::key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv)
+{
+    uint32_t type;
+    data_blob_clear(&data_blob_);
+    WERROR error = reg_key_get_value_by_index(ctx_, ctx_->current, idx, name, &type, &data_blob_);
+    if(!W_ERROR_IS_OK(error)) {
+        //   AU_LOG_ERROR("No such index '%z'", idx);
+        return {false, error};
+    }
+    normalize(rv);
+    return {true, error};
+}
+
+result registry_client::key_get_value_by_name(const char* name, registry_value& rv)
+{
+    uint32_t type;
+    data_blob_clear(&data_blob_);
+    WERROR error = reg_key_get_value_by_name(ctx_, ctx_->current, name, &type, &data_blob_);
+    if(!W_ERROR_IS_OK(error)) {
+        //    AU_LOG_ERROR("No such value '%s'", name);
+        return {false, error};
+    }
+    rv.type(type);
+    normalize(rv);
     return {true, error};
 }
 

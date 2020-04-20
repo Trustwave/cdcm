@@ -43,6 +43,10 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
+    if( veact->key_.empty()||veact->value_.empty())
+    {
+        res->res("Error: key and value are mandatory");
+    }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));

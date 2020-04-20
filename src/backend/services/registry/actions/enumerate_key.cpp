@@ -68,6 +68,10 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
+    if( ekact->key_.empty())
+    {
+        res->res("Error: key is mandatory");
+    }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
