@@ -1,183 +1,698 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <cdcm_client_settings response_timeout="5"/>
+    <cdcm_client_settings response_timeout="360" />
     <assets>
-        <asset name="asset1" address="192.168.140.32" user="administrator" pass="finjan123" domain="workgroup"
-               workstation="commander_aka"/>
+        <asset name="asset1" address="192.168.140.32" user="administrator" pass="finjan123" domain="workgroup" workstation="commander_aka" /> <!-- all open and response -->
+        <asset name="asset2" address="192.168.90.53" user="administrator" pass="finjan" domain="workgroup" workstation="commander_aka" /> 
+        <asset name="asset_invalid_ip" address="300.300.300.300" user="administrator" pass="finjan123" domain="workgroup" workstation="commander_aka" /> 
+        <asset name="asset_non_existing_ip" address="10.200.1.1" user="administrator" pass="finjan123" domain="workgroup" workstation="commander_aka" /> 
 
     </assets>
     <verification_methods>
         <!-- vm_params are expected to be found as atributes of the seesion_item element -->
-        <verification_method vm_name="substr_exist" vm_params="substr"/>
-        <verification_method vm_name="regex_match" vm_params="regex"/>
-        <verification_method vm_name="boolean" vm_params="expected"/>
-        <verification_method vm_name="do_not_verify" vm_params=""/>
+        <verification_method vm_name="substr_exist" vm_params="substr" />
+        <verification_method vm_name="regex_match" vm_params="regex" />
+        <verification_method vm_name="boolean" vm_params="expected" />
+        <verification_method vm_name="is_base64" vm_params="" />
+        <verification_method vm_name="do_not_verify" vm_params="" />
     </verification_methods>
 
     <actions>
-        <action name="start_session" params=""/>
-        <action name="enumerate" params="key"/>
-        <action name="value_exists" params="key,value"/>
-        <action name="key_exists" params="key"/>
-        <action name="query_value" params="key,value"/>
-
-        <action name="read_file" params="path,size,offset"/>
-        <action name="list_dir" params="param, pattern"/>
-        <action name="file_exists" params="param"/>
-        <action name="get_file_info" params="param"/>
-        <action name="close_session" params=""/>
+        <action name="start_session"  params="" />
+        <action name="enumerate"  params="key" />
+        <action name="value_exists" params="key,value" />
+        <action name="key_exists"  params="key" />
+        <action name="query_value"  params="key,value" />
+        <action name="read_file"  params="path,size,offset" />
+        <action name="list_dir"  params="param, pattern" />
+        <action name="file_exists"  params="param" />
+        <action name="get_file_info"  params="param" />
+        <action name="wmi_wql"  params="wql,wmi_namespace" />
+        <action name="wmi_reg_enum_key"  params="hive,key,wmi_namespace" />
+        <action name="winrm_identify"  params="" />
+        <action name="winrm_get"  params="uri,selectors" />
+        <action name="winrm_enumerate"  params="uri,filter" />
+        <action name="close_session"  params="" />
     </actions>
 
-
     <test_sets>
-        <test_set test_set_name="registry enumerate exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-                          verification_method="substr_exist" substr="class_name"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_start_session_non_existent_ip" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="key_exists" key="SOFTWARE" verification_method="substr_exist" substr="Error: WERR_SEM_TIMEOUT" />
+            <session_item  action="file_exists" param="C$/Windows/Notepad.exe" verification_method="substr_exist" substr="Error: Connection timed out" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+
         </test_set>
-        <test_set test_set_name="registry key_exists exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-                          verification_method="boolean" expected="True"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+
+        <test_set test_set_name="cdcm_test_start_session_invalid_ip" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="key_exists" key="SOFTWARE" verification_method="substr_exist" substr="Error: WERR_FILE_NOT_FOUND" />
+            <session_item  action="file_exists" param="C$/Windows/Notepad.exe" verification_method="substr_exist" substr="Error: Invalid argument" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="registry key_exists not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\XXXCurrentVersion"
-                          verification_method="boolean" expected="False"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+
+        <test_set test_set_name="cdcm_test_start_session_inaccessible_ip" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="key_exists" key="SOFTWARE" verification_method="substr_exist" substr="Error: WERR_NOT_ENOUGH_MEMORY" />
+            <session_item  action="file_exists" param="C$/Windows/Notepad.exe" verification_method="substr_exist" substr="Error: No route to host" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="registry value_exists  exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot"
-                          verification_method="boolean" expected="true"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+
+<!-- file_exists -->
+        <test_set test_set_name="cdcm_test_file_exists long file name" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/cccccccccccccccccccccccccccccccccccccccccccccccccccc.txt" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="registry value_exists not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SemRoot"
-                          verification_method="boolean" expected="false"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists file with special chars" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/!x#x@x%.txt" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="registry query_value exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot"
-                          verification_method="substr_exist" substr="Windows"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists zero bytes file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/0_byte_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="registry query_value not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="XXX"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists zero bytes file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/0_byte_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb file_exists exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists big file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/big/BigFile.7z" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb file_exists not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="file_exists" param="ADMIN$/xxxhh.exe" verification_method="boolean" expected="false"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists readonly+hidden+system+archive file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/99_bytes_read_only_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/99_bytes_hidden_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="ADMIN$/system32/ntoskrnl.exe" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/12288_bytes_archived_zip_test_file.zip" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb get_file_info exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
-                          regex="^(.*)path(.*)size(.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists locked file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/locked/dialer_locked.exe" verification_method="boolean" expected="true" /> <!-- locked for write -->
+            <session_item  action="file_exists" param="C$/7up/cdcm/locked/dialer_locked_full.exe" verification_method="regex_match" regex="^Error: (.*)$" /> /> <!-- locked for read+write -->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb get_file_info not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="get_file_info" param="ADMIN$/XXX.exe" verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists file without read permissions" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/test_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb read_file exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="read_file" path="ADMIN$/hh.exe" size="104" offset="100"
-                          verification_method="do_not_verify"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists non-existent file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/kuku.txt" verification_method="boolean" expected="false" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb read_file not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="read_file" path="ADMIN$/xxx.exe" size="104" offset="100"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists filename which is actually a directory" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/big" verification_method="substr_exist" substr="Error: Is a directory" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb list_dir exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
-                          regex="^(.*)name(.*)(.*)type(.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists paths with slashes / backslashes" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/test_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="C$//7up//cdcm//test_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="C$/7up\\cdcm\\test_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="C$\\7up\\cdcm\\test_file.txt" verification_method="boolean" expected="false" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb list_dir not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="list_dir" param="ADMIN$/XXKSJK" pattern="" verification_method="regex_match"
-                          regex="^Error: (.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_file_exists Paths with C$ / ADMIN$" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="file_exists" param="C$/7up/cdcm/test_file.txt" verification_method="boolean" expected="true" />
+            <session_item  action="file_exists" param="ADMIN$/system32/ntoskrnl.exe" verification_method="boolean" expected="true" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb all exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="file_exists" param="ADMIN$/hh.exe" verification_method="boolean" expected="true"/>
-            <session_item action="get_file_info" param="ADMIN$/winhlp32.exe" verification_method="regex_match"
-                          regex="^(.*)path(.*)size(.*)$"/>
-            <session_item action="read_file" path="ADMIN$/hh.exe" size="104" offset="100"
-                          verification_method="do_not_verify"/>
-            <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
-                          regex="^(.*)name(.*)(.*)type(.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+
+
+
+<!-- get_file_info -->
+        <test_set test_set_name="cdcm_test_get_file_info_asset2 regular" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/Windows/System32/amstream.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/amstream.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb all not exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="read_file" path="ADMIN$/xxx.exe" size="104" offset="100"
-                          verification_method="regex_match" regex="^Error: (.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_get_file_info long file name" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
-        <test_set test_set_name="smb list_dir exists">
-            <session_item action="start_session" verification_method="regex_match"
-                          regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"/>
-            <session_item action="list_dir" param="ADMIN$" pattern="" verification_method="regex_match"
-                          regex="^(.*)name(.*)(.*)type(.*)$"/>
-            <session_item action="close_session" verification_method="substr_exist" substr="session closed"/>
+        <test_set test_set_name="cdcm_test_get_file_info file with special chars" > 
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/amstream_special_chars_!@#$%^&amp;().dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
         </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info readonly+hidden+system+archive file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/amstream_readonly.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/amstream _hidden.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="ADMIN$/system32/ntoskrnl.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/attributes/readonly.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/attributes/hidden.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/attributes/system.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/attributes/archive.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info locked file" > 
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/locked/dialer_locked.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/locked/dialer_locked_full.exe" verification_method="regex_match" regex="^Error: (.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info file without read permissions" > 
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/permissions/dialer_no_read_permissions.exe" verification_method="regex_match" regex="^Error: (.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info non-existent file" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/kuku.dll" verification_method="regex_match" regex="^Error: (.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info filename which is actually a directory" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/big" verification_method="regex_match" regex="^Error: (.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info paths with slashes / backslashes" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/7up/cdcm/amstream.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$//7up//cdcm//amstream.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="C$/7up\\cdcm\\amstream.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />            
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_get_file_info Paths with C$ / ADMIN$" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="get_file_info" param="C$/Windows/System32/amstream.dll" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />
+            <session_item  action="get_file_info" param="ADMIN$/system32/ntoskrnl.exe" verification_method="regex_match" regex="^(.*)path(.*)size(.*)$" />            
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+        
+<!-- list_dir -->        
+        <test_set test_set_name="cdcm_test_list_dir_directory_non_existing_path" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="C$/kuku" pattern="" verification_method="regex_match" regex="^Error: (.*)$" />  <!-- directory not exist -->
+            <session_item  action="list_dir" param="C$/kuku" pattern="*.txt" verification_method="regex_match" regex="^Error: (.*)$" />  <!-- directory not exist -->
+            <session_item  action="list_dir" param="L:/" pattern="" verification_method="regex_match" regex="^Error: (.*)$" />  <!-- directory not exist -->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_long_path" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="C$/7up/cdcm/aaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbb" pattern="*.txt" verification_method="regex_match" regex="^(.*)name(.*)test_file.txt(.*)type(.*)$" />
+            <session_item  action="list_dir" param="C$/7up/cdcm/aaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbb" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" /> 
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_deep path structure" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="C$/7up/cdcm/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p" pattern="" verification_method="regex_match" regex="^(.*)name(.*)test_file.txt(.*)type(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory with special chars" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="C$/7up/cdcm/!@#$%" pattern="" verification_method="regex_match" regex="^(.*)name(.*)test_file.txt(.*)type(.*)$" />  <!-- directory with special chars -->
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory containing many files (>5000)" > 
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="C$/7up/cdcm/many_small_files/" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />  
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory containing both sub-directories and files" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="C$/7up/cdcm/" pattern="" verification_method="regex_match" regex="^(.*)FILE(.*)DIR(.*)$|^(.*)DIR(.*)FILE(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory containing long file names" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm/" pattern="" verification_method="regex_match" regex="^(.*)cccccccccccccccccccccccccccccccccccccccccccccccccccc.txt(.*)$" /> 
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory containing files with special chars" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm/" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" /> 
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory containing readonly+hidden+system+archive files" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm/" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />  
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_directory containing locked files" > 
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm/locked/" pattern="" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />  
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir_wildcards" >
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm" pattern="test_file.*" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />  
+            <session_item  action="list_dir" param="c$/7up/cdcm" pattern="*.txt" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />  
+            <session_item  action="list_dir" param="c$/7up/cdcm" pattern="test_file.t*t" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />  
+            <session_item  action="list_dir" param="c$/7up/cdcm" pattern="te*st_file.txt" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" /> 
+            <session_item  action="list_dir" param="c$/7up/cdcm" pattern="t*st_file.txt" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm" pattern="ccccccccccccccccccccccccccccccccccccccccccccccc*cccc.txt" verification_method="regex_match" regex="^(.*)name(.*)type(.*)$" />
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+        <test_set test_set_name="cdcm_test_list_dir inaccesible folder" > 
+            <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+            <session_item  action="list_dir" param="c$/7up/cdcm/permissions/folder_no_read_permissions" pattern="" verification_method="regex_match" regex="^Error: (.*)$" />  
+            <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+        </test_set>
+
+
+
+<!--  read_file -->
+            <test_set test_set_name="cdcm_test_read_file_non existing file" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <!--sion_item  action="read_file" path="C$/7up/cdcm/kuku" size="104" offset="0" verification_method="regex_match" regex="^(.*)(?&lt;!Error:)$" /> -->
+                    <session_item  action="read_file" path="C$/7up/cdcm/kuku" size="104" offset="0" verification_method="regex_match" regex="^Error: (.*)$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/kuku" size="104" offset="1" verification_method="regex_match" regex="^Error: (.*)$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/kuku" size="104" offset="100" verification_method="regex_match" regex="^Error: (.*)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file long path" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/aaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbb/test_file.txt" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/aaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbb/test_file.txt" size="104" offset="0" verification_method="is_base64"  />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file deep structure" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/test_file.txt" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file directory with special chars" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/!@#$%/test_file.txt" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file file with special chars" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/!x#x@x%.txt" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file readonly+hidden+system+archive files" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/99_bytes_read_only_file.txt" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/99_bytes_hidden_file.txt" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="ADMIN$/system32/ntoskrnl.exe" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" /> 
+                    <!--<session_item  action="read_file" path="ADMIN$/system32/ntoskrnl.exe" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />  --> 
+                    <session_item  action="read_file" path="C$/7up/cdcm/12288_bytes_archived_zip_test_file.zip" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <!--<session_item  action="read_file" path="C$/7up/cdcm/12288_bytes_archived_zip_test_file.zip" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" /> --> 
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>            
+            <test_set test_set_name="cdcm_test_read_file locked file" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/locked/dialer_locked.exe" size="100" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/locked/dialer_locked_full.exe" size="100" offset="0" verification_method="regex_match" regex="^Error: (.*)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file 0 byte file" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/0_byte_file.txt" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/0_byte_file.txt" size="10" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/0_byte_file.txt" size="10" offset="100" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>             
+            <test_set test_set_name="cdcm_test_read_file big files (>10GB)" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/big/BigFile.7z" size="100" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <!--<session_item  action="read_file" path="C$/7up/cdcm/big/BigFile.7z" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />-->
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file negative size" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/test_file.txt" size="-5" offset="0" verification_method="regex_match" regex="^Error: (.*)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file size =0" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+<!--                <session_item  action="read_file" path="C$/7up/cdcm/test_file.txt" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/test_file.txt" size="0" offset="100" verification_method="regex_match" regex="^(?!Error:.*$).*$" />-->
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="0" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="0" offset="30" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file size bigger than file" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="100" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file size=1" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="1" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file size = filesize -1" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="51" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file negative offset" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/test_file.txt" size="104" offset="-10" verification_method="regex_match" regex="^Error: (.*)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file offset = 0" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/test_file.txt" size="104" offset="0" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file offset equal / bigger than file size" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="50" offset="52" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="50" offset="60" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file offset  =1" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/test_file.txt" size="104" offset="1" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file offset  = filesize -1" >
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="50" offset="51" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/52_bytes_test_file_small.txt" size="1" offset="51" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_read_file offset with big files" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/big/BigFile.7z" size="100" offset="1" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="read_file" path="C$/7up/cdcm/big/BigFile.7z" size="100" offset="10000" verification_method="regex_match" regex="^(?!Error:.*$).*$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+
+
+<!-- key_exists -->
+            <test_set test_set_name="cdcm_test_key_exists an existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_key_exists a none existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\kuku" verification_method="boolean" expected="false" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_key_exists inaccessible key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="key_exists" key="SOFTWARE\\cdcm\\inaccessible" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <!-- tbd , this key doesn't work, i get a malformed error -->
+            <test_set test_set_name="cdcm_test_key_exists key with special chars" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <!--<session_item  action="key_exists" key="SOFTWARE\\cdcm\\specialchars_!@#$%^&amp;*()[]{}|;:'&quot;`~/,.&lt;&gt;-=_+" verification_method="boolean" expected="true" />-->
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_key_exists key with a long path ,Long sub key names" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="key_exists" key="SOFTWARE\\cdcm\\long path\\long sub key names\\123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-\\abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_key_exists key with a long path, Deep key structure" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="key_exists" key="SOFTWARE\\cdcm\\long path\\deep sub key structure\\a\\b\\c\\d\\e\\f\\g\\h\\i\\j\\k\\l\\m\\n\\o\\p\\q\\r\\s\\t\\u\\v\\w\\x\\y\\z" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_key_exists check case-insensitive" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\currentversion" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+
+
+<!-- value_exists -->
+
+            <test_set test_set_name="cdcm_test_value_exists an existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot" verification_method="boolean" expected="true" /> 
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myString" verification_method="boolean" expected="true" /><!-- string -->
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myBinary" verification_method="boolean" expected="true" /> <!-- binary -->
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myDWORD" verification_method="boolean" expected="true" /> <!-- DWORD -->
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myQWORD" verification_method="boolean" expected="true" /> <!-- QWORD -->
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myMultiString" verification_method="boolean" expected="true" /> <!-- Multi string --> <!-- tbd, cause bug -->
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myExpandableString" verification_method="boolean" expected="true" /> <!-- Expandable string --> 
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists a none existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\kuku" value="SystemRoot" verification_method="boolean" expected="false" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists inaccessible key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\inaccessible" value="mor" verification_method="boolean" expected="false" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists key with special chars" > <!-- tbd i get malformed message error-->
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <!--<session_item  action="value_exists" key="SOFTWARE\\cdcm\\specialchars_!@#$%^&amp;*()[]{}|;:'&quot;`~/,.&lt;&gt;-=_+" value="b-flat_!@#$%^&amp;*()[]{}|;:'&quot;`~/,.&lt;&gt;-=_+_nothing_special_here" verification_method="boolean" expected="true" />-->
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists key with a long path ,Long sub key names" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\long path\\long sub key names\\123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-\\abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-" value="I'm just a string" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists key with a long path, Deep key structure" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\long path\\deep sub key structure\\a\\b\\c\\d\\e\\f\\g\\h\\i\\j\\k\\l\\m\\n\\o\\p\\q\\r\\s\\t\\u\\v\\w\\x\\y\\z" value="rock" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists check case-insensitive" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\currentversion" value="SystemRoot" verification_method="boolean" expected="true" />
+                    <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="systemroot" verification_method="boolean" expected="true" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_value_exists none exist value" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="kuku" verification_method="boolean" expected="false" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+
+
+
+<!-- query_value -->
+            <test_set test_set_name="cdcm_test_query_value an existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"  value="SystemRoot" verification_method="substr_exist" substr="Windows" />
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\types" value="myString" verification_method="substr_exist" substr="tis mine" /><!-- string -->                    
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\types" value="myBinary" verification_method="substr_exist" substr="31323334353637" /> <!-- binary -->
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\types" value="myDWORD" verification_method="substr_exist" substr="0xaabbccdd" /> <!-- DWORD -->
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\types" value="myQWORD" verification_method="substr_exist" substr="0xffeeccbbaa112233" /> <!-- QWORD -->
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\types" value="myMultiString" verification_method="substr_exist" substr="I've won it fair and square!" /> <!-- Multi string --> <!-- tbd, cause core, test again with new build-->
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\types" value="myExpandableString" verification_method="substr_exist" substr="absence makes the heart grow fonder" /> <!-- Expandable string -->
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_query_value a none existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\kuku" value="SystemRoot" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_query_value inaccessible key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\inaccessible" value="mor" verification_method="substr_exist" substr="Error: Value is empty" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <!-- tbd, get malformed request error, insert verification -->
+            <test_set test_set_name="cdcm_test_query_value key with special chars" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <!--<session_item  action="query_value" key="SOFTWARE\\cdcm\\specialchars_!@#$%^&amp;*()[]{}|;:'&quot;`~/,.&lt;&gt;-=_+" value="b-flat_!@#$%^&amp;*()[]{}|;:'&quot;`~/,.&lt;&gt;-=_+_nothing_special_here" verification_method="substr_exist" substr="nothing to see" />-->
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_query_value key with a long path ,Long sub key names" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\long path\\long sub key names\\123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-\\abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-" value="I'm just a string" verification_method="substr_exist" substr="cobweb" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_query_value key with a long path, Deep key structure" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\cdcm\\long path\\deep sub key structure\\a\\b\\c\\d\\e\\f\\g\\h\\i\\j\\k\\l\\m\\n\\o\\p\\q\\r\\s\\t\\u\\v\\w\\x\\y\\z" value="rock" verification_method="substr_exist" substr="bottom" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_query_value check case-insensitive" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\currentversion" value="SystemRoot" verification_method="substr_exist" substr="C:\WINDOWS" />
+                    <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="systemroot" verification_method="substr_exist" substr="C:\WINDOWS" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_query_value none exist value" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="kuku" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+
+
+
+<!-- enumerate -->
+            <test_set test_set_name="cdcm_test_enumerate an existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="substr_exist" substr="class_name" />
+                    <session_item  action="enumerate" key="SOFTWARE\\cdcm\\types\\myString" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+                    <!--<session_item  action="enumerate" key="SOFTWARE\\cdcm\\types" verification_method="substr_exist" substr="class_name" /> --><!-- tbd, cause bug -->
+                    <session_item  action="enumerate" key="SOFTWARE\\cdcm\\long path" verification_method="substr_exist" substr="class_name" />
+                    <session_item  action="enumerate" key="SOFTWARE\\cdcm" verification_method="substr_exist" substr="class_name" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_enumerate a none existing key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\kuku" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_enumerate inaccessible key" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="enumerate" key="SOFTWARE\\cdcm\\inaccessible" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_enumerate key with special chars" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <!--<session_item  action="enumerate" key="SOFTWARE\\cdcm\\specialchars_!@#$%^&amp;*()[]{}|;:'&quot;`~/,.&lt;&gt;-=_+" verification_method="substr_exist" substr="class_name" /> --> <!-- tbd, i get a malformed error -->
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_enumerate key with a long path ,Long sub key names" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="enumerate" key="SOFTWARE\\cdcm\\cdcm\\long path\\long sub key names\\123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-\\abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-abcdefghi-" verification_method="substr_exist" substr="class_name" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_enumerate key with a long path, Deep key structure" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="enumerate" key="SOFTWARE\\cdcm\\long path\\deep sub key structure\\a\\b\\c\\d\\e\\f\\g\\h\\i\\j\\k\\l\\m\\n\\o\\p\\q\\r\\s\\t\\u\\v\\w\\x\\y\\z" verification_method="substr_exist" substr="rock" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+            <test_set test_set_name="cdcm_test_enumerate check case-insensitive" > 
+                    <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
+                    <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\currentversion" verification_method="substr_exist" substr="class_name" />
+                    <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="substr_exist" substr="class_name" />
+                    <session_item  action="close_session" verification_method="substr_exist" substr="session closed" />
+            </test_set>
+
+
     </test_sets>
 
     <sessions>
-        <session session_name="registry key_exists exists" test_set_name="registry key_exists exists" asset_name="asset1" description="aaa" />
-        <session session_name="registry key_exists not exists" test_set_name="registry key_exists not exists" asset_name="asset1" description="aaa" />
-        <session session_name="registry value_exists  exists" test_set_name="registry value_exists  exists" asset_name="asset1" description="aaa" />
-        <session session_name="registry value_exists not exists" test_set_name="registry value_exists not exists" asset_name="asset1" description="aaa" />
-        <session session_name="registry query_value exists" test_set_name="registry query_value exists" asset_name="asset1" description="aaa" />
-        <session session_name="registry query_value not exists" test_set_name="registry query_value not exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb file_exists exists" test_set_name="smb file_exists exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb file_exists not exists" test_set_name="smb file_exists not exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb get_file_info exists" test_set_name="smb get_file_info exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb get_file_info not exists" test_set_name="smb get_file_info not exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb read_file exists" test_set_name="smb read_file exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb read_file not exists" test_set_name="smb read_file not exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb list_dir exists" test_set_name="smb list_dir exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb list_dir not exists" test_set_name="smb list_dir not exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb all exists" test_set_name="smb all exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb all not exists" test_set_name="smb all not exists" asset_name="asset1" description="aaa" />
-        <session session_name="smb list_dir exists" test_set_name="smb list_dir exists" asset_name="asset1" description="aaa" />
+
+        <!--<session session_name="cdcm_test_start_session_non_existent_ip_asset" test_set_name="cdcm_test_start_session_non_existent_ip" asset_name="asset_non_existing_ip"  description="cdcm_test_start_session_non_existent_ip" />-->
+
+        <!--<session session_name="cdcm_test_start_session_invalid_ip_asset" test_set_name="cdcm_test_start_session_invalid_ip" asset_name="asset_invalid_ip"  description="cdcm_test_start_session_invalid_ip" />-->
+        <!--<session session_name="cdcm_test_start_session_inaccessible_ip_asset" test_set_name="cdcm_test_start_session_inaccessible_ip" asset_name="asset1"  description="cdcm_test_start_session_inaccessible_ip" />-->
+        <!--<session session_name="cdcm_test_get_file_info_asset2" test_set_name="cdcm_test_get_file_info" asset_name="asset2"  description="cdcm_test_get_file_info" />-->
+        <!--<session session_name="cdcm_test_read_file_asset2" test_set_name="cdcm_test_read_file" asset_name="asset2"  description="cdcm_test_read_file" />-->
+ 
+<!-- file_exists tests -->
+        <session session_name="cdcm_test_file_exists long file name_asset2" test_set_name="cdcm_test_file_exists long file name" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists file with special chars_asset2" test_set_name="cdcm_test_file_exists file with special chars" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists zero bytes file_asset2" test_set_name="cdcm_test_file_exists zero bytes file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists big file_asset2" test_set_name="cdcm_test_file_exists big file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists readonly+hidden+system+archive file_asset2" test_set_name="cdcm_test_file_exists readonly+hidden+system+archive file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists locked file_asset2" test_set_name="cdcm_test_file_exists locked file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists file without read permissions_asset2" test_set_name="cdcm_test_file_exists file without read permissions" asset_name="asset2" description="" />
+        <session session_name="cdcm_test_file_exists non-existent file_asset2" test_set_name="cdcm_test_file_exists non-existent file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists filename which is actually a directory_asset2" test_set_name="cdcm_test_file_exists filename which is actually a directory" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists paths with slashes / backslashes_asset2" test_set_name="cdcm_test_file_exists paths with slashes / backslashes" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_file_exists Paths with C$ / ADMIN$_asset2" test_set_name="cdcm_test_file_exists Paths with C$ / ADMIN$" asset_name="asset2"  description="" />
+
+
+<!-- get_file_info tests -->
+        <session session_name="cdcm_test_get_file_info regular_asset2" test_set_name="cdcm_test_get_file_info regular" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info long file name_asset2" test_set_name="cdcm_test_get_file_info long file name" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info file with special chars_asset2" test_set_name="cdcm_test_get_file_info file with special chars" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info readonly+hidden+system+archive file_asset2" test_set_name="cdcm_test_get_file_info readonly+hidden+system+archive file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info locked file_asset2" test_set_name="cdcm_test_get_file_info locked file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info file without read permissions_asset2" test_set_name="cdcm_test_get_file_info file without read permissions" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info non-existent file_asset2" test_set_name="cdcm_test_get_file_info non-existent file" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info filename which is actually a directory_asset2" test_set_name="cdcm_test_get_file_info filename which is actually a directory" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info paths with slashes / backslashes_asset2" test_set_name="cdcm_test_get_file_info paths with slashes / backslashes" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_get_file_info Paths with C$ / ADMIN$_asset2" test_set_name="cdcm_test_get_file_info Paths with C$ / ADMIN$" asset_name="asset2"  description="" />
+
+
+ <!-- list_sir tests -->
+        <session session_name="cdcm_test_list_dir_directory_non_existing_path_asset2" test_set_name="cdcm_test_list_dir_directory_non_existing_path" asset_name="asset2"  description="cdcm_test_list_dir_directory_non_existing_path" />
+        <session session_name="cdcm_test_list_dir_long_path_asset2" test_set_name="cdcm_test_list_dir_long_path" asset_name="asset2"  description="cdcm_test_list_dir_long_path" />
+        <session session_name="cdcm_test_list_dir_deep path structure_asset2" test_set_name="cdcm_test_list_dir_deep path structure" asset_name="asset2"  description="cdcm_test_list_dir_deep path structure" />
+        <session session_name="cdcm_test_list_dir_directory with special chars_asset2" test_set_name="cdcm_test_list_dir_directory with special chars" asset_name="asset2"  description="cdcm_test_list_dir_directory with special chars" /> 
+        <session session_name="cdcm_test_list_dir_directory containing many files (>5000)_asset2" test_set_name="cdcm_test_list_dir_directory containing many files (>5000)" asset_name="asset2"  description="cdcm_test_list_dir_directory containing many files (>5000)" />
+        <session session_name="cdcm_test_list_dir_directory containing both sub-directories and files_asset2" test_set_name="cdcm_test_list_dir_directory containing both sub-directories and files" asset_name="asset2"  description="cdcm_test_list_dir_directory containing both sub-directories and files" />
+        <session session_name="cdcm_test_list_dir_directory containing long file names_asset2" test_set_name="cdcm_test_list_dir_directory containing long file names" asset_name="asset2"  description="cdcm_test_list_dir_directory containing long file names" />
+        <session session_name="cdcm_test_list_dir_directory containing files with special chars_asset2" test_set_name="cdcm_test_list_dir_directory containing files with special chars" asset_name="asset2"  description="cdcm_test_list_dir_directory containing files with special chars" />
+        <session session_name="cdcm_test_list_dir_directory containing readonly+hidden+system+archive files_asset2" test_set_name="cdcm_test_list_dir_directory containing readonly+hidden+system+archive files" asset_name="asset2"  description="cdcm_test_list_dir_directory containing readonly+hidden+system+archive files" /> 
+        <session session_name="cdcm_test_list_dir_directory containing locked files_asset2" test_set_name="cdcm_test_list_dir_directory containing locked files" asset_name="asset2"  description="cdcm_test_list_dir_directory containing locked files" />
+        <session session_name="cdcm_test_list_dir_wildcards_asset2" test_set_name="cdcm_test_list_dir_wildcards" asset_name="asset2"  description="cdcm_test_list_dir_wildcards" />
+        <session session_name="cdcm_test_list_dir inaccesible folder_asset2" test_set_name="cdcm_test_list_dir inaccesible folder" asset_name="asset2"  description="cdcm_test_list_dir inaccesible folder" />
+
+
+ <!-- read_file tests -->
+       <session session_name="cdcm_test_read_file_non existing file_asset2" test_set_name="cdcm_test_read_file_non existing file" asset_name="asset2"  description="cdcm_test_read_file_non existing file" />
+       <session session_name="cdcm_test_read_file long path_asset2" test_set_name="cdcm_test_read_file long path" asset_name="asset2"  description="cdcm_test_read_file long path" />
+       <session session_name="cdcm_test_read_file deep structure_asset2" test_set_name="cdcm_test_read_file deep structure" asset_name="asset2"  description="cdcm_test_read_file deep structure" />
+       <session session_name="cdcm_test_read_file directory with special chars_asset2" test_set_name="cdcm_test_read_file directory with special chars" asset_name="asset2"  description="cdcm_test_read_file directory with special chars" />
+       <session session_name="cdcm_test_read_file file with special chars_asset2" test_set_name="cdcm_test_read_file file with special chars" asset_name="asset2"  description="cdcm_test_read_file file with special chars" />
+       <session session_name="cdcm_test_read_file readonly+hidden+system+archive files_asset2" test_set_name="cdcm_test_read_file readonly+hidden+system+archive files" asset_name="asset2"  description="cdcm_test_read_file readonly+hidden+system+archive files" />
+       <session session_name="cdcm_test_read_file locked file_asset2" test_set_name="cdcm_test_read_file locked file" asset_name="asset2"  description="cdcm_test_read_file locked file" />
+       <session session_name="cdcm_test_read_file 0 byte file_asset2" test_set_name="cdcm_test_read_file 0 byte file" asset_name="asset2"  description="cdcm_test_read_file 0 byte file" />
+       <session session_name="cdcm_test_read_file big files (>10GB)_asset2" test_set_name="cdcm_test_read_file big files (>10GB)" asset_name="asset2"  description="cdcm_test_read_file big files (>10GB)" />
+       <session session_name="cdcm_test_read_file negative size_asset2" test_set_name="cdcm_test_read_file negative size" asset_name="asset2"  description="cdcm_test_read_file negative size" /> <!--- bugs to be fixed -->
+       <session session_name="cdcm_test_read_file size =0_asset2" test_set_name="cdcm_test_read_file size =0" asset_name="asset2"  description="cdcm_test_read_file size =0" />
+       <session session_name="cdcm_test_read_file size bigger than file_asset2" test_set_name="cdcm_test_read_file size bigger than file" asset_name="asset2"  description="cdcm_test_read_file size bigger than file" />
+       <session session_name="cdcm_test_read_file size=1_asset2" test_set_name="cdcm_test_read_file size=1" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file size = filesize -1_asset2" test_set_name="cdcm_test_read_file size = filesize -1" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file negative offset_asset2" test_set_name="cdcm_test_read_file negative offset" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file offset = 0_asset2" test_set_name="cdcm_test_read_file offset = 0" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file offset equal / bigger than file size_asset2" test_set_name="cdcm_test_read_file offset equal / bigger than file size" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file offset  =1_asset2" test_set_name="cdcm_test_read_file offset  =1" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file offset  = filesize -1_asset2" test_set_name="cdcm_test_read_file offset  = filesize -1" asset_name="asset2"  description="" />
+       <session session_name="cdcm_test_read_file offset with big files_asset2" test_set_name="cdcm_test_read_file offset with big files" asset_name="asset2"  description="" /> 
+    
+
+ <!-- key_exists tests -->
+
+        <session session_name="cdcm_test_key_exists an existing key_asset2" test_set_name="cdcm_test_key_exists an existing key" asset_name="asset2"  description="" /> 
+        <session session_name="cdcm_test_key_exists a none existing key_asset2" test_set_name="cdcm_test_key_exists a none existing key" asset_name="asset2"  description="" /> 
+        <session session_name="cdcm_test_key_exists inaccessible key_asset2" test_set_name="cdcm_test_key_exists inaccessible key" asset_name="asset2"  description="" /> 
+        <session session_name="cdcm_test_key_exists key with special chars_asset2" test_set_name="cdcm_test_key_exists key with special chars" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_key_exists key with a long path ,Long sub key names_asset2" test_set_name="cdcm_test_key_exists key with a long path ,Long sub key names" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_key_exists key with a long path, Deep key structure_asset2" test_set_name="cdcm_test_key_exists key with a long path, Deep key structure" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_key_exists check case-insensitive_asset2" test_set_name="cdcm_test_key_exists check case-insensitive" asset_name="asset2"  description="" />
+
+
+ <!-- value_exists tests -->
+        <session session_name="cdcm_test_value_exists an existing key_asset2" test_set_name="cdcm_test_value_exists an existing key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists a none existing key_asset2" test_set_name="cdcm_test_value_exists a none existing key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists inaccessible key_asset2" test_set_name="cdcm_test_value_exists inaccessible key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists key with special chars_asset2" test_set_name="cdcm_test_value_exists key with special chars" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists key with a long path ,Long sub key names_asset2" test_set_name="cdcm_test_value_exists key with a long path ,Long sub key names" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists key with a long path, Deep key structure_asset2" test_set_name="cdcm_test_value_exists key with a long path, Deep key structure" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists check case-insensitive_asset2" test_set_name="cdcm_test_value_exists check case-insensitive" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_value_exists none exist value_asset2" test_set_name="cdcm_test_value_exists none exist value" asset_name="asset2"  description="" />
+
+
+<!-- query_value tests -->
+        <session session_name="cdcm_test_query_value an existing key_asset2" test_set_name="cdcm_test_query_value an existing key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value a none existing key_asset2" test_set_name="cdcm_test_query_value a none existing key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value inaccessible key_asset2" test_set_name="cdcm_test_query_value inaccessible key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value key with special chars_asset2" test_set_name="cdcm_test_query_value key with special chars" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value key with a long path ,Long sub key names_asset2" test_set_name="cdcm_test_query_value key with a long path ,Long sub key names" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value key with a long path, Deep key structure_asset2" test_set_name="cdcm_test_query_value key with a long path, Deep key structure" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value check case-insensitive_asset2" test_set_name="cdcm_test_query_value check case-insensitive" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_query_value none exist value_asset2" test_set_name="cdcm_test_query_value none exist value" asset_name="asset2"  description="" />
+
+
+<!-- enumerate tests-->        
+        <session session_name="cdcm_test_enumerate an existing key_asset2" test_set_name="cdcm_test_enumerate an existing key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_enumerate a none existing key_asset2" test_set_name="cdcm_test_enumerate a none existing key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_enumerate inaccessible key_asset2" test_set_name="cdcm_test_enumerate inaccessible key" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_enumerate key with special chars_asset2" test_set_name="cdcm_test_enumerate key with special chars" asset_name="asset2"  description="" />
+        <session session_name="dcm_test_enumerate key with a long path ,Long sub key names_asset2" test_set_name="dcm_test_enumerate key with a long path ,Long sub key names" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_enumerate key with a long path, Deep key structure_asset2" test_set_name="cdcm_test_enumerate key with a long path, Deep key structure" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_enumerate check case-insensitive_asset2" test_set_name="cdcm_test_enumerate check case-insensitive" asset_name="asset2"  description="" />
+        <session session_name="cdcm_test_enumerate none exist value_asset2" test_set_name="cdcm_test_enumerate none exist value" asset_name="asset2"  description="" />
+
 
     </sessions>
 </root>
