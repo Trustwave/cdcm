@@ -115,6 +115,7 @@ result registry_client::key_get_value_by_index(uint32_t idx, const char** name, 
         //   AU_LOG_ERROR("No such index '%z'", idx);
         return {false, error};
     }
+    rv.type(type);
     normalize(rv);
     return {true, error};
 }
