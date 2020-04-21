@@ -1,3 +1,8 @@
+v1.0.3
+Fixed issues
+ - CDCM-86
+   change session idle timeout from 300 to 1800.
+
 v1.0.2
 Fixed issues
  - CDCM-77
