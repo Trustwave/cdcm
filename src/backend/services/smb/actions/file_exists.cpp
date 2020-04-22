@@ -43,7 +43,7 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
     }
     if( smb_action->param.empty())
     {
-        res->res("Error: param is mandatory")
+        res->res("Error: param is mandatory");
         return action_status::FAILED;
     }
     std::string base("smb://");
