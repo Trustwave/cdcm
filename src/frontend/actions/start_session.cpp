@@ -36,6 +36,7 @@ Start_Session::act(boost::shared_ptr<session>, std::shared_ptr<action_msg> actio
        )
     {
         res->res("Error: remote,username and password are mandatory");
+        return Action_Base::action_status::FAILED;
     }
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
     auto sess = boost::make_shared<trustwave::session>(gsact->remote, creds);
