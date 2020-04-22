@@ -47,6 +47,7 @@ action_status Key_Exists_Action::act(boost::shared_ptr<session> sess, std::share
         )
     {
         res->res("Error: key is mandatory");
+        return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
