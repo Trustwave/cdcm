@@ -86,15 +86,19 @@ void registry_client::normalize(registry_value& rv)
 {
     if(REG_MULTI_SZ == rv.type())
     {
+        AU_LOG_DEBUG("Type is REG_MULTI_SZ");
         const char** a = nullptr;
         pull_reg_multi_sz(mem_ctx_,&data_blob_,&a);
-        const char** p = nullptr;
+        const char* p = nullptr;
         std::string s;
-        p=a;
-        while (*p)               // while not at the end of strings
+        p=*a;
+        while(true)
         {
-            s.append(*p).append("\n");        // add string to array
-            p += s.length()  ;  // find next string
+            std::string_view sv(p);
+            if(sv.empty())
+                break;
+            s.append(sv).append("\n");
+            p=p+sv.length()+1;
         }
         rv.value(s);
     }
@@ -111,6 +115,7 @@ result registry_client::key_get_value_by_index(uint32_t idx, const char** name, 
         //   AU_LOG_ERROR("No such index '%z'", idx);
         return {false, error};
     }
+    rv.type(type);
     normalize(rv);
     return {true, error};
 }
