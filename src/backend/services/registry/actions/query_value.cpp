@@ -48,6 +48,7 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     if( qvact->key_.empty()||qvact->value_.empty())
     {
         res->res("Error: key and value are mandatory");
+        return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {

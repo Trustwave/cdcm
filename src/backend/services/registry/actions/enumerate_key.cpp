@@ -71,6 +71,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
     if( ekact->key_.empty())
     {
         res->res("Error: key is mandatory");
+        return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {

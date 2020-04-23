@@ -104,6 +104,7 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     if( smb_action->path_.empty())
     {
         res->res("Error: path is mandatory");
+        return action_status::FAILED;
     }
     if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
     {
