@@ -31,11 +31,10 @@ Start_Session::act(boost::shared_ptr<session>, std::shared_ptr<action_msg> actio
         return Action_Base::action_status::FAILED;
     }
     if(gsact->remote.empty()  ||
-       gsact->username.empty()||
-       gsact->password.empty()
+       gsact->username.empty()
        )
     {
-        res->res("Error: remote,username and password are mandatory");
+        res->res("Error: remote and username are mandatory");
         return Action_Base::action_status::FAILED;
     }
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
