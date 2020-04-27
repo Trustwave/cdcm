@@ -106,6 +106,15 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
         res->res("Error: path is mandatory");
         return action_status::FAILED;
     }
+    if (smb_action->offset_.empty())
+    {
+        smb_action->offset_ = "0";
+    }
+    if (smb_action->size_.empty())
+    {
+        smb_action->size_ = "0";
+    }
+
     if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
     {
         res->res("Error: Bad parameter");
