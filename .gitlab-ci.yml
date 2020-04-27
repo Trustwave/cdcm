@@ -65,8 +65,11 @@ build:
       changes:
         - build/version.txt
         - src/**/*
+        - tars/**/*
         - .gitlab-ci.yml
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+
   artifacts:
     paths:
       - build_cdcm/
@@ -99,6 +102,7 @@ test:
         - src/**/*
         - .gitlab-ci.yml
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
   artifacts:
     when: always
     paths:
@@ -175,6 +179,8 @@ build_rpms:
         - build/cdcm.service
         - build/50-cdcm.preset
         - .gitlab-ci.yml
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+
   artifacts:
     paths:
       - build/RPMS/x86_64/
@@ -212,6 +218,7 @@ test_install:
         - build/cdcm.service
         - .gitlab-ci.yml
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - exists:
         - build/RPMS/x86_64/*.rpm
   dependencies:
