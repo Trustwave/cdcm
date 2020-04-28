@@ -29,6 +29,8 @@ namespace trustwave {
         [[nodiscard]] std::string_view name() const { return name_; }
         const std::string_view name_;
 
+        virtual std::string to_string() const { return std::string();}
+
     protected:
         explicit configuration(const std::string_view name): name_(name) {}
     };

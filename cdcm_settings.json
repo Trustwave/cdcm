@@ -1,5 +1,6 @@
 {
   "cdcm": {
+    "session_cache_size": 10,
     "heartbeat_liveness": 3,
     "heartbeat_interval": 3,
     "heartbeat_expiry": 3,

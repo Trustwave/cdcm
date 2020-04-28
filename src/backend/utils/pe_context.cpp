@@ -513,9 +513,13 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
         }
         str_vih = ptr_add<version_info_header>(vend, calculate_padding(vend, fm_.data()));
     }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
     if(rc >= 0 && rc < MAX_MSG) {
         static constexpr auto fv_str = u"FileVersion";
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         ret[fv_str] = convert.from_bytes(version_from_fixed);
     }
+// restore compiler switches
+#pragma GCC diagnostic pop
 }

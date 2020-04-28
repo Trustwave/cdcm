@@ -44,7 +44,7 @@ wrapper::start_external_test(std::string command, std::string params,
                 [command, this, promise](int, const std::error_code& ec) { promise->set_value(std::move(ec)); }),
             bp::std_in.close(), bp::std_out > streams.first, bp::std_err > streams.second, ios);
 
-        return std::move(p);
+        return p;
     }
     catch(std::exception& exception) {
         std::cout << std::endl << "Got exception: " << exception.what() << std::endl;

@@ -21,7 +21,9 @@
 #include <memory>
 #include <string>
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wpessimizing-move"
 #include <boost/process.hpp>
 // restore compiler switches
 #pragma GCC diagnostic pop

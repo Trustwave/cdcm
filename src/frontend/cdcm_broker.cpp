@@ -22,6 +22,7 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }
+    AU_LOG_INFO("%s",conf_->to_string().c_str());
     std::thread broker_thread(message_broker::th_func, std::ref(ctx), std::ref(ios));
     maintenance m(ios);
     ios.run();
