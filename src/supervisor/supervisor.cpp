@@ -29,6 +29,7 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
         abort();
     }
     supervisor sv(ios);
+    AU_LOG_INFO("%s",conf_->to_string().c_str());
     sv.run();
     ios.run();
 

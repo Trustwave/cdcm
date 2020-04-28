@@ -20,6 +20,16 @@ namespace trustwave {
         static constexpr std::string_view srv_name{"smb"};
         smb_service_configuration(): configuration(srv_name) {}
         off_t max_mem_segment = 128 * 1024 * 1024;
+        std::string to_string() const override
+        {
+            std::stringstream ss;
+            ss <<"\n"
+               <<"\t"<<srv_name << " Configuration\n"
+               <<"\t"<<"===============================\n"
+               <<"\tmax_mem_segment          :\t"<< max_mem_segment             <<" bytes\n"
+                ;
+            return ss.str();
+        }
     };
 } // namespace trustwave
 namespace tao::json {
