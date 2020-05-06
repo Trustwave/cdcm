@@ -82,7 +82,7 @@ namespace {
         static int krb5_set = 1;
         const char* wg = "WORKGROUP";
         if(!sess->id().is_nil()) {
-            AU_LOG_INFO("smbc_auth_fn session for %s found", pServer);
+            AU_LOG_DEBUG("smbc_auth_fn session for %s found", pServer);
 
             if(sess->creds().username().empty()) {
                 strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1));
@@ -93,7 +93,7 @@ namespace {
 
             strncpy(pUsername, sess->creds().username().c_str(), static_cast<size_t>(maxLenUsername - 1));
             strncpy(pPassword, sess->creds().password().c_str(), static_cast<size_t>(maxLenPassword - 1));
-            AU_LOG_INFO("smbc_auth_fn session for %s found and set", pServer);
+            AU_LOG_DEBUG("smbc_auth_fn session for %s found and set", pServer);
             return;
         }
 
@@ -128,7 +128,10 @@ namespace {
 } // namespace
 smb_client::smb_client(): ctx_(nullptr)
 {
-    this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
+    if (this->init_conf(authenticated_scan_server::instance().service_conf_repository))
+    {
+        AU_LOG_INFO("%s", conf_->to_string().c_str());
+    }
 }
 smb_client::~smb_client()
 {

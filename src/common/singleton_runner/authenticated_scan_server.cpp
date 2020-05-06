@@ -23,9 +23,8 @@ authenticated_scan_server::authenticated_scan_server(): logger_ptr_(nullptr)
     auto fn = std::string(std::string(conf_root) + "/cdcm_settings.json");
     const tao::json::value v = tao::json::from_file(fn);
     conf_ = v.as<std::shared_ptr<cdcm_settings>>();
-    service_conf_reppsitory.register1(conf_);
-
-    sessions = shared_mem_sessions_cache::get_or_create("sessions", 1024 * 1024 * 10, conf_->session_idle_time_);
+    service_conf_repository.register1(conf_);
+    sessions = shared_mem_sessions_cache::get_or_create("sessions", conf_->session_cache_size_*MB , conf_->session_idle_time_);
 }
 boost::shared_ptr<trustwave::session> authenticated_scan_server::get_session(const std::string& session_id)
 {
