@@ -29,5 +29,9 @@ each client will be executed at seperate process, in loop
 logs directory 
 log path can be set by editing the testsRunner_settings.json file
 
-how to use the actions.xml:
+in the xml, when using backslash, it is required to precede it with another backslash, for escaping.
+for example:
+    <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="boolean" expected="true" />
+or
+    <session_item  action="value_exists" key="SOFTWARE\\cdcm\\types" value="myString" verification_method="boolean" expected="true" />
 
