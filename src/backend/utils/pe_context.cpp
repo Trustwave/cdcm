@@ -313,9 +313,9 @@ NODE_PERES* pe_context::discoveryNodesPeres()
                                                + lastNodeByTypeAndLevel(node, RDT_RESOURCE_DIRECTORY, RDT_LEVEL1)
                                                      ->resource.resourceDirectory->NumberOfIdEntries);
         i++) {
-        static constexpr auto first_directory_offset = 8;
-        static constexpr auto not_first_directory_offset = 16;
-        offsetDirectory1 += (i == 1) ? not_first_directory_offset : first_directory_offset;
+        static constexpr auto first_directory_offset = 16;
+        static constexpr auto not_first_directory_offset = 8;
+        offsetDirectory1 += (i == 1) ?   first_directory_offset:not_first_directory_offset;
         offset = resourceDirOffset + offsetDirectory1;
         ptr = ptr_add<void>(fm_.data(), offset);
         if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY))) {
@@ -327,6 +327,17 @@ NODE_PERES* pe_context::discoveryNodesPeres()
         node->rootNode = rootNode;
         node->nodeLevel = RDT_LEVEL1;
         node->resource.directoryEntry = reinterpret_cast<IMAGE_RESOURCE_DIRECTORY_ENTRY*>(ptr);
+        if (node->resource.directoryEntry->DirectoryName.name.NameIsString == 1){
+            offset = resourceDirOffset + node->resource.directoryEntry->DirectoryName.name.NameOffset;
+            ptr = ptr_add<void>(fm_.data(), offset);
+            if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_STRING))) {
+                goto _error;
+            }
+            node = createNode(node, RDT_DATA_STRING);
+            node->rootNode = rootNode;
+            node->nodeLevel = RDT_LEVEL1;
+            node->resource.dataString = reinterpret_cast<IMAGE_RESOURCE_DATA_STRING*>(ptr);
+        }
 
         const NODE_PERES* lastDirectoryEntryNodeAtLevel1
             = lastNodeByTypeAndLevel(node, RDT_DIRECTORY_ENTRY, RDT_LEVEL1);
@@ -350,7 +361,7 @@ NODE_PERES* pe_context::discoveryNodesPeres()
                       + lastNodeByTypeAndLevel(node, RDT_RESOURCE_DIRECTORY, RDT_LEVEL2)
                             ->resource.resourceDirectory->NumberOfIdEntries);
                 j++) {
-                offsetDirectory2 += (j == 1) ? not_first_directory_offset : first_directory_offset;
+                offsetDirectory2 += (j == 1) ?   first_directory_offset:not_first_directory_offset;
                 offset = resourceDirOffset
                          + lastNodeByTypeAndLevel(node, RDT_DIRECTORY_ENTRY, RDT_LEVEL1)
                                ->resource.directoryEntry->DirectoryData.data.OffsetToDirectory
@@ -364,9 +375,19 @@ NODE_PERES* pe_context::discoveryNodesPeres()
                 node->rootNode = rootNode;
                 node->nodeLevel = RDT_LEVEL2;
                 node->resource.directoryEntry = reinterpret_cast<IMAGE_RESOURCE_DIRECTORY_ENTRY*>(ptr);
-
-                offset = resourceDirOffset
-                         + node->resource.directoryEntry->DirectoryData.data.OffsetToDirectory; // posiciona em 0x72
+                if (node->resource.directoryEntry->DirectoryName.name.NameIsString == 1){
+                    offset = resourceDirOffset + node->resource.directoryEntry->DirectoryName.name.NameOffset;
+                    ptr = ptr_add<void>(fm_.data(), offset);
+                    if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_STRING))) {
+                        goto _error;
+                    }
+                    node = createNode(node, RDT_DATA_STRING);
+                    node->rootNode = rootNode;
+                    node->nodeLevel = RDT_LEVEL2;
+                    node->resource.dataString = reinterpret_cast<IMAGE_RESOURCE_DATA_STRING*>(ptr);
+                }
+                const NODE_PERES * lastDirectoryEntryNodeAtLevel2 = lastNodeByTypeAndLevel(node, RDT_DIRECTORY_ENTRY, RDT_LEVEL2);
+                offset = resourceDirOffset + lastDirectoryEntryNodeAtLevel2->resource.directoryEntry->DirectoryData.data.OffsetToDirectory;
                 ptr = ptr_add<void>(fm_.data(), offset);
                 if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DIRECTORY))) {
                     goto _error;
@@ -392,19 +413,21 @@ NODE_PERES* pe_context::discoveryNodesPeres()
                     node->rootNode = rootNode;
                     node->nodeLevel = RDT_LEVEL3;
                     node->resource.directoryEntry = (IMAGE_RESOURCE_DIRECTORY_ENTRY*)ptr;
-
-                    offset = resourceDirOffset + node->resource.directoryEntry->DirectoryName.name.NameOffset;
-                    ptr = ptr_add<void>(fm_.data(), offset);
-                    if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_STRING))) {
-                        goto _error;
+                    if (node->resource.directoryEntry->DirectoryName.name.NameIsString == 1) {
+                        offset = resourceDirOffset + node->resource.directoryEntry->DirectoryName.name.NameOffset;
+                        ptr = ptr_add<void>(fm_.data(), offset);
+                        if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_STRING))) { goto _error; }
+                        node = createNode(node, RDT_DATA_STRING);
+                        node->rootNode = rootNode;
+                        node->nodeLevel = RDT_LEVEL3;
+                        node->resource.dataString = reinterpret_cast<IMAGE_RESOURCE_DATA_STRING*>(ptr);
                     }
-                    node = createNode(node, RDT_DATA_STRING);
-                    node->rootNode = rootNode;
-                    node->nodeLevel = RDT_LEVEL3;
-                    node->resource.dataString = reinterpret_cast<IMAGE_RESOURCE_DATA_STRING*>(ptr);
+                    if(y==1)
+                    {
+                        const NODE_PERES * lastDirectoryEntryNodeAtLevel3 = lastNodeByTypeAndLevel(node, RDT_DIRECTORY_ENTRY, RDT_LEVEL3);
+                        offset = resourceDirOffset + lastDirectoryEntryNodeAtLevel3->resource.directoryEntry->DirectoryData.data.OffsetToDirectory;
+                    }
 
-                    offset = resourceDirOffset
-                             + node->lastNode->resource.directoryEntry->DirectoryData.data.OffsetToDirectory;
                     ptr = ptr_add<void>(fm_.data(), offset);
                     if(!fm_.map_chunk_by_pointer(ptr, sizeof(IMAGE_RESOURCE_DATA_ENTRY))) {
                         goto _error;
@@ -432,7 +455,10 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
 {
     auto node_ptr = std::unique_ptr<NODE_PERES, decltype(freeNodes)*>(discoveryNodesPeres(), freeNodes);
     auto node = node_ptr.get();
-    assert(node != nullptr);
+    if(!node)
+    {
+       return;
+    }
 
     const NODE_PERES* dataEntryNode = nullptr;
     uint32_t nameOffset;
@@ -449,11 +475,12 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
         }
         dataEntryNode = lastNodeByType(node, RDT_DATA_ENTRY);
         if(dataEntryNode == nullptr) return;
-        nameOffset = node->rootNode->resource.directoryEntry->DirectoryName.name.NameOffset;
-        if(nameOffset == RT_VERSION) {
-            found = true;
-            break;
-        }
+             nameOffset = node->rootNode->resource.directoryEntry->DirectoryName.name.NameOffset;
+            if(nameOffset == RT_VERSION) {
+                found = true;
+                break;
+            }
+
         node = node->nextNode;
     }
 
@@ -464,12 +491,12 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
     const uint64_t offsetData = pe_rva2ofs(dataEntryNode->resource.dataEntry->offsetToData);
     const size_t dataEntrySize = dataEntryNode->resource.dataEntry->size;
 
-    const char* buffer = ptr_add<char>(fm_.data(), header_size + offsetData);
+    const char* buffer = ptr_add<char>(fm_.data(), offsetData);
 
     if(!fm_.map_chunk_by_pointer(buffer, dataEntrySize)) {
         return;
     }
-
+    buffer = ptr_add<char>(buffer, header_size);
     VS_FIXEDFILEINFO* info = reinterpret_cast<VS_FIXEDFILEINFO*>(const_cast<char*>(buffer));
     static constexpr size_t MAX_MSG = 256;
     char version_from_fixed[MAX_MSG];
@@ -484,7 +511,7 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
     static constexpr auto sfi = u"StringFileInfo";
     auto* pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
     while(std::u16string(pad) != sfi) {
-        vih = ptr_add<version_info_header>(vih, vih->wLength);
+        vih = ptr_add<version_info_header>(vih, vih->wLength==0?2:vih->wLength);
         pad = ptr_add<char16_t>(vih, sizeof(version_info_header));
     }
 
@@ -513,9 +540,13 @@ void pe_context::extract_info(std::map<std::u16string, std::u16string>& ret,
         }
         str_vih = ptr_add<version_info_header>(vend, calculate_padding(vend, fm_.data()));
     }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
     if(rc >= 0 && rc < MAX_MSG) {
         static constexpr auto fv_str = u"FileVersion";
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         ret[fv_str] = convert.from_bytes(version_from_fixed);
     }
+// restore compiler switches
+#pragma GCC diagnostic pop
 }
