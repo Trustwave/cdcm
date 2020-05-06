@@ -51,7 +51,7 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
-        if(WERR_PIPE_BUSY.w == std::get<1>(r).w) {
+        if(werr_pipe_busy == std::get<1>(r).w) {
             res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
             return action_status::POSTPONED;
         }

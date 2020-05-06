@@ -57,7 +57,7 @@ namespace trustwave {
         struct registry_key* root;
     };
     using result = std::tuple<bool, WERROR>;
-
+    static constexpr auto werr_pipe_busy = 0xe7;
     class registry_client final: public cdcm_client, public configurable<registry_service_configuration> {
         struct key_info {
             const char* classname = nullptr;
