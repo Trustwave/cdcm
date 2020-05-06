@@ -37,7 +37,11 @@ using trustwave::result;
 
 registry_client::registry_client(): ctx_(nullptr), ev_ctx_(nullptr), data_blob_{}
 {
-    this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
+    if (this->init_conf(authenticated_scan_server::instance().service_conf_repository))
+    {
+        AU_LOG_INFO("%s", conf_->to_string().c_str());
+    }
+
     mem_ctx_ = talloc_new(nullptr);
     ctx_ = talloc_zero(mem_ctx_, struct reg_context);
 

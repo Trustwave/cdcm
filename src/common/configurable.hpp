@@ -30,28 +30,31 @@ namespace trustwave {
             }
             return conf_;
         }
-        void init_conf(Dispatcher<configuration>& service_conf_reppsitory)
+        bool init_conf(Dispatcher<configuration>& service_conf_repository)
         {
             if(!conf_) {
-                if(service_conf_reppsitory.has(T::srv_name)) {
-                    conf_ = std::dynamic_pointer_cast<T>(service_conf_reppsitory.find(T::srv_name));
+                if(service_conf_repository.has(T::srv_name)) {
+                    conf_ = std::dynamic_pointer_cast<T>(service_conf_repository.find(T::srv_name));
+                    return false;
                 }
                 else {
                     try {
                         static const auto fn
-                            = std::string(service_conf_reppsitory.find_as<cdcm_settings>()->plugins_dir_)+"/"
+                            = std::string(service_conf_repository.find_as<cdcm_settings>()->plugins_dir_)+"/"
                               + std::string(T::srv_name) + std::string(".json");
                         const tao::json::value v = tao::json::from_file(fn);
                         conf_ = v.as<std::shared_ptr<T>>();
-                        service_conf_reppsitory.register1(conf_);
+                        service_conf_repository.register1(conf_);
                     }
                     catch(const std::exception& e) {
                         // fixme assaf handle exception
                         std::cerr << "Failed reading " << T::srv_name.data() << " configuration " << e.what()
                                   << std::endl;
+                        return false;
                     }
                 }
             }
+            return true;
         }
 
         std::shared_ptr<T> conf_;

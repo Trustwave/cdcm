@@ -25,6 +25,7 @@ namespace trustwave {
     };
 
     static constexpr std::string_view conf_root("/etc/cdcm/");
+    static constexpr auto MB = 1024*1024;
 
 } // namespace trustwave
 

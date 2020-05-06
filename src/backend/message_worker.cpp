@@ -59,8 +59,8 @@ message_worker::message_worker(zmq::context_t& ctx):
 //  Destructor
 
 message_worker::~message_worker() {
-    AU_LOG_INFO("%zu client msgs replied",replied_);
-    std::cerr << replied_ << " client msgs replied" << std::endl; }
+    AU_LOG_INFO("worker %s replied %zu client messages",LoggerSource::instance()->get_source_id().c_str(),replied_);
+    std::cerr <<"worker "<<LoggerSource::instance()->get_source_id().c_str()<<" replied " << replied_ << " client messages" << std::endl; }
 
 //  ---------------------------------------------------------------------
 //  Send message to broker
