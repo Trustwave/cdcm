@@ -1,4 +1,6 @@
 %define _unpackaged_files_terminate_build 0
+%global __provides_exclude ^.*.so.*$
+%define __requires_exclude ^.*.so.*$
 %{!?pkg_version:%define pkg_version 1.0.0}
 %{!?release:%define release 1}
 Name:       cdcm
@@ -10,6 +12,9 @@ URL: https://www.trustwave.com/
 Summary:    Credentialed Data Collection Module
 BuildRequires: systemd
 Requires: systemd
+Requires: zeromq
+Requires: openpgm
+Requires: libsodium
 %description
 Credentialed Data Collection Module
 
