@@ -51,7 +51,7 @@ namespace {
         size_t charCount = 0; // Count byte tripples
         size_t outPos = 0; // Current letter in the output stream
 
-        std::string ret(base64_encoded_length(inLen) + 1, '\0');
+        std::string ret(base64_encoded_length(inLen) , '\0');
         while(inLen--) // Scan the input bit stream
         {
             currByte = *(inBuf++);
@@ -96,6 +96,25 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_read_file_msg>(action);
+    if(!smb_action) {
+        AU_LOG_ERROR("Failed dynamic cast");
+        res->res("Error: Internal error");
+        return action_status::FAILED;
+    }
+    if( smb_action->path_.empty())
+    {
+        res->res("Error: path is mandatory");
+        return action_status::FAILED;
+    }
+    if (smb_action->offset_.empty())
+    {
+        smb_action->offset_ = "0";
+    }
+    if (smb_action->size_.empty())
+    {
+        smb_action->size_ = "0";
+    }
+
     if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
     {
         res->res("Error: Bad parameter");

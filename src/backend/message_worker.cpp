@@ -59,8 +59,8 @@ message_worker::message_worker(zmq::context_t& ctx):
 //  Destructor
 
 message_worker::~message_worker() {
-    AU_LOG_INFO("%zu client msgs replied",replied_);
-    std::cerr << replied_ << " client msgs replied" << std::endl; }
+    AU_LOG_INFO("worker %s replied %zu client messages",LoggerSource::instance()->get_source_id().c_str(),replied_);
+    std::cerr <<"worker "<<LoggerSource::instance()->get_source_id().c_str()<<" replied " << replied_ << " client messages" << std::endl; }
 
 //  ---------------------------------------------------------------------
 //  Send message to broker
@@ -225,7 +225,7 @@ zmsg* message_worker::recv(zmsg*& reply_p)
         }
     }
     if(zmq_helpers::interrupted) {
-        AU_LOG_DEBUG("W: interrupt received, killing worker...\n");
+        AU_LOG_INFO("W: interrupt received, killing worker...\n");
     }
     return nullptr;
 }
@@ -302,7 +302,7 @@ int message_worker::worker_loop()
                 }
             }
         }
-        catch(std::exception& e) {
+        catch(const std::exception& e) {
             AU_LOG_ERROR("Malformed message %s", e.what());
             auto action_result = std::make_shared<result_msg>();
             action_result->id("unknown");
@@ -321,7 +321,7 @@ int message_worker::worker_loop()
                 mw.reply_to_.clear();
             }
         }
-        catch(std::exception& e) {
+        catch(const std::exception& e) {
             AU_LOG_ERROR("Failed building response message %s", e.what());
         }
     }

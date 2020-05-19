@@ -36,7 +36,7 @@ namespace trustwave {
     class authenticated_scan_server final: public configurable<cdcm_settings> {
     public:
         [[nodiscard]] Dispatcher<Action_Base>& public_dispatcher();
-        Dispatcher<configuration> service_conf_reppsitory;
+        Dispatcher<configuration> service_conf_repository;
         boost::shared_ptr<shared_mem_sessions_cache> sessions;
         virtual ~authenticated_scan_server() = default;
         authenticated_scan_server(const authenticated_scan_server&) = delete;
