@@ -37,7 +37,11 @@ using trustwave::result;
 
 registry_client::registry_client(): ctx_(nullptr), ev_ctx_(nullptr), data_blob_{}
 {
-    this->init_conf(authenticated_scan_server::instance().service_conf_reppsitory);
+    if (this->init_conf(authenticated_scan_server::instance().service_conf_repository))
+    {
+        AU_LOG_INFO("%s", conf_->to_string().c_str());
+    }
+
     mem_ctx_ = talloc_new(nullptr);
     ctx_ = talloc_zero(mem_ctx_, struct reg_context);
 
@@ -82,7 +86,30 @@ result registry_client::open_key(const char* full_path)
     }
     return {true, error};
 }
-
+void registry_client::normalize(registry_value& rv)
+{
+    if(REG_MULTI_SZ == rv.type())
+    {
+        AU_LOG_DEBUG("Type is REG_MULTI_SZ");
+        const char** a = nullptr;
+        pull_reg_multi_sz(mem_ctx_,&data_blob_,&a);
+        const char* p = nullptr;
+        std::string s;
+        p=*a;
+        while(true)
+        {
+            std::string_view sv(p);
+            if(sv.empty())
+                break;
+            s.append(sv).append("\n");
+            p=p+sv.length()+1;
+        }
+        rv.value(s);
+    }
+    else {
+        rv.value(reg_val_data_string(ctx_, rv.type(), data_blob_));
+    }
+}
 result registry_client::key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv)
 {
     uint32_t type;
@@ -93,8 +120,7 @@ result registry_client::key_get_value_by_index(uint32_t idx, const char** name, 
         return {false, error};
     }
     rv.type(type);
-    rv.value(reg_val_data_string(ctx_, type, data_blob_));
-    //   AU_LOG_ERROR("%s%s", str_regtype(type), reg_val_data_string(ctx_, type, data_blob_));
+    normalize(rv);
     return {true, error};
 }
 
@@ -108,23 +134,7 @@ result registry_client::key_get_value_by_name(const char* name, registry_value& 
         return {false, error};
     }
     rv.type(type);
-    if(REG_MULTI_SZ == type)
-    {
-        const char** a = nullptr;
-        pull_reg_multi_sz(mem_ctx_,&data_blob_,&a);
-        const char** p = nullptr;
-        std::string s;
-        p=a;
-        while (*p)               // while not at the end of strings
-        {
-            s.append(*p).append("\n");        // add string to array
-            p += s.length()  ;  // find next string
-        }
-        rv.value(s);
-    }
-    else {
-        rv.value(reg_val_data_string(ctx_, type, data_blob_));
-    }
+    normalize(rv);
     return {true, error};
 }
 

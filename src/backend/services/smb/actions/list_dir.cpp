@@ -44,6 +44,16 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_list_dir_msg>(action);
+    if(!smb_action) {
+        AU_LOG_ERROR("Failed dynamic cast");
+        res->res("Error: Internal error");
+        return action_status::FAILED;
+    }
+    if( smb_action->param.empty())
+    {
+        res->res("Error: param is mandatory");
+        return action_status::FAILED;
+    }
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
     std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());

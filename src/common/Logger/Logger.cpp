@@ -55,6 +55,7 @@
 #include <unistd.h>
 #include <regex>
 #include "conf/LoggerConfiguration.h"
+#include "../typedefs.hpp"
 //===========================================================================
 //						Define the attribute keywords
 //===========================================================================
@@ -64,6 +65,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", ::trustwave::logger::severity_
 
 namespace detail {
 
+    using trustwave::MB;
     //===========================================================================
     // @{FUNH}
     //							read_error_from_errno()
@@ -201,7 +203,6 @@ namespace detail {
     //===========================================================================
     void Logger::add_file_sink(const ::trustwave::sink_conf& s)
     {
-        static constexpr auto MB = 1024*1024;
         auto fname = std::string(
             s.path +"/"+ s.name + ::trustwave::logger::sourcesArray[::trustwave::LoggerSource::instance()->get_source()]
             + std::string(::trustwave::LoggerSource::instance()->get_source_id()) + ".log.%N");
