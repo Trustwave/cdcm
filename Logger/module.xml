@@ -22,7 +22,7 @@
                 <id>1</id>
                 <path>/var/log/cdcm/</path>
                 <name>cdcm</name>
-                <filter>debug1</filter> <!-- severity -->
+                <filter>info</filter> <!-- severity -->
                 <enable>true</enable>
                 <max_files>16</max_files><!-- rotation files-->
                 <min_free_space>200</min_free_space> <!-- stop writing logs if disk have ??? free space -->
