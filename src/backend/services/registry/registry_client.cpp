@@ -180,3 +180,46 @@ result registry_client::enumerate_key(const std::string& key, enum_key& ek)
     }
     return status;
 }
+
+//rotem TODO: remove one of the versions
+result registry_client::enumerate_key_values_ver1(const std::string& key, enum_key_values_ver1& ek)
+{
+    auto status = open_key(key.c_str());
+    key_info ki;
+
+    if(std::get<0>(status)) {
+        status = key_get_info(ki);
+
+        if(std::get<0>(status)) {
+            for(uint32_t i = 0; i < ki.num_values; i++) {
+                registry_value rv;
+                const char* name;
+                key_get_value_by_index(i, &name, rv);
+                rv.name(name);
+                ek.registry_values_.push_back(rv);
+            }
+        }
+    }
+    return status;
+}
+
+result registry_client::enumerate_key_values_ver2(const std::string& key, enum_key_values_ver2& ek)
+{
+    auto status = open_key(key.c_str());
+    key_info ki;
+
+    if(std::get<0>(status)) {
+        status = key_get_info(ki);
+
+        if(std::get<0>(status)) {
+            for(uint32_t i = 0; i < ki.num_values; i++) {
+                registry_value rv;
+                const char* name;
+                key_get_value_by_index(i, &name, rv);
+                rv.name(name);
+                ek.registry_values_.push_back(rv.name());
+            }
+        }
+    }
+    return status;
+}

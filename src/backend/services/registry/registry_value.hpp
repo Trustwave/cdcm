@@ -43,5 +43,13 @@ namespace trustwave {
         std::vector<registry_value> registry_values_;
     };
 
+    struct enum_key_values_ver1 {
+        std::vector<registry_value> registry_values_;
+    };
+
+    struct enum_key_values_ver2 {
+        std::vector<std::string> registry_values_;
+    };
+
 } // namespace trustwave
 #endif /* TRUSTWAVE_MISC_REGISTRY_VALUE_HPP_ */

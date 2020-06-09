@@ -79,9 +79,6 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     return action_status::SUCCEEDED;
 }
 
-// Dispatcher <Action_Base>::Registrator Query_Value_Action::m_registrator(new Query_Value_Action,
-//                authenticated_scan_server::instance().public_dispatcher_);
-
 // instance of the our plugin
 static std::shared_ptr<Query_Value_Action> instance = nullptr;
 

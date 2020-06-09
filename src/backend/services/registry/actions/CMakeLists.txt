@@ -6,7 +6,7 @@ include_directories(${SMB_INCLUDES})
 link_directories(${SMB_LINKS})
 
 set(LD_ACTION_LIBS dl tw-registry-client)
-set(ACTION_NAMES enumerate_key value_exists key_exists query_value)
+set(ACTION_NAMES enumerate_key value_exists key_exists query_value enumerate_registry_values)
 
 foreach (X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")
