@@ -23,6 +23,7 @@ extern "C" {
 #include "auth/credentials/credentials.h"
 #include "libcli/registry/util_reg.h"
 #include "lib/util/time.h"
+#include "libcli/security/display_sec.h"
 #ifdef __cplusplus
 }
 
@@ -157,11 +158,20 @@ result registry_client::enumerate_key(const std::string& key, enum_key& ek)
     const char* nm = nullptr;
     const char* cnm = nullptr;
     NTTIME lm;
+    struct security_descriptor* sd;
     auto status = open_key(key.c_str());
     key_info ki;
 
     if(std::get<0>(status)) {
         status = key_get_info(ki);
+    auto error = reg_get_sec_desc(ctx_, ctx_->current,&sd);
+    if (!W_ERROR_IS_OK(error)) {
+       std::cerr<< "Error getting security descriptor: " << win_errstr(error) << std::endl;
+        return {true, error};
+    }
+
+    display_sec_desc(sd);
+
 
         if(std::get<0>(status)) {
             for(uint32_t i = 0; i < ki.num_subkeys; i++) {
@@ -180,3 +190,7 @@ result registry_client::enumerate_key(const std::string& key, enum_key& ek)
     }
     return status;
 }
+/*
+ * reg_get_sec_desc(TALLOC_CTX *ctx, const struct registry_key *key,
+                        struct security_descriptor **secdesc);
+ */

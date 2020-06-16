@@ -22,6 +22,7 @@ set(SMB_INCLUDES
 set(SMB_LINKS
         ${SAMBA_SRC}/bin/shared/
         ${SAMBA_SRC}/bin/shared/private/
+        ${SAMBA_SRC}/bin/shared/librpc/
         ${SAMBA_SRC}/bin/default/libcli/util
         ${SAMBA_SRC}/bin/default/lib/util
         ${SAMBA_SRC}/bin/default/lib/param
