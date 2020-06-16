@@ -39,19 +39,19 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
                                      std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_get_file_info_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->res("Error: Internal error"); //error type B
         return action_status::FAILED;
     }
     if( smb_action->param.empty())
     {
-        res->res("Error: param is mandatory");
+        res->res("Error: param is mandatory"); //error type A
         return action_status::FAILED;
     }
     std::string base("smb://");
@@ -59,13 +59,13 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
-        res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
+        res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second)))); //error type C
         return action_status::FAILED;
     }
 
     pe_context pc(rc);
     if(0 != pc.parse()) {
-        res->res("Error: parse file failed");
+        res->res("Error: parse file failed"); //error type B
         return action_status::FAILED;
     }
     std::map<std::u16string, std::u16string> ret;

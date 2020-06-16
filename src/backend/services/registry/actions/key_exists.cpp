@@ -31,7 +31,7 @@ action_status Key_Exists_Action::act(boost::shared_ptr<session> sess, std::share
 {
     if(!sess || (sess && sess->id().is_nil())) {
         AU_LOG_ERROR("Session not found");
-        res->res("Error: Session not found");
+        res->res("Error: Session not found"); //error type A
         return action_status::FAILED;
     }
 
@@ -40,27 +40,27 @@ action_status Key_Exists_Action::act(boost::shared_ptr<session> sess, std::share
     auto keact = std::dynamic_pointer_cast<reg_action_key_exists_msg>(action);
     if(!keact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->res("Error: Internal error"); //error type B
         return action_status::FAILED;
     }
     if( keact->key_.empty()
         )
     {
-        res->res("Error: key is mandatory");
+        res->res("Error: key is mandatory");  //error type A
         return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
         if( werr_pipe_busy == std::get<1>(r).w) {
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));  //error type C
             return action_status::POSTPONED;
         }
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));  //error type C
         return action_status::FAILED;
     }
     if(!std::get<0>(c.open_key(keact->key_.c_str()))) {
-        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
+        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());  //error type C
         res->res("False");
     }
     else {

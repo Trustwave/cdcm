@@ -56,7 +56,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
                                         std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
 
@@ -65,12 +65,12 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
     auto ekact = std::dynamic_pointer_cast<reg_action_enum_key_msg>(action);
     if(!ekact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->res("Error: Internal error");  //error type B
         return action_status::FAILED;
     }
     if( ekact->key_.empty())
     {
-        res->res("Error: key is mandatory");
+        res->res("Error: key is mandatory");  //error type A
         return action_status::FAILED;
     }
     result r = c.connect(*sess);
@@ -80,7 +80,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
             res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
             return action_status::POSTPONED;
         }
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));  //error type C
         return action_status::FAILED;
     }
 
@@ -92,7 +92,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
     else {
         auto status = werror_to_ntstatus(std::get<1>(ret));
         AU_LOG_DEBUG("%s", nt_errstr(status));
-        res->res(std::string("Error: ") + nt_errstr(status));
+        res->res(std::string("Error: ") + nt_errstr(status)); //error type C
     }
     return action_status::SUCCEEDED;
 }
