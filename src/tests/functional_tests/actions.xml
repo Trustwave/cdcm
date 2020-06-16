@@ -23,6 +23,7 @@
     <actions>
         <action name="start_session"  params="" />
         <action name="enumerate"  params="key" />
+        <action name="enumerate_registry_values"  params="key" />
         <action name="value_exists" params="key,value" />
         <action name="key_exists"  params="key" />
         <action name="query_value"  params="key,value" />
@@ -42,6 +43,7 @@
         <test_set test_set_name="registry_tests_with_existing_values" >
             <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
             <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="substr_exist" substr="class_name" />
+            <session_item  action="enumerate_registry_values" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="substr_exist" substr="registry_values" />
             <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" verification_method="boolean" expected="true" />
             <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="SystemRoot" verification_method="boolean" expected="true" />
             <session_item  action="query_value" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"  value="SystemRoot" verification_method="substr_exist" substr="Windows" />
@@ -51,6 +53,7 @@
         <test_set test_set_name="registry_tests_with_fault_values" >
             <session_item  action="start_session" verification_method="regex_match" regex="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$" />
             <session_item  action="enumerate" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
+            <session_item  action="enumerate_registry_values" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning" verification_method="regex_match" regex="^Error: (.*)(?!=Session not found)$" />
             <session_item  action="key_exists" key="SOFTWARE\\Microsoft\\Windows NT\\key_with_no_meaning" verification_method="boolean" expected="false" />
             <session_item  action="value_exists" key="key_with_no_meaning" value="Debugger" verification_method="boolean" expected="false" />
             <session_item  action="value_exists" key="SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" value="value_with_no_meaning" verification_method="boolean" expected="false" />
