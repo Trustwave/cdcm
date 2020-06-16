@@ -31,19 +31,19 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
                                    std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_file_exists_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->res("Error: Internal error");  //error type B
         return action_status::FAILED;
     }
     if( smb_action->param.empty())
     {
-        res->res("Error: param is mandatory");
+        res->res("Error: param is mandatory");  //error type A
         return action_status::FAILED;
     }
     std::string base("smb://");
@@ -51,13 +51,13 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
-        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
+        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));  //error type C
 
         if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT) {
             res->res(std::string("False"));
         }
         else {
-            res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));
+            res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));  //error type C
         }
     }
     else {

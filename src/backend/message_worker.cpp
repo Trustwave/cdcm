@@ -297,7 +297,7 @@ int message_worker::worker_loop()
                     catch(...) {
                         action_result->id("unknown");
                     }
-                    action_result->res("Error: Malformed message - " + tao::json::to_string(action_message));
+                    action_result->res("Error: Malformed message - " + tao::json::to_string(action_message));  //error type A
                     result.msgs.push_back(action_result);
                 }
             }
@@ -306,7 +306,7 @@ int message_worker::worker_loop()
             AU_LOG_ERROR("Malformed message %s", e.what());
             auto action_result = std::make_shared<result_msg>();
             action_result->id("unknown");
-            action_result->res("Error: Malformed message ");
+            action_result->res("Error: Malformed message ");  //error type A
             result.msgs.push_back(action_result);
         }
         try {
