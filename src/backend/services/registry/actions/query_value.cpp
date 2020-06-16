@@ -33,6 +33,7 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
                                       std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
+        res->set_resp_code(trustwave::resp_code({"B",666}));
         res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
@@ -42,11 +43,13 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     auto qvact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
     if(!qvact) {
         AU_LOG_ERROR("Failed dynamic cast");
+        res->set_resp_code(trustwave::resp_code({"B",666}));
         res->res("Error: Internal error"); //error type B
         return action_status::FAILED;
     }
     if( qvact->key_.empty())
     {
+        res->set_resp_code(trustwave::resp_code({"A",666}));
         res->res("Error: key is mandatory"); //error type A
         return action_status::FAILED;
     }

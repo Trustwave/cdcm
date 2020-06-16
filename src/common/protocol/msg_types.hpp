@@ -21,10 +21,22 @@
 #include <utility>
 #include <vector>
 namespace trustwave {
+    struct resp_code {
+    public:
+        resp_code(const resp_code&) = default;
+        resp_code(resp_code&&) = default;
+        resp_code& operator=(const resp_code&) = default;
+        resp_code& operator=(resp_code&&) = default;
+        resp_code() = default;
+        std::string group;
+        int error_code; //roem TODO: choose the correct variable type
+    };
+
     // todo assaf fix encapsulation
     struct result_msg {
     public:
         std::string id_;
+        resp_code resp_code_;
         tao::json::value res_;
 
     public:
@@ -38,6 +50,8 @@ namespace trustwave {
         void id(const std::string& ids) { id_ = ids; }
         tao::json::value res() const { return res_; }
         void res(const tao::json::value& ress) { res_ = ress; }
+        resp_code get_resp_code() const { return resp_code_; }
+        void set_resp_code(const resp_code& resp_code) { resp_code_ = resp_code; }
     };
 
     struct action_msg {
