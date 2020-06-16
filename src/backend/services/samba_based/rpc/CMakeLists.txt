@@ -23,22 +23,7 @@ target_link_libraries(tw-rpc-client
         samba-util
         samba-hostconfig)
 
-add_executable(rct rpc_client_tester.cpp)
-target_link_libraries(rct tw-rpc-client dcerpc-binding
-        libsmb-samba4
-        tevent
-        samba-errors
-        talloc
-        ndr-standard
-        ndr
-        ndr-nbt
-        libcli-lsa3-samba4
-        libcli-netlogon3-samba4
-        dcerpc-samba-samba4
-        ndr-krb5pac
-        ndr-samba4
-        samba-util
-        samba-hostconfig)
+
 install(TARGETS tw-rpc-client LIBRARY DESTINATION lib
         DESTINATION ${lib_dest})
 
