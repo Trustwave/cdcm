@@ -30,6 +30,7 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
                                        std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
+        res->set_resp_code(trustwave::resp_code({"B",666}));
         res->res("Error: Session not found");//error type B
         return action_status::FAILED;
     }
@@ -40,6 +41,7 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
     auto veact = std::dynamic_pointer_cast<reg_action_value_exists_msg>(action);
     if(!veact) {
         AU_LOG_ERROR("Failed dynamic cast");
+        res->set_resp_code(trustwave::resp_code({"B",666}));
         res->res("Error: Internal error"); //error type B
         return action_status::FAILED;
     }

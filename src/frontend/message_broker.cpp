@@ -317,6 +317,7 @@ void message_broker::client_process(const std::string& sender, std::unique_ptr<z
         auto res = std::make_shared<trustwave::result_msg>();
         result_message.msgs.push_back(res);
         res->id("N/A");
+        res->set_resp_code(trustwave::resp_code({"A",666}));
         res->res(std::string("Error: Malformed message ") + e.what()); //error type A
         send_local_to_client(result_message, sender, msg->unwrap());
     }
