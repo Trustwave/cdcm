@@ -12,6 +12,6 @@ install(TARGETS tw-smb-client LIBRARY DESTINATION lib
 install(TARGETS tw-smb-client LIBRARY DESTINATION DESTINATION lib
         DESTINATION ${release_lib_dest})
 
-install(FILES smb.json  DESTINATION ${release_lib_dest}/plugins/)
+install(FILES smb.json DESTINATION ${release_lib_dest}/plugins/)
 
 #configure_file(smb.json ${release_lib_dest}/plugins/smb.json COPYONLY)
