@@ -15,6 +15,10 @@ Requires: systemd
 Requires: zeromq
 Requires: openpgm
 Requires: libsodium
+Requires: boost169-filesystem
+Requires: boost169-log
+Requires: gnutls
+
 %description
 Credentialed Data Collection Module
 
