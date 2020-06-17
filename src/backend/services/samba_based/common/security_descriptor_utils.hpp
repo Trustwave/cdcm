@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include "taocpp-json/include/tao/json.hpp"
+#include "taocpp-json/include/tao/json/contrib/traits.hpp"
 struct cli_state;
 struct security_descriptor;
 struct security_ace;
@@ -57,5 +59,34 @@ namespace trustwave {
 std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::ACE_str& acl);
 std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::Security_Descriptor_str& sds);
 
+namespace tao ::json {
+/* struct ACE_str {
+            std::string SecurityPrincipal;
+            std::vector<std::string> FileSystemRights;
+            std::string AccessControlType;
+            std::vector<std::string> AccessControlFlags;
+        };
+ * */
+    template<>
+    struct traits<trustwave::sd_utils::ACE_str>:
+        binding::object<TAO_JSON_BIND_REQUIRED("SecurityPrincipal", &trustwave::sd_utils::ACE_str::SecurityPrincipal),
+            TAO_JSON_BIND_REQUIRED("FileSystemRights", &trustwave::sd_utils::ACE_str::FileSystemRights),
+            TAO_JSON_BIND_REQUIRED("AccessControlType", &trustwave::sd_utils::ACE_str::AccessControlType),
+            TAO_JSON_BIND_REQUIRED("AccessControlFlags", &trustwave::sd_utils::ACE_str::AccessControlFlags)
 
+        > {
+    };
+    template<>
+    struct traits<trustwave::sd_utils::Security_Descriptor_str>:
+        binding::object<TAO_JSON_BIND_REQUIRED("Revision", &trustwave::sd_utils::Security_Descriptor_str::Revision),
+            TAO_JSON_BIND_REQUIRED("Control", &trustwave::sd_utils::Security_Descriptor_str::Control),
+            TAO_JSON_BIND_REQUIRED("Owner", &trustwave::sd_utils::Security_Descriptor_str::Owner),
+            TAO_JSON_BIND_REQUIRED("Group", &trustwave::sd_utils::Security_Descriptor_str::Group),
+            TAO_JSON_BIND_REQUIRED("ACLS", &trustwave::sd_utils::Security_Descriptor_str::ACLS)
+
+        > {
+    };
+
+
+} // namespace tao::json
 #endif // SRC_BACKEND_SERVICES_SAMBA_BASED_LSA_SECURITY_DESCRIPTOR_UTILS_HPP
