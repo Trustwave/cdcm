@@ -33,12 +33,6 @@ extern "C" {
 #include "client.hpp"
 #include "configurable.hpp"
 #include "../common/security_descriptor_utils.hpp"
-
-//#include "rpc_service_configuration.hpp"
-struct cli_state;
-struct cli_credentials;
-struct rpc_pipe_client;
-struct ndr_interface_table;
 struct security_descriptor;
 
 //=====================================================================================================================
@@ -49,25 +43,18 @@ namespace trustwave {
     class rpc_client;
     using result = std::tuple<bool, WERROR>;
     typedef char fstring[256];
-    class lsa_client final: public cdcm_client/*, public configurable<rpc_service_configuration>*/ {
-
-
-    public:
+    class lsa_client final: public cdcm_client{
+  public:
         //fixme assaf add copy ctor move ......
         lsa_client();
         ~lsa_client() override;
         int connect(const session& sess,const std::string& share);
         int cacl_dump(const std::string& filename);
         std::vector<sd_utils::ACE_str> get_acls(const std::string& filename);
-
     private:
-
         security_descriptor * get_secdesc(const std::string& filename);
-
         std::unique_ptr<rpc_client> client_;
         TALLOC_CTX* mem_ctx_;
-
-
     };
 } // namespace trustwave
 

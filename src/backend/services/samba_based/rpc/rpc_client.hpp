@@ -15,65 +15,46 @@
 //=====================================================================================================================
 #ifndef SRC_BACKEND_SERVICES_RPC_RPC_CLIENT_HPP
 #define SRC_BACKEND_SERVICES_RPC_RPC_CLIENT_HPP
-
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "includes.h"
-#include "lib/registry/registry.h"
-#include "lib/cmdline/popt_common.h"
-#include "lib/events/events.h"
-#include "system/time.h"
-#include "libcli/smbreadline/smbreadline.h"
-#include "librpc/gen_ndr/ndr_security.h"
-#include "bin/default/librpc/gen_ndr/winreg.h"
-#include "lib/registry/tools/common.h"
-#include "param/param.h"
-#include "credentials.h"
+#include "libcli/util/error.h"
+#include "lib/talloc/talloc.h"
 #ifdef __cplusplus
 }
 #endif
-#undef uint_t
 #include <string>
 #include <tuple>
 #include "client.hpp"
 #include "configurable.hpp"
-//#include "rpc_service_configuration.hpp"
 struct cli_state;
 struct cli_credentials;
 struct rpc_pipe_client;
 struct ndr_interface_table;
+
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
     class session;
-
     using result = std::tuple<bool, WERROR>;
     class rpc_client final {
-
-
     public:
         //fixme assaf add copy ctor move ......
-        rpc_client();
-        ~rpc_client() ;
+        rpc_client(TALLOC_CTX* mem_ctx);
+        ~rpc_client();
         int connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table*);
         cli_state	*cli();
         rpc_pipe_client	*pipe_handle();
-
     private:
-        tevent_context* ev_ctx_;
-        DATA_BLOB data_blob_;
         TALLOC_CTX* mem_ctx_;
         cli_state	*cli_ = nullptr;
         cli_credentials* creds_= nullptr;
         rpc_pipe_client* pipe_handle_ = nullptr;
-
-
-    };
+  };
 } // namespace trustwave
 
 #endif // SRC_BACKEND_SERVICES_RPC_RPC_CLIENT_HPP
