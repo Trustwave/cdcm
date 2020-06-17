@@ -41,34 +41,36 @@ using trustwave::result;
 //=====================================================================================================================
 using trustwave::session;
 
-rpc_client::rpc_client(TALLOC_CTX* mem_ctx):mem_ctx_(mem_ctx)
-{ /*mem_ctx_ = talloc_stackframe();*/ }
+rpc_client::rpc_client()
+{  }
 rpc_client::~rpc_client()
 {
     if(cli_ != nullptr) { cli_shutdown(cli_); }
 }
-int rpc_client::connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table* table)
+result rpc_client::connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table* table)
 {
-    creds_ = ::cli_credentials_init(mem_ctx_);
+    creds_ = ::cli_credentials_init(talloc_tos());
     cli_credentials_set_domain(creds_, sess.creds().domain().c_str(), CRED_SPECIFIED);
     cli_credentials_set_username(creds_, sess.creds().username().c_str(), CRED_SPECIFIED);
     cli_credentials_set_password(creds_, sess.creds().password().c_str(), CRED_SPECIFIED);
     cli_credentials_set_workstation(creds_, sess.creds().workstation().c_str(), CRED_SPECIFIED);
 
     struct dcerpc_binding* binding = nullptr;
-    NTSTATUS nt_status = dcerpc_parse_binding(mem_ctx_, sess.remote().c_str(), &binding);
+    NTSTATUS nt_status = dcerpc_parse_binding(talloc_tos(), sess.remote().c_str(), &binding);
 
-    if(!NT_STATUS_IS_OK(nt_status)) { return -1; }
+    if(!NT_STATUS_IS_OK(nt_status)) {         return  {false, ntstatus_to_werror(nt_status)};
+    }
 
     nt_status = dcerpc_binding_set_transport(binding, NCACN_NP);
-    if(!NT_STATUS_IS_OK(nt_status)) { return -1; }
+    if(!NT_STATUS_IS_OK(nt_status)) {         return  {false, ntstatus_to_werror(nt_status)};
+    }
 
     nt_status = cli_full_connection_creds(&cli_, nullptr, dcerpc_binding_get_string_option(binding, "host"), nullptr, 0,
                                           share.c_str(), device.c_str(), creds_, 0, SMB_SIGNING_IPC_DEFAULT);
 
     if(!NT_STATUS_IS_OK(nt_status)) {
         DEBUG(0, ("Cannot connect to server.  Error was %s\n", nt_errstr(nt_status)));
-        return -1;
+        return  {false, ntstatus_to_werror(nt_status)};
     }
 
     cli_set_timeout(cli_, 10000);
@@ -77,9 +79,10 @@ int rpc_client::connect(const session& sess,const std::string& share,const std::
                                                  creds_, &pipe_handle_);
     if(!NT_STATUS_IS_OK(ntresult)) {
         printf("Could not initialise %s. Error was %s\n", table->name, nt_errstr(ntresult));
-        return -1; // ntresult;
+        return  {false, ntstatus_to_werror(nt_status)};
+
     }
-    return 0;
+    return  {true, ntstatus_to_werror(nt_status)};
 }
 cli_state	*rpc_client::cli()
 {

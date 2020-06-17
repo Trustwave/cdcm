@@ -40,35 +40,13 @@ namespace trustwave{
     using result = std::tuple<bool, WERROR>;
     static constexpr auto werr_pipe_busy = 0xe7;
     class registry_client2 final: public cdcm_client{
-//        struct key_info {
-//            const char* classname = nullptr;
-//            uint32_t num_subkeys = 0, max_subkeylen = 0; //, max_classlen;
-//            NTTIME last_changed_time = 0;
-//            uint32_t num_values = 0, max_valnamelen = 0, max_valbufsize = 0;
-//        };
-
     public:
-        registry_client2() :mem_ctx_( talloc_stackframe()),client_(std::make_unique<rpc_client>(mem_ctx_)) { }
+        registry_client2() :client_(std::make_unique<rpc_client>()) { }
         ~registry_client2() override;
-        int connect(const session& sess);
-//        result key_get_value_by_name(const char* name, registry_value& rv);
-//        result key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv);
-//        result key_get_subkey_by_index(TALLOC_CTX* mem_ctx, const struct registry_key* key, uint32_t idx,
-//                                       const char** name, const char** classname, NTTIME* last_mod_time);
-//        result key_get_subkey_by_name(TALLOC_CTX* mem_ctx, const struct registry_key* key, const char* name,
-//                                      struct registry_key** subkey);
-//        result enumerate_key(const std::string&, enum_key&);
-//        result key_exists(const std::string&);
-//        result value_exists(const char* valname);
-//
-        NTSTATUS open_key(const std::string& k);
-        NTSTATUS get_sd(sd_utils::Security_Descriptor_str&);
+        result connect(const session& sess);
+        result open_key(const std::string& k);
+        result get_sd(sd_utils::Security_Descriptor_str&);
     private:
-
-//        result key_get_info(key_info&);
-//        void normalize(registry_value& rv);
-
-        TALLOC_CTX* mem_ctx_;
         std::unique_ptr<rpc_client> client_;
         reg_context ctx_;
     };

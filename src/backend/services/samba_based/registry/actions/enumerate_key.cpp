@@ -93,6 +93,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
         auto status = werror_to_ntstatus(std::get<1>(ret));
         AU_LOG_DEBUG("%s", nt_errstr(status));
         res->res(std::string("Error: ") + nt_errstr(status));
+        return action_status::FAILED;
     }
     return action_status::SUCCEEDED;
 }

@@ -44,13 +44,12 @@ namespace trustwave {
     class rpc_client final {
     public:
         //fixme assaf add copy ctor move ......
-        rpc_client(TALLOC_CTX* mem_ctx);
+        rpc_client();
         ~rpc_client();
-        int connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table*);
+        result connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table*);
         cli_state	*cli();
         rpc_pipe_client	*pipe_handle();
     private:
-        TALLOC_CTX* mem_ctx_;
         cli_state	*cli_ = nullptr;
         cli_credentials* creds_= nullptr;
         rpc_pipe_client* pipe_handle_ = nullptr;

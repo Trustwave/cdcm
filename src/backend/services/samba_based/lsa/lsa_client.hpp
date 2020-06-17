@@ -48,13 +48,14 @@ namespace trustwave {
         //fixme assaf add copy ctor move ......
         lsa_client();
         ~lsa_client() override;
-        int connect(const session& sess,const std::string& share);
-        int cacl_dump(const std::string& filename);
-        std::vector<sd_utils::ACE_str> get_acls(const std::string& filename);
+        result connect(const session& sess,const std::string& share);
+        result get_sd(const std::string& path,sd_utils::entity_type et,trustwave::sd_utils::Security_Descriptor_str &outsd);
+
+        result cacl_dump(const std::string& filename);
     private:
-        security_descriptor * get_secdesc(const std::string& filename);
+        result get_acls(const std::string& filename,std::vector<sd_utils::ACE_str>&);
+        result get_secdesc(const std::string& filename,security_descriptor*&);
         std::unique_ptr<rpc_client> client_;
-        TALLOC_CTX* mem_ctx_;
     };
 } // namespace trustwave
 
