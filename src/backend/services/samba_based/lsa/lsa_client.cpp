@@ -28,7 +28,6 @@ extern "C" {
 #include "source3/rpc_client/cli_pipe.h"
 #ifdef __cplusplus
 }
-
 #endif
 #include "lsa_client.hpp"
 #include "session.hpp"
@@ -82,8 +81,11 @@ std::vector<trustwave::sd_utils::ACE_str> lsa_client::get_acls(const std::string
     return trustwave::sd_utils::get_acls(client_->cli(), sd,sd_utils::entity_type::NTFS_DIR);
 }
 
-lsa_client::lsa_client(): client_(std::make_unique<rpc_client>()) { mem_ctx_ = talloc_stackframe(); }
-lsa_client::~lsa_client() { }
+lsa_client::lsa_client():mem_ctx_(talloc_stackframe()), client_(std::make_unique<rpc_client>(mem_ctx_)) {  }
+lsa_client::~lsa_client()
+{
+    talloc_free(mem_ctx_);
+}
 int lsa_client::connect(const session& sess, const std::string& share)
 {
     client_->connect(sess, share,"?????", &ndr_table_lsarpc);
