@@ -1,6 +1,6 @@
 //=====================================================================================================================
 // Trustwave ltd. @{SRCH}
-//														lsa_client.hpp
+//														srvsvc_client.hpp
 //
 //---------------------------------------------------------------------------------------------------------------------
 // DESCRIPTION:
@@ -8,10 +8,11 @@
 //
 //---------------------------------------------------------------------------------------------------------------------
 // By      : Assaf Cohen
-// Date    : 6/9/20
+// Date    : 6/18/20
 // Comments:
-#ifndef SRC_BACKEND_SERVICES_SAMBA_BASED_LSA_LSA_CLIENT_HPP
-#define SRC_BACKEND_SERVICES_SAMBA_BASED_LSA_LSA_CLIENT_HPP
+//=====================================================================================================================
+#ifndef SRC_BACKEND_SERVICES_SAMBA_BASED_SRVSVC_SRVSVC_CLIENT_HPP
+#define SRC_BACKEND_SERVICES_SAMBA_BASED_SRVSVC_SRVSVC_CLIENT_HPP
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
@@ -42,21 +43,22 @@ namespace trustwave {
     class session;
     class rpc_client;
     using result = std::tuple<bool, WERROR>;
-    typedef char fstring[256];
-    class lsa_client final: public cdcm_client{
-  public:
+    struct share_info
+    {
+        std::string name_;
+        std::string comment_;
+        std::string path_;
+    };
+    class srvsvc_client final: public cdcm_client{
+    public:
         //fixme assaf add copy ctor move ......
-        lsa_client();
-        ~lsa_client() override;
-        result connect(const session& sess,const std::string& share);
-        result get_sd(const std::string& path,sd_utils::entity_type et,trustwave::sd_utils::Security_Descriptor_str &outsd);
-
-        result cacl_dump(const std::string& filename);
+        srvsvc_client();
+        ~srvsvc_client() override;
+        result connect(const session& sess);
+        result enumerate_all_shares(std::vector<share_info>&);
     private:
-        result get_acls(const std::string& filename,std::vector<sd_utils::ACE_str>&);
-        result get_secdesc(const std::string& filename,security_descriptor*&);
         std::unique_ptr<rpc_client> client_;
     };
+    std::ostream& operator<<(std::ostream& , const trustwave::share_info& );
 } // namespace trustwave
-
-#endif // SRC_BACKEND_SERVICES_SAMBA_BASED_LSA_LSA_CLIENT_HPP
+#endif // SRC_BACKEND_SERVICES_SAMBA_BASED_SRVSVC_SRVSVC_CLIENT_HPP

@@ -16,7 +16,7 @@ target_link_libraries(tw-registry-client s4_events tevent samba-errors talloc sa
 add_library(registry_common OBJECT ${SAMBA_SRC}/source4/lib/registry/tools/common.c)
 add_library(s4_events OBJECT ${SAMBA_SRC}/source4/lib/events/tevent_s4.c)
 #add_executable(rc2t rc2t.cpp)
-#target_link_libraries(rc2t tw-common tw-registry-client2)
+#target_link_libraries(rc2t tw-utils tw-registry-client2)
 
 add_subdirectory(actions)
 install(TARGETS tw-registry-client2 DESTINATION ${release_lib_dest})

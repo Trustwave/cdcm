@@ -217,29 +217,34 @@ namespace {
         aa.FileSystemRights = get_access_mask(ace->access_mask,et);
         return aa;
     }
-    static std::ostream& operator<<(std::ostream& os, const std::vector<std::string> v)
-    {
-        for(auto e: v) { os << e << "|"; }
-        return os;
-    }
+
 
 }
-std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::ACE_str& acl)
+
+
+std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::sd_utils::ACE_str& acl)
 {
-    return os << "SecurityPrincipal: " << acl.SecurityPrincipal << "\n"
-              << "FileSystemRights: " << acl.FileSystemRights << "\n"
+    os << "SecurityPrincipal: " << acl.SecurityPrincipal << "\n"
+              << "FileSystemRights: ";
+    for(auto e:  acl.FileSystemRights) { os << e << "|"; }
+    os <<"\n"
               << "AccessControlType: " << acl.AccessControlType << "\n"
-              << "AccessControlFlags: " << acl.AccessControlFlags << "\n";
+              << "AccessControlFlags: ";
+    for(auto e:  acl.AccessControlFlags) { os << e << "|"; }
+    os  << "\n";
+    return os;
 }
-std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::Security_Descriptor_str& sds)
+std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::sd_utils::Security_Descriptor_str& sds)
 {
     os << "Revision: " << sds.Revision << "\n"
-       << "Control: " << sds.Control << "\n"
+       << "Control: ";
+    for(auto e:  sds.Control) { os << e << "|"; }
+    os<< "\n"
        << "Owner: " << sds.Owner << "\n"
        << "Group: " << sds.Group << "\n"
        << "ACLS: "
        << "\n";
-    for(auto e: sds.ACLS) { os << e; }
+    for(const auto& e: sds.ACLS) { os << e; }
     return os;
 }
 void trustwave::sd_utils::sec_desc_print( cli_state* cli, std::stringstream& ss, security_descriptor* sd,entity_type et)

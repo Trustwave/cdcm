@@ -30,8 +30,12 @@ extern "C" {
 }
 #endif
 #include "registry_client2.hpp"
-#include "../common/security_descriptor_utils.hpp"
+#include "../utils/security_descriptor_utils.hpp"
 #include <unordered_map>
+#undef Required
+#include "singleton_runner/authenticated_scan_server.hpp"
+#define Required (3)
+
 using trustwave::registry_client2;
 using trustwave::result;
 namespace {
@@ -147,7 +151,7 @@ result trustwave::registry_client2::open_key(const std::string& k)
     NTSTATUS status
         = registry_openkey(talloc_tos(), client_->pipe_handle(), k, access_mask, &ctx_.pol_hive, &ctx_.pol_key);
     if(!NT_STATUS_IS_OK(status)) {
-        fprintf(stderr, "registry_openkey failed: %s\n", nt_errstr(status));
+        AU_LOG_DEBUG("registry_openkey failed: %s\n", nt_errstr(status));
         return  {false, ntstatus_to_werror(status)};
     }
     return  {true, ntstatus_to_werror(status)};
@@ -178,12 +182,12 @@ result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descrip
     WERROR werr;
     status = registry_getsd(talloc_tos(), b, &ctx_.pol_key, sec_info, sd, &werr);
     if(!NT_STATUS_IS_OK(status)) {
-        fprintf(stderr, "getting sd failed: %s\n", nt_errstr(status));
+        AU_LOG_DEBUG( "getting sd failed: %s\n", nt_errstr(status));
         return out();
     }
     if(!W_ERROR_IS_OK(werr)) {
         status = werror_to_ntstatus(werr);
-        fprintf(stderr, "getting sd failed: %s\n", win_errstr(werr));
+        AU_LOG_DEBUG( "getting sd failed: %s\n", win_errstr(werr));
         return out();
     }
     DATA_BLOB blob;
