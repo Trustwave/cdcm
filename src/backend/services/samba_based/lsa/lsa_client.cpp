@@ -31,7 +31,6 @@ extern "C" {
 #endif
 #include "lsa_client.hpp"
 #include "session.hpp"
-#include "../rpc/rpc_client.hpp"
 #include "credentials.hpp"
 #undef Required
 #include "singleton_runner/authenticated_scan_server.hpp"
@@ -89,11 +88,8 @@ result lsa_client::get_acls(const std::string& filename,std::vector<trustwave::s
 
 lsa_client::lsa_client(): client_(std::make_unique<rpc_client>())
 {
+}
 
-}
-lsa_client::~lsa_client()
-{
-}
 result lsa_client::connect(const session& sess, const std::string& share)
 {
     return client_->connect(sess, share,"?????");
