@@ -6,7 +6,7 @@ include_directories(${SMB_INCLUDES})
 link_directories(${SMB_LINKS})
 
 set(LD_ACTION_LIBS dl tw-lsa-client)
-set(ACTION_NAMES  get_ntfs_permissions get_share_permissions)
+set(ACTION_NAMES get_ntfs_file_permissions get_ntfs_folder_permissions get_share_permissions)
 
 foreach (X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")

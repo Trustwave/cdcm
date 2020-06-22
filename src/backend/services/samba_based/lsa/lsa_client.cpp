@@ -96,7 +96,7 @@ lsa_client::~lsa_client()
 }
 result lsa_client::connect(const session& sess, const std::string& share)
 {
-    return client_->connect(sess, share,"?????", &ndr_table_lsarpc);
+    return client_->connect(sess, share,"?????");
 }
 result lsa_client::get_sd(const std::string& path,sd_utils::entity_type et,trustwave::sd_utils::Security_Descriptor_str &outsd)
 {

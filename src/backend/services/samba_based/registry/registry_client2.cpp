@@ -159,7 +159,7 @@ result trustwave::registry_client2::open_key(const std::string& k)
 }
 result trustwave::registry_client2::connect(const session& sess)
 {
-    return client_->connect(sess, "IPC$", "IPC", &ndr_table_winreg);
+    return client_->connect_and_open_pipe(sess, "IPC$", "IPC", &ndr_table_winreg);
 }
 result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descriptor_str &outsd)
 {
@@ -205,4 +205,3 @@ result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descrip
     outsd = sd_utils::get_sd_str(client_->cli(), &sec_desc, sd_utils::entity_type::REGISTRY);
     return out();
 }
-trustwave::registry_client2::~registry_client2() {  }
