@@ -56,7 +56,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
                                         std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
@@ -66,13 +66,13 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
     auto ekact = std::dynamic_pointer_cast<reg_action_enum_key_msg>(action);
     if(!ekact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Internal error");  //error type B
         return action_status::FAILED;
     }
     if( ekact->key_.empty())
     {
-        res->set_resp_code(trustwave::resp_code({"A",666}));
+        res->set_resp_code(trustwave::resp_code({2,666}));
         res->res("Error: key is mandatory");  //error type A
         return action_status::FAILED;
     }
