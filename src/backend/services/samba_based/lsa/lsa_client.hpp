@@ -42,7 +42,6 @@ namespace trustwave {
     class session;
     class rpc_client;
     using result = std::tuple<bool, WERROR>;
-    typedef char fstring[256];
     class lsa_client final: public cdcm_client{
   public:
         //fixme assaf add copy ctor move ......

@@ -63,7 +63,7 @@ namespace trustwave {
     class registry_client final: public cdcm_client, public configurable<registry_service_configuration> {
         struct key_info {
             const char* classname = nullptr;
-            uint32_t num_subkeys = 0, max_subkeylen = 0; //, max_classlen;
+            uint32_t num_subkeys = 0, max_subkeylen = 0;
             NTTIME last_changed_time = 0;
             uint32_t num_values = 0, max_valnamelen = 0, max_valbufsize = 0;
         };

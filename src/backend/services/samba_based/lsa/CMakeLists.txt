@@ -8,8 +8,8 @@ link_directories(${SAMBA_SRC}/bin/default/librpc)
 add_library(tw-lsa-client SHARED ${SOURCE_FILES})
 target_link_libraries(tw-lsa-client tw-common tw-sd-utils tw-rpc-client tw-singleton-runner)
 add_subdirectory(actions)
-#add_executable(lct lsa_client_tester.cpp)
-#target_link_libraries(lct tw-utils tw-lsa-client)
+add_executable(lct lsa_client_tester.cpp)
+target_link_libraries(lct tw-sd-utils tw-lsa-client)
 
 
 install(TARGETS tw-lsa-client LIBRARY DESTINATION lib DESTINATION ${lib_dest})

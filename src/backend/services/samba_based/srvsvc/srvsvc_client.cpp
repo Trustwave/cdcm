@@ -49,7 +49,8 @@ srvsvc_client::srvsvc_client(): client_(std::make_unique<rpc_client>()) { }
 srvsvc_client::~srvsvc_client() { }
 result srvsvc_client::connect(const session& sess)
 {
-    return client_->connect(sess, "IPC$", "IPC", &ndr_table_srvsvc, true);
+    return client_->connect_and_open_pipe(sess, "IPC$", "IPC", &ndr_table_srvsvc, true);
+
 }
 result srvsvc_client::enumerate_all_shares(std::vector<share_info>& shares_result)
 {

@@ -42,7 +42,7 @@ namespace trustwave{
     class registry_client2 final: public cdcm_client{
     public:
         registry_client2() :client_(std::make_unique<rpc_client>()) { }
-        ~registry_client2() override;
+        ~registry_client2() override = default;
         result connect(const session& sess);
         result open_key(const std::string& k);
         result get_sd(sd_utils::Security_Descriptor_str&);
