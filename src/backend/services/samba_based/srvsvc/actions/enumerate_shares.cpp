@@ -1,6 +1,6 @@
 //=====================================================================================================================
 // Trustwave ltd. @{SRCH}
-//														get_share_permissions.cpp
+//														enumerate_shares.cpp
 //
 //---------------------------------------------------------------------------------------------------------------------
 // DESCRIPTION:
@@ -8,25 +8,35 @@
 //
 //---------------------------------------------------------------------------------------------------------------------
 // By      : Assaf Cohen
-// Date    : 6/17/20
+// Date    : 6/22/20
 // Comments:
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
 #include "lib/talloc/talloc.h"
-#include "get_share_permissions.hpp"
+#include "enumerate_shares.hpp"
 #include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-#include "../lsa_client.hpp"
-#include "../../utils/security_descriptor_utils.hpp"
+#include "../srvsvc_client.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
-using trustwave::Get_Share_Permissions_Action;
+using trustwave::Enumerate_Shares_Action;
 using action_status = trustwave::Action_Base::action_status;
 
-action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
+namespace tao ::json {
+    template<>
+    struct traits<trustwave::share_info>:
+        binding::object<TAO_JSON_BIND_REQUIRED("Name", &trustwave::share_info::name_),
+            TAO_JSON_BIND_REQUIRED("Comment", &trustwave::share_info::comment_),
+            TAO_JSON_BIND_REQUIRED("Path", &trustwave::share_info::path_)
+
+        > {
+    };
+
+} // namespace tao::json
+action_status Enumerate_Shares_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
                                                std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
@@ -34,16 +44,13 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
         return action_status::FAILED;
     }
 
-    auto gnpact = std::dynamic_pointer_cast<lsa_action_get_share_permissions_msg>(action);
-    if(!gnpact) {
+    auto esact = std::dynamic_pointer_cast<srvsvc_action_enumerate_shares_msg>(action);
+    if(!esact) {
         AU_LOG_ERROR("Failed dynamic cast");
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if(gnpact->key_.empty()) {
-        res->res("Error: key is mandatory");
-        return action_status::FAILED;
-    }
+
     struct my_frame
     {
         void* f_;
@@ -53,21 +60,21 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
         }
     }ff;
     {
-        auto c = trustwave::lsa_client();
+        auto c = trustwave::srvsvc_client();
 
-        result r = c.connect(*sess,gnpact->key_);
+        result r = c.connect(*sess);
         if(!std::get<0>(r)) {
-            AU_LOG_DEBUG("Failed connecting to %s share: %s err: %s", sess->remote().c_str(),gnpact->key_.c_str(), win_errstr(std::get<1>(r)));
+            AU_LOG_DEBUG("Failed connecting to %s err: %s", sess->remote().c_str(), win_errstr(std::get<1>(r)));
 
             res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
             return action_status::FAILED;
         }
 
-        trustwave::sd_utils::Security_Descriptor_str sd;
+      std::vector<trustwave::share_info> shares_vec;
+        auto ret = c.enumerate_all_shares(shares_vec);
 
-        auto ret = c.get_sd("",trustwave::sd_utils::entity_type::SHARE,sd);
         if(std::get<0>(ret)) {
-            res->res(sd);
+            res->res(shares_vec);
         }
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
@@ -80,10 +87,10 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
 }
 
 // instance of the our plugin
-static std::shared_ptr<Get_Share_Permissions_Action> instance = nullptr;
+static std::shared_ptr<Enumerate_Shares_Action> instance = nullptr;
 
 // extern function, that declared in "action.hpp", for export the plugin from dll
 std::shared_ptr<trustwave::Action_Base> import_action()
 {
-    return instance ? instance : (instance = std::make_shared<Get_Share_Permissions_Action>());
+    return instance ? instance : (instance = std::make_shared<Enumerate_Shares_Action>());
 }

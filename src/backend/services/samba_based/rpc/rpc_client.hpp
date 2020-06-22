@@ -26,6 +26,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#undef uint_t
 #include <string>
 #include <tuple>
 #include "client.hpp"
@@ -46,7 +47,7 @@ namespace trustwave {
         //fixme assaf add copy ctor move ......
         rpc_client();
         ~rpc_client();
-        result connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table*);
+        result connect(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table*,bool noauth=false);
         cli_state	*cli();
         rpc_pipe_client	*pipe_handle();
     private:

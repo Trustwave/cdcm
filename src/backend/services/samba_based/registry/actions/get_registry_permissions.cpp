@@ -20,7 +20,7 @@
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client2.hpp"
-#include "../../common/security_descriptor_utils.hpp"
+#include "../../utils/security_descriptor_utils.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================

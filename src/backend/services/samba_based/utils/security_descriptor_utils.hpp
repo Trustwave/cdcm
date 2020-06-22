@@ -55,18 +55,13 @@ namespace trustwave {
         void sec_desc_print( cli_state* cli, std::stringstream& ss,  security_descriptor* sd,entity_type et);
         Security_Descriptor_str get_sd_str(cli_state* cli, security_descriptor* sd,entity_type et);
 
-    }}
-std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::ACE_str& acl);
-std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::Security_Descriptor_str& sds);
+    }
+    std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::ACE_str& acl);
+    std::ostream& operator<<(std::ostream& os, const trustwave::sd_utils::Security_Descriptor_str& );
+}// namespace trustwave
+
 
 namespace tao ::json {
-/* struct ACE_str {
-            std::string SecurityPrincipal;
-            std::vector<std::string> FileSystemRights;
-            std::string AccessControlType;
-            std::vector<std::string> AccessControlFlags;
-        };
- * */
     template<>
     struct traits<trustwave::sd_utils::ACE_str>:
         binding::object<TAO_JSON_BIND_REQUIRED("SecurityPrincipal", &trustwave::sd_utils::ACE_str::SecurityPrincipal),
