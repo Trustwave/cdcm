@@ -30,7 +30,7 @@
 namespace trustwave {
     struct reg_action_value_exists_msg: public action_msg {
         static constexpr std::string_view act_name{"value_exists"};
-        reg_action_value_exists_msg(): action_msg(act_name) {}
+        reg_action_value_exists_msg(): action_msg(act_name) { }
 
         std::string key_;
         std::string value_;
@@ -60,7 +60,7 @@ namespace trustwave {
 
     class Value_Exists_Action final: public Action_Base {
     public:
-        Value_Exists_Action(): Action_Base(trustwave::reg_action_value_exists_msg::act_name) {}
+        Value_Exists_Action(): Action_Base(trustwave::reg_action_value_exists_msg::act_name) { }
 
         action_status
         act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;

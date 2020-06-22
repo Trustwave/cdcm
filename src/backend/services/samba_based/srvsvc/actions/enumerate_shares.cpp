@@ -29,15 +29,15 @@ namespace tao ::json {
     template<>
     struct traits<trustwave::share_info>:
         binding::object<TAO_JSON_BIND_REQUIRED("Name", &trustwave::share_info::name_),
-            TAO_JSON_BIND_REQUIRED("Comment", &trustwave::share_info::comment_),
-            TAO_JSON_BIND_REQUIRED("Path", &trustwave::share_info::path_)
+                        TAO_JSON_BIND_REQUIRED("Comment", &trustwave::share_info::comment_),
+                        TAO_JSON_BIND_REQUIRED("Path", &trustwave::share_info::path_)
 
-        > {
+                        > {
     };
 
 } // namespace tao::json
 action_status Enumerate_Shares_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                               std::shared_ptr<result_msg> res)
+                                           std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
@@ -51,14 +51,11 @@ action_status Enumerate_Shares_Action::act(boost::shared_ptr<session> sess, std:
         return action_status::FAILED;
     }
 
-    struct my_frame
-    {
+    struct my_frame {
         void* f_;
-        my_frame():f_(talloc_stackframe()){}
-        ~my_frame(){
-            talloc_free(f_);
-        }
-    }ff;
+        my_frame(): f_(talloc_stackframe()) { }
+        ~my_frame() { talloc_free(f_); }
+    } ff;
     {
         auto c = trustwave::srvsvc_client();
 
@@ -70,12 +67,10 @@ action_status Enumerate_Shares_Action::act(boost::shared_ptr<session> sess, std:
             return action_status::FAILED;
         }
 
-      std::vector<trustwave::share_info> shares_vec;
+        std::vector<trustwave::share_info> shares_vec;
         auto ret = c.enumerate_all_shares(shares_vec);
 
-        if(std::get<0>(ret)) {
-            res->res(shares_vec);
-        }
+        if(std::get<0>(ret)) { res->res(shares_vec); }
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));

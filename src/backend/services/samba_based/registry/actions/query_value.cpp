@@ -45,8 +45,7 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( qvact->key_.empty())
-    {
+    if(qvact->key_.empty()) {
         res->res("Error: key is mandatory");
         return action_status::FAILED;
     }

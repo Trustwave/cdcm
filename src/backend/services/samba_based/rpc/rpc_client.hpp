@@ -45,20 +45,22 @@ namespace trustwave {
     using result = std::tuple<bool, WERROR>;
     class rpc_client final {
     public:
-        //fixme assaf add copy ctor move ......
+        // fixme assaf add copy ctor move ......
         rpc_client();
         ~rpc_client();
-        result connect(const session& sess,const std::string& share,const std::string& device);
-        result connect_and_open_pipe(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table* table,const bool noauth=false);
-        cli_state	*cli();
-        rpc_pipe_client	*pipe_handle();
+        result connect(const session& sess, const std::string& share, const std::string& device);
+        result connect_and_open_pipe(const session& sess, const std::string& share, const std::string& device,
+                                     const ndr_interface_table* table, const bool noauth = false);
+        cli_state* cli();
+        rpc_pipe_client* pipe_handle();
+
     private:
-        result open_pipe(const ndr_interface_table* table,const bool noauth);
-        cli_state	*cli_ = nullptr;
-        cli_credentials* creds_= nullptr;
+        result open_pipe(const ndr_interface_table* table, const bool noauth);
+        cli_state* cli_ = nullptr;
+        cli_credentials* creds_ = nullptr;
         rpc_pipe_client* pipe_handle_ = nullptr;
         dcerpc_binding* binding_ = nullptr;
-  };
+    };
 } // namespace trustwave
 
 #endif // SRC_BACKEND_SERVICES_RPC_RPC_CLIENT_HPP

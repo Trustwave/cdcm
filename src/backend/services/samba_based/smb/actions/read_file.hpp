@@ -27,7 +27,7 @@
 namespace trustwave {
     struct smb_read_file_msg: public action_msg {
         static constexpr std::string_view act_name{"read_file"};
-        smb_read_file_msg(): action_msg(act_name) {}
+        smb_read_file_msg(): action_msg(act_name) { }
 
         std::string path_;
         std::string size_;
@@ -60,7 +60,7 @@ namespace trustwave {
 
     class SMB_Read_File final: public Action_Base {
     public:
-        SMB_Read_File(): Action_Base(trustwave::smb_read_file_msg::act_name) {}
+        SMB_Read_File(): Action_Base(trustwave::smb_read_file_msg::act_name) { }
 
         action_status
         act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;

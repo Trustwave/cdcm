@@ -68,8 +68,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( ekact->key_.empty())
-    {
+    if(ekact->key_.empty()) {
         res->res("Error: key is mandatory");
         return action_status::FAILED;
     }
@@ -86,9 +85,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
 
     trustwave::enum_key ek{};
     auto ret = c.enumerate_key(ekact->key_, ek);
-    if(std::get<0>(ret)) {
-        res->res(ek);
-    }
+    if(std::get<0>(ret)) { res->res(ek); }
     else {
         auto status = werror_to_ntstatus(std::get<1>(ret));
         AU_LOG_DEBUG("%s", nt_errstr(status));

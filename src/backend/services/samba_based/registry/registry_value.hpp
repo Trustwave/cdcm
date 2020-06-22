@@ -20,8 +20,8 @@
 namespace trustwave {
     class registry_value final {
     public:
-        registry_value(): value_() {}
-        registry_value(uint32_t type, const char* value, const char* name): type_(type), value_(value), name_(name) {}
+        registry_value(): value_() { }
+        registry_value(uint32_t type, const char* value, const char* name): type_(type), value_(value), name_(name) { }
         uint32_t type() const { return type_; }
         std::string value() const { return value_; }
         std::string name() const { return name_; }

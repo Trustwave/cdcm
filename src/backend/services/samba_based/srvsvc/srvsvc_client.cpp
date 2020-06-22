@@ -50,7 +50,6 @@ srvsvc_client::~srvsvc_client() { }
 result srvsvc_client::connect(const session& sess)
 {
     return client_->connect_and_open_pipe(sess, "IPC$", "IPC", &ndr_table_srvsvc, true);
-
 }
 result srvsvc_client::enumerate_all_shares(std::vector<share_info>& shares_result)
 {
@@ -65,30 +64,23 @@ result srvsvc_client::enumerate_all_shares(std::vector<share_info>& shares_resul
     uint32_t preferred_len = 0xffffffff;
     uint32_t totalentries = 0;
     WERROR result;
-    NTSTATUS status = dcerpc_srvsvc_NetShareEnumAll(b, talloc_tos(), client_->pipe_handle()->desthost, &info_ctr, preferred_len, &totalentries, nullptr,
-                                                    &result);
+    NTSTATUS status = dcerpc_srvsvc_NetShareEnumAll(b, talloc_tos(), client_->pipe_handle()->desthost, &info_ctr,
+                                                    preferred_len, &totalentries, nullptr, &result);
 
-    if(!NT_STATUS_IS_OK(status)) {
-        return  {false, ntstatus_to_werror(status)};
-    }
-    if(!W_ERROR_IS_OK(result))
-    { return  {false, result};
-       }
+    if(!NT_STATUS_IS_OK(status)) { return {false, ntstatus_to_werror(status)}; }
+    if(!W_ERROR_IS_OK(result)) { return {false, result}; }
 
     uint32_t count = info_ctr.ctr.ctr2->count;
-    for(uint32_t i = 0; i < count; i++)
-    {
+    for(uint32_t i = 0; i < count; i++) {
         auto& element = info_ctr.ctr.ctr2->array[i];
-        shares_result.push_back({element.name,element.comment,element.path});
+        shares_result.push_back({element.name, element.comment, element.path});
     }
-    return  {true, ntstatus_to_werror(status)};
-
+    return {true, ntstatus_to_werror(status)};
 }
 
 std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::share_info& si)
 {
-    return os<<"Name: "<<si.name_<<"\n"
-    <<"\tComment: "<<si.comment_<<"\n"
-    <<"\tPath: "<<si.path_<<"\n";
-
+    return os << "Name: " << si.name_ << "\n"
+              << "\tComment: " << si.comment_ << "\n"
+              << "\tPath: " << si.path_ << "\n";
 }

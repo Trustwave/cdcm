@@ -62,8 +62,8 @@ result rpc_client::connect(const session& sess, const std::string& share, const 
 
     nt_status = dcerpc_binding_set_transport(binding_, NCACN_NP);
     if(!NT_STATUS_IS_OK(nt_status)) { return {false, ntstatus_to_werror(nt_status)}; }
-    nt_status = cli_full_connection_creds(&cli_, nullptr, dcerpc_binding_get_string_option(binding_, "host"), nullptr, 0,
-                                          share.c_str(), device.c_str(), creds_, 0, SMB_SIGNING_IPC_DEFAULT);
+    nt_status = cli_full_connection_creds(&cli_, nullptr, dcerpc_binding_get_string_option(binding_, "host"), nullptr,
+                                          0, share.c_str(), device.c_str(), creds_, 0, SMB_SIGNING_IPC_DEFAULT);
 
     if(!NT_STATUS_IS_OK(nt_status)) {
         AU_LOG_DEBUG("Cannot connect to server. Error was %s\n", nt_errstr(nt_status));
@@ -71,9 +71,8 @@ result rpc_client::connect(const session& sess, const std::string& share, const 
     }
     return {true, ntstatus_to_werror(nt_status)};
 }
-result rpc_client::open_pipe(const ndr_interface_table* table,const bool noauth)
+result rpc_client::open_pipe(const ndr_interface_table* table, const bool noauth)
 {
-
     cli_set_timeout(cli_, 10000);
     NTSTATUS nt_status;
     if(noauth) {
@@ -94,16 +93,15 @@ result rpc_client::open_pipe(const ndr_interface_table* table,const bool noauth)
     }
     return {true, ntstatus_to_werror(nt_status)};
 }
-result rpc_client::connect_and_open_pipe(const session& sess,const std::string& share,const std::string& device,const ndr_interface_table* table,const bool noauth)
+result rpc_client::connect_and_open_pipe(const session& sess, const std::string& share, const std::string& device,
+                                         const ndr_interface_table* table, const bool noauth)
 {
-    auto rv = connect(sess,share,device);
-    if (!std::get<0>(rv))
-    {
+    auto rv = connect(sess, share, device);
+    if(!std::get<0>(rv)) {
         AU_LOG_DEBUG("Connect failed. ");
         return rv;
-
     }
-    return open_pipe(table,noauth);
+    return open_pipe(table, noauth);
 }
 cli_state* rpc_client::cli() { return cli_; }
 rpc_pipe_client* rpc_client::pipe_handle() { return pipe_handle_; }

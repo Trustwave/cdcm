@@ -27,9 +27,9 @@
 namespace trustwave {
     struct smb_list_dir_msg: public single_param_action_msg {
         static constexpr std::string_view act_name{"list_dir"};
-        smb_list_dir_msg(): single_param_action_msg(act_name) {}
+        smb_list_dir_msg(): single_param_action_msg(act_name) { }
 
-        explicit smb_list_dir_msg(const single_param_action_msg& o): single_param_action_msg(o, act_name) {}
+        explicit smb_list_dir_msg(const single_param_action_msg& o): single_param_action_msg(o, act_name) { }
         std::string pattern;
     };
 } // namespace trustwave
@@ -55,7 +55,7 @@ namespace trustwave {
 
     class SMB_List_Dir final: public Action_Base {
     public:
-        SMB_List_Dir(): Action_Base(trustwave::smb_list_dir_msg::act_name) {}
+        SMB_List_Dir(): Action_Base(trustwave::smb_list_dir_msg::act_name) { }
 
         action_status
         act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;

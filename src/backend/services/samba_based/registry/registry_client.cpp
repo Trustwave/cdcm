@@ -37,8 +37,7 @@ using trustwave::result;
 
 registry_client::registry_client(): ctx_(nullptr), ev_ctx_(nullptr), data_blob_{}
 {
-    if (this->init_conf(authenticated_scan_server::instance().service_conf_repository))
-    {
+    if(this->init_conf(authenticated_scan_server::instance().service_conf_repository)) {
         AU_LOG_INFO("%s", conf_->to_string().c_str());
     }
 
@@ -49,8 +48,7 @@ registry_client::registry_client(): ctx_(nullptr), ev_ctx_(nullptr), data_blob_{
     data_blob_ = data_blob_talloc_zero(mem_ctx_, conf_->data_blob_size);
 }
 
-registry_client::~registry_client()
-{ talloc_free(mem_ctx_); }
+registry_client::~registry_client() { talloc_free(mem_ctx_); }
 
 result registry_client::connect(const session& sess)
 {
@@ -62,9 +60,7 @@ result registry_client::connect(const session& sess)
     WERROR error = reg_open_remote(mem_ctx_, &ctx_->registry, nullptr, creds, ::loadparm_init_global(false),
                                    sess.remote().c_str(), ev_ctx_);
 
-    if(!W_ERROR_IS_OK(error)) {
-        return {false, error};
-    }
+    if(!W_ERROR_IS_OK(error)) { return {false, error}; }
 
     error = reg_get_predefined_key(ctx_->registry, reg_predefined_keys[2].handle, &ctx_->current);
     if(W_ERROR_IS_OK(error)) {
@@ -88,21 +84,18 @@ result registry_client::open_key(const char* full_path)
 }
 void registry_client::normalize(registry_value& rv)
 {
-    if(REG_MULTI_SZ == rv.type())
-    {
+    if(REG_MULTI_SZ == rv.type()) {
         AU_LOG_DEBUG("Type is REG_MULTI_SZ");
         const char** a = nullptr;
-        pull_reg_multi_sz(mem_ctx_,&data_blob_,&a);
+        pull_reg_multi_sz(mem_ctx_, &data_blob_, &a);
         const char* p = nullptr;
         std::string s;
-        p=*a;
-        while(true)
-        {
+        p = *a;
+        while(true) {
             std::string_view sv(p);
-            if(sv.empty())
-                break;
+            if(sv.empty()) break;
             s.append(sv).append("\n");
-            p=p+sv.length()+1;
+            p = p + sv.length() + 1;
         }
         rv.value(s);
     }
@@ -181,7 +174,7 @@ result registry_client::enumerate_key(const std::string& key, enum_key& ek)
     return status;
 }
 
-//rotem TODO: remove one of the versions
+// rotem TODO: remove one of the versions
 result registry_client::enumerate_key_values_ver1(const std::string& key, enum_key_values_ver1& ek)
 {
     auto status = open_key(key.c_str());

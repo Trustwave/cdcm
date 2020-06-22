@@ -14,23 +14,23 @@
 //                          						Include files
 //=====================================================================================================================
 #ifdef __cplusplus
-extern"C" {
+extern "C" {
 #endif
-#include"source3/include/includes.h"
-#include"../librpc/gen_ndr/ndr_lsa_c.h"
+#include "source3/include/includes.h"
+#include "../librpc/gen_ndr/ndr_lsa_c.h"
 //#include"libcli/smb/smb_constants.h"
-#include"source3/libsmb/proto.h"
-#include"source3/include/client.h"
-#include"libcli/smb/smbXcli_base.h"
-#include"source3/rpc_client/cli_lsarpc.h"
-#include"libcli/security/dom_sid.h"
-#include"libcli/security/security.h"
-#include"source3/rpc_client/cli_pipe.h"
+#include "source3/libsmb/proto.h"
+#include "source3/include/client.h"
+#include "libcli/smb/smbXcli_base.h"
+#include "source3/rpc_client/cli_lsarpc.h"
+#include "libcli/security/dom_sid.h"
+#include "libcli/security/security.h"
+#include "source3/rpc_client/cli_pipe.h"
 #ifdef __cplusplus
 }
 
 #endif
-#include"security_descriptor_utils.hpp"
+#include "security_descriptor_utils.hpp"
 #include <unordered_map>
 #include <sstream>
 #include <iostream>
@@ -121,11 +121,11 @@ namespace {
         ss << "/" << std::hex << flags << "/";
     }
     static std::vector<std::string> get_ace_flags(uint8_t flags) { return std::move(flags_vector(ace_flags, flags)); }
-    static std::vector<std::string> get_access_mask(uint32_t mask,entity_type et)
+    static std::vector<std::string> get_access_mask(uint32_t mask, entity_type et)
     {
         return std::move(flags_vector(perm_dir.at(et), mask));
     }
-    static void SidToString( cli_state* cli, fstring str, const  dom_sid* sid)
+    static void SidToString(cli_state* cli, fstring str, const dom_sid* sid)
     {
         static constexpr auto tcon_fail
             = [&](cli_state* cli, smbXcli_tcon* o_conn) { cli_state_restore_tcon(cli, o_conn); };
@@ -161,7 +161,7 @@ namespace {
         }
         return fail(cli, p, o_conn);
     }
-    static void print_ace( cli_state* cli, std::stringstream& ss,  security_ace* ace,entity_type et)
+    static void print_ace(cli_state* cli, std::stringstream& ss, security_ace* ace, entity_type et)
     {
         fstring sidstr;
         SidToString(cli, sidstr, &ace->trustee);
@@ -200,7 +200,7 @@ namespace {
     {
         return std::move(flags_vector(sec_desc_ctrl_bits, ctrl));
     }
-    static trustwave::sd_utils::ACE_str get_acl( cli_state* cli,  security_ace* ace,entity_type et)
+    static trustwave::sd_utils::ACE_str get_acl(cli_state* cli, security_ace* ace, entity_type et)
     {
         fstring sidstr;
         SidToString(cli, sidstr, &ace->trustee);
@@ -214,32 +214,30 @@ namespace {
             aa.AccessControlType = std::to_string(ace->type);
         }
         aa.AccessControlFlags = get_ace_flags(ace->flags);
-        aa.FileSystemRights = get_access_mask(ace->access_mask,et);
+        aa.FileSystemRights = get_access_mask(ace->access_mask, et);
         return aa;
     }
 
-
-}
-
+} // namespace
 
 std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::sd_utils::ACE_str& acl)
 {
     os << "SecurityPrincipal: " << acl.SecurityPrincipal << "\n"
-              << "FileSystemRights: ";
-    for(auto e:  acl.FileSystemRights) { os << e << "|"; }
-    os <<"\n"
-              << "AccessControlType: " << acl.AccessControlType << "\n"
-              << "AccessControlFlags: ";
-    for(auto e:  acl.AccessControlFlags) { os << e << "|"; }
-    os  << "\n";
+       << "FileSystemRights: ";
+    for(auto e: acl.FileSystemRights) { os << e << "|"; }
+    os << "\n"
+       << "AccessControlType: " << acl.AccessControlType << "\n"
+       << "AccessControlFlags: ";
+    for(auto e: acl.AccessControlFlags) { os << e << "|"; }
+    os << "\n";
     return os;
 }
 std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::sd_utils::Security_Descriptor_str& sds)
 {
     os << "Revision: " << sds.Revision << "\n"
        << "Control: ";
-    for(auto e:  sds.Control) { os << e << "|"; }
-    os<< "\n"
+    for(auto e: sds.Control) { os << e << "|"; }
+    os << "\n"
        << "Owner: " << sds.Owner << "\n"
        << "Group: " << sds.Group << "\n"
        << "ACLS: "
@@ -247,58 +245,60 @@ std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::sd_utils:
     for(const auto& e: sds.ACLS) { os << e; }
     return os;
 }
-void trustwave::sd_utils::sec_desc_print( cli_state* cli, std::stringstream& ss, security_descriptor* sd,entity_type et)
+void trustwave::sd_utils::sec_desc_print(cli_state* cli, std::stringstream& ss, security_descriptor* sd, entity_type et)
 {
     fstring sidstr;
     uint32_t i;
-    ss <<"REVISION:" << sd->revision <<"\n";
+    ss << "REVISION:" << sd->revision << "\n";
     print_acl_ctrl(ss, sd->type);
 
     /* Print owner and group sid */
 
     if(sd->owner_sid) { SidToString(cli, sidstr, sd->owner_sid); }
     else {
-        fstrcpy(sidstr,"");
+        fstrcpy(sidstr, "");
     }
-    ss <<"OWNER:" << sidstr <<"\n";
+    ss << "OWNER:" << sidstr << "\n";
 
     if(sd->group_sid) { SidToString(cli, sidstr, sd->group_sid); }
     else {
-        fstrcpy(sidstr,"");
+        fstrcpy(sidstr, "");
     }
-    ss <<"GROUP:" << sidstr <<"\n";
+    ss << "GROUP:" << sidstr << "\n";
 
     /* Print aces */
     for(i = 0; sd->dacl && i < sd->dacl->num_aces; i++) {
         security_ace* ace = &sd->dacl->aces[i];
-        ss <<"ACL_str:";
-        print_ace(cli, ss, ace,et);
-        ss <<"\n";
+        ss << "ACL_str:";
+        print_ace(cli, ss, ace, et);
+        ss << "\n";
     }
 }
 
-trustwave::sd_utils::Security_Descriptor_str trustwave::sd_utils::get_sd_str(cli_state* cli, security_descriptor* sd,entity_type et)
+trustwave::sd_utils::Security_Descriptor_str
+trustwave::sd_utils::get_sd_str(cli_state* cli, security_descriptor* sd, entity_type et)
 {
     trustwave::sd_utils::Security_Descriptor_str r;
-    r.Revision= std::to_string(sd->revision);
-    r.Control = get_acl_ctrl( sd->type);
+    r.Revision = std::to_string(sd->revision);
+    r.Control = get_acl_ctrl(sd->type);
     fstring sidstr;
     if(sd->owner_sid) { SidToString(cli, sidstr, sd->owner_sid); }
     else {
-        fstrcpy(sidstr,"");
+        fstrcpy(sidstr, "");
     }
-    r.Owner=sidstr;
+    r.Owner = sidstr;
 
     if(sd->group_sid) { SidToString(cli, sidstr, sd->group_sid); }
     else {
-        fstrcpy(sidstr,"");
+        fstrcpy(sidstr, "");
     }
-    r.Group=sidstr;
-    r.ACLS = trustwave::sd_utils::get_acls(cli,sd,et);
+    r.Group = sidstr;
+    r.ACLS = trustwave::sd_utils::get_acls(cli, sd, et);
 
     return r;
 }
-std::vector<trustwave::sd_utils::ACE_str> trustwave::sd_utils::get_acls(cli_state* cli, security_descriptor* sd,entity_type et)
+std::vector<trustwave::sd_utils::ACE_str>
+trustwave::sd_utils::get_acls(cli_state* cli, security_descriptor* sd, entity_type et)
 {
     std::vector<trustwave::sd_utils::ACE_str> v;
     for(uint32_t i = 0; sd->dacl && i < sd->dacl->num_aces; i++) {

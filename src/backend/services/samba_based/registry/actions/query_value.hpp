@@ -30,7 +30,7 @@
 namespace trustwave {
     struct reg_action_query_value_msg: public action_msg {
         static constexpr std::string_view act_name{"query_value"};
-        reg_action_query_value_msg(): action_msg(act_name) {}
+        reg_action_query_value_msg(): action_msg(act_name) { }
 
         std::string key_;
         std::string value_;
@@ -60,7 +60,7 @@ namespace trustwave {
 
     class Query_Value_Action final: public Action_Base {
     public:
-        Query_Value_Action(): Action_Base(trustwave::reg_action_query_value_msg::act_name) {}
+        Query_Value_Action(): Action_Base(trustwave::reg_action_query_value_msg::act_name) { }
 
         action_status
         act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;
