@@ -49,8 +49,7 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( smb_action->param.empty())
-    {
+    if(smb_action->param.empty()) {
         res->res("Error: param is mandatory");
         return action_status::FAILED;
     }
@@ -93,9 +92,7 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
         {
             static const std::regex re("([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)\\s+.*");
             std::smatch what;
-            if(std::regex_match(val, what, re)) {
-                val = what.str(1);
-            }
+            if(std::regex_match(val, what, re)) { val = what.str(1); }
         }
         c.key(key);
         c.string(val.empty() ? std::string("NULL") : val);

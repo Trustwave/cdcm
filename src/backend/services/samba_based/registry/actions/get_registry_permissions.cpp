@@ -27,22 +27,18 @@
 using trustwave::Get_Registry_Permissions_Action;
 using action_status = trustwave::Action_Base::action_status;
 
-
 action_status Get_Registry_Permissions_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                      std::shared_ptr<result_msg> res)
+                                                   std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
         return action_status::FAILED;
     }
-    struct my_frame
-    {
+    struct my_frame {
         void* f_;
-        my_frame():f_(talloc_stackframe()){}
-        ~my_frame(){
-            talloc_free(f_);
-        }
-    }ff;
+        my_frame(): f_(talloc_stackframe()) { }
+        ~my_frame() { talloc_free(f_); }
+    } ff;
     {
         auto c = trustwave::registry_client2();
 
@@ -75,9 +71,7 @@ action_status Get_Registry_Permissions_Action::act(boost::shared_ptr<session> se
         trustwave::sd_utils::Security_Descriptor_str sd;
 
         auto ret = c.get_sd(sd);
-        if(std::get<0>(ret)) {
-             res->res(sd);
-        }
+        if(std::get<0>(ret)) { res->res(sd); }
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));

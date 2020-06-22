@@ -144,7 +144,7 @@ namespace {
         }
         return NT_STATUS_OK;
     }
-}
+} // namespace
 result trustwave::registry_client2::open_key(const std::string& k)
 {
     uint32_t access_mask = SEC_FLAG_MAXIMUM_ALLOWED | SEC_FLAG_SYSTEM_SECURITY;
@@ -152,16 +152,15 @@ result trustwave::registry_client2::open_key(const std::string& k)
         = registry_openkey(talloc_tos(), client_->pipe_handle(), k, access_mask, &ctx_.pol_hive, &ctx_.pol_key);
     if(!NT_STATUS_IS_OK(status)) {
         AU_LOG_DEBUG("registry_openkey failed: %s\n", nt_errstr(status));
-        return  {false, ntstatus_to_werror(status)};
+        return {false, ntstatus_to_werror(status)};
     }
-    return  {true, ntstatus_to_werror(status)};
-
+    return {true, ntstatus_to_werror(status)};
 }
 result trustwave::registry_client2::connect(const session& sess)
 {
     return client_->connect_and_open_pipe(sess, "IPC$", "IPC", &ndr_table_winreg);
 }
-result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descriptor_str &outsd)
+result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descriptor_str& outsd)
 {
     NTSTATUS status;
     dcerpc_binding_handle* b = client_->pipe_handle()->binding_handle;
@@ -169,8 +168,7 @@ result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descrip
         WERROR werr;
         dcerpc_winreg_CloseKey(b, talloc_tos(), &ctx_.pol_key, &werr);
         dcerpc_winreg_CloseKey(b, talloc_tos(), &ctx_.pol_hive, &werr);
-        return  {NT_STATUS_IS_OK(status), ntstatus_to_werror(status)};
-
+        return {NT_STATUS_IS_OK(status), ntstatus_to_werror(status)};
     };
     struct KeySecurityData* sd = talloc_zero(talloc_tos(), struct KeySecurityData);
     if(!sd) {
@@ -182,12 +180,12 @@ result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descrip
     WERROR werr;
     status = registry_getsd(talloc_tos(), b, &ctx_.pol_key, sec_info, sd, &werr);
     if(!NT_STATUS_IS_OK(status)) {
-        AU_LOG_DEBUG( "getting sd failed: %s\n", nt_errstr(status));
+        AU_LOG_DEBUG("getting sd failed: %s\n", nt_errstr(status));
         return out();
     }
     if(!W_ERROR_IS_OK(werr)) {
         status = werror_to_ntstatus(werr);
-        AU_LOG_DEBUG( "getting sd failed: %s\n", win_errstr(werr));
+        AU_LOG_DEBUG("getting sd failed: %s\n", win_errstr(werr));
         return out();
     }
     DATA_BLOB blob;

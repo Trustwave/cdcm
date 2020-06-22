@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
-set(SOURCE_FILES  srvsvc_client.cpp)
+set(SOURCE_FILES srvsvc_client.cpp)
 include_directories(${SAMBA_SRC}/source3)
 include_directories(${SAMBA_SRC}/source3/include)
 link_directories(${SAMBA_SRC}/bin/default/librpc)

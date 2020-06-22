@@ -6,7 +6,7 @@ include_directories(${SMB_INCLUDES})
 link_directories(${SMB_LINKS})
 
 set(LD_ACTION_LIBS dl tw-srvsvc-client)
-set(ACTION_NAMES  enumerate_shares)
+set(ACTION_NAMES enumerate_shares)
 
 foreach (X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")

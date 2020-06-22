@@ -41,7 +41,7 @@ using trustwave::lsa_client;
 using trustwave::session;
 using trustwave::result;
 
-result lsa_client::get_secdesc(const std::string& filename,security_descriptor*& sd)
+result lsa_client::get_secdesc(const std::string& filename, security_descriptor*& sd)
 {
     uint16_t fnum = (uint16_t)-1;
     uint32_t desired_access = SEC_STD_READ_CONTROL | SEC_FLAG_SYSTEM_SECURITY;
@@ -50,56 +50,48 @@ result lsa_client::get_secdesc(const std::string& filename,security_descriptor*&
                                    FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN, 0x0, 0x0, &fnum, nullptr);
     if(!NT_STATUS_IS_OK(status)) {
         AU_LOG_DEBUG("Failed to open %s: %s\n", filename.c_str(), nt_errstr(status));
-        return  {false, ntstatus_to_werror(status)};
+        return {false, ntstatus_to_werror(status)};
     }
 
     status = cli_query_security_descriptor(client_->cli(), fnum, sec_info, talloc_tos(), &sd);
 
     if(!NT_STATUS_IS_OK(status)) {
         AU_LOG_DEBUG("Failed to get security descriptor: %s\n", nt_errstr(status));
-        return  {false, ntstatus_to_werror(status)};
+        return {false, ntstatus_to_werror(status)};
     }
-    return  {true, ntstatus_to_werror(status)};
+    return {true, ntstatus_to_werror(status)};
 }
 
 result lsa_client::cacl_dump(const std::string& filename)
 {
     security_descriptor* sd;
-    auto ret = get_secdesc(filename,sd);
-    if(!std::get<0>(ret)) {
-        return ret;
-    }
+    auto ret = get_secdesc(filename, sd);
+    if(!std::get<0>(ret)) { return ret; }
     std::stringstream ss;
-    trustwave::sd_utils::sec_desc_print(client_->cli(), ss, sd,sd_utils::entity_type::NTFS_DIR);
+    trustwave::sd_utils::sec_desc_print(client_->cli(), ss, sd, sd_utils::entity_type::NTFS_DIR);
     std::cerr << ss.str();
-    std::cerr<< trustwave::sd_utils::get_sd_str(client_->cli(),sd,sd_utils::entity_type::NTFS_DIR).ACLS[0];
+    std::cerr << trustwave::sd_utils::get_sd_str(client_->cli(), sd, sd_utils::entity_type::NTFS_DIR).ACLS[0];
     return ret;
 }
-result lsa_client::get_acls(const std::string& filename,std::vector<trustwave::sd_utils::ACE_str>& acls)
+result lsa_client::get_acls(const std::string& filename, std::vector<trustwave::sd_utils::ACE_str>& acls)
 {
     security_descriptor* sd;
-    auto ret = get_secdesc(filename,sd);
-    if(std::get<0>(ret))  {
-        acls = trustwave::sd_utils::get_acls(client_->cli(), sd,sd_utils::entity_type::NTFS_DIR);
-    }
-    return  ret;
-
+    auto ret = get_secdesc(filename, sd);
+    if(std::get<0>(ret)) { acls = trustwave::sd_utils::get_acls(client_->cli(), sd, sd_utils::entity_type::NTFS_DIR); }
+    return ret;
 }
 
-lsa_client::lsa_client(): client_(std::make_unique<rpc_client>())
-{
-}
+lsa_client::lsa_client(): client_(std::make_unique<rpc_client>()) { }
 
 result lsa_client::connect(const session& sess, const std::string& share)
 {
-    return client_->connect(sess, share,"?????");
+    return client_->connect(sess, share, "?????");
 }
-result lsa_client::get_sd(const std::string& path,sd_utils::entity_type et,trustwave::sd_utils::Security_Descriptor_str &outsd)
+result lsa_client::get_sd(const std::string& path, sd_utils::entity_type et,
+                          trustwave::sd_utils::Security_Descriptor_str& outsd)
 {
     security_descriptor* sd;
-    auto ret = get_secdesc(path,sd);
-    if(std::get<0>(ret))  {
-        outsd =trustwave::sd_utils::get_sd_str(client_->cli(), sd,et);
-    }
-    return  ret;
+    auto ret = get_secdesc(path, sd);
+    if(std::get<0>(ret)) { outsd = trustwave::sd_utils::get_sd_str(client_->cli(), sd, et); }
+    return ret;
 }

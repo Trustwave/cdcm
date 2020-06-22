@@ -43,8 +43,7 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( veact->key_.empty()||veact->value_.empty())
-    {
+    if(veact->key_.empty() || veact->value_.empty()) {
         res->res("Error: key and value are mandatory");
         return action_status::FAILED;
     }

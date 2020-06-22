@@ -38,7 +38,7 @@ void split_share_path(const std::string& full, std::string& share, std::string& 
     }
 }
 action_status Get_NTFS_File_Permissions_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                                      std::shared_ptr<result_msg> res)
+                                                    std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
@@ -55,26 +55,24 @@ action_status Get_NTFS_File_Permissions_Action::act(boost::shared_ptr<session> s
         res->res("Error: key is mandatory");
         return action_status::FAILED;
     }
-    std::string share,path;
-    split_share_path(gnpact->key_,share,path);
+    std::string share, path;
+    split_share_path(gnpact->key_, share, path);
     if(share.empty()) {
         res->res("Error: share is needed");
         return action_status::FAILED;
     }
-    struct my_frame
-    {
+    struct my_frame {
         void* f_;
-        my_frame():f_(talloc_stackframe()){}
-        ~my_frame(){
-            talloc_free(f_);
-        }
-    }ff;
+        my_frame(): f_(talloc_stackframe()) { }
+        ~my_frame() { talloc_free(f_); }
+    } ff;
     {
         auto c = trustwave::lsa_client();
 
-        result r = c.connect(*sess,share);
+        result r = c.connect(*sess, share);
         if(!std::get<0>(r)) {
-            AU_LOG_DEBUG("Failed connecting to %s share: %s err: %s", sess->remote().c_str(),share.c_str(), win_errstr(std::get<1>(r)));
+            AU_LOG_DEBUG("Failed connecting to %s share: %s err: %s", sess->remote().c_str(), share.c_str(),
+                         win_errstr(std::get<1>(r)));
 
             res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
             return action_status::FAILED;
@@ -82,11 +80,9 @@ action_status Get_NTFS_File_Permissions_Action::act(boost::shared_ptr<session> s
 
         trustwave::sd_utils::Security_Descriptor_str sd;
 
-        auto ret = c.get_sd(path,trustwave::sd_utils::entity_type::NTFS_FILE,sd);
+        auto ret = c.get_sd(path, trustwave::sd_utils::entity_type::NTFS_FILE, sd);
 
-        if(std::get<0>(ret)) {
-            res->res(sd);
-        }
+        if(std::get<0>(ret)) { res->res(sd); }
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));
@@ -97,7 +93,7 @@ action_status Get_NTFS_File_Permissions_Action::act(boost::shared_ptr<session> s
     return action_status::SUCCEEDED;
 }
 
-//instance of the our plugin
+// instance of the our plugin
 static std::shared_ptr<Get_NTFS_File_Permissions_Action> instance = nullptr;
 
 // extern function, that declared in "action.hpp", for export the plugin from dll

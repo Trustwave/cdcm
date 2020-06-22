@@ -51,7 +51,7 @@ namespace {
         size_t charCount = 0; // Count byte tripples
         size_t outPos = 0; // Current letter in the output stream
 
-        std::string ret(base64_encoded_length(inLen) , '\0');
+        std::string ret(base64_encoded_length(inLen), '\0');
         while(inLen--) // Scan the input bit stream
         {
             currByte = *(inBuf++);
@@ -75,9 +75,7 @@ namespace {
             bitsContainer <<= 16 - (8 * charCount);
             ret[outPos++] = base64Alphabet[bitsContainer >> 18 & 0x3f];
             ret[outPos++] = base64Alphabet[(bitsContainer >> 12) & 0x3f];
-            if(charCount == 1) {
-                ret[outPos++] = PAD;
-            }
+            if(charCount == 1) { ret[outPos++] = PAD; }
             else {
                 ret[outPos++] = base64Alphabet[(bitsContainer >> 6) & 0x3f];
             }
@@ -101,26 +99,18 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( smb_action->path_.empty())
-    {
+    if(smb_action->path_.empty()) {
         res->res("Error: path is mandatory");
         return action_status::FAILED;
     }
-    if (smb_action->offset_.empty())
-    {
-        smb_action->offset_ = "0";
-    }
-    if (smb_action->size_.empty())
-    {
-        smb_action->size_ = "0";
-    }
+    if(smb_action->offset_.empty()) { smb_action->offset_ = "0"; }
+    if(smb_action->size_.empty()) { smb_action->size_ = "0"; }
 
-    if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
-    {
+    if(std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_) < 0) {
         res->res("Error: Bad parameter");
         return action_status::FAILED;
     }
-   
+
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->path_);
     trustwave::smb_client rc;
@@ -132,9 +122,7 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     }
     auto off = smb_action->offset_.empty() ? 0 : std::stoul(smb_action->offset_);
     auto sz = smb_action->size_.empty() ? 0 : std::stoul(smb_action->size_);
-    if(0 == sz) {
-        sz = rc.file_size() - off;
-    }
+    if(0 == sz) { sz = rc.file_size() - off; }
     AU_LOG_DEBUG("Received offset: %zu size: %zu", off, sz);
     auto buff = std::make_unique<char[]>(sz);
     if(!buff) {

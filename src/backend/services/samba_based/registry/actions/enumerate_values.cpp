@@ -13,38 +13,35 @@
 #include "../registry_client.hpp"
 #include "../registry_value.hpp"
 
-
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
-
 
 namespace tao ::json {
 
     template<>
     struct traits<trustwave::registry_value>:
-            binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
-                    TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_),
-                    TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
+        binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
+                        TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_),
+                        TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
     };
 
     template<>
     struct traits<trustwave::enum_key_values_ver1>:
-            binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values_ver1::registry_values_)> {
+        binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values_ver1::registry_values_)> {
     };
 
-    template <>
+    template<>
     struct traits<trustwave::enum_key_values_ver2>:
-            binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values_ver2::registry_values_)> {
+        binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values_ver2::registry_values_)> {
     };
-
 
 } // namespace tao::json
 
 using trustwave::Enumerate_Registry_Values_Action;
 using action_status = trustwave::Action_Base::action_status;
 action_status Enumerate_Registry_Values_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                     std::shared_ptr<result_msg> res)
+                                                    std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->res("Error: Session not found");
@@ -59,8 +56,7 @@ action_status Enumerate_Registry_Values_Action::act(boost::shared_ptr<session> s
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( ekact->key_.empty())
-    {
+    if(ekact->key_.empty()) {
         res->res("Error: key is mandatory");
         return action_status::FAILED;
     }
@@ -76,16 +72,14 @@ action_status Enumerate_Registry_Values_Action::act(boost::shared_ptr<session> s
     }
 
     // version 1  - as we currently behave, return the value, type and data
-    //trustwave::enum_key_values_ver1 ek{};
-    //auto ret = c.enumerate_key_values_ver1(ekact->key_, ek);
+    // trustwave::enum_key_values_ver1 ek{};
+    // auto ret = c.enumerate_key_values_ver1(ekact->key_, ek);
 
     // version 2  - as pm defined, only values as string
     trustwave::enum_key_values_ver2 ek{};
     auto ret = c.enumerate_key_values_ver2(ekact->key_, ek);
 
-    if(std::get<0>(ret)) {
-        res->res(ek);
-    }
+    if(std::get<0>(ret)) { res->res(ek); }
     else {
         auto status = werror_to_ntstatus(std::get<1>(ret));
         AU_LOG_DEBUG("%s", nt_errstr(status));

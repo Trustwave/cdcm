@@ -49,8 +49,7 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( smb_action->param.empty())
-    {
+    if(smb_action->param.empty()) {
         res->res("Error: param is mandatory");
         return action_status::FAILED;
     }

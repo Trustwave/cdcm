@@ -84,9 +84,7 @@ namespace {
         if(!sess->id().is_nil()) {
             AU_LOG_DEBUG("smbc_auth_fn session for %s found", pServer);
 
-            if(sess->creds().username().empty()) {
-                strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1));
-            }
+            if(sess->creds().username().empty()) { strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1)); }
             else {
                 strncpy(pWorkgroup, sess->creds().domain().c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
             }
@@ -111,7 +109,7 @@ namespace {
 
         if((ctx = smbc_new_context()) == nullptr) return nullptr;
 
-        //smbc_setDebug(ctx, 100);
+        // smbc_setDebug(ctx, 100);
         smbc_setFunctionAuthData(ctx, smbc_auth_fn);
         if(smbc_init_context(ctx) == nullptr) {
             smbc_free_context(ctx, 1);
@@ -120,16 +118,12 @@ namespace {
 
         return ctx;
     }
-    void delete_smbctx(SMBCCTX* ctx)
-    {
-        smbc_free_context(ctx, 0);
-    }
+    void delete_smbctx(SMBCCTX* ctx) { smbc_free_context(ctx, 0); }
 
 } // namespace
 smb_client::smb_client(): ctx_(nullptr)
 {
-    if (this->init_conf(authenticated_scan_server::instance().service_conf_repository))
-    {
+    if(this->init_conf(authenticated_scan_server::instance().service_conf_repository)) {
         AU_LOG_INFO("%s", conf_->to_string().c_str());
     }
 }
@@ -156,9 +150,7 @@ std::pair<bool, int> smb_client::open_file(const char* path)
 
     remote_fd_ = smbc_open(path, O_RDONLY, 0755);
     current_open_path_ = path;
-    if(remote_fd_ <= 0) {
-        return std::make_pair(false, errno);
-    }
+    if(remote_fd_ <= 0) { return std::make_pair(false, errno); }
     if(smbc_fstat(remote_fd_, &remotestat_) < 0) {
         AU_LOG_ERROR("Can't stat %s: %s", path, strerror(errno));
         return std::make_pair(false, -1);
@@ -178,14 +170,11 @@ bool smb_client::download_portion(off_t curpos, off_t count, bool to_file)
         if(bytesread < 0) {
             AU_LOG_ERROR("Can't read %d bytes at offset %jd, file %s", SMB_DEFAULT_BLOCKSIZE, (intmax_t)curpos,
                          current_open_path_.data());
-            if(local_fd_ != STDOUT_FILENO) {
-            }
+            if(local_fd_ != STDOUT_FILENO) { }
             return false;
         }
 
-        if(to_file) {
-            byteswritten = write(local_fd_, readbuf, static_cast<size_t>(bytesread));
-        }
+        if(to_file) { byteswritten = write(local_fd_, readbuf, static_cast<size_t>(bytesread)); }
         else {
             byteswritten += bytesread;
         }
@@ -203,9 +192,7 @@ bool smb_client::download_portion_to_memory(const char* base, const char* name, 
     char path[SMB_MAXPATHLEN];
     snprintf(path, SMB_MAXPATHLEN - 1, "%s%s%s", base,
              (*base && *name && name[0] != '/' && base[strlen(base) - 1] != '/') ? "/" : "", name);
-    if(!open_file(path).first) {
-        return false;
-    }
+    if(!open_file(path).first) { return false; }
     off_t off = smbc_lseek(remote_fd_, offset, SEEK_SET);
     if(off < 0) {
         AU_LOG_ERROR("Can't seek to %jd in remote file %s", (intmax_t)offset, path);
@@ -281,8 +268,6 @@ uintmax_t smb_client::file_size() const { return static_cast<uintmax_t>(remotest
 time_t smb_client::last_modified() const { return remotestat_.st_mtim.tv_sec; }
 bool smb_client::validate_open()
 {
-    if(ctx_ && !current_open_path_.empty()) {
-        return true;
-    }
+    if(ctx_ && !current_open_path_.empty()) { return true; }
     return open_file(current_open_path_.data()).first;
 }

@@ -29,9 +29,9 @@ namespace trustwave {
     struct smb_file_exists_msg: public single_param_action_msg {
         static constexpr std::string_view act_name{"file_exists"};
 
-        smb_file_exists_msg(): single_param_action_msg(act_name) {}
+        smb_file_exists_msg(): single_param_action_msg(act_name) { }
 
-        explicit smb_file_exists_msg(const single_param_action_msg& o): single_param_action_msg(o, act_name) {}
+        explicit smb_file_exists_msg(const single_param_action_msg& o): single_param_action_msg(o, act_name) { }
     };
 } // namespace trustwave
 namespace tao::json {
@@ -54,7 +54,7 @@ namespace tao::json {
 namespace trustwave {
     class SMB_File_Exists final: public Action_Base {
     public:
-        SMB_File_Exists(): Action_Base(trustwave::smb_file_exists_msg::act_name) {}
+        SMB_File_Exists(): Action_Base(trustwave::smb_file_exists_msg::act_name) { }
 
         action_status
         act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg>, std::shared_ptr<result_msg>) override;

@@ -20,17 +20,18 @@
 namespace trustwave {
     struct registry_service_configuration: public configuration {
         static constexpr std::string_view srv_name{"registry"};
-        registry_service_configuration(): configuration(srv_name) {}
+        registry_service_configuration(): configuration(srv_name) { }
         off_t data_blob_size = 1024 * 1024;
         size_t reconnect_attempt_on_pipe_busy = 1;
         std::string to_string() const override
         {
             std::stringstream ss;
-            ss <<"\n"
-               <<"\t"<<srv_name << " Configuration\n"
-               <<"\t"<<"===============================\n"
-               <<"\tdata_blob_size                          :\t"<< data_blob_size             <<" bytes\n"
-               <<"\treconnect_attempt_on_pipe_busy          :\t"<< reconnect_attempt_on_pipe_busy             <<" bytes\n"
+            ss << "\n"
+               << "\t" << srv_name << " Configuration\n"
+               << "\t"
+               << "===============================\n"
+               << "\tdata_blob_size                          :\t" << data_blob_size << " bytes\n"
+               << "\treconnect_attempt_on_pipe_busy          :\t" << reconnect_attempt_on_pipe_busy << " bytes\n"
 
                 ;
             return ss.str();

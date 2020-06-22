@@ -41,8 +41,7 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if( smb_action->param.empty())
-    {
+    if(smb_action->param.empty()) {
         res->res("Error: param is mandatory");
         return action_status::FAILED;
     }

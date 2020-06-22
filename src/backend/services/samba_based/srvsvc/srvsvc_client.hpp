@@ -43,22 +43,22 @@ namespace trustwave {
     class session;
     class rpc_client;
     using result = std::tuple<bool, WERROR>;
-    struct share_info
-    {
+    struct share_info {
         std::string name_;
         std::string comment_;
         std::string path_;
     };
-    class srvsvc_client final: public cdcm_client{
+    class srvsvc_client final: public cdcm_client {
     public:
-        //fixme assaf add copy ctor move ......
+        // fixme assaf add copy ctor move ......
         srvsvc_client();
         ~srvsvc_client() override;
         result connect(const session& sess);
         result enumerate_all_shares(std::vector<share_info>&);
+
     private:
         std::unique_ptr<rpc_client> client_;
     };
-    std::ostream& operator<<(std::ostream& , const trustwave::share_info& );
+    std::ostream& operator<<(std::ostream&, const trustwave::share_info&);
 } // namespace trustwave
 #endif // SRC_BACKEND_SERVICES_SAMBA_BASED_SRVSVC_SRVSVC_CLIENT_HPP
