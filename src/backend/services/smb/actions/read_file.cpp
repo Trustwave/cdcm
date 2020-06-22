@@ -91,7 +91,7 @@ action_status
 SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
@@ -99,13 +99,13 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     auto smb_action = std::dynamic_pointer_cast<smb_read_file_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Internal error");  //error type B
         return action_status::FAILED;
     }
     if( smb_action->path_.empty())
     {
-        res->set_resp_code(trustwave::resp_code({"A",666}));
+        res->set_resp_code(trustwave::resp_code({2,666}));
         res->res("Error: path is mandatory");  //error type A
         return action_status::FAILED;
     }
@@ -120,7 +120,7 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
 
     if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
     {
-        res->set_resp_code(trustwave::resp_code({"A",666}));
+        res->set_resp_code(trustwave::resp_code({2,666}));
         res->res("Error: Bad parameter");  //error type A
         return action_status::FAILED;
     }
@@ -142,7 +142,7 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     AU_LOG_DEBUG("Received offset: %zu size: %zu", off, sz);
     auto buff = std::make_unique<char[]>(sz);
     if(!buff) {
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Memory allocation failed"); //error type B
         return action_status::FAILED;
     }

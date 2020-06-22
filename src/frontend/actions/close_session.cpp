@@ -27,7 +27,7 @@ action_status
 Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }

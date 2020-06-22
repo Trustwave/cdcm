@@ -17,10 +17,15 @@
 #define TRUSTWAVE_COMMON_PROTOCOL_MSG_TYPES_HPP_
 #include <memory>
 #include <string>
-#include <taocpp-json/include/tao/json/value.hpp>
 #include <utility>
 #include <vector>
+#include <map>
+#include <taocpp-json/include/tao/json/value.hpp>
+
 namespace trustwave {
+
+    static  std::map<uint32_t,std::string> group_code_description = {{1,"OK"},{2, "Error in request"},{3, "CDCM internal error"},{4, "Error with asset"}};
+
     struct resp_code {
     public:
         resp_code(const resp_code&) = default;
@@ -28,8 +33,8 @@ namespace trustwave {
         resp_code& operator=(const resp_code&) = default;
         resp_code& operator=(resp_code&&) = default;
         resp_code() = default;
-        std::string group;
-        int error_code; //roem TODO: choose the correct variable type
+        uint32_t group;
+        uint32_t error_code; //rotem TODO: choose the correct variable type
     };
 
     // todo assaf fix encapsulation

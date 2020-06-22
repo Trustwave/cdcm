@@ -31,7 +31,7 @@ action_status Key_Exists_Action::act(boost::shared_ptr<session> sess, std::share
 {
     if(!sess || (sess && sess->id().is_nil())) {
         AU_LOG_ERROR("Session not found");
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Session not found"); //error type B
         return action_status::FAILED;
     }
@@ -41,14 +41,14 @@ action_status Key_Exists_Action::act(boost::shared_ptr<session> sess, std::share
     auto keact = std::dynamic_pointer_cast<reg_action_key_exists_msg>(action);
     if(!keact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({"B",666}));
+        res->set_resp_code(trustwave::resp_code({3,666}));
         res->res("Error: Internal error"); //error type B
         return action_status::FAILED;
     }
     if( keact->key_.empty()
         )
     {
-        res->set_resp_code(trustwave::resp_code({"A",666}));
+        res->set_resp_code(trustwave::resp_code({2,666}));
         res->res("Error: key is mandatory");  //error type A
         return action_status::FAILED;
     }
