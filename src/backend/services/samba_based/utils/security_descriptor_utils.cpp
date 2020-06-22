@@ -105,7 +105,7 @@ namespace {
         for(const auto e: cont) {
             if(flags & e.first) { v.emplace_back(e.second); }
         }
-        return std::move(v);
+        return v;
     }
     static void print_ace_flags(std::stringstream& ss, uint8_t flags)
     {
@@ -301,9 +301,9 @@ trustwave::sd_utils::Security_Descriptor_str trustwave::sd_utils::get_sd_str(cli
 std::vector<trustwave::sd_utils::ACE_str> trustwave::sd_utils::get_acls(cli_state* cli, security_descriptor* sd,entity_type et)
 {
     std::vector<trustwave::sd_utils::ACE_str> v;
-    for(int i = 0; sd->dacl && i < sd->dacl->num_aces; i++) {
+    for(uint32_t i = 0; sd->dacl && i < sd->dacl->num_aces; i++) {
         security_ace* ace = &sd->dacl->aces[i];
         v.emplace_back(get_acl(cli, ace, et));
     }
-    return std::move(v);
+    return v;
 }

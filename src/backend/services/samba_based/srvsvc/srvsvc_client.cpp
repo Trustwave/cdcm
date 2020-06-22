@@ -76,7 +76,7 @@ result srvsvc_client::enumerate_all_shares(std::vector<share_info>& shares_resul
        }
 
     uint32_t count = info_ctr.ctr.ctr2->count;
-    for(auto i = 0; i < count; i++)
+    for(uint32_t i = 0; i < count; i++)
     {
         auto& element = info_ctr.ctr.ctr2->array[i];
         shares_result.push_back({element.name,element.comment,element.path});

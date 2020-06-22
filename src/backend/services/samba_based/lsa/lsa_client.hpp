@@ -33,6 +33,8 @@ extern "C" {
 #include "client.hpp"
 #include "configurable.hpp"
 #include "../utils/security_descriptor_utils.hpp"
+#include "../rpc/rpc_client.hpp"
+
 struct security_descriptor;
 
 //=====================================================================================================================
@@ -40,13 +42,12 @@ struct security_descriptor;
 //=====================================================================================================================
 namespace trustwave {
     class session;
-    class rpc_client;
     using result = std::tuple<bool, WERROR>;
     class lsa_client final: public cdcm_client{
   public:
         //fixme assaf add copy ctor move ......
         lsa_client();
-        ~lsa_client() override;
+        ~lsa_client() override = default;
         result connect(const session& sess,const std::string& share);
         result get_sd(const std::string& path,sd_utils::entity_type et,trustwave::sd_utils::Security_Descriptor_str &outsd);
 

@@ -56,7 +56,6 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
     }
     std::string base("smb://");
     base.append(sess->remote()).append("/").append(smb_action->param);
-    std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     std::vector<trustwave::dirent> dir_entries;
     if(!rc.list_dir(base.c_str(), dir_entries)) {
