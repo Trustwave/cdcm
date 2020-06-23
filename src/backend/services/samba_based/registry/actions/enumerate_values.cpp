@@ -21,19 +21,14 @@ namespace tao ::json {
 
     template<>
     struct traits<trustwave::registry_value>:
-        binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
-                        TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_),
-                        TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
+            binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
+                    TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_as_string_),
+                    TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
     };
 
     template<>
-    struct traits<trustwave::enum_key_values_ver1>:
-        binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values_ver1::registry_values_)> {
-    };
-
-    template<>
-    struct traits<trustwave::enum_key_values_ver2>:
-        binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values_ver2::registry_values_)> {
+    struct traits<trustwave::enum_key_values>:
+            binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values::registry_values_)> {
     };
 
 } // namespace tao::json
@@ -71,13 +66,8 @@ action_status Enumerate_Registry_Values_Action::act(boost::shared_ptr<session> s
         return action_status::FAILED;
     }
 
-    // version 1  - as we currently behave, return the value, type and data
-    // trustwave::enum_key_values_ver1 ek{};
-    // auto ret = c.enumerate_key_values_ver1(ekact->key_, ek);
-
-    // version 2  - as pm defined, only values as string
-    trustwave::enum_key_values_ver2 ek{};
-    auto ret = c.enumerate_key_values_ver2(ekact->key_, ek);
+    trustwave::enum_key_values ek{};
+    auto ret = c.enumerate_key_values(ekact->key_, ek);
 
     if(std::get<0>(ret)) { res->res(ek); }
     else {
