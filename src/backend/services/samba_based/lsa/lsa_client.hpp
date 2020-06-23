@@ -45,9 +45,18 @@ namespace trustwave {
     using result = std::tuple<bool, WERROR>;
     class lsa_client final: public cdcm_client {
     public:
-        // fixme assaf add copy ctor move ......
         lsa_client();
         ~lsa_client() override = default;
+        lsa_client(lsa_client const& other) = delete;
+        lsa_client& operator=(lsa_client other) noexcept {
+            swap(*this, other);
+            return *this;
+        }
+        friend void swap(lsa_client& a,lsa_client& b) noexcept
+        {
+            using std::swap;
+            swap(a.client_,b.client_);
+        }
         result connect(const session& sess, const std::string& share);
         result
         get_sd(const std::string& path, sd_utils::entity_type et, trustwave::sd_utils::Security_Descriptor_str& outsd);

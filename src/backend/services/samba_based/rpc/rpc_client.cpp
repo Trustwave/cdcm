@@ -43,7 +43,6 @@ using trustwave::result;
 //=====================================================================================================================
 using trustwave::session;
 
-rpc_client::rpc_client() { }
 rpc_client::~rpc_client()
 {
     if(cli_ != nullptr) { cli_shutdown(cli_); }

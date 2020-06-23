@@ -46,8 +46,21 @@ namespace trustwave {
     class rpc_client final {
     public:
         // fixme assaf add copy ctor move ......
-        rpc_client();
+        rpc_client()=default;
         ~rpc_client();
+        rpc_client(rpc_client const& other) = delete;
+        rpc_client& operator=(rpc_client other) noexcept {
+            swap(*this, other);
+            return *this;
+        }
+        friend void swap(rpc_client& a,rpc_client& b) noexcept
+        {
+            using std::swap;
+            swap(a.cli_,b.cli_);
+            swap(a.creds_,b.creds_);
+            swap(a.pipe_handle_,b.pipe_handle_);
+            swap(a.binding_,b.binding_);
+        }
         result connect(const session& sess, const std::string& share, const std::string& device);
         result connect_and_open_pipe(const session& sess, const std::string& share, const std::string& device,
                                      const ndr_interface_table* table, const bool noauth = false);

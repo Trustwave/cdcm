@@ -50,9 +50,18 @@ namespace trustwave {
     };
     class srvsvc_client final: public cdcm_client {
     public:
-        // fixme assaf add copy ctor move ......
         srvsvc_client();
         ~srvsvc_client() override;
+        srvsvc_client(srvsvc_client const& other) = delete;
+        srvsvc_client& operator=(srvsvc_client other) noexcept {
+            swap(*this, other);
+            return *this;
+        }
+        friend void swap(srvsvc_client& a,srvsvc_client& b) noexcept
+        {
+            using std::swap;
+            swap(a.client_,b.client_);
+        }
         result connect(const session& sess);
         result enumerate_all_shares(std::vector<share_info>&);
 
