@@ -1,3 +1,25 @@
+v1.0.6
+Fixed issues
+ - CDCM-99
+   Added boost and gnutls dependencies.
+
+v1.0.5
+Fixed issues
+ - CDCM-84
+   Removed redundant NULL at the end of the base64 response.
+ - CDCM-85
+   Check for mandatory parameters in actions.
+ - CDCM-87
+   Ordinal to name resolution fix on libpe
+   Several get_file_info issues fixed.
+ - CDCM-91
+   Added dependancy excludes to spec file
+Improvment issue
+ - CDCM-88
+   Some compilation warnings removed.
+   Shared memory size is now configurable.
+   Configuration values is dumped to log.
+
 v1.0.3
 Fixed issues
  - CDCM-86
