@@ -52,8 +52,9 @@ libtw-logger.so \
 libtw-common.so \
 libtw-lsa-client.so \
 libtw-rpc-client.so \
-libtw-registry-client2.so
-libtw-srvsvc-client.so"
+libtw-registry-client2.so \
+libtw-srvsvc-client.so \
+libtw-sd-utils.so"
 
 # copy libs
 for f in $libs;do
