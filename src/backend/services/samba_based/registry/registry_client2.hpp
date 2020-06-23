@@ -41,6 +41,16 @@ namespace trustwave {
     public:
         registry_client2(): client_(std::make_unique<rpc_client>()) { }
         ~registry_client2() override = default;
+        registry_client2(registry_client2 const& other) = delete;
+        registry_client2& operator=(registry_client2 other) noexcept {
+            swap(*this, other);
+            return *this;
+        }
+        friend void swap(registry_client2& a,registry_client2& b) noexcept
+        {
+            using std::swap;
+            swap(a.client_,b.client_);
+        }
         result connect(const session& sess);
         result open_key(const std::string& k);
         result get_sd(sd_utils::Security_Descriptor_str&);
