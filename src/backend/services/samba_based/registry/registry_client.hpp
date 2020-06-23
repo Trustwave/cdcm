@@ -49,8 +49,8 @@ namespace trustwave {
     class session;
     class registry_value;
     class enum_key;
-    class enum_key_values_ver1;
-    class enum_key_values_ver2;
+    class enum_key_values;
+    //class enum_key_values_ver2;
     struct reg_context {
         struct registry_context* registry;
         char* path;
@@ -80,8 +80,7 @@ namespace trustwave {
         result key_get_subkey_by_name(TALLOC_CTX* mem_ctx, const struct registry_key* key, const char* name,
                                       struct registry_key** subkey);
         result enumerate_key(const std::string&, enum_key&);
-        result enumerate_key_values_ver1(const std::string&, enum_key_values_ver1&);
-        result enumerate_key_values_ver2(const std::string&, enum_key_values_ver2&);
+        result enumerate_key_values(const std::string&, enum_key_values&);
         result key_exists(const std::string&);
         result value_exists(const char* valname);
         result open_key(const char* full_path);

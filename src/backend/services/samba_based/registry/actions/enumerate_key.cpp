@@ -33,7 +33,7 @@ namespace tao ::json {
     template<>
     struct traits<trustwave::registry_value>:
         binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
-                        TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_),
+                        TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_as_string_),
                         TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
     };
     template<>
