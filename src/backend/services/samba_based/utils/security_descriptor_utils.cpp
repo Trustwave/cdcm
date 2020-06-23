@@ -18,7 +18,6 @@ extern "C" {
 #endif
 #include "source3/include/includes.h"
 #include "../librpc/gen_ndr/ndr_lsa_c.h"
-//#include"libcli/smb/smb_constants.h"
 #include "source3/libsmb/proto.h"
 #include "source3/include/client.h"
 #include "libcli/smb/smbXcli_base.h"
