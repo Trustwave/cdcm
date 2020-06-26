@@ -305,7 +305,7 @@ functional_tests:
   artifacts:
     when: always
     paths:
-      - build_cdcm/src/cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/*.log
   tags:
     - cdcm_tests
 
