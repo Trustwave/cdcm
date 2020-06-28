@@ -306,6 +306,7 @@ functional_tests:
     when: always
     paths:
       - cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/log/*.log
   tags:
     - cdcm_tests
 
