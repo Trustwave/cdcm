@@ -62,7 +62,7 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
-        res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second)))); //error type C
+        res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second)))); //error type C //rotem: add error code
         return action_status::FAILED;
     }
 
@@ -107,7 +107,7 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     }
     c.end_object();
 
-    res->res(c.value);
+    res->res(c.value); //rotem: add error code
     return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_Get_File_Info> instance = nullptr;

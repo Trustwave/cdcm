@@ -23,8 +23,9 @@ namespace tao::json {
 
     template<>
     struct traits<trustwave::resp_code>:
-            binding::object<TAO_JSON_BIND_REQUIRED("group", &trustwave::resp_code::group),
-                            TAO_JSON_BIND_REQUIRED("error_code", &trustwave::resp_code::error_code)> {
+            binding::object<TAO_JSON_BIND_REQUIRED("code_group", &trustwave::resp_code::code_group_),
+            TAO_JSON_BIND_REQUIRED("code_group_description", &trustwave::resp_code::code_group_description_),
+            TAO_JSON_BIND_REQUIRED("error_code", &trustwave::resp_code::error_code_)> {
     };
 
     template<>
