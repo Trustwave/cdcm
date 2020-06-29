@@ -47,21 +47,21 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
     }
     if( veact->key_.empty()||veact->value_.empty())
     {
-        res->res("Error: key and value are mandatory"); //error type A
+        res->res("Error: key and value are mandatory"); //error type A //rotem: add error code
         return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
         if(werr_pipe_busy == std::get<1>(r).w) {
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C
+            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C //rotem: add error code
             return action_status::POSTPONED;
         }
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));  //error type C
+        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));  //error type C //rotem: add error code
         return action_status::FAILED;
     }
     if(!std::get<0>(c.open_key(veact->key_.c_str()))) {
-        AU_LOG_DEBUG("Failed opening  %s", veact->key_.c_str()); //error type C
+        AU_LOG_DEBUG("Failed opening  %s", veact->key_.c_str()); //error type C //rotem: add error code
         res->res("False");
         //  res->res("Key doesn't exist");
         return action_status::FAILED;
@@ -69,10 +69,10 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
     trustwave::registry_value rv;
     if(!std::get<0>(c.key_get_value_by_name(veact->value_.c_str(), rv))) {
         AU_LOG_DEBUG("Failed getting value %s", veact->value_.c_str());
-        res->res("False");
+        res->res("False"); //rotem: add error code
     }
     else {
-        res->res("True");
+        res->res("True"); //rotem: add error code
     }
     return action_status::SUCCEEDED;
 }

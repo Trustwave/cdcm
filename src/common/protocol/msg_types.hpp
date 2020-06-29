@@ -20,21 +20,81 @@
 #include <utility>
 #include <vector>
 #include <map>
+
 #include <taocpp-json/include/tao/json/value.hpp>
 
 namespace trustwave {
+    enum class RESP_GROUP_CODE  {OK = 1, ERROR_IN_REQUEST, CDCM_INTERNAL_ERROR, ERROR_WITH_ASSET};
+    static  std::map<RESP_GROUP_CODE,std::string> group_code_description_mapping = {{RESP_GROUP_CODE::OK ,"OK"},
+                                                                                    {RESP_GROUP_CODE::ERROR_IN_REQUEST, "Error in request"},
+                                                                                    {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, "CDCM internal error"},
+                                                                                    {RESP_GROUP_CODE::ERROR_WITH_ASSET, "Error with asset"}};
 
-    static  std::map<uint32_t,std::string> group_code_description = {{1,"OK"},{2, "Error in request"},{3, "CDCM internal error"},{4, "Error with asset"}};
 
+    enum class  CDCM_ERROR : uint32_t
+    {
+        OK = 101,
+
+        MALFORMED_MESSAGE = 201, //error in request
+        KEY_AND_VALUE_ARE_MANDATORY,
+        KEY_IS_MANDATORY,
+        BAD_PARAMETER,
+        PARAM_IS_MANDATORY,
+        PATH_IS_MANDATORY,
+
+        SESSION_NOT_FOUND = 301, //cdcm internal error
+        INTERNAL_ERROR,
+        MEMORY_ALLOCATION_FAILED,
+        PARSE_FILE_FAILED,
+
+        ERROR_WITH_ASSET = 401
+    };
+
+
+    std::map<CDCM_ERROR, std::tuple<RESP_GROUP_CODE, uint32_t, std::string>> cdcm_error_mapping = {
+            {CDCM_ERROR::OK , {RESP_GROUP_CODE::OK, 101, "OK"} },
+
+            {CDCM_ERROR::MALFORMED_MESSAGE , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 201, "Malformed message"} },
+            {CDCM_ERROR::KEY_AND_VALUE_ARE_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 202, "Key and value are mandatory"} },
+            {CDCM_ERROR::KEY_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 203, "Key is mandatory"} },
+            {CDCM_ERROR::BAD_PARAMETER , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 204, "Bad parameter"} },
+            {CDCM_ERROR::PARAM_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 205, "Param is mandatory"} },
+            {CDCM_ERROR::PATH_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 206, "Path is mandatory"} },
+
+            {CDCM_ERROR::SESSION_NOT_FOUND , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 301, "Session not found"} },
+            {CDCM_ERROR::INTERNAL_ERROR , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 302, "Internal error"} },
+            {CDCM_ERROR::MEMORY_ALLOCATION_FAILED , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 303, "Memory allocation failed"} },
+            {CDCM_ERROR::PARSE_FILE_FAILED , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 304, "Parse file failed"} }
+
+    };
     struct resp_code {
     public:
+        resp_code(RESP_GROUP_CODE grp_code, uint32_t err_code) {
+            code_group(grp_code);
+            error_code_ = err_code;
+        }
         resp_code(const resp_code&) = default;
         resp_code(resp_code&&) = default;
         resp_code& operator=(const resp_code&) = default;
         resp_code& operator=(resp_code&&) = default;
         resp_code() = default;
-        uint32_t group;
-        uint32_t error_code; //rotem TODO: choose the correct variable type
+        void code_group(RESP_GROUP_CODE resp_group_code) {
+            code_group_ = (uint32_t)resp_group_code;
+            code_group_description_ = group_code_description_mapping[resp_group_code];
+        }
+        void error_code(uint32_t error_code) {error_code_ = error_code;}
+
+        void set_resp_status_for_cdcm_error(CDCM_ERROR cdcm_error)
+        {
+            code_group(std::get<0>(cdcm_error_mapping[cdcm_error]));
+            error_code(std::get<1>(cdcm_error_mapping[cdcm_error]));
+        };
+
+        std::string get_error_message
+
+        uint32_t code_group_;
+        std::string code_group_description_;
+        uint32_t error_code_;
     };
 
     // todo assaf fix encapsulation

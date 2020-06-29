@@ -57,14 +57,15 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
         AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));  //error type C
 
         if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT) {
-            res->res(std::string("False"));
+            res->res(std::string("False")); //rotem: add error code //rotem: add error code
         }
         else {
+            //rotem: add error code
             res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));  //error type C
         }
     }
     else {
-        res->res(std::string("True"));
+        res->res(std::string("True")); //rotem: add error code
     }
     return action_status::SUCCEEDED;
 }

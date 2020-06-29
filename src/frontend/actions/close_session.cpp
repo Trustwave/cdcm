@@ -34,7 +34,7 @@ Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
 
     authenticated_scan_server::instance().sessions->remove_by_id(sess->idstr());
     res->id(am->id());
-    res->res("Session closed");
+    res->res("Session closed"); //rotem: add error code
     return action_status::SUCCEEDED;
 }
 

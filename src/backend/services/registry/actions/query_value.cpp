@@ -57,26 +57,26 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
         if(werr_pipe_busy == std::get<1>(r).w) {
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C
+            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C //rotem: add error code
             return action_status::POSTPONED;
         }
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C
+        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C //rotem: add error code
         return action_status::FAILED;
     }
 
     if(!std::get<0>(c.open_key(qvact->key_.c_str()))) {
         AU_LOG_DEBUG("Failed opening  %s", qvact->key_.c_str());
-        res->res("Error: Failed to open key"); //error type C
+        res->res("Error: Failed to open key"); //error type C //rotem: add error code
         return action_status::FAILED;
     }
     trustwave::registry_value rv;
     c.key_get_value_by_name(qvact->value_.c_str(), rv);
     if(rv.value().empty()) {
-        res->res("Error: Value is empty");
+        res->res("Error: Value is empty"); //rotem: add error code
         AU_LOG_ERROR("Error: Value is empty"); //error type C
     }
     else {
-        res->res(rv.value());
+        res->res(rv.value()); //rotem: add error code
         AU_LOG_INFO(rv.value().c_str());
     }
     return action_status::SUCCEEDED;
