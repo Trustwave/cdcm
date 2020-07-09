@@ -35,34 +35,80 @@ extern "C" {
 #include <iostream>
 using trustwave::sd_utils::entity_type;
 namespace {
-    static const std::unordered_map<entity_type, std::unordered_map<uint32_t, std::string>> perm_dir{
+    constexpr uint32_t Read_Permissions = 0x20000;
+    constexpr uint32_t Take_Ownership   = 0x80000;
+    constexpr uint32_t Modify           = 0x301BF;
+    constexpr uint32_t Read             = 131209;
+    constexpr uint32_t Write            = 278;
+    constexpr uint32_t Syncronize       = 0x100000;
+
+    constexpr uint32_t Read_And_Execute = 0x200A9;//Files,Dirs Only
+    constexpr uint32_t Full_Control     = 2032127;//Files,Dirs Only
+
+    constexpr uint32_t Reg_Full_Control     = 983103;//Registry Only
+    constexpr uint32_t Reg_Read_And_Execute = 131097;//Registry Only
+    constexpr uint32_t Write_Key            = 131078;//Registry Only
+
+
+static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std::greater<uint32_t>>> perm_dir{
         {entity_type::NTFS_FILE,
-         {{SEC_FILE_READ_DATA, "FILE_READ_DATA"},
-          {SEC_FILE_WRITE_DATA, "FILE_WRITE_DATA"},
-          {SEC_FILE_APPEND_DATA, "FILE_APPEND_DATA"},
-          {SEC_FILE_READ_EA, "FILE_READ_EA"},
-          {SEC_FILE_WRITE_EA, "FILE_WRITE_EA"},
-          {SEC_FILE_EXECUTE, "FILE_EXECUTE"},
-          {SEC_FILE_READ_ATTRIBUTE, "FILE_READ_ATTRIBUTE"},
-          {SEC_FILE_WRITE_ATTRIBUTE, "FILE_WRITE_ATTRIBUTE"},
-          {SEC_FILE_ALL, "FILE_ALL_ACCESS"}}},
+         {{SEC_FILE_READ_DATA, "FILE_READ_DATA"},//1
+          {SEC_FILE_WRITE_DATA, "FILE_WRITE_DATA"},//2
+          {SEC_FILE_APPEND_DATA, "FILE_APPEND_DATA"},//4
+          {SEC_FILE_READ_EA, "FILE_READ_EA"},//8
+          {SEC_FILE_WRITE_EA, "FILE_WRITE_EA"},//16
+          {SEC_FILE_EXECUTE, "FILE_EXECUTE"},//32
+          {SEC_FILE_READ_ATTRIBUTE, "FILE_READ_ATTRIBUTE"},//128
+          {SEC_FILE_WRITE_ATTRIBUTE, "FILE_WRITE_ATTRIBUTE"},//256
+          {SEC_STD_WRITE_DAC,"Change Permissions"},//0x40000
+          {SEC_STD_DELETE,"Delete"},//0x10000
+          {Read_Permissions  ,"Read Permissions"},
+          {Take_Ownership    ,"Take Ownership"},
+          {Modify            ,"Modify"},
+          {Read_And_Execute  ,"Read And_Execute"},
+          {Full_Control      ,"Full Control"},
+          {Read              ,"Read"},
+          {Write             ,"Write"},
+             {Syncronize,"Syncronize"}
+
+         }
+          },
         {entity_type::NTFS_DIR,
-         {{SEC_DIR_LIST, "DIR_LIST"},
-          {SEC_DIR_ADD_FILE, "DIR_ADD_FILE"},
-          {SEC_DIR_ADD_SUBDIR, "DIR_ADD_SUBDIR"},
-          {SEC_DIR_READ_EA, "DIR_READ_EA"},
-          {SEC_DIR_WRITE_EA, "DIR_WRITE_EA"},
-          {SEC_DIR_TRAVERSE, "DIR_TRAVERSE"},
-          {SEC_DIR_DELETE_CHILD, "SEC_DIR_DELETE_CHILD"},
-          {SEC_DIR_READ_ATTRIBUTE, "DIR_READ_ATTRIBUTE"},
-          {SEC_DIR_WRITE_ATTRIBUTE, "DIR_WRITE_ATTRIBUTE"}}},
+         {{SEC_DIR_LIST, "DIR_LIST"}, // 1
+             {SEC_DIR_ADD_FILE, "DIR_ADD_FILE"}, // 2
+             {SEC_DIR_ADD_SUBDIR, "DIR_ADD_SUBDIR"}, // 4
+             {SEC_DIR_READ_EA, "DIR_READ_EA"}, // 8
+             {SEC_DIR_WRITE_EA, "DIR_WRITE_EA"}, // 16
+             {SEC_DIR_TRAVERSE, "DIR_TRAVERSE"}, // 32
+             {SEC_DIR_DELETE_CHILD, "SEC_DIR_DELETE_CHILD"}, // 64
+             {SEC_DIR_READ_ATTRIBUTE, "DIR_READ_ATTRIBUTE"}, // 128
+             {SEC_DIR_WRITE_ATTRIBUTE, "DIR_WRITE_ATTRIBUTE"} ,// 256
+             {SEC_STD_WRITE_DAC,"Change Permissions"},//0x40000
+             {SEC_STD_DELETE,"Delete"},//0x10000
+             {Read_Permissions  ,"Read Permissions"},
+             {Take_Ownership    ,"Take Ownership"},
+             {Modify            ,"Modify"},
+             {Read_And_Execute  ,"Read And_Execute"},
+             {Full_Control      ,"Full Control"},
+             {Read              ,"Read"},
+             {Write             ,"Write"},
+             {Syncronize        ,"Syncronize"}
+         }},
         {entity_type::REGISTRY,
-         {{SEC_REG_QUERY_VALUE, "REG_QUERY_VALUE"},
-          {SEC_REG_SET_VALUE, "REG_SET_VALUE"},
-          {SEC_REG_CREATE_SUBKEY, "REG_CREATE_SUBKEY"},
-          {SEC_REG_ENUM_SUBKEYS, "REG_ENUM_SUBKEYS"},
-          {SEC_REG_NOTIFY, "REG_NOTIFY"},
-          {SEC_REG_CREATE_LINK, "REG_CREATE_LINK"}}},
+         {{SEC_REG_QUERY_VALUE, "REG_QUERY_VALUE"},//1
+          {SEC_REG_SET_VALUE, "REG_SET_VALUE"},//2
+          {SEC_REG_CREATE_SUBKEY, "REG_CREATE_SUBKEY"},//4
+          {SEC_REG_ENUM_SUBKEYS, "REG_ENUM_SUBKEYS"},//8
+          {SEC_REG_NOTIFY, "REG_NOTIFY"},//16
+          {SEC_REG_CREATE_LINK, "REG_CREATE_LINK"},//32
+             {SEC_STD_WRITE_DAC,"Change Permissions"},//0x40000
+             {SEC_STD_DELETE,"Delete"},//0x10000
+             {Read_Permissions,"Read Permissions"},
+             {Take_Ownership,"Take Ownership"},
+             {Reg_Read_And_Execute,"Read Key, Execute Key"},
+             {Reg_Full_Control,"Full Control"}
+
+         }},
         {entity_type::SHARE, {{SHARE_ALL_ACCESS, "SHARE_ALL_ACCESS"}, {SHARE_READ_ONLY, "SHARE_READ_ONLY"}}},
         {entity_type::GENERIC,
          {{DELETE_ACCESS, "DELETE_ACCESS"},
@@ -98,11 +144,16 @@ namespace {
                                                                         {SEC_ACE_FLAG_INHERITED_ACE, "I"}
 
     };
-    static std::vector<std::string> flags_vector(const std::unordered_map<uint32_t, std::string> cont, uint32_t flags)
+    template<typename Cont>
+    static std::vector<std::string> flags_vector(const Cont cont, uint32_t flags)
     {
         std::vector<std::string> v;
         for(const auto e: cont) {
-            if(flags & e.first) { v.emplace_back(e.second); }
+            if(flags >= e.first && flags & e.first)
+            {
+                v.emplace_back(e.second);
+                flags -= e.first;
+            }
         }
         return v;
     }
