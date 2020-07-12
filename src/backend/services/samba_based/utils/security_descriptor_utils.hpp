@@ -30,8 +30,7 @@ namespace trustwave {
             NTFS_FILE,
             NTFS_DIR,
             SHARE,
-            REGISTRY,
-            GENERIC
+            REGISTRY
 
         };
         struct ACE_str {
