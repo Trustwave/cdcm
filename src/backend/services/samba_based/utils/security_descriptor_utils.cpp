@@ -69,11 +69,7 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
           {Full_Control      ,"Full Control"},
           {Read              ,"Read"},
           {Write             ,"Write"},
-             {Syncronize,"Syncronize"},
-{GENERIC_ALL_ACCESS, "GENERIC_ALL_ACCESS"},
-{GENERIC_EXECUTE_ACCESS, "GENERIC_EXECUTE_ACCESS"},
-{GENERIC_WRITE_ACCESS, "GENERIC_WRITE_ACCESS"},
-{GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"}
+             {Syncronize,"Syncronize"}
 
          }
           },
@@ -96,11 +92,7 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
              {Full_Control      ,"Full Control"},
              {Read              ,"Read"},
              {Write             ,"Write"},
-             {Syncronize        ,"Syncronize"},
-{GENERIC_ALL_ACCESS, "GENERIC_ALL_ACCESS"},
-{GENERIC_EXECUTE_ACCESS, "GENERIC_EXECUTE_ACCESS"},
-{GENERIC_WRITE_ACCESS, "GENERIC_WRITE_ACCESS"},
-{GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"}
+             {Syncronize        ,"Syncronize"}
          }},
         {entity_type::REGISTRY,
          {{SEC_REG_QUERY_VALUE, "REG_QUERY_VALUE"},//1
@@ -114,14 +106,24 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
              {Read_Permissions,"Read Permissions"},
              {Take_Ownership,"Take Ownership"},
              {Reg_Read_And_Execute,"Read Key, Execute Key"},
-             {Reg_Full_Control,"Full Control"},
-{GENERIC_ALL_ACCESS, "GENERIC_ALL_ACCESS"},
-{GENERIC_EXECUTE_ACCESS, "GENERIC_EXECUTE_ACCESS"},
-{GENERIC_WRITE_ACCESS, "GENERIC_WRITE_ACCESS"},
-{GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"}
+             {Reg_Full_Control,"Full Control"}
 
          }},
-        {entity_type::SHARE, {{SHARE_ALL_ACCESS, "SHARE_ALL_ACCESS"}, {SHARE_READ_ONLY, "SHARE_READ_ONLY"}}}
+        {entity_type::SHARE, {{SHARE_ALL_ACCESS, "SHARE_ALL_ACCESS"}, {SHARE_READ_ONLY, "SHARE_READ_ONLY"}}},
+        {entity_type::GENERIC,
+         {{DELETE_ACCESS, "DELETE_ACCESS"},
+          {READ_CONTROL_ACCESS, "READ_CONTROL_ACCESS"},
+          {WRITE_DAC_ACCESS, "WRITE_DAC_ACCESS"},
+          {WRITE_OWNER_ACCESS, "WRITE_OWNER_ACCESS"},
+          {SYNCHRONIZE_ACCESS, "SYNCHRONIZE_ACCESS"},
+          {GENERIC_ALL_ACCESS, "GENERIC_ALL_ACCESS"},
+          {GENERIC_EXECUTE_ACCESS, "GENERIC_EXECUTE_ACCESS"},
+          {GENERIC_WRITE_ACCESS, "GENERIC_WRITE_ACCESS"},
+          {GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"},
+          //      {FILE_GENERIC_ALL,"FILE_GENERIC_ALL"},
+          {FILE_GENERIC_READ, "FILE_GENERIC_READ"},
+          {FILE_GENERIC_WRITE, "FILE_GENERIC_WRITE"},
+          {FILE_GENERIC_EXECUTE, "FILE_GENERIC_EXECUTE"}}}
 
     };
 
