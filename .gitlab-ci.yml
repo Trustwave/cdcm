@@ -292,10 +292,11 @@ functional_tests:
     - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" testsRunner_settings.json
     - source /etc/profile.d/rvm.sh
     - rvm reload
-    - for i in {full.xml,qa_2_dlls.xml};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ;done
-    - for i in {full.xml,qa_2_dlls.xml};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
+    - testFiles =(full.xml)
+    - for i in ${testFiles[@]};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ;done
+    - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
     - export FAILED=0
-    - for i in {full.xml,qa_2_dlls.xml};do if [ $(cat $REPORT_FNAME.functional.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success;((FAILED++)) ; echo failed; fi ;done
+    - for i in ${testFiles[@]};do if [ $(cat $REPORT_FNAME.functional.$i.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success;((FAILED++)) ; echo failed; fi ;done
     - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
 
   rules:

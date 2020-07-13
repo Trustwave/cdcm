@@ -95,22 +95,15 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
          }},
         {entity_type::SHARE, {{SHARE_ALL_ACCESS, "SHARE_ALL_ACCESS"}, {SHARE_READ_ONLY, "SHARE_READ_ONLY"},{SEC_FILE_APPEND_DATA,"Change"}}},
         {entity_type::GENERIC,
-         {{DELETE_ACCESS, "DELETE_ACCESS"},
-          {READ_CONTROL_ACCESS, "READ_CONTROL_ACCESS"},
-          {WRITE_DAC_ACCESS, "WRITE_DAC_ACCESS"},
-          {WRITE_OWNER_ACCESS, "WRITE_OWNER_ACCESS"},
-          {SYNCHRONIZE_ACCESS, "SYNCHRONIZE_ACCESS"},
+         {
           {GENERIC_ALL_ACCESS, "GENERIC_ALL_ACCESS"},
           {GENERIC_EXECUTE_ACCESS, "GENERIC_EXECUTE_ACCESS"},
           {GENERIC_WRITE_ACCESS, "GENERIC_WRITE_ACCESS"},
-          {GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"},
-          {FILE_GENERIC_READ, "FILE_GENERIC_READ"},
-          {FILE_GENERIC_WRITE, "FILE_GENERIC_WRITE"},
-          {FILE_GENERIC_EXECUTE, "FILE_GENERIC_EXECUTE"}}},
+          {GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"}}},
     {entity_type::STD,{
 
-{  SEC_STD_DELETE        ,  "DELETE"},
-{  SEC_STD_READ_CONTROL  ,  "READ_CONTROL"},
+{  SEC_STD_DELETE        ,  "Delete"},
+{  SEC_STD_READ_CONTROL  ,  "Read Control"},
 {  SEC_STD_WRITE_DAC     ,  "Change Permissions"},
 {  SEC_STD_WRITE_OWNER   ,  "Take Ownership"},
 {  SEC_STD_SYNCHRONIZE   ,  "Synchronize"}
@@ -150,8 +143,8 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
             if(flags >= e.first && (flags & e.first)==e.first)
             {
                 out_vector.emplace_back(e.second);
-                remain &= ~e.first;
-                flags -= e.first;
+                flags &= ~e.first;
+                //flags -= e.first;
             }
         }
 
@@ -177,19 +170,29 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
     static void get_ace_flags(uint8_t flags,string_vec& out_vec) { flags_vector(ace_flags, flags,out_vec); }
     static void get_access_mask(uint32_t mask, entity_type et,string_vec& out_vector)
     {
-        flags_vector(perm_dir.at(et), mask, out_vector);
-        if(mask > 0)
-        flags_vector(perm_dir.at(entity_type::STD), mask, out_vector);
-
-        if(out_vector.empty()) {
+        auto orig_mask=mask;
+        uint32_t xxx= 0;
+        static  const std::map<uint32_t,uint32_t> zzz = {{GENERIC_ALL_ACCESS, FILE_GENERIC_ALL},
+                                                         {GENERIC_EXECUTE_ACCESS, FILE_GENERIC_EXECUTE},
+                                                         {GENERIC_WRITE_ACCESS, FILE_GENERIC_WRITE},
+                                                         {GENERIC_READ_ACCESS, FILE_GENERIC_READ}};
         for (const auto v:perm_dir.at(entity_type::GENERIC)) {
-            if (mask == v.first) {
+            if (v.first == (orig_mask & v.first)) {
+                xxx |= zzz.at(v.first);
+            }
+        }
+        xxx &=0x00FFFFFF;
+        flags_vector(perm_dir.at(et), orig_mask, out_vector);
+        for (const auto v:perm_dir.at(entity_type::STD)) {
+            if (v.first == (xxx & v.first)) {
                 out_vector.emplace_back(v.second);
-                return;
             }
         }
 
-            out_vector.emplace_back(NType_to_hex_string(mask));
+
+        if(out_vector.empty()) {
+
+        out_vector.emplace_back(NType_to_hex_string(orig_mask));
         }
     }
     static void SidToString(cli_state* cli, fstring str, const dom_sid* sid)
