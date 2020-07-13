@@ -34,6 +34,7 @@ extern "C" {
 #include <sstream>
 #include <iostream>
 using trustwave::sd_utils::entity_type;
+using trustwave::sd_utils::string_vec;
 namespace {
     constexpr uint32_t Read_Permissions = 0x20000;
     constexpr uint32_t Take_Ownership   = 0x80000;
@@ -123,7 +124,12 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
           //      {FILE_GENERIC_ALL,"FILE_GENERIC_ALL"},
           {FILE_GENERIC_READ, "FILE_GENERIC_READ"},
           {FILE_GENERIC_WRITE, "FILE_GENERIC_WRITE"},
-          {FILE_GENERIC_EXECUTE, "FILE_GENERIC_EXECUTE"}}}
+          {FILE_GENERIC_EXECUTE, "FILE_GENERIC_EXECUTE"}}},
+    {entity_type::STD,{
+            {    SEC_RIGHTS_DIR_READ|SEC_DIR_TRAVERSE                                   ,"READ"        },
+            {  SEC_RIGHTS_DIR_READ|SEC_STD_DELETE|SEC_RIGHTS_DIR_WRITE|SEC_DIR_TRAVERSE ,"CHANGE" },
+            {    SEC_RIGHTS_DIR_ALL                                                     ,"FULL"    }
+        }}
 
     };
 
@@ -144,22 +150,34 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
                                                                         {SEC_ACE_FLAG_INHERITED_ACE, "I"}
 
     };
+
+    static std::string uint32_to_hex_string(uint32_t v) {
+        std::stringstream ss;
+        ss << std::hex <<  v;
+        return ss.str();
+    }
+
     template<typename Cont>
-    static std::vector<std::string> flags_vector(const Cont cont, uint32_t flags)
+    static void flags_vector(const Cont cont, uint32_t flags,string_vec& out_vector)
     {
-        std::vector<std::string> v;
+        uint32_t remain = 0;
         for(const auto e: cont) {
-            if(flags >= e.first && flags & e.first)
+            if(flags >= e.first && (flags & e.first)==e.first)
             {
-                v.emplace_back(e.second);
+                out_vector.emplace_back(e.second);
+                remain &= ~e.first;
                 flags -= e.first;
             }
         }
-        return v;
+        if(remain > 0)
+        {
+            out_vector.emplace_back(uint32_to_hex_string(remain));
+        }
     }
     static void print_ace_flags(std::stringstream& ss, uint8_t flags)
     {
-        auto v = flags_vector(ace_flags, flags);
+        string_vec v;
+        flags_vector(ace_flags, flags,v);
         std::string str;
         for(const auto e: v) { str.append(e).append("|"); }
         if(str[str.length() - 1] == '|') {
@@ -170,10 +188,23 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
 
         ss << "/" << std::hex << flags << "/";
     }
-    static std::vector<std::string> get_ace_flags(uint8_t flags) { return std::move(flags_vector(ace_flags, flags)); }
-    static std::vector<std::string> get_access_mask(uint32_t mask, entity_type et)
+    static void get_ace_flags(uint8_t flags,string_vec& out_vec) { flags_vector(ace_flags, flags,out_vec); }
+    static void get_access_mask(uint32_t mask, entity_type et,string_vec& out_vec)
     {
-        return std::move(flags_vector(perm_dir.at(et), mask));
+        for (const auto v:perm_dir.at(entity_type::STD)) {
+            if (mask == v.first) {
+                out_vec.emplace_back(v.second);
+                return;
+            }
+        }
+        for (const auto v:perm_dir.at(entity_type::GENERIC)) {
+            if (mask == v.first) {
+                out_vec.emplace_back(v.second);
+                return;
+            }
+        }
+
+        flags_vector(perm_dir.at(et), mask, out_vec);
     }
     static void SidToString(cli_state* cli, fstring str, const dom_sid* sid)
     {
@@ -228,7 +259,8 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
         }
 
         print_ace_flags(ss, ace->flags);
-        auto v = flags_vector(perm_dir.at(et), ace->access_mask);
+        string_vec v;
+        flags_vector(perm_dir.at(et), ace->access_mask,v);
         std::string str;
         for(const auto e: v) { str.append(e).append("|"); }
         if(str[str.length() - 1] == '|') { str.erase(str.length() - 1, 1); }
@@ -237,7 +269,8 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
     static void print_acl_ctrl(std::stringstream& ss, uint16_t ctrl)
     {
         ss << "CONTROL:";
-        auto v = flags_vector(sec_desc_ctrl_bits, ctrl);
+        string_vec v;
+        flags_vector(sec_desc_ctrl_bits, ctrl,v);
         std::string str;
         for(const auto e: v) { str.append(e).append("|"); }
         if(str[str.length() - 1] == '|') {
@@ -246,9 +279,9 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
             return;
         }
     }
-    static std::vector<std::string> get_acl_ctrl(uint16_t ctrl)
+    static void get_acl_ctrl(uint16_t ctrl,string_vec& out_vec)
     {
-        return std::move(flags_vector(sec_desc_ctrl_bits, ctrl));
+        flags_vector(sec_desc_ctrl_bits, ctrl,out_vec);
     }
     static trustwave::sd_utils::ACE_str get_acl(cli_state* cli, security_ace* ace, entity_type et)
     {
@@ -263,8 +296,8 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
         else {
             aa.AccessControlType = std::to_string(ace->type);
         }
-        aa.AccessControlFlags = get_ace_flags(ace->flags);
-        aa.FileSystemRights = get_access_mask(ace->access_mask, et);
+        get_ace_flags(ace->flags,aa.AccessControlFlags);
+        get_access_mask(ace->access_mask,et,aa.FileSystemRights );
         return aa;
     }
 
@@ -330,7 +363,7 @@ trustwave::sd_utils::get_sd_str(cli_state* cli, security_descriptor* sd, entity_
 {
     trustwave::sd_utils::Security_Descriptor_str r;
     r.Revision = std::to_string(sd->revision);
-    r.Control = get_acl_ctrl(sd->type);
+    get_acl_ctrl(sd->type,r.Control);
     fstring sidstr;
     if(sd->owner_sid) { SidToString(cli, sidstr, sd->owner_sid); }
     else {
