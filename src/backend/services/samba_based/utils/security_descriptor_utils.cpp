@@ -36,19 +36,16 @@ extern "C" {
 using trustwave::sd_utils::entity_type;
 using trustwave::sd_utils::string_vec;
 namespace {
-    constexpr uint32_t Read_Permissions = 0x20000;
-    constexpr uint32_t Take_Ownership   = 0x80000;
     constexpr uint32_t Modify           = 0x301BF;
-    constexpr uint32_t Read             = 131209;
-    constexpr uint32_t Write            = 278;
-    constexpr uint32_t Syncronize       = 0x100000;
+    constexpr uint32_t Read             = 0x20089;
+    constexpr uint32_t Write            = 0x116;
 
     constexpr uint32_t Read_And_Execute = 0x200A9;//Files,Dirs Only
-    constexpr uint32_t Full_Control     = 2032127;//Files,Dirs Only
+    constexpr uint32_t Full_Control     = 0x1F01FF;//Files,Dirs Only
 
-    constexpr uint32_t Reg_Full_Control     = 983103;//Registry Only
-    constexpr uint32_t Reg_Read_And_Execute = 131097;//Registry Only
-    constexpr uint32_t Write_Key            = 131078;//Registry Only
+    constexpr uint32_t Reg_Full_Control     = 0xF003F;//Registry Only
+    constexpr uint32_t Reg_Read_And_Execute = 0x20019;//Registry Only
+    constexpr uint32_t Write_Key            = 0x20006;//Registry Only
 
 
 static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std::greater<uint32_t>>> perm_dir{
@@ -61,16 +58,11 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
           {SEC_FILE_EXECUTE, "FILE_EXECUTE"},//32
           {SEC_FILE_READ_ATTRIBUTE, "FILE_READ_ATTRIBUTE"},//128
           {SEC_FILE_WRITE_ATTRIBUTE, "FILE_WRITE_ATTRIBUTE"},//256
-          {SEC_STD_WRITE_DAC,"Change Permissions"},//0x40000
-          {SEC_STD_DELETE,"Delete"},//0x10000
-          {Read_Permissions  ,"Read Permissions"},
-          {Take_Ownership    ,"Take Ownership"},
           {Modify            ,"Modify"},
-          {Read_And_Execute  ,"Read And_Execute"},
+          {Read_And_Execute  ,"Read And Execute"},
           {Full_Control      ,"Full Control"},
           {Read              ,"Read"},
-          {Write             ,"Write"},
-             {Syncronize,"Syncronize"}
+          {Write             ,"Write"}
 
          }
           },
@@ -84,33 +76,24 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
              {SEC_DIR_DELETE_CHILD, "SEC_DIR_DELETE_CHILD"}, // 64
              {SEC_DIR_READ_ATTRIBUTE, "DIR_READ_ATTRIBUTE"}, // 128
              {SEC_DIR_WRITE_ATTRIBUTE, "DIR_WRITE_ATTRIBUTE"} ,// 256
-             {SEC_STD_WRITE_DAC,"Change Permissions"},//0x40000
-             {SEC_STD_DELETE,"Delete"},//0x10000
-             {Read_Permissions  ,"Read Permissions"},
-             {Take_Ownership    ,"Take Ownership"},
              {Modify            ,"Modify"},
-             {Read_And_Execute  ,"Read And_Execute"},
+             {Read_And_Execute  ,"Read And Execute"},
              {Full_Control      ,"Full Control"},
              {Read              ,"Read"},
              {Write             ,"Write"},
-             {Syncronize        ,"Syncronize"}
          }},
         {entity_type::REGISTRY,
-         {{SEC_REG_QUERY_VALUE, "REG_QUERY_VALUE"},//1
-          {SEC_REG_SET_VALUE, "REG_SET_VALUE"},//2
-          {SEC_REG_CREATE_SUBKEY, "REG_CREATE_SUBKEY"},//4
-          {SEC_REG_ENUM_SUBKEYS, "REG_ENUM_SUBKEYS"},//8
-          {SEC_REG_NOTIFY, "REG_NOTIFY"},//16
-          {SEC_REG_CREATE_LINK, "REG_CREATE_LINK"},//32
-             {SEC_STD_WRITE_DAC,"Change Permissions"},//0x40000
-             {SEC_STD_DELETE,"Delete"},//0x10000
-             {Read_Permissions,"Read Permissions"},
-             {Take_Ownership,"Take Ownership"},
+         {{SEC_REG_QUERY_VALUE, "Query"},//1
+          {SEC_REG_SET_VALUE, "Set Value"},//2
+          {SEC_REG_CREATE_SUBKEY, "CreateSubKey"},//4
+          {SEC_REG_ENUM_SUBKEYS, "EnumSubKey"},//8
+          {SEC_REG_NOTIFY, "Notify"},//16
+          {SEC_REG_CREATE_LINK, "Create Link"},//32
              {Reg_Read_And_Execute,"Read Key, Execute Key"},
              {Reg_Full_Control,"Full Control"}
 
          }},
-        {entity_type::SHARE, {{SHARE_ALL_ACCESS, "SHARE_ALL_ACCESS"}, {SHARE_READ_ONLY, "SHARE_READ_ONLY"}}},
+        {entity_type::SHARE, {{SHARE_ALL_ACCESS, "SHARE_ALL_ACCESS"}, {SHARE_READ_ONLY, "SHARE_READ_ONLY"},{SEC_FILE_APPEND_DATA,"Change"}}},
         {entity_type::GENERIC,
          {{DELETE_ACCESS, "DELETE_ACCESS"},
           {READ_CONTROL_ACCESS, "READ_CONTROL_ACCESS"},
@@ -121,15 +104,17 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
           {GENERIC_EXECUTE_ACCESS, "GENERIC_EXECUTE_ACCESS"},
           {GENERIC_WRITE_ACCESS, "GENERIC_WRITE_ACCESS"},
           {GENERIC_READ_ACCESS, "GENERIC_READ_ACCESS"},
-          //      {FILE_GENERIC_ALL,"FILE_GENERIC_ALL"},
           {FILE_GENERIC_READ, "FILE_GENERIC_READ"},
           {FILE_GENERIC_WRITE, "FILE_GENERIC_WRITE"},
           {FILE_GENERIC_EXECUTE, "FILE_GENERIC_EXECUTE"}}},
     {entity_type::STD,{
-            {    SEC_RIGHTS_DIR_READ|SEC_DIR_TRAVERSE                                   ,"READ"        },
-            {  SEC_RIGHTS_DIR_READ|SEC_STD_DELETE|SEC_RIGHTS_DIR_WRITE|SEC_DIR_TRAVERSE ,"CHANGE" },
-            {    SEC_RIGHTS_DIR_ALL                                                     ,"FULL"    }
-        }}
+
+{  SEC_STD_DELETE        ,  "DELETE"},
+{  SEC_STD_READ_CONTROL  ,  "READ_CONTROL"},
+{  SEC_STD_WRITE_DAC     ,  "Change Permissions"},
+{  SEC_STD_WRITE_OWNER   ,  "Take Ownership"},
+{  SEC_STD_SYNCHRONIZE   ,  "Synchronize"}
+       }}
 
     };
 
@@ -150,17 +135,17 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
                                                                         {SEC_ACE_FLAG_INHERITED_ACE, "I"}
 
     };
-
-    static std::string uint32_to_hex_string(uint32_t v) {
+    template<typename NType>
+    static std::string NType_to_hex_string(NType v) {
         std::stringstream ss;
         ss << "0x"<<std::hex <<  v;
         return ss.str();
     }
 
-    template<typename Cont>
-    static void flags_vector(const Cont cont, uint32_t flags,string_vec& out_vector)
+    template<typename Cont,typename NType>
+    static void flags_vector(const Cont cont, NType& flags,string_vec& out_vector)
     {
-        uint32_t remain = 0;
+        NType remain = 0;
         for(const auto e: cont) {
             if(flags >= e.first && (flags & e.first)==e.first)
             {
@@ -169,12 +154,10 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
                 flags -= e.first;
             }
         }
-        if(out_vector.empty()) {
-                out_vector.emplace_back(uint32_to_hex_string(flags));
-        }
-        else  if(remain > 0)
+
+        if(remain > 0)
         {
-            out_vector.emplace_back(uint32_to_hex_string(remain));
+            out_vector.emplace_back(NType_to_hex_string(remain));
         }
     }
     static void print_ace_flags(std::stringstream& ss, uint8_t flags)
@@ -192,22 +175,22 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
         ss << "/" << std::hex << flags << "/";
     }
     static void get_ace_flags(uint8_t flags,string_vec& out_vec) { flags_vector(ace_flags, flags,out_vec); }
-    static void get_access_mask(uint32_t mask, entity_type et,string_vec& out_vec)
+    static void get_access_mask(uint32_t mask, entity_type et,string_vec& out_vector)
     {
-        for (const auto v:perm_dir.at(entity_type::STD)) {
-            if (mask == v.first) {
-                out_vec.emplace_back(v.second);
-                return;
-            }
-        }
+        flags_vector(perm_dir.at(et), mask, out_vector);
+        if(mask > 0)
+        flags_vector(perm_dir.at(entity_type::STD), mask, out_vector);
+
+        if(out_vector.empty()) {
         for (const auto v:perm_dir.at(entity_type::GENERIC)) {
             if (mask == v.first) {
-                out_vec.emplace_back(v.second);
+                out_vector.emplace_back(v.second);
                 return;
             }
         }
 
-        flags_vector(perm_dir.at(et), mask, out_vec);
+            out_vector.emplace_back(NType_to_hex_string(mask));
+        }
     }
     static void SidToString(cli_state* cli, fstring str, const dom_sid* sid)
     {
