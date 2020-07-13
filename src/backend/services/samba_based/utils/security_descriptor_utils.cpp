@@ -153,7 +153,7 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
 
     static std::string uint32_to_hex_string(uint32_t v) {
         std::stringstream ss;
-        ss << std::hex <<  v;
+        ss << "0x"<<std::hex <<  v;
         return ss.str();
     }
 
@@ -169,7 +169,10 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
                 flags -= e.first;
             }
         }
-        if(remain > 0)
+        if(out_vector.empty()) {
+                out_vector.emplace_back(uint32_to_hex_string(flags));
+        }
+        else  if(remain > 0)
         {
             out_vector.emplace_back(uint32_to_hex_string(remain));
         }
