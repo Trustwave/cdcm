@@ -26,23 +26,25 @@ struct security_descriptor;
 struct security_ace;
 namespace trustwave {
     namespace sd_utils {
+        using string_vec = std::vector<std::string>;
         enum class entity_type {
             NTFS_FILE,
             NTFS_DIR,
             SHARE,
             REGISTRY,
-            GENERIC
+            GENERIC,
+            STD
 
         };
         struct ACE_str {
             std::string SecurityPrincipal;
-            std::vector<std::string> FileSystemRights;
+            string_vec FileSystemRights;
             std::string AccessControlType;
-            std::vector<std::string> AccessControlFlags;
+            string_vec AccessControlFlags;
         };
         struct Security_Descriptor_str {
             std::string Revision;
-            std::vector<std::string> Control;
+            string_vec Control;
             std::string Owner;
             std::string Group;
             std::vector<ACE_str> ACLS;
