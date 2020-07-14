@@ -51,5 +51,5 @@ shared_lib_list action_manager::load(const boost::filesystem::path& p_dir, Dispa
     }
     registered_plugins.append(std::string("Resgistered"));
     std::cerr <<registered_plugins <<std::endl;
-    return std::move(sl_vec);
+    return sl_vec;
 }
