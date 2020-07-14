@@ -144,7 +144,6 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
             {
                 out_vector.emplace_back(e.second);
                 flags &= ~e.first;
-                //flags -= e.first;
             }
         }
 
@@ -171,28 +170,26 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
     static void get_access_mask(uint32_t mask, entity_type et,string_vec& out_vector)
     {
         auto orig_mask=mask;
-        uint32_t xxx= 0;
-        static  const std::map<uint32_t,uint32_t> zzz = {{GENERIC_ALL_ACCESS, FILE_GENERIC_ALL},
+        uint32_t new_mask= 0;
+        static  const std::map<uint32_t,uint32_t> generic_to_file_generic = {{GENERIC_ALL_ACCESS, FILE_GENERIC_ALL},
                                                          {GENERIC_EXECUTE_ACCESS, FILE_GENERIC_EXECUTE},
                                                          {GENERIC_WRITE_ACCESS, FILE_GENERIC_WRITE},
                                                          {GENERIC_READ_ACCESS, FILE_GENERIC_READ}};
-        for (const auto v:perm_dir.at(entity_type::GENERIC)) {
+        for (const auto v:generic_to_file_generic) {
             if (v.first == (orig_mask & v.first)) {
-                xxx |= zzz.at(v.first);
+                new_mask |= v.second; // add the file generic to new mask
             }
         }
-        xxx &=0x00FFFFFF;
-        flags_vector(perm_dir.at(et), orig_mask, out_vector);
+        new_mask &=0x00FFFFFF;// remove the generic
+        flags_vector(perm_dir.at(et), orig_mask, out_vector);// extract special permissions
         for (const auto v:perm_dir.at(entity_type::STD)) {
-            if (v.first == (xxx & v.first)) {
+            if (v.first == (new_mask & v.first)) {
                 out_vector.emplace_back(v.second);
             }
         }
 
-
         if(out_vector.empty()) {
-
-        out_vector.emplace_back(NType_to_hex_string(orig_mask));
+            out_vector.emplace_back(NType_to_hex_string(orig_mask));
         }
     }
     static void SidToString(cli_state* cli, fstring str, const dom_sid* sid)
