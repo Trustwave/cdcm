@@ -41,7 +41,7 @@ namespace trustwave {
                         }
                     }),
                     ios_);
-                return std::move(broker);
+                return broker;
             }
             catch(std::exception& exception) {
                 AU_LOG_ERROR("got exception while trying to start worker. exception: %s", exception.what());
