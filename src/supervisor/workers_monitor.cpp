@@ -88,7 +88,7 @@ std::unique_ptr<boost::process::child> workers_monitor::start_worker(std::string
                 }
             }),
             ios);
-        return std::move(worker);
+        return worker;
     }
     catch(std::exception& exception) {
         AU_LOG_ERROR("got exception while trying to start worker. exception: %s", exception.what());
