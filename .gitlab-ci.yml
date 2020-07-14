@@ -292,7 +292,7 @@ functional_tests:
     - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" testsRunner_settings.json
     - source /etc/profile.d/rvm.sh
     - rvm reload
-    - testFiles =(full.xml qa_4_permissions.xml)
+    - export testFiles=(full.xml qa_4_permissions.xml)
     - for i in ${testFiles[@]};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ;done
     - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
     - export FAILED=0
