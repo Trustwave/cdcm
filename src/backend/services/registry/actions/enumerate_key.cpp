@@ -56,8 +56,7 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
                                         std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Session not found"); //error type B
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
@@ -66,42 +65,38 @@ action_status Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::sh
     auto ekact = std::dynamic_pointer_cast<reg_action_enum_key_msg>(action);
     if(!ekact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Internal error");  //error type B
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
     if( ekact->key_.empty())
     {
-        res->set_resp_code(trustwave::resp_code({2,666}));
-        res->res("Error: key is mandatory");  //error type A
+        res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
-        AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
+        AU_LOG_DEBUG("Failed connecting to %s err: %s ", sess->remote().c_str(), win_errstr(std::get<1>(r)));// rotem to do fixed
         if(werr_pipe_busy == std::get<1>(r).w) {
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //rotem: add error code
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
             return action_status::POSTPONED;
         }
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));  //error type C //rotem: add error code
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET,  W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
         return action_status::FAILED;
     }
 
     trustwave::enum_key ek{};
     auto ret = c.enumerate_key(ekact->key_, ek);
     if(std::get<0>(ret)) {
-        res->res(ek); //rotem: add error code
+        res->set_response_for_success(ek);
     }
     else {
         auto status = werror_to_ntstatus(std::get<1>(ret));
         AU_LOG_DEBUG("%s", nt_errstr(status));
-        res->res(std::string("Error: ") + nt_errstr(status)); //error type C //rotem: add error code
+        //rotem todo : check what type is status
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), nt_errstr(status) );
     }
     return action_status::SUCCEEDED;
 }
-//
-// Dispatcher <Action_Base>::Registrator Enumerate_Key_Action::m_registrator(new Enumerate_Key_Action,
-//                authenticated_scan_server::instance().public_dispatcher_);
 
 // instance of the our plugin
 static std::shared_ptr<Enumerate_Key_Action> instance = nullptr;

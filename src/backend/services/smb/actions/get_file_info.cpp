@@ -39,22 +39,19 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
                                      std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Session not found"); //error type B
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_get_file_info_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Internal error"); //error type B
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
     if( smb_action->param.empty())
     {
-        res->set_resp_code(trustwave::resp_code({2,666}));
-        res->res("Error: param is mandatory"); //error type A
+        res->set_response_for_error(CDCM_ERROR::PARAM_IS_MANDATORY);
         return action_status::FAILED;
     }
     std::string base("smb://");
@@ -62,14 +59,13 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
-        res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second)))); //error type C //rotem: add error code
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, connect_res.second, std::string((std::strerror(connect_res.second))) );
         return action_status::FAILED;
     }
 
     pe_context pc(rc);
     if(0 != pc.parse()) {
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: parse file failed"); //error type B
+        res->set_response_for_error(CDCM_ERROR::PARSE_FILE_FAILED);
         return action_status::FAILED;
     }
     std::map<std::u16string, std::u16string> ret;
@@ -107,7 +103,7 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     }
     c.end_object();
 
-    res->res(c.value); //rotem: add error code
+    res->set_response_for_success(c.value);
     return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_Get_File_Info> instance = nullptr;

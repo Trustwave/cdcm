@@ -39,22 +39,19 @@ action_status
 SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Session not found"); //error type B
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_list_dir_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Internal error"); //error type B
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
     if( smb_action->param.empty())
     {
-        res->set_resp_code(trustwave::resp_code({2,666}));
-        res->res("Error: param is mandatory"); //error type A
+        res->set_response_for_error(CDCM_ERROR::PARAM_IS_MANDATORY);
         return action_status::FAILED;
     }
     std::string base("smb://");
@@ -63,7 +60,7 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
     trustwave::smb_client rc;
     std::vector<trustwave::dirent> dir_entries;
     if(!rc.list_dir(base.c_str(), dir_entries)) {
-        res->res("Error: List Failed"); //error type C //rotem: add error code
+        res->set_response_for_error(CDCM_ERROR::LIST_FAILED);
         return action_status::FAILED;
     }
     AU_LOG_INFO("list returned");
@@ -78,8 +75,7 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
             dir_entries.end());
     }
 
-    res->res(dir_entries); //rotem: add error code
-
+    res->set_response_for_success(dir_entries);
     return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_List_Dir> instance = nullptr;

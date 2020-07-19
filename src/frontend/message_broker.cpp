@@ -317,8 +317,7 @@ void message_broker::client_process(const std::string& sender, std::unique_ptr<z
         auto res = std::make_shared<trustwave::result_msg>();
         result_message.msgs.push_back(res);
         res->id("N/A");
-        res->set_resp_code(trustwave::resp_code({2,666}));
-        res->res(std::string("Error: Malformed message ") + e.what()); //error type A
+        res->set_response_for_error(CDCM_ERROR::MALFORMED_MESSAGE);
         send_local_to_client(result_message, sender, msg->unwrap());
     }
     AU_LOG_SENSITIVE_DATA_DEBUG("body : %s", msg->body());
