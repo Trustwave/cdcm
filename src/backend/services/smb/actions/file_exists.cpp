@@ -31,22 +31,19 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
                                    std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Session not found"); //error type B
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_file_exists_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Internal error");  //error type B
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
     if( smb_action->param.empty())
     {
-        res->set_resp_code(trustwave::resp_code({2,666}));
-        res->res("Error: param is mandatory");  //error type A
+        res->set_response_for_error(CDCM_ERROR::PARAM_IS_MANDATORY);
         return action_status::FAILED;
     }
     std::string base("smb://");
@@ -54,18 +51,18 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
-        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));  //error type C
+        AU_LOG_DEBUG("got smb error: %i - %s", connect_res.second, std::strerror(connect_res.second));
 
         if(connect_res.second == ENODEV || connect_res.second == ENOTDIR || connect_res.second == ENOENT) {
-            res->res(std::string("False")); //rotem: add error code //rotem: add error code
+            res->set_response_for_success("False");
         }
         else {
-            //rotem: add error code
-            res->res(std::string("Error: ") + std::string((std::strerror(connect_res.second))));  //error type C
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, connect_res.second, std::string((std::strerror(connect_res.second))) );
+            return action_status::FAILED;
         }
     }
     else {
-        res->res(std::string("True")); //rotem: add error code
+        res->set_response_for_success("True");
     }
     return action_status::SUCCEEDED;
 }

@@ -33,8 +33,7 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
                                       std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Session not found"); //error type B
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
@@ -43,47 +42,42 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     auto qvact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
     if(!qvact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->set_resp_code(trustwave::resp_code({3,666}));
-        res->res("Error: Internal error"); //error type B
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
     if( qvact->key_.empty())
     {
-        res->set_resp_code(trustwave::resp_code({2,666}));
-        res->res("Error: key is mandatory"); //error type A
+        res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
         if(werr_pipe_busy == std::get<1>(r).w) {
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C //rotem: add error code
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
             return action_status::POSTPONED;
         }
-        res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r)))); //error type C //rotem: add error code
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
         return action_status::FAILED;
     }
 
     if(!std::get<0>(c.open_key(qvact->key_.c_str()))) {
         AU_LOG_DEBUG("Failed opening  %s", qvact->key_.c_str());
-        res->res("Error: Failed to open key"); //error type C //rotem: add error code
+        res->set_response_for_error(CDCM_ERROR::OPEN_KEY_FAILED);
         return action_status::FAILED;
     }
     trustwave::registry_value rv;
     c.key_get_value_by_name(qvact->value_.c_str(), rv);
     if(rv.value().empty()) {
-        res->res("Error: Value is empty"); //rotem: add error code
-        AU_LOG_ERROR("Error: Value is empty"); //error type C
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0, "Value is empty");
+        AU_LOG_ERROR("Error: Value is empty");
     }
     else {
-        res->res(rv.value()); //rotem: add error code
+        res->set_response_for_success(rv.value());
         AU_LOG_INFO(rv.value().c_str());
     }
     return action_status::SUCCEEDED;
 }
-
-// Dispatcher <Action_Base>::Registrator Query_Value_Action::m_registrator(new Query_Value_Action,
-//                authenticated_scan_server::instance().public_dispatcher_);
 
 // instance of the our plugin
 static std::shared_ptr<Query_Value_Action> instance = nullptr;
