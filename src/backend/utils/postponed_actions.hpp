@@ -29,10 +29,12 @@
 #include "protocol/msg_types.hpp"
 
 namespace trustwave {
+    class postponed_action;
+    std::ostream& operator<<(std::ostream&, const postponed_action&);
     namespace bmi = boost::multi_index;
     namespace chr = std::chrono;
     class postponed_action final {
-        friend std::ostream& operator<<(std::ostream&, const postponed_action&);
+        friend std::ostream& ::trustwave::operator<<(std::ostream&, const postponed_action&);
 
     public:
         postponed_action(tao::json::value action_message, std::string reply_to, std::string id, u_int8_t remaining_runs,
@@ -65,7 +67,8 @@ namespace trustwave {
         time_t expiration_time_;
         header header_;
     };
-
+    class postponed_actions_queue;
+    std::ostream& operator<<(std::ostream&, const postponed_actions_queue&);
     class postponed_actions_queue final {
         friend std::ostream& operator<<(std::ostream&, const postponed_actions_queue&);
 
