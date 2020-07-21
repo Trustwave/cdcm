@@ -45,7 +45,7 @@ namespace tao::json {
             trustwave::smb_list_dir_msg result;
             const auto o = v.at(trustwave::smb_list_dir_msg::act_name);
             result.id_ = o.at("id").template as<std::string>();
-            result.param = o.at("param").template as<std::string>();
+            result.param = o.at("path").template as<std::string>();
             result.pattern = o.at("pattern").template as<std::string>();
             return result;
         }

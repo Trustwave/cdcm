@@ -40,7 +40,7 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
         res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
-    if(gnpact->key_.empty()) {
+    if(gnpact->share_name_.empty()) {
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
@@ -52,9 +52,9 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
     {
         auto c = trustwave::lsa_client();
 
-        result r = c.connect(*sess, gnpact->key_);
+        result r = c.connect(*sess, gnpact->share_name_);
         if(!std::get<0>(r)) {
-            AU_LOG_DEBUG("Failed connecting to %s share: %s err: %s", sess->remote().c_str(), gnpact->key_.c_str(),
+            AU_LOG_DEBUG("Failed connecting to %s share: %s err: %s", sess->remote().c_str(), gnpact->share_name_.c_str(),
                          win_errstr(std::get<1>(r)));
 
             res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));

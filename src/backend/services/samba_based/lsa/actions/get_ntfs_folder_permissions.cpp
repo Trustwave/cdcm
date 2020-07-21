@@ -52,12 +52,12 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
         res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
-    if(gnpact->key_.empty()) {
+    if(gnpact->path_.empty()) {
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
     std::string share, path;
-    split_share_path(gnpact->key_, share, path);
+    split_share_path(gnpact->path_, share, path);
     if(share.empty()) {
         res->set_response_for_error(CDCM_ERROR::SHARE_IS_MISSING_IN_KEY);
         return action_status::FAILED;
