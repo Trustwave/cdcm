@@ -22,10 +22,10 @@
 namespace tao::json {
 
     template<>
-    struct traits<trustwave::resp_code>:
-            binding::object<TAO_JSON_BIND_REQUIRED("code_group", &trustwave::resp_code::code_group_),
-            TAO_JSON_BIND_REQUIRED("code_group_description", &trustwave::resp_code::code_group_description_),
-            TAO_JSON_BIND_REQUIRED("code", &trustwave::resp_code::code_)> {
+    struct traits<trustwave::resp_status>:
+            binding::object<TAO_JSON_BIND_REQUIRED("code_group", &trustwave::resp_status::code_group_),
+            TAO_JSON_BIND_REQUIRED("code_group_description", &trustwave::resp_status::code_group_description_),
+            TAO_JSON_BIND_REQUIRED("code", &trustwave::resp_status::code_)> {
     };
 
     template<>
@@ -52,19 +52,9 @@ namespace tao::json {
     template<>
     struct traits<trustwave::result_msg>:
             binding::object<TAO_JSON_BIND_REQUIRED("res", &trustwave::result_msg::res_),
-                    TAO_JSON_BIND_REQUIRED("code", &trustwave::result_msg::resp_code_),
+                    TAO_JSON_BIND_REQUIRED("status", &trustwave::result_msg::resp_status_),
                     TAO_JSON_BIND_REQUIRED("id", &trustwave::result_msg::id_)> {
     };
-
-//    template<>
-//    struct traits<trustwave::result_msg>:
-//        binding::object<TAO_JSON_BIND_REQUIRED("res", &trustwave::result_msg::res_),
-//                        TAO_JSON_BIND_REQUIRED("code_group", &trustwave::result_msg::resp_code_::code_group_),
-//                        TAO_JSON_BIND_REQUIRED("code_group_description", &trustwave::result_msg::resp_code_::code_group_description_),
-//                        TAO_JSON_BIND_REQUIRED("error_code", &trustwave::result_msg::resp_code_::code_),
-//                        //TAO_JSON_BIND_REQUIRED("code", &trustwave::result_msg::resp_code_),
-//                        TAO_JSON_BIND_REQUIRED("id", &trustwave::result_msg::id_)> {
-//    };
 
     template<>
     struct traits<trustwave::action_msg>:

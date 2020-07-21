@@ -70,7 +70,7 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));
-            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), nt_errstr(status) );
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(ret)), nt_errstr(status) );
             return action_status::FAILED;
         }
     }
