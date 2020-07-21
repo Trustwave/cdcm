@@ -51,7 +51,7 @@ namespace tao::json {
 
     template<>
     struct traits<trustwave::result_msg>:
-            binding::object<TAO_JSON_BIND_REQUIRED("res", &trustwave::result_msg::res_),
+            binding::object<TAO_JSON_BIND_REQUIRED("result", &trustwave::result_msg::result_),
                     TAO_JSON_BIND_REQUIRED("status", &trustwave::result_msg::resp_status_),
                     TAO_JSON_BIND_REQUIRED("id", &trustwave::result_msg::id_)> {
     };

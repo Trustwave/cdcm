@@ -127,7 +127,7 @@ namespace trustwave {
     public:
         std::string id_;
         resp_status resp_status_;
-        tao::json::value res_;
+        tao::json::value result_;
 
     public:
         virtual ~result_msg() = default;
@@ -138,8 +138,8 @@ namespace trustwave {
         result_msg() = default;
         std::string id() const { return id_; }
         void id(const std::string& ids) { id_ = ids; }
-        tao::json::value res() const { return res_; }
-        void res(const tao::json::value& ress) { res_ = ress; }
+        tao::json::value res() const { return result_; }
+        void res(const tao::json::value& ress) { result_ = ress; }
 
         /************************************************************************************
          * sets both the status (for success) and res
