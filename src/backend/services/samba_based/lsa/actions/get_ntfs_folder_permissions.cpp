@@ -52,12 +52,12 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-    if(gnpact->key_.empty()) {
+    if(gnpact->path_.empty()) {
         res->res("Error: key is mandatory");
         return action_status::FAILED;
     }
     std::string share, path;
-    split_share_path(gnpact->key_, share, path);
+    split_share_path(gnpact->path_, share, path);
     if(share.empty()) {
         res->res("Error: share is needed");
         return action_status::FAILED;
