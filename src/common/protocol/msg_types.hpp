@@ -20,16 +20,15 @@
 #include <utility>
 #include <vector>
 #include <map>
-#include <iostream> //rotem todo delete
 #include <taocpp-json/include/tao/json/value.hpp>
 
 namespace trustwave {
     enum class RESP_GROUP_CODE  {OK = 1, ERROR_IN_REQUEST, CDCM_INTERNAL_ERROR, ERROR_WITH_ASSET, NON_EXIST};
+
     static  std::map<RESP_GROUP_CODE,std::string> group_code_description_mapping = {{RESP_GROUP_CODE::OK ,"OK"},
                                                                                     {RESP_GROUP_CODE::ERROR_IN_REQUEST, "Error in request"},
                                                                                     {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, "CDCM internal error"},
                                                                                     {RESP_GROUP_CODE::ERROR_WITH_ASSET, "Error with asset"}};
-
 
     enum class  CDCM_ERROR : uint32_t
     {
@@ -42,6 +41,7 @@ namespace trustwave {
         PARAM_IS_MANDATORY,
         PATH_IS_MANDATORY,
         REMOTE_AND_USERNAME_ARE_MANDATORY,
+        SHARE_IS_MISSING_IN_KEY,
 
         SESSION_NOT_FOUND = 301, //cdcm internal error
         INTERNAL_ERROR,
@@ -51,7 +51,7 @@ namespace trustwave {
         OPEN_KEY_FAILED,
         FAILED_ADDING_NEW_SESSION,
 
-        LIST_FAILED = 401,
+        LIST_FAILED = 401,        // error with asset
         GENERAL_ERROR_WITH_ASSET
     };
 
@@ -66,6 +66,7 @@ namespace trustwave {
             {CDCM_ERROR::PARAM_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 205, "Param is mandatory"} },
             {CDCM_ERROR::PATH_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 206, "Path is mandatory"} },
             {CDCM_ERROR::REMOTE_AND_USERNAME_ARE_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 207, "Remote and username are mandatory"} },
+            {CDCM_ERROR::SHARE_IS_MISSING_IN_KEY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 208, "Share is missing in the provided key"} },
 
             {CDCM_ERROR::SESSION_NOT_FOUND , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 301, "Session not found"} },
             {CDCM_ERROR::INTERNAL_ERROR , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 302, "Internal error"} },
@@ -76,35 +77,39 @@ namespace trustwave {
             {CDCM_ERROR::FAILED_ADDING_NEW_SESSION , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 307, "Failed adding new session"}},
 
             {CDCM_ERROR::LIST_FAILED , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 401, "List failed"}},
-            {CDCM_ERROR::GENERAL_ERROR_WITH_ASSET , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 402, "rotem to delete"}}
+            {CDCM_ERROR::GENERAL_ERROR_WITH_ASSET , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 402, "Error with asset"}}
 
     };
     //rotem TODO: change struct name
-    struct resp_code {
+    struct resp_status {
     public:
-        resp_code(RESP_GROUP_CODE grp_code, uint32_t err_code) {
+        resp_status(RESP_GROUP_CODE grp_code, uint32_t code) {
             code_group(grp_code);
-            code_ = err_code;
+            code_ = code;
         }
-        resp_code(const resp_code&) = default;
-        resp_code(resp_code&&) = default;
-        resp_code& operator=(const resp_code&) = default;
-        resp_code& operator=(resp_code&&) = default;
-        resp_code() = default;
-        //set both the code_group and the code_group_description
+        resp_status(const resp_status&) = default;
+        resp_status(resp_status&&) = default;
+        resp_status& operator=(const resp_status&) = default;
+        resp_status& operator=(resp_status&&) = default;
+        resp_status() = default;
+
+        /************************************************************************************
+         * set both the code_group and the code_group_description
+         ************************************************************************************/
         void code_group(RESP_GROUP_CODE resp_group_code) {
             code_group_ = (uint32_t)resp_group_code;
             code_group_description_ = group_code_description_mapping[resp_group_code];
         }
-        void error_code(uint32_t error_code) {code_ = error_code;}
 
-        /*
+        void code(uint32_t code) { code_ = code;}
+
+        /************************************************************************************
          * sets 'code_group', 'code_group_description' and 'code'
-         */
+         ************************************************************************************/
         void set_resp_status_for_cdcm_error(CDCM_ERROR cdcm_error)
         {
             code_group(std::get<0>(cdcm_error_mapping[cdcm_error]));
-            error_code(std::get<1>(cdcm_error_mapping[cdcm_error]));
+            code(std::get<1>(cdcm_error_mapping[cdcm_error]));
         };
 
         std::string get_error_message(CDCM_ERROR& cdcm_error)
@@ -121,7 +126,7 @@ namespace trustwave {
     struct result_msg {
     public:
         std::string id_;
-        resp_code resp_code_;
+        resp_status resp_status_;
         tao::json::value res_;
 
     public:
@@ -135,40 +140,43 @@ namespace trustwave {
         void id(const std::string& ids) { id_ = ids; }
         tao::json::value res() const { return res_; }
         void res(const tao::json::value& ress) { res_ = ress; }
-        resp_code get_resp_code() const { return resp_code_; }
-        void set_resp_code(const resp_code& resp_code) { resp_code_ = resp_code; }
 
-
-
+        /************************************************************************************
+         * sets both the status (for success) and res
+         ************************************************************************************/
         void set_response_for_success(const tao::json::value& result) {
-            resp_code_.set_resp_status_for_cdcm_error(CDCM_ERROR::OK);
+            resp_status_.set_resp_status_for_cdcm_error(CDCM_ERROR::OK);
             res(result);
         }
 
-        /*
-        * sets 'code_group', 'code_group_description', 'code' and message (as res) related to the cdcm_error enum
-        */
+        /***********************************************************************************
+        *  sets both the status (for error) and res (with the appropriate error message)
+        ************************************************************************************/
         void set_response_for_error(CDCM_ERROR cdcm_error) {
-            resp_code_.set_resp_status_for_cdcm_error(cdcm_error);
-            res("Error: " + resp_code_.get_error_message(cdcm_error));
+            resp_status_.set_resp_status_for_cdcm_error(cdcm_error);
+            res("Error: " + resp_status_.get_error_message(cdcm_error));
         }
 
-        /*
+
+
+        /************************************************************************************
         * sets 'code_group', 'code_group_description' related to the cdcm_error enum.
-        * 'code' and 'res' will be taken from input parameters
-        */
+        * 'code' and 'res' will be taken from input parameters. if not supplied, 'code' and 'res' will
+        * be taken from the code and string related to the cdcm_error enum
+        ************************************************************************************/
         void set_response_for_error_with_unique_code_or_msg(CDCM_ERROR cdcm_error, uint32_t error_code =0, std::string err_msg= "") {
-            resp_code_.code_group(std::get<0>(cdcm_error_mapping[cdcm_error]));
+            resp_status_.code_group(std::get<0>(cdcm_error_mapping[cdcm_error]));
             if (0 != error_code)
-                resp_code_.error_code(error_code);
+                resp_status_.code(error_code);
             else
-                resp_code_.error_code(std::get<1>(cdcm_error_mapping[cdcm_error]));
+                resp_status_.code(std::get<1>(cdcm_error_mapping[cdcm_error]));
 
             if (!err_msg.empty())
                 res("Error: " + err_msg);
             else
-                res("Error: " + resp_code_.get_error_message(cdcm_error));
+                res("Error: " + resp_status_.get_error_message(cdcm_error));
         }
+
     };
 
     struct action_msg {

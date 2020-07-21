@@ -59,7 +59,7 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
     std::string share, path;
     split_share_path(gnpact->key_, share, path);
     if(share.empty()) {
-        res->res("Error: share is needed"); //rotem todo write other meessage and enum
+        res->set_response_for_error(CDCM_ERROR::SHARE_IS_MISSING_IN_KEY);
         return action_status::FAILED;
     }
     struct my_frame {
@@ -89,7 +89,7 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));
-            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), nt_errstr(status) );
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(ret)), nt_errstr(status) );
             return action_status::FAILED;
         }
     }
