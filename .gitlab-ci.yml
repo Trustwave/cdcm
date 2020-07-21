@@ -295,6 +295,7 @@ functional_tests:
     - export testFiles=(full.xml qa_4_permissions.xml)
     - for i in ${testFiles[@]};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ;done
     - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
+    - sshpass -f /root/pf  scp -P 2222  log/cdcm_client1.log root@10.88.240.20://opt/tests_results
     - export FAILED=0
     - for i in ${testFiles[@]};do if [ $(cat $REPORT_FNAME.functional.$i.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success;((FAILED++)) ; echo failed; fi ;done
     - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
@@ -311,6 +312,7 @@ functional_tests:
     when: always
     paths:
       - cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/log/*.log
   tags:
     - cdcm_tests
 
