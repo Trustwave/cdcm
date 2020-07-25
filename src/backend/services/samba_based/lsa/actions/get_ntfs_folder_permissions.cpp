@@ -42,24 +42,24 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
                                         std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     auto gnpact = std::dynamic_pointer_cast<lsa_action_get_ntfs_folder_permissions_msg>(action);
     if(!gnpact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
     if(gnpact->path_.empty()) {
-        res->res("Error: key is mandatory");
+        res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
     std::string share, path;
     split_share_path(gnpact->path_, share, path);
     if(share.empty()) {
-        res->res("Error: share is needed");
+        res->set_response_for_error(CDCM_ERROR::SHARE_IS_MISSING_IN_KEY);
         return action_status::FAILED;
     }
     struct my_frame {
@@ -75,7 +75,7 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
             AU_LOG_DEBUG("Failed connecting to %s share: %s err: %s", sess->remote().c_str(), share.c_str(),
                          win_errstr(std::get<1>(r)));
 
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
             return action_status::FAILED;
         }
 
@@ -83,11 +83,13 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
 
         auto ret = c.get_sd(path, trustwave::sd_utils::entity_type::NTFS_DIR, sd);
 
-        if(std::get<0>(ret)) { res->res(sd); }
+        if(std::get<0>(ret)) {
+            res->set_response_for_success(sd);
+        }
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));
-            res->res(std::string("Error: ") + nt_errstr(status));
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(ret)), nt_errstr(status) );
             return action_status::FAILED;
         }
     }

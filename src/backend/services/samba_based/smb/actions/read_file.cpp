@@ -89,25 +89,27 @@ action_status
 SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     auto smb_action = std::dynamic_pointer_cast<smb_read_file_msg>(action);
     if(!smb_action) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
-    if(smb_action->path_.empty()) {
-        res->res("Error: path is mandatory");
+    if( smb_action->path_.empty())
+    {
+        res->set_response_for_error(CDCM_ERROR::PATH_IS_MANDATORY);
         return action_status::FAILED;
     }
     if(smb_action->offset_.empty()) { smb_action->offset_ = "0"; }
     if(smb_action->size_.empty()) { smb_action->size_ = "0"; }
 
-    if(std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_) < 0) {
-        res->res("Error: Bad parameter");
+    if( std::stoll(smb_action->offset_) < 0 || std::stoll(smb_action->size_)  < 0 )
+    {
+        res->set_response_for_error(CDCM_ERROR::BAD_PARAMETER);
         return action_status::FAILED;
     }
 
@@ -117,7 +119,7 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     auto connect_result = rc.open_file(base.c_str());
     if(!connect_result.first) {
         AU_LOG_DEBUG("got smb error: %i - %s", connect_result.second, std::strerror(connect_result.second));
-        res->res(std::string("Error: ") + std::string(std::strerror(connect_result.second)));
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, connect_result.second, std::strerror(connect_result.second));
         return action_status::FAILED;
     }
     auto off = smb_action->offset_.empty() ? 0 : std::stoul(smb_action->offset_);
@@ -126,17 +128,17 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
     AU_LOG_DEBUG("Received offset: %zu size: %zu", off, sz);
     auto buff = std::make_unique<char[]>(sz);
     if(!buff) {
-        res->res("Error: Memory allocation failed");
+        res->set_response_for_error(CDCM_ERROR::MEMORY_ALLOCATION_FAILED);
         return action_status::FAILED;
     }
     ssize_t r = rc.read(off, sz, buff.get());
     if(-1 == r) {
-        res->res("Error: read_file failed");
+        res->set_response_for_error(CDCM_ERROR::READ_FILE_FAILED);
         return action_status::FAILED;
     }
 
     auto c64_str = base64_encode(buff.get(), r);
-    res->res(c64_str);
+    res->set_response_for_success(c64_str);
     return action_status::SUCCEEDED;
 }
 static std::shared_ptr<SMB_Read_File> instance = nullptr;
