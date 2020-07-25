@@ -19,13 +19,13 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <taocpp-json/include/tao/json/value.hpp>
 
 namespace trustwave {
-    enum class RESP_GROUP_CODE  {OK = 1, ERROR_IN_REQUEST, CDCM_INTERNAL_ERROR, ERROR_WITH_ASSET, NON_EXIST};
+    enum class RESP_GROUP_CODE: uint32_t  {OK = 1, ERROR_IN_REQUEST, CDCM_INTERNAL_ERROR, ERROR_WITH_ASSET, NON_EXIST};
 
-    static  std::map<RESP_GROUP_CODE,std::string> group_code_description_mapping = {{RESP_GROUP_CODE::OK ,"OK"},
+    static  const std::unordered_map<RESP_GROUP_CODE,std::string> group_code_description_mapping = {{RESP_GROUP_CODE::OK ,"OK"},
                                                                                     {RESP_GROUP_CODE::ERROR_IN_REQUEST, "Error in request"},
                                                                                     {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, "CDCM internal error"},
                                                                                     {RESP_GROUP_CODE::ERROR_WITH_ASSET, "Error with asset"}};
@@ -56,7 +56,7 @@ namespace trustwave {
     };
 
 
-    static std::map<CDCM_ERROR, std::tuple<RESP_GROUP_CODE, uint32_t, std::string>> cdcm_error_mapping = {
+   const static std::unordered_map<CDCM_ERROR, std::tuple<RESP_GROUP_CODE, uint32_t, std::string>> cdcm_error_mapping = {
             {CDCM_ERROR::OK , {RESP_GROUP_CODE::OK, 101, "OK"} },
 
             {CDCM_ERROR::MALFORMED_MESSAGE , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 201, "Malformed message"} },
@@ -80,7 +80,6 @@ namespace trustwave {
             {CDCM_ERROR::GENERAL_ERROR_WITH_ASSET , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 402, "Error with asset"}}
 
     };
-    //rotem TODO: change struct name
     struct resp_status {
     public:
         resp_status(RESP_GROUP_CODE grp_code, uint32_t code) {
@@ -96,9 +95,9 @@ namespace trustwave {
         /************************************************************************************
          * set both the code_group and the code_group_description
          ************************************************************************************/
-        void code_group(RESP_GROUP_CODE resp_group_code) {
-            code_group_ = (uint32_t)resp_group_code;
-            code_group_description_ = group_code_description_mapping[resp_group_code];
+        void code_group(const RESP_GROUP_CODE resp_group_code) {
+            code_group_ = static_cast<uint32_t>(resp_group_code);
+            code_group_description_ = group_code_description_mapping.at(resp_group_code);
         }
 
         void code(uint32_t code) { code_ = code;}
@@ -108,13 +107,13 @@ namespace trustwave {
          ************************************************************************************/
         void set_resp_status_for_cdcm_error(CDCM_ERROR cdcm_error)
         {
-            code_group(std::get<0>(cdcm_error_mapping[cdcm_error]));
-            code(std::get<1>(cdcm_error_mapping[cdcm_error]));
+            code_group(std::get<0>(cdcm_error_mapping.at(cdcm_error)));
+            code(std::get<1>(cdcm_error_mapping.at(cdcm_error)));
         };
 
-        std::string get_error_message(CDCM_ERROR& cdcm_error)
+        std::string get_error_message(const CDCM_ERROR& cdcm_error) const
         {
-            return std::get<2>(cdcm_error_mapping[cdcm_error]);
+            return std::get<2>(cdcm_error_mapping.at(cdcm_error));
         }
 
         uint32_t code_group_ ;
@@ -165,11 +164,11 @@ namespace trustwave {
         * be taken from the code and string related to the cdcm_error enum
         ************************************************************************************/
         void set_response_for_error_with_unique_code_or_msg(CDCM_ERROR cdcm_error, uint32_t error_code =0, std::string err_msg= "") {
-            resp_status_.code_group(std::get<0>(cdcm_error_mapping[cdcm_error]));
+            resp_status_.code_group(std::get<0>(cdcm_error_mapping.at(cdcm_error)));
             if (0 != error_code)
                 resp_status_.code(error_code);
             else
-                resp_status_.code(std::get<1>(cdcm_error_mapping[cdcm_error]));
+                resp_status_.code(std::get<1>(cdcm_error_mapping.at(cdcm_error)));
 
             if (!err_msg.empty())
                 res("Error: " + err_msg);
