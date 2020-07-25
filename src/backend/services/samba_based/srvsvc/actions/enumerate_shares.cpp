@@ -40,14 +40,14 @@ action_status Enumerate_Shares_Action::act(boost::shared_ptr<session> sess, std:
                                            std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     auto esact = std::dynamic_pointer_cast<srvsvc_action_enumerate_shares_msg>(action);
     if(!esact) {
         AU_LOG_ERROR("Failed dynamic cast");
-        res->res("Error: Internal error");
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
 
@@ -63,18 +63,20 @@ action_status Enumerate_Shares_Action::act(boost::shared_ptr<session> sess, std:
         if(!std::get<0>(r)) {
             AU_LOG_DEBUG("Failed connecting to %s err: %s", sess->remote().c_str(), win_errstr(std::get<1>(r)));
 
-            res->res(std::string("Error: ") + std::string(win_errstr(std::get<1>(r))));
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
             return action_status::FAILED;
         }
 
         std::vector<trustwave::share_info> shares_vec;
         auto ret = c.enumerate_all_shares(shares_vec);
 
-        if(std::get<0>(ret)) { res->res(shares_vec); }
+        if(std::get<0>(ret)) {
+            res->set_response_for_success(shares_vec);
+        }
         else {
             auto status = werror_to_ntstatus(std::get<1>(ret));
             AU_LOG_DEBUG("%s", nt_errstr(status));
-            res->res(std::string("Error: ") + nt_errstr(status));
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(ret)), nt_errstr(status) );
             return action_status::FAILED;
         }
     }

@@ -27,13 +27,13 @@ action_status
 Close_Session::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> am, std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
-        res->res("Error: Session not found");
+        res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
 
     authenticated_scan_server::instance().sessions->remove_by_id(sess->idstr());
     res->id(am->id());
-    res->res("Session closed");
+    res->set_response_for_success("Session closed");
     return action_status::SUCCEEDED;
 }
 
