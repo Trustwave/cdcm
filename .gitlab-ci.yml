@@ -292,8 +292,14 @@ functional_tests:
     - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" testsRunner_settings.json
     - source /etc/profile.d/rvm.sh
     - rvm reload
-    - ruby mdclient2.rb full.xml 2>&1 | tee $REPORT_FNAME.functional.log
-    - sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.log root@10.88.240.20://opt/tests_results
+    - export testFiles=(full.xml qa_4_permissions.xml)
+    - for i in ${testFiles[@]};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ;done
+    - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
+    - sshpass -f /root/pf  scp -P 2222  log/cdcm_client1.log root@10.88.240.20://opt/tests_results
+    - export FAILED=0
+    - for i in ${testFiles[@]};do if [ $(cat $REPORT_FNAME.functional.$i.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success;((FAILED++)) ; echo failed; fi ;done
+    - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
+
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
       changes:
@@ -306,6 +312,7 @@ functional_tests:
     when: always
     paths:
       - cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/log/*.log
   tags:
     - cdcm_tests
 
@@ -313,7 +320,7 @@ smoke_test:
   stage: smoke_test
   allow_failure: true
   script:
-    - sudo yum update -y
+    - sudo yum update -y --nogpgcheck
     - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
@@ -324,9 +331,12 @@ smoke_test:
     - sudo yum install -y cdcm.rpm
     - export PATH=/opt/carrier/bin:$PATH
     - echo $PATH
+    - export FAILED=0
     - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  sudo PATH=/opt/carrier/bin:$PATH /opt/carrier/bin/carrier -t full -p 445 -x /root/input_file_$i.xml --asset-meta-path output_meta.xml  2>&1 | tee $REPORT_FNAME.$i.smoke.log ;done
-    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  cat $REPORT_FNAME.$i.smoke.log ;done
     - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  sshpass -f /root/pf  scp -P 2222  $REPORT_FNAME.$i.smoke.log root@10.88.240.20://opt/tests_results ;done
+    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  if  grep -q AUTHENTICATION_SUCCESS_EVENT $REPORT_FNAME.$i.smoke.log; then echo success;else ((FAILED++)) ; echo failed; fi ;done
+    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  if [ $(cat $REPORT_FNAME.$i.smoke.log  | grep ERROR  | wc -l) = "0" ]; then echo success;else ((FAILED++)) ; echo failed; fi ;done
+    - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
   rules:
     - if: ' $RunFast==null && $BumpTag == null'
       changes:
