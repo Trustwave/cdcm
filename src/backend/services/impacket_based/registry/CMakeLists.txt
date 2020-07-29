@@ -9,8 +9,6 @@ add_executable(wmi_registry-tester tester.cpp)
 target_link_libraries(wmi_registry-tester tw-wmi_registry-client)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helper_module.py ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py COPYONLY)
 
-
-
 #add_subdirectory(actions)
 install(TARGETS tw-wmi_registry-client DESTINATION ${release_lib_dest})
 install(TARGETS tw-wmi_registry-client DESTINATION ${lib_dest})
@@ -20,10 +18,4 @@ install(TARGETS tw-wmi_registry-client ARCHIVE DESTINATION lib
 install(TARGETS tw-wmi_registry-client ARCHIVE DESTINATION lib
         DESTINATION ${release_lib_dest})
 
-install(FILES helper_module.py
-         DESTINATION bin
-        DESTINATION ${lib_dest})
-install(FILES helper_module.py
-         DESTINATION bin
-        DESTINATION ${release_lib_dest})
 #configure_file(registry.json ${release_lib_dest}/plugins/registry.json COPYONLY)

@@ -122,19 +122,25 @@ bool wmi_registry_client::key_get_value_by_name(const std::string& key,const std
         {
             try {
                 auto rr = exec_.attr(type_to_method.at(it->type()).first.data())(key,value);
-                auto sv = rr.attr(type_to_method.at(it->type()).second.data());
+//                auto sv = rr.attr(type_to_method.at(it->type()).second.data());
                 rv.type(it->type());
                 rv.name(it->name());
                 if(it->type() == 7)
                 {
-//                    rv.value(to_std_vector<std::string>(sv)[0]);
-                    rv.value("Fixme");
+                    auto sss = bp::extract<std::string>(rr);
+
+                    rv.value(sss);
+                    return true;
+//                    rv.value("Fixme");
                 }
                 if(it->type() == 3)
                 {
                     rv.value("Fixme");
 
                 }
+
+                auto sv = rr.attr(type_to_method.at(it->type()).second.data());
+
                 rv.value(to_std_vector<std::string>(sv)[0]);
                 return true;
 

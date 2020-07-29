@@ -12,7 +12,7 @@ sys.path.append('./impacket')
 import time
 import logging
 # import ntpath
-
+from pprint import pprint
 # from impacket.examples import logger
 # from impacket import version
 from impacket.smbconnection import SMBConnection, SMB_DIALECT, SMB2_DIALECT_002, SMB2_DIALECT_21
@@ -55,7 +55,6 @@ class WMI_REG_EXEC_METHOD:
             self.__lmhash, self.__nthash = hashes.split(':')
 
     def connect(self):
-        print("connect")
         self.__conn = SMBConnection(self.__addr, self.__addr)
         if self.__doKerberos is False:
             self.__conn.login(self.__username, self.__password, self.__domain, self.__lmhash, self.__nthash)
@@ -91,8 +90,6 @@ class WMI_REG_EXEC_METHOD:
     def EnumKey(self, key, hive=0x80000002):
         try:
             rr = self.__StdRegProv.EnumKey(hive, key)
-            print ("EnumKey")
-            print(rr)
             return rr
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
@@ -104,7 +101,6 @@ class WMI_REG_EXEC_METHOD:
     def EnumValues(self, key, hive=0x80000002):
         try:
             rr = self.__StdRegProv.EnumValues(hive, key)
-            print("\nEnumValues")
             return rr
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
@@ -116,9 +112,8 @@ class WMI_REG_EXEC_METHOD:
     def GetBinaryValue(self, key, value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetBinaryValue(hive, key,value)
-            print("GetBinaryValue")
-            print_attributes(rr)
-            return rr
+            print(rr.uValue)
+            return rr.uValue
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
                 import traceback
@@ -129,9 +124,7 @@ class WMI_REG_EXEC_METHOD:
     def GetDWORDValue(self, key,value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetDWORDValue(hive, key,value)
-            print ("AAA")
-            print(rr)
-            return rr
+            return rr.uValue
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
                 import traceback
@@ -142,9 +135,7 @@ class WMI_REG_EXEC_METHOD:
     def GetExpandedStringValue(self, key,value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetExpandedStringValue(hive, key,value)
-            print ("AAA")
-            print(rr)
-            return rr
+            return rr.sValue
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
                 import traceback
@@ -155,9 +146,10 @@ class WMI_REG_EXEC_METHOD:
     def GetMultiStringValue(self, key,value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetMultiStringValue(hive, key, value)
-            print ("AAA")
-            print(rr)
-            return rr
+            ret = ""
+            for x in rr.sValue:
+                ret += x + "\n"
+            return ret
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
                 import traceback
@@ -168,9 +160,7 @@ class WMI_REG_EXEC_METHOD:
     def GetStringValue(self, key,value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetStringValue(hive, key,value)
-            print ("GetStringValue")
-            print_attributes(rr)
-            return rr
+            return rr.sValue
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
                 import traceback
@@ -181,9 +171,7 @@ class WMI_REG_EXEC_METHOD:
     def GetQWORDValue(self, key,value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetQWORDValue(hive, key,value)
-            print ("AAA")
-            print(rr)
-            return rr
+            return rr.uValue
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
                 import traceback
