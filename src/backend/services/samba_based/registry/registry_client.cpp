@@ -87,15 +87,21 @@ void registry_client::normalize(registry_value& rv)
     if(REG_MULTI_SZ == rv.type()) {
         AU_LOG_DEBUG("Type is REG_MULTI_SZ");
         const char** a = nullptr;
-        pull_reg_multi_sz(mem_ctx_, &data_blob_, &a);
-        const char* p = nullptr;
         std::string s;
-        p = *a;
-        while(true) {
-            std::string_view sv(p);
-            if(sv.empty()) break;
-            s.append(sv).append("\n");
-            p = p + sv.length() + 1;
+        for(int i = 0 ; i< data_blob_.length;i=i+2)
+        {
+            if(data_blob_.data[i] == 0)
+            {
+                s.append("\n");
+                if(data_blob_.data[i+2] == 0)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                s.push_back(data_blob_.data[i]);
+            }
         }
         rv.value(s);
     }
