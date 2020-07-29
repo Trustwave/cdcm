@@ -20,18 +20,17 @@
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
 #include <boost/python/tuple.hpp>
-#include "session.hpp"
-#include "credentials.hpp"
-#include "../../../utils/registry_value.hpp"
-#include <iostream>
 #include <string>
+#include "session.hpp"
+#include "base64_encode.hpp"
 using trustwave::wmi_registry_client;
 namespace bp = boost::python;
 using bpo = bp::object;
-template<typename T>
-inline std::vector<T> to_std_vector(const boost::python::object &iterable) {
-    return std::vector<T>(bp::stl_input_iterator<T>(iterable),
-                          bp::stl_input_iterator<T>());
+namespace {
+    template<typename T> inline std::vector<T> to_std_vector(const boost::python::object& iterable)
+    {
+        return std::vector<T>(bp::stl_input_iterator<T>(iterable), bp::stl_input_iterator<T>());
+    }
 }
 bool wmi_registry_client::connect(const session& sess)
 {
@@ -50,7 +49,6 @@ bool wmi_registry_client::connect(const session& sess)
     catch (const boost::python::error_already_set &) {
         PyErr_Print();
         return false;
-
     } catch (...) {
         return false;
     }
@@ -70,7 +68,6 @@ bool wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
     catch (const boost::python::error_already_set &) {
         PyErr_Print();
         return false;
-
     } catch (...) {
         return false;
     }
@@ -89,12 +86,10 @@ bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_
             registry_value rv123(vt[i],"",vs[i].c_str());
             ev.push_back(rv123);
         }
-
     }
     catch (const boost::python::error_already_set &) {
         PyErr_Print();
         return false;
-
     } catch (...) {
         return false;
     }
@@ -103,16 +98,15 @@ bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_
 
 bool wmi_registry_client::key_get_value_by_name(const std::string& key,const std::string& value, registry_value& rv)
 {
-    static const std::unordered_map<uint32_t,std::pair<std::string_view,std::string_view>> type_to_method=
+    static const std::unordered_map<uint32_t,std::string_view> type_to_method=
     {
-        {1, {"GetStringValue"          ,"sValue"} },
-        {2, {"GetExpandedStringValue"  ,"sValue"} },
-        {3, {"GetBinaryValue"          ,"uValue"} },
-        {4, {"GetDWORDValue"           ,"uValue"} },
-        {7, {"GetMultiStringValue"     ,"sValue"} },
-        {11,{"GetQWORDValue"           ,"uValue"} }
-
-        };
+        {REG_SZ         , "GetStringValue"         },
+        {REG_EXPAND_SZ  , "GetExpandedStringValue" },
+        {REG_BINARY     , "GetBinaryValue"         },
+        {REG_DWORD      , "GetDWORDValue"          },
+        {REG_MULTI_SZ   , "GetMultiStringValue"    },
+        {REG_QWORD      , "GetQWORDValue"          }
+     };
     enum_key_values ekv;
     if(enumerate_key_values(key,ekv))
     {
@@ -121,34 +115,38 @@ bool wmi_registry_client::key_get_value_by_name(const std::string& key,const std
         if(it != ekv.end())
         {
             try {
-                auto rr = exec_.attr(type_to_method.at(it->type()).first.data())(key,value);
-//                auto sv = rr.attr(type_to_method.at(it->type()).second.data());
+                auto rr = exec_.attr(type_to_method.at(it->type()).data())(key,value);
                 rv.type(it->type());
                 rv.name(it->name());
-                if(it->type() == 7)
-                {
-                    auto sss = bp::extract<std::string>(rr);
-
-                    rv.value(sss);
-                    return true;
-//                    rv.value("Fixme");
+                switch(it->type()) {
+                    case REG_BINARY:
+                    {
+                        auto bin_data = to_std_vector<uint8_t>(rr);
+                        auto c64_str = base64_encode(reinterpret_cast< char*>(bin_data.data()), bin_data.size());
+                        rv.value(c64_str);
+                    }
+                    break;
+                    case REG_DWORD:
+                    case REG_QWORD:
+                    {
+                        rv.value(std::to_string(bp::extract<uint32_t>(rr)));
+                    }
+                    break;
+                    case REG_SZ:
+                    case REG_EXPAND_SZ:
+                    case REG_MULTI_SZ:
+                    {
+                        rv.value(bp::extract<std::string>(rr));
+                    }
+                    break;
+                    default:
+                        return false;
                 }
-                if(it->type() == 3)
-                {
-                    rv.value("Fixme");
-
-                }
-
-                auto sv = rr.attr(type_to_method.at(it->type()).second.data());
-
-                rv.value(to_std_vector<std::string>(sv)[0]);
                 return true;
-
             }
             catch (const boost::python::error_already_set &) {
                 PyErr_Print();
                 return false;
-
             } catch (...) {
                 return false;
             }

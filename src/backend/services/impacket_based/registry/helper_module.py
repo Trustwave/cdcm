@@ -112,7 +112,6 @@ class WMI_REG_EXEC_METHOD:
     def GetBinaryValue(self, key, value, hive=0x80000002):
         try:
             rr = self.__StdRegProv.GetBinaryValue(hive, key,value)
-            print(rr.uValue)
             return rr.uValue
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:
