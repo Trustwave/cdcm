@@ -69,7 +69,7 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     trustwave::registry_value rv;
     c.key_get_value_by_name(qvact->value_.c_str(), rv);
     if(rv.value().empty()) {
-        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0, "Value is empty");
+        res->set_response_for_error(CDCM_ERROR::VALUE_IS_EMPTY);
         AU_LOG_ERROR("Error: Value is empty");
     }
     else {
