@@ -42,14 +42,12 @@ extern "C" {
 #include "client.hpp"
 #include "registry_service_configuration.hpp"
 #include "configurable.hpp"
+#include "registry_value.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
     class session;
-    class registry_value;
-    class enum_key;
-    class enum_key_values;
     //class enum_key_values_ver2;
     struct reg_context {
         struct registry_context* registry;

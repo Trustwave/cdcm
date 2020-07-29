@@ -188,7 +188,7 @@ result registry_client::enumerate_key_values(const std::string& key, enum_key_va
                 const char* name;
                 key_get_value_by_index(i, &name, rv);
                 rv.name(name);
-                ek.registry_values_.push_back(rv);
+                ek.push_back(rv);
             }
         }
     }

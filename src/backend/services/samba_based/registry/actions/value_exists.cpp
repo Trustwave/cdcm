@@ -20,7 +20,7 @@
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
-#include "../registry_value.hpp"
+#include "registry_value.hpp"
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
