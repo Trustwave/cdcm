@@ -54,7 +54,7 @@ namespace trustwave {
     class registry_value final {
     public:
         registry_value(): value_() { }
-        registry_value(uint32_t type, const std::string& value,const std::string& name): type_(type), value_(value), name_(name) { }
+        registry_value(uint32_t type, const std::string& value,const std::string& name): type_(type),type_as_string_(reg_type_string[type]), value_(value), name_(name) { }
         uint32_t type() const { return type_; }
         std::string value() const { return value_; }
         std::string name() const { return name_; }

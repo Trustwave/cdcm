@@ -90,6 +90,8 @@ class WMI_REG_EXEC_METHOD:
     def EnumKey(self, key, hive=0x80000002):
         try:
             rr = self.__StdRegProv.EnumKey(hive, key)
+            # pprint(dir(rr))
+            # print(rr.sNames)
             return rr
         except  (Exception, KeyboardInterrupt) as e:
             if logging.getLogger().level == logging.DEBUG:

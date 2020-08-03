@@ -35,10 +35,14 @@ namespace trustwave {
 //                                      struct registry_key** subkey);
         bool enumerate_key(const std::string&, enum_key&);
         bool enumerate_key_values(const std::string&, enum_key_values&);
+        bool key_exists(const std::string&,bool&);
+        bool value_exists(const std::string&,const std::string&,bool&);
+
 //        bool key_exists(const std::string&);
 //        bool value_exists(const char* valname);
 
     private:
+        bool internal_key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
     using bpo = boost::python::object;
         bpo main_;
         bpo global_;

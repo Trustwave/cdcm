@@ -55,16 +55,22 @@ action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::
     }
 
     trustwave::registry_value rv;
-    c.key_get_value_by_name(qvact->key_,qvact->value_, rv);
-    if(rv.value().empty()) {
-        res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
-        AU_LOG_ERROR("Error: Value is empty");
+
+    if(c.key_get_value_by_name(qvact->key_,qvact->value_, rv)) {
+        if(rv.value().empty()) {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                                "Value is empty");
+            AU_LOG_ERROR("Error: Value is empty");
+        }
+        else {
+            res->set_response_for_success(rv.value());
+            AU_LOG_INFO(rv.value().c_str());
+        }
+        return action_status::SUCCEEDED;
     }
-    else {
-        res->set_response_for_success(rv.value());
-        AU_LOG_INFO(rv.value().c_str());
-    }
-    return action_status::SUCCEEDED;
+    res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
+    return action_status::FAILED;
+
 }
 
 // instance of the our plugin

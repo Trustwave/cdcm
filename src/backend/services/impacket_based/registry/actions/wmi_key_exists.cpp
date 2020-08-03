@@ -52,13 +52,14 @@ action_status WMI_Key_Exists_Action::act(boost::shared_ptr<session> sess, std::s
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-    enum_key ek;
-    if(!c.enumerate_key(keact->key_,ek)) {
-        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
-        res->set_response_for_success("False");
+    bool exists=false;
+    if(c.key_exists(keact->key_,exists) ) {
+//        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
+        res->set_response_for_success(exists?"True":"False");
     }
     else {
-        res->set_response_for_success("True");
+        res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
+        return action_status::FAILED;
     }
 
     return action_status::SUCCEEDED;

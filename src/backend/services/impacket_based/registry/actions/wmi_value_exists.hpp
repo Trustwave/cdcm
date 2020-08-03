@@ -25,7 +25,7 @@
 //=====================================================================================================================
 namespace trustwave {
     struct wmi_reg_action_value_exists_msg: public action_msg {
-        static constexpr std::string_view act_name{"value_exists"};
+        static constexpr std::string_view act_name{"wmi_value_exists"};
         wmi_reg_action_value_exists_msg(): action_msg(act_name) { }
 
         std::string key_;

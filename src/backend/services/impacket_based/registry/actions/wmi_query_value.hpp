@@ -29,7 +29,7 @@
 //=====================================================================================================================
 namespace trustwave {
     struct wmi_reg_action_query_value_msg: public action_msg {
-        static constexpr std::string_view act_name{"query_value"};
+        static constexpr std::string_view act_name{"wmi_query_value"};
         wmi_reg_action_query_value_msg(): action_msg(act_name) { }
 
         std::string key_;

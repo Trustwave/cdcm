@@ -43,8 +43,7 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
         res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
-    if( ekact->key_.empty())
-    {
+    if(ekact->key_.empty()) {
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
@@ -54,16 +53,22 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-
+    bool exists = false;
+    c.key_exists(ekact->key_, exists);
+    if(exists) {
     trustwave::enum_key ek{};
     r = c.enumerate_key(ekact->key_, ek);
-    if(r) {
-        res->set_response_for_success(ek);
-    }
+    if(r) { res->set_response_for_success(ek); }
     else {
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
     }
     return action_status::SUCCEEDED;
+    }
+    else
+    {
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                            "Key Doesn't Exist");
+    }
 }
 
 // instance of the our plugin

@@ -51,13 +51,14 @@ action_status WMI_Value_Exists_Action::act(boost::shared_ptr<session> sess, std:
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-    trustwave::registry_value rv;
-    if(!c.key_get_value_by_name(veact->key_,veact->value_, rv)) {
-        AU_LOG_DEBUG("Failed getting value %s", veact->value_.c_str());
-        res->set_response_for_success("False");
+    bool exists=false;
+    if(c.value_exists(veact->key_,veact->value_,exists) ) {
+//        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
+        res->set_response_for_success(exists?"True":"False");
     }
     else {
-        res->set_response_for_success("True");
+        res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
+        return action_status::FAILED;
     }
     return action_status::SUCCEEDED;
 }
