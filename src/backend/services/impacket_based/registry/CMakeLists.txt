@@ -5,8 +5,8 @@ add_library(tw-wmi_registry-client SHARED wmi_registry_client.cpp)
 target_link_libraries(tw-wmi_registry-client boost_python36 boost_system boost_filesystem python3.6m pthread dl  util m tw-common tw-singleton-runner)
 include_directories(/usr/include/python3.6m/)
 
-add_executable(wmi_registry-tester tester.cpp)
-target_link_libraries(wmi_registry-tester tw-wmi_registry-client)
+#add_executable(wmi_registry-tester tester.cpp)
+#target_link_libraries(wmi_registry-tester tw-wmi_registry-client)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helper_module.py ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py COPYONLY)
 
 add_subdirectory(actions)

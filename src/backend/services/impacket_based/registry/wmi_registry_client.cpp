@@ -78,12 +78,9 @@ bool wmi_registry_client::key_exists(const std::string& key, bool& exists)
         auto sn = rr.attr("sNames");
         try {
             auto vec = to_std_vector<std::string>(sn);
-            exists = vec.end()
-                     != std::find_if(vec.begin(), vec.end(),
-                                     [&child_key](const std::string& e) {
-                                         return boost::iequals(child_key, e);
-                                     }
-                     );
+            exists = vec.end() != std::find_if(vec.begin(), vec.end(), [&child_key](const std::string& e) {
+                         return boost::iequals(child_key, e);
+                     });
         }
         catch(const boost::python::error_already_set&) {
             PyErr_Print();
@@ -102,7 +99,7 @@ bool wmi_registry_client::key_exists(const std::string& key, bool& exists)
     }
     return true;
 }
-bool wmi_registry_client::value_exists(const std::string& key,const std::string& value, bool& exists)
+bool wmi_registry_client::value_exists(const std::string& key, const std::string& value, bool& exists)
 {
     try {
         static constexpr std::string_view slashes("\\");
@@ -111,12 +108,9 @@ bool wmi_registry_client::value_exists(const std::string& key,const std::string&
         auto sn = rr.attr("sNames");
         try {
             auto vec = to_std_vector<std::string>(sn);
-            exists = vec.end()
-                     != std::find_if(vec.begin(), vec.end(),
-                                     [&value](const std::string& e) {
-                                         return boost::iequals(value, e);
-                                     }
-            );
+            exists = vec.end() != std::find_if(vec.begin(), vec.end(), [&value](const std::string& e) {
+                         return boost::iequals(value, e);
+                     });
         }
         catch(const boost::python::error_already_set&) {
             PyErr_Print();
@@ -141,15 +135,13 @@ bool wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
     try {
         auto rr = exec_.attr("EnumKey")(key);
         auto sn = rr.attr("sNames");
-        std::vector<std::string> vec ;
+        std::vector<std::string> vec;
         try {
             vec = to_std_vector<std::string>(sn);
         }
         catch(const boost::python::error_already_set&) {
-
             PyErr_Print();
-            //no subkeys maybe values therefore will not return
-
+            // no subkeys maybe values therefore will not return
         }
         catch(...) {
             return false;
@@ -173,8 +165,8 @@ bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_
         auto rr = exec_.attr("EnumValues")(key);
         auto sn = rr.attr("sNames");
         auto ty = rr.attr("Types");
-        std::vector<std::string> vs ;
-        std::vector<uint32_t> vt ;
+        std::vector<std::string> vs;
+        std::vector<uint32_t> vt;
         try {
             vs = to_std_vector<std::string>(sn);
             vt = to_std_vector<uint32_t>(ty);
@@ -187,8 +179,8 @@ bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_
             return false;
         }
         for(size_t i = 0; i < vs.size(); ++i) {
-            registry_value rv(vt[i],"",vs[i]);
-            internal_key_get_value_by_name(key,vs[i],rv);
+            registry_value rv(vt[i], "", vs[i]);
+            internal_key_get_value_by_name(key, vs[i], rv);
             ev.push_back(rv);
         }
     }
@@ -204,22 +196,23 @@ bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_
 
 bool wmi_registry_client::key_get_value_by_name(const std::string& key, const std::string& value, registry_value& rv)
 {
-     enum_key_values ekv;
+    enum_key_values ekv;
     if(enumerate_key_values(key, ekv)) {
-        auto it
-            = std::find_if(ekv.begin(), ekv.end(), [&value](const registry_value& el) {return boost::iequals(el.name_, value);  });
+        auto it = std::find_if(ekv.begin(), ekv.end(),
+                               [&value](const registry_value& el) { return boost::iequals(el.name_, value); });
         if(it != ekv.end()) {
             rv.type(it->type());
             rv.name(it->name());
-            return internal_key_get_value_by_name(key,value,rv);
+            return internal_key_get_value_by_name(key, value, rv);
         }
-        //value doesnt exist
+        // value doesnt exist
         return false;
     }
 
     return false;
 }
-bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key,const std::string&value, registry_value& rv)
+bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key, const std::string& value,
+                                                         registry_value& rv)
 {
     static const std::unordered_map<uint32_t, std::string_view> type_to_method
         = {{REG_SZ, "GetStringValue"},   {REG_EXPAND_SZ, "GetExpandedStringValue"}, {REG_BINARY, "GetBinaryValue"},
@@ -233,16 +226,15 @@ bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key,
                 auto c64_str = base64_encode(reinterpret_cast<char*>(bin_data.data()), bin_data.size());
                 rv.value(c64_str);
             } break;
-            case REG_DWORD:
-            {
+            case REG_DWORD: {
                 std::stringstream stream;
-                stream <<"0x"<< std::hex << bp::extract<uint32_t>(rr);
-                rv.value(stream.str() );
+                stream << "0x" << std::hex << bp::extract<uint32_t>(rr);
+                rv.value(stream.str());
             } break;
             case REG_QWORD: {
                 std::stringstream stream;
-                stream <<"0x"<< std::hex << bp::extract<uint64_t>(rr);
-                rv.value(stream.str() );
+                stream << "0x" << std::hex << bp::extract<uint64_t>(rr);
+                rv.value(stream.str());
             } break;
             case REG_SZ:
             case REG_EXPAND_SZ:
@@ -250,7 +242,7 @@ bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key,
                 rv.value(bp::extract<std::string>(rr));
             } break;
             default: {
-                std::cerr<<"in default";
+                std::cerr << "in default";
                 return false;
             }
         }
@@ -263,5 +255,4 @@ bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key,
     catch(...) {
         return false;
     }
-
 }
