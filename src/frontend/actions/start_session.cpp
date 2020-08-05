@@ -27,25 +27,25 @@ Start_Session::act(boost::shared_ptr<session>, std::shared_ptr<action_msg> actio
 {
     auto gsact = std::dynamic_pointer_cast<local_start_session_msg>(action);
     if(!gsact) {
-        res->res("Error: Internal error");
+        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return Action_Base::action_status::FAILED;
     }
     if(gsact->remote.empty()  ||
        gsact->username.empty()
        )
     {
-        res->res("Error: remote and username are mandatory");
+        res->set_response_for_error(CDCM_ERROR::REMOTE_AND_USERNAME_ARE_MANDATORY);
         return Action_Base::action_status::FAILED;
     }
     trustwave::credentials creds(gsact->domain, gsact->username, gsact->password, gsact->workstation);
     auto sess = boost::make_shared<trustwave::session>(gsact->remote, creds);
     if(!authenticated_scan_server::instance().sessions->add(sess)) {
-        res->res("Error: Failed adding new session");
+        res->set_response_for_error(CDCM_ERROR::FAILED_ADDING_NEW_SESSION);
         return Action_Base::action_status::FAILED;
     }
 
     res->id(gsact->id());
-    res->res(sess->idstr());
+    res->set_response_for_success(sess->idstr());
     return Action_Base::action_status::SUCCEEDED;
 }
 
