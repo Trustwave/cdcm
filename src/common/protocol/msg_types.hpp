@@ -52,7 +52,8 @@ namespace trustwave {
         FAILED_ADDING_NEW_SESSION,
 
         LIST_FAILED = 401,        // error with asset
-        GENERAL_ERROR_WITH_ASSET
+        GENERAL_ERROR_WITH_ASSET,
+        VALUE_IS_EMPTY
     };
 
 
@@ -77,7 +78,8 @@ namespace trustwave {
             {CDCM_ERROR::FAILED_ADDING_NEW_SESSION , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 307, "Failed adding new session"}},
 
             {CDCM_ERROR::LIST_FAILED , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 401, "List failed"}},
-            {CDCM_ERROR::GENERAL_ERROR_WITH_ASSET , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 402, "Error with asset"}}
+            {CDCM_ERROR::GENERAL_ERROR_WITH_ASSET , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 402, "Error with asset"}},
+            {CDCM_ERROR::VALUE_IS_EMPTY , {RESP_GROUP_CODE::ERROR_WITH_ASSET, 403, "Value is empty"}}
 
     };
     struct resp_status {
