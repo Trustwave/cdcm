@@ -1,3 +1,24 @@
+v1.0.7
+Improvment issues
+ - CDCM-93
+   SMB P2 - enumerate_registry_values action.
+ - CDCM-94
+   SMB P2 - file_exists action.
+ - CDCM-95
+   SMB P2 - get_ntfs_permissions actions.
+ - CDCM-96
+   SMB P2 - get_share_permissions action
+ - CDCM-97
+   SMB P2 - get_registry_permissions action.
+ - CDCM-100
+   Add response codes to msgs.
+
+Fixed issues
+ - CDCM-104
+   Give more descriptive argument names.
+ - CDCM-101
+   Remove all password occurrences.
+
 v1.0.6
 Fixed issues
  - CDCM-99
