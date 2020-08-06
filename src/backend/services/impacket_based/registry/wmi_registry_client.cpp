@@ -23,6 +23,7 @@
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <iostream>
+#include <chrono>
 #include "session.hpp"
 #include "base64_encode.hpp"
 using trustwave::wmi_registry_client;
@@ -33,13 +34,28 @@ namespace {
     {
         return std::vector<T>(bp::stl_input_iterator<T>(iterable), bp::stl_input_iterator<T>());
     }
+    struct scoped_timer
+    {
+        explicit scoped_timer(const std::string_view name):start_(std::chrono::high_resolution_clock::now()),name_(name)
+        {}
+        ~scoped_timer()
+        {
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start_);
+
+            std::cerr << "Time taken by "<<name_<<": "
+                      << duration.count() << " microseconds" << std::endl;
+        }
+        decltype(std::chrono::high_resolution_clock::now()) start_;
+        const std::string_view name_;
+    };
 } // namespace
 bool wmi_registry_client::connect(const session& sess)
 {
+    scoped_timer t("connect");
     try {
         Py_Initialize();
         boost::filesystem::path workingDir = boost::filesystem::absolute("./").normalize();
-        std::cerr << workingDir << "\n";
         PyObject* sysPath = PySys_GetObject("path");
         PyList_Insert(sysPath, 0, PyUnicode_FromString(workingDir.string().c_str()));
         PySys_SetObject("path", sysPath);
@@ -47,7 +63,10 @@ bool wmi_registry_client::connect(const session& sess)
         global_ = main_.attr("__dict__");
         helper_ = boost::python::import("helper_module");
         exec_ = helper_.attr("WMI_REG_EXEC_METHOD")(sess.remote(), sess.creds().username(), sess.creds().password());
-        exec_.attr("connect")();
+        {
+            scoped_timer t("real connect");
+            exec_.attr("connect")();
+        }
     }
     catch(const boost::python::error_already_set&) {
         PyErr_Print();
@@ -60,6 +79,7 @@ bool wmi_registry_client::connect(const session& sess)
 }
 bool wmi_registry_client::key_exists(const std::string& key, bool& exists)
 {
+    scoped_timer t("key_exists");
     try {
         static constexpr std::string_view slashes("\\");
         auto pos = key.find_last_of(slashes);
@@ -101,6 +121,7 @@ bool wmi_registry_client::key_exists(const std::string& key, bool& exists)
 }
 bool wmi_registry_client::value_exists(const std::string& key, const std::string& value, bool& exists)
 {
+    scoped_timer t("value_exists");
     try {
         static constexpr std::string_view slashes("\\");
         exists = false;
@@ -132,6 +153,7 @@ bool wmi_registry_client::value_exists(const std::string& key, const std::string
 
 bool wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
 {
+    scoped_timer t("enumerate_key");
     try {
         auto rr = exec_.attr("EnumKey")(key);
         auto sn = rr.attr("sNames");
@@ -161,6 +183,8 @@ bool wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
 }
 bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_values& ev)
 {
+    scoped_timer t("enumerate_key_values");
+
     try {
         auto rr = exec_.attr("EnumValues")(key);
         auto sn = rr.attr("sNames");
@@ -196,6 +220,8 @@ bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_
 
 bool wmi_registry_client::key_get_value_by_name(const std::string& key, const std::string& value, registry_value& rv)
 {
+    scoped_timer t("key_get_value_by_name");
+
     enum_key_values ekv;
     if(enumerate_key_values(key, ekv)) {
         auto it = std::find_if(ekv.begin(), ekv.end(),
@@ -214,6 +240,7 @@ bool wmi_registry_client::key_get_value_by_name(const std::string& key, const st
 bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key, const std::string& value,
                                                          registry_value& rv)
 {
+    scoped_timer t("internal_key_get_value_by_name");
     static const std::unordered_map<uint32_t, std::string_view> type_to_method
         = {{REG_SZ, "GetStringValue"},   {REG_EXPAND_SZ, "GetExpandedStringValue"}, {REG_BINARY, "GetBinaryValue"},
            {REG_DWORD, "GetDWORDValue"}, {REG_MULTI_SZ, "GetMultiStringValue"},     {REG_QWORD, "GetQWORDValue"}};

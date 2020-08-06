@@ -35,7 +35,7 @@ extern "C" {
 using trustwave::registry_client;
 using trustwave::result;
 
-registry_client::registry_client(): ctx_(nullptr), ev_ctx_(nullptr), data_blob_{}
+registry_client::registry_client():cdcm_client(protocol), ctx_(nullptr), ev_ctx_(nullptr), data_blob_{}
 {
     if(this->init_conf(authenticated_scan_server::instance().service_conf_repository)) {
         AU_LOG_INFO("%s", conf_->to_string().c_str());

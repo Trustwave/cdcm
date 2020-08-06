@@ -48,7 +48,6 @@ extern "C" {
 //=====================================================================================================================
 namespace trustwave {
     class session;
-    //class enum_key_values_ver2;
     struct reg_context {
         struct registry_context* registry;
         char* path;
@@ -67,6 +66,7 @@ namespace trustwave {
         };
 
     public:
+        static constexpr std::string_view protocol{"smb_registry"};
         registry_client();
         ~registry_client() override;
         result connect(const session& sess);

@@ -121,7 +121,7 @@ namespace {
     void delete_smbctx(SMBCCTX* ctx) { smbc_free_context(ctx, 0); }
 
 } // namespace
-smb_client::smb_client(): ctx_(nullptr)
+smb_client::smb_client():cdcm_client(protocol),ctx_(nullptr)
 {
     if(this->init_conf(authenticated_scan_server::instance().service_conf_repository)) {
         AU_LOG_INFO("%s", conf_->to_string().c_str());

@@ -50,6 +50,7 @@ namespace trustwave {
     };
     class srvsvc_client final: public cdcm_client {
     public:
+        static constexpr std::string_view protocol{"smb_srvsvc"};
         srvsvc_client();
         ~srvsvc_client() override;
         srvsvc_client(srvsvc_client const& other) = delete;

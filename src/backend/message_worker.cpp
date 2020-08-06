@@ -132,7 +132,6 @@ void message_worker::handle_postponed_actions()
                 if(!postponed_actions_.decrement_runs_and_update_expiration(act_m->id())) {
                     AU_LOG_ERROR("action %s doesnt exist ", act_key.c_str());
                 }
-                //    std::cerr << "Updated "<< postponed_actions_;
             }
             else {
                 res_msg result;
@@ -149,7 +148,6 @@ void message_worker::handle_postponed_actions()
                     AU_LOG_ERROR("Failed removing action %s -> %s  from postponed queue ", act_key.c_str(),
                                  act_m->id());
                 }
-                //       std::cerr << "Rermoved "<< postponed_actions_;
                 ++replied_;
             }
         }
@@ -280,7 +278,6 @@ int message_worker::worker_loop()
                                result.hdr))) {
                             AU_LOG_ERROR("Failed adding %s to postponed queue", act_key.c_str());
                         }
-                        // std::cerr << "Added "<< mw.postponed_actions_;
                     }
                     else {
                         AU_LOG_DEBUG("action %s returned ", act_key.c_str());

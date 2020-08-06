@@ -81,7 +81,7 @@ result lsa_client::get_acls(const std::string& filename, std::vector<trustwave::
     return ret;
 }
 
-lsa_client::lsa_client(): client_(std::make_unique<rpc_client>()) { }
+lsa_client::lsa_client():cdcm_client(protocol),client_(std::make_unique<rpc_client>()) { }
 
 result lsa_client::connect(const session& sess, const std::string& share)
 {

@@ -24,22 +24,15 @@ namespace trustwave {
     class wmi_registry_client final: public cdcm_client {
 
     public:
-        wmi_registry_client()=default;
+        static constexpr std::string_view protocol{"wmi_registry"};
+        wmi_registry_client():cdcm_client(protocol){}
         ~wmi_registry_client() override = default;
         bool connect(const session& sess);
         bool key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
-//        bool key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv);
-//        bool key_get_subkey_by_index(TALLOC_CTX* mem_ctx, const struct registry_key* key, uint32_t idx,
-//                                       const char** name, const char** classname, NTTIME* last_mod_time);
-//        bool key_get_subkey_by_name(TALLOC_CTX* mem_ctx, const struct registry_key* key, const char* name,
-//                                      struct registry_key** subkey);
         bool enumerate_key(const std::string&, enum_key&);
         bool enumerate_key_values(const std::string&, enum_key_values&);
         bool key_exists(const std::string&,bool&);
         bool value_exists(const std::string&,const std::string&,bool&);
-
-//        bool key_exists(const std::string&);
-//        bool value_exists(const char* valname);
 
     private:
         bool internal_key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
