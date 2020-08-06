@@ -18,4 +18,10 @@ install(TARGETS tw-wmi_registry-client ARCHIVE DESTINATION lib
 install(TARGETS tw-wmi_registry-client ARCHIVE DESTINATION lib
         DESTINATION ${release_lib_dest})
 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py
+        DESTINATION ${bin_dest})
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py
+        DESTINATION ${release_bin_dest})
+
 #configure_file(registry.json ${release_lib_dest}/plugins/registry.json COPYONLY)
