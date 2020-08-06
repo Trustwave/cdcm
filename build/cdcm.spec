@@ -18,12 +18,26 @@ Requires: libsodium
 Requires: boost169-filesystem
 Requires: boost169-log
 Requires: gnutls
+Requires: python36
+Requires: python36-pyasn1
+Requires: python36-six
+Requires: python36-pycryptodomex
+Requires: python36-pyOpenSSL
+Requires: python36-ldap3
+Requires: python36-flask
+
 
 %description
 Credentialed Data Collection Module
 
 %clean
 rm -rf %{buildroot}
+
+%prep
+cp -rf  %{_specdir}/../deps/impacket %{_topdir}/BUILD/
+%build
+cd %{_topdir}/BUILD/impacket
+python3.6 setup.py build
 
 %install
 rm -rf %{buildroot}
@@ -36,7 +50,9 @@ for dir in %{cdcm_lib} %{cdcm_lib}/plugins %{_bindir} %{cdcm_conf} /var/log/cdcm
 done
 executables="cdcm_broker \
 cdcm_supervisor \
-cdcm_worker"
+cdcm_worker \
+helper_module.py"
+
 
 %define output_dir /opt/output/%{getenv:CI_COMMIT_REF_SLUG}/
 
@@ -90,6 +106,8 @@ set -e
 %{__install} -m644 %{_specdir}/50-%{name}.preset %{buildroot}/%{_presetdir}/50-%{name}.preset
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
+cd  %{_topdir}/BUILD/impacket
+python3.6 setup.py install --single-version-externally-managed -O1 --root=%{buildroot} --record=INSTALLED_FILES
 
 %post
 /sbin/ldconfig
@@ -110,11 +128,13 @@ if [ $1 -ge 1 ] ; then
         systemctl restart  %{name}.service >/dev/null 2>&1 || :
 fi
 
-%files
+%files -f %{_topdir}/BUILD/impacket/INSTALLED_FILES
 %defattr(-,root,root,-)
 %attr(755, root, root) %{_bindir}/cdcm_broker
 %attr(755, root, root) %{_bindir}/cdcm_supervisor
 %attr(755, root, root) %{_bindir}/cdcm_worker
+%attr(755, root, root) %{_bindir}/helper_module.py
+
 %{cdcm_lib}/*.so*
 %{cdcm_lib}/plugins/*
 /var/cdcm
