@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <unistd.h>
+#include <boost/algorithm/string/replace.hpp>
 #include "taocpp-json/include/tao/json.hpp"
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
@@ -51,11 +52,12 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
     }
     if( smb_action->param.empty())
     {
-        res->set_response_for_error(CDCM_ERROR::PARAM_IS_MANDATORY);
+        res->set_response_for_error(CDCM_ERROR::PATH_IS_MANDATORY);
         return action_status::FAILED;
     }
+    std::string path = boost::replace_all_copy(smb_action->param, "\\", "/");
     std::string base("smb://");
-    base.append(sess->remote()).append("/").append(smb_action->param);
+    base.append(sess->remote()).append("/").append(path);
     std::string tmp_name("/tmp/" + sess->idstr() + "-" + action->id());
     trustwave::smb_client rc;
     std::vector<trustwave::dirent> dir_entries;
