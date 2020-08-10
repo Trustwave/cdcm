@@ -17,6 +17,7 @@
 #include <string>
 #include <unordered_set>
 #include <codecvt>
+#include <boost/algorithm/string/replace.hpp>
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "../smb_client.hpp"
 #include <regex>
@@ -51,11 +52,12 @@ action_status SMB_Get_File_Info::act(boost::shared_ptr<session> sess, std::share
     }
     if( smb_action->param.empty())
     {
-        res->set_response_for_error(CDCM_ERROR::PARAM_IS_MANDATORY);
+        res->set_response_for_error(CDCM_ERROR::PATH_IS_MANDATORY);
         return action_status::FAILED;
     }
+    std::string path = boost::replace_all_copy(smb_action->param, "\\", "/");
     std::string base("smb://");
-    base.append(sess->remote()).append("/").append(smb_action->param);
+    base.append(sess->remote()).append("/").append(path);
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {

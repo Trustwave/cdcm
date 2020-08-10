@@ -42,6 +42,7 @@ namespace trustwave {
         PATH_IS_MANDATORY,
         REMOTE_AND_USERNAME_ARE_MANDATORY,
         SHARE_IS_MISSING_IN_KEY,
+        SHARE_NAME_IS_MANDATORY,
 
         SESSION_NOT_FOUND = 301, //cdcm internal error
         INTERNAL_ERROR,
@@ -66,6 +67,8 @@ namespace trustwave {
             {CDCM_ERROR::BAD_PARAMETER , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 204, "Bad parameter"} },
             {CDCM_ERROR::PARAM_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 205, "Param is mandatory"} },
             {CDCM_ERROR::PATH_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 206, "Path is mandatory"} },
+            {CDCM_ERROR::SHARE_NAME_IS_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 209, "Share name is mandatory"} },
+
             {CDCM_ERROR::REMOTE_AND_USERNAME_ARE_MANDATORY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 207, "Remote and username are mandatory"} },
             {CDCM_ERROR::SHARE_IS_MISSING_IN_KEY , {RESP_GROUP_CODE::ERROR_IN_REQUEST, 208, "Share is missing in the provided key"} },
 

@@ -58,9 +58,21 @@ action_status Key_Exists_Action::act(boost::shared_ptr<session> sess, std::share
        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
         return action_status::FAILED;
     }
-    if(!std::get<0>(c.open_key(keact->key_.c_str()))) {
-        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
-        res->set_response_for_success("False");
+    r = c.open_key(keact->key_.c_str());
+    if(!std::get<0>(r)) {
+        AU_LOG_DEBUG("Failed opening  %s %s ", keact->key_.c_str(),win_errstr(std::get<1>(r)));
+        if(werr_file_not_found ==std::get<1>(r).w)
+        {
+            res->set_response_for_success("False");
+            return action_status::SUCCEEDED;
+        }
+        else
+        {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET,
+                                                                W_ERROR_V(std::get<1>(r)),
+                                                                std::string(win_errstr(std::get<1>(r))));
+        }
+        return action_status::FAILED;
     }
     else {
         res->set_response_for_success("True");
