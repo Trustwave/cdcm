@@ -16,10 +16,10 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#include <string>
-
-#include "../smb_client.hpp"
 #include "file_exists.hpp"
+#include <string>
+#include <boost/algorithm/string/replace.hpp>
+#include "../smb_client.hpp"
 
 #include "protocol/msg_types.hpp"
 #include "session.hpp"
@@ -43,11 +43,12 @@ action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_
     }
     if( smb_action->param.empty())
     {
-        res->set_response_for_error(CDCM_ERROR::PARAM_IS_MANDATORY);
+        res->set_response_for_error(CDCM_ERROR::PATH_IS_MANDATORY);
         return action_status::FAILED;
     }
+    std::string path = boost::replace_all_copy(smb_action->param, "\\", "/");
     std::string base("smb://");
-    base.append(sess->remote()).append("/").append(smb_action->param);
+    base.append(sess->remote()).append("/").append(path);
     trustwave::smb_client rc;
     auto connect_res = rc.open_file(base.c_str());
     if(!connect_res.first) {
