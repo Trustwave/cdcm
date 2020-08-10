@@ -41,7 +41,7 @@ using trustwave::result;
 namespace {
     bool split_hive_key(const std::string& path, std::string& hivename, std::string& subkeyname)
     {
-        if(path.empty()) { return false; }
+
         auto pos = path.find("\\");
         if(std::string::npos != pos) {
             subkeyname.assign(path.substr(pos + 1));
@@ -55,13 +55,7 @@ namespace {
     }
     bool reg_hive_key(const std::string& fullname, uint32_t& reg_type, std::string& subkeyname)
     {
-        std::string hivename;
-        std::string tmp_keyname;
-        bool ret = split_hive_key(fullname, hivename, tmp_keyname);
-        if(!ret) { return ret; }
-
-        subkeyname = tmp_keyname;
-        if(subkeyname.empty()) { return false; }
+        if(fullname.empty()) { return false; }
         static const std::unordered_map<std::string, uint32_t> hives{
             {"HKLM", HKEY_LOCAL_MACHINE},
             {"HKEY_LOCAL_MACHINE", HKEY_LOCAL_MACHINE},
@@ -74,11 +68,20 @@ namespace {
             {"HKPD", HKEY_PERFORMANCE_DATA},
             {"HKEY_PERFORMANCE_DATA", HKEY_PERFORMANCE_DATA},
         };
-        try {
-            reg_type = hives.at(hivename);
+
+        std::string hivename;
+        std::string tmp_keyname;
+        bool ret = split_hive_key(fullname, hivename, tmp_keyname);
+        auto it = hives.find(hivename);
+        if(it == hives.end())
+        {
+            reg_type = HKEY_LOCAL_MACHINE;
+            subkeyname = fullname;
         }
-        catch(const std::out_of_range& e) {
-            // fixme assaf add notif in log
+        else
+        {
+            reg_type = it->second;
+            subkeyname = tmp_keyname;
         }
         return true;
     }
