@@ -297,7 +297,7 @@ functional_tests:
     - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
     - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222  log/cdcm_client.$i.log root@10.88.240.20://opt/tests_results ;done
     - export FAILED=0
-    - for i in ${testFiles[@]};do if [ $(cat $REPORT_FNAME.functional.$i.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success;((FAILED++)) ; echo failed; fi ;done
+    - for i in ${testFiles[@]};do if [ $(cat $REPORT_FNAME.functional.$i.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success; else ((FAILED++)) ; echo failed; fi ;done
     - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
 
   rules:

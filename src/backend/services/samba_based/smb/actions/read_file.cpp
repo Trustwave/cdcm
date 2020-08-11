@@ -13,13 +13,10 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-//=====================================================================================================================
-//                          						Include files
-//=====================================================================================================================
 #include <unistd.h>
 #include <string>
 #include <memory>
-
+#include <boost/algorithm/string/replace.hpp>
 #include "../smb_client.hpp"
 #include "read_file.hpp"
 
@@ -56,9 +53,9 @@ SMB_Read_File::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> 
         res->set_response_for_error(CDCM_ERROR::BAD_PARAMETER);
         return action_status::FAILED;
     }
-
+    std::string path = boost::replace_all_copy(smb_action->path_, "\\", "/");
     std::string base("smb://");
-    base.append(sess->remote()).append("/").append(smb_action->path_);
+    base.append(sess->remote()).append("/").append(path);
     trustwave::smb_client rc;
     auto connect_result = rc.open_file(base.c_str());
     if(!connect_result.first) {
