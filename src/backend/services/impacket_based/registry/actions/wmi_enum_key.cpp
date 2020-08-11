@@ -47,27 +47,35 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
-    bool r = c.connect(*sess);
-    if(!r) {
+    auto r = c.connect(*sess);
+    if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s ", sess->remote().c_str());
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
     bool exists = false;
-    c.key_exists(ekact->key_, exists);
-    if(exists) {
-    trustwave::enum_key ek{};
-    r = c.enumerate_key(ekact->key_, ek);
-    if(r) { res->set_response_for_success(ek); }
-    else {
-        res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
-    }
-    return action_status::SUCCEEDED;
+    r = c.key_exists(ekact->key_, exists);
+    if(std::get<0>(r)) {
+        std::cerr<<"ek key is "<<ekact->key_<<std::endl;
+        if(exists) {
+            trustwave::enum_key ek{};
+            r = c.enumerate_key(ekact->key_, ek);
+            if(std::get<0>(r)) { res->set_response_for_success(ek); }
+            else {
+                res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                                    std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
+            }
+            return action_status::SUCCEEDED;
+        }
+        else {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                                "Key Doesn't Exist");
+        }
     }
     else
     {
         res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                            "Key Doesn't Exist");
+                                                            std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
     }
 }
 

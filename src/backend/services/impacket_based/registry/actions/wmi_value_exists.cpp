@@ -25,7 +25,7 @@
 using trustwave::WMI_Value_Exists_Action;
 using action_status = trustwave::Action_Base::action_status;
 action_status WMI_Value_Exists_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                       std::shared_ptr<result_msg> res)
+                                           std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
@@ -41,26 +41,43 @@ action_status WMI_Value_Exists_Action::act(boost::shared_ptr<session> sess, std:
         res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
-    if( veact->key_.empty()||veact->value_.empty())
-    {
+    if(veact->key_.empty() || veact->value_.empty()) {
         res->set_response_for_error(CDCM_ERROR::KEY_AND_VALUE_ARE_MANDATORY);
         return action_status::FAILED;
     }
-    bool r = c.connect(*sess);
-    if(!r) {
+    auto r = c.connect(*sess);
+    if(!std::get<0>(r)) {
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-    bool exists=false;
-    if(c.value_exists(veact->key_,veact->value_,exists) ) {
-//        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
-        res->set_response_for_success(exists?"True":"False");
+    bool key_exists = false;
+    r = c.key_exists(veact->key_, key_exists);
+    if(std::get<0>(r)) {
+        if(key_exists) {
+            bool exists = false;
+            r = c.value_exists(veact->key_, veact->value_, exists);
+            if(std::get<0>(r)) {
+                //        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
+                res->set_response_for_success(exists ? "True" : "False");
+            }
+            else {
+                res->set_response_for_error_with_unique_code_or_msg(
+                    CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0, std::get<1>(r).empty() ? "Unknown error" : std::get<1>(r));
+
+                return action_status::FAILED;
+            }
+        }
+        else {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                                "Key Doesn't Exist");
+        }
+
+        return action_status::SUCCEEDED;
     }
     else {
-        res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
-        return action_status::FAILED;
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                            std::get<1>(r).empty() ? "Unknown error" : std::get<1>(r));
     }
-    return action_status::SUCCEEDED;
 }
 
 // instance of the our plugin

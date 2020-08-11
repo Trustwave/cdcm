@@ -36,9 +36,7 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
         res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
-
     auto c = trustwave::wmi_registry_client();
-
     auto ekact = std::dynamic_pointer_cast<wmi_reg_action_enumerate_registry_values_msg>(action);
     if(!ekact) {
         AU_LOG_ERROR("Failed dynamic cast");
@@ -49,30 +47,38 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
-    bool r = c.connect(*sess);
-    if(!r) {
+    auto r = c.connect(*sess);
+    if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s ", sess->remote().c_str());
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-
-
     bool exists = false;
-    c.key_exists(ekact->key_, exists);
-    if(exists) {
-        trustwave::enum_key_values ek{};
-        r = c.enumerate_key_values(ekact->key_, ek);
+    r = c.key_exists(ekact->key_, exists);
+    if(std::get<0>(r)) {
+        if(exists) {
+            trustwave::enum_key_values ek{};
+            r = c.enumerate_key_values(ekact->key_, ek);
 
-        if(r) { res->res(ek); }
-        else {
-            res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
+            if(std::get<0>(r)) { res->res(ek); }
+            else {
+                res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                                    std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
+                return action_status::FAILED;
+            }
+            return action_status::SUCCEEDED;
         }
-        return action_status::SUCCEEDED;
+        else {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                                "Key Doesn't Exist");
+            return action_status::FAILED;
+        }
     }
     else
     {
         res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                            "Key Doesn't Exist");
+                                                            std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
+        return action_status::FAILED;
     }
 }
 

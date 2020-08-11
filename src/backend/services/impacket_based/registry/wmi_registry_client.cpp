@@ -28,7 +28,6 @@
 #include "base64_encode.hpp"
 using trustwave::wmi_registry_client;
 namespace bp = boost::python;
-using bpo = bp::object;
 namespace {
     template<typename T> inline std::vector<T> to_std_vector(const boost::python::object& iterable)
     {
@@ -49,8 +48,30 @@ namespace {
         decltype(std::chrono::high_resolution_clock::now()) start_;
         const std::string_view name_;
     };
+
+    wmi_registry_client::result handle_pyerror()
+    {
+        std::string msg;
+        if (PyErr_Occurred()) {
+            using namespace boost::python;
+            using namespace boost;
+
+            PyObject *exc,*val,*tb;
+            object formatted_list, formatted;
+            PyErr_Fetch(&exc,&val,&tb);
+            handle<> hexc(exc),hval(allow_null(val)),htb(allow_null(tb));
+            object traceback(import("traceback"));
+            object format_exception_only(traceback.attr("format_exception_only"));
+            formatted_list = format_exception_only(hexc,hval);
+            formatted = str("\n").join(formatted_list);
+            msg = extract<std::string>(formatted);
+        }
+        bp::handle_exception();
+        PyErr_Clear();
+        return std::make_tuple(false,msg);
+    }
 } // namespace
-bool wmi_registry_client::connect(const session& sess)
+wmi_registry_client::result wmi_registry_client::connect(const session& sess)
 {
     scoped_timer t("connect");
     try {
@@ -70,174 +91,254 @@ bool wmi_registry_client::connect(const session& sess)
     }
     catch(const boost::python::error_already_set&) {
         PyErr_Print();
-        return false;
+        return std::make_tuple(false,"");
     }
     catch(...) {
-        return false;
+        return std::make_tuple(false,"");
     }
-    return true;
+    return std::make_tuple(true,"");
 }
-bool wmi_registry_client::key_exists(const std::string& key, bool& exists)
+wmi_registry_client::result wmi_registry_client::key_exists(const std::string& key, bool& exists)
 {
     scoped_timer t("key_exists");
+    static constexpr std::string_view slashes("\\");
+    auto pos = key.find_last_of(slashes);
+    std::string parent_key;
+    std::string child_key;
+    if(pos == std::string::npos) {
+        parent_key = std::string("");
+        child_key = key;
+    }
+    else {
+        parent_key = std::string(key.c_str(), pos);
+        child_key = std::string_view(key.c_str() + pos + slashes.length());
+    }
+    exists = false;
     try {
-        static constexpr std::string_view slashes("\\");
-        auto pos = key.find_last_of(slashes);
-        std::string parent_key;
-        std::string child_key;
-        if(pos == std::string::npos) {
-            parent_key = std::string("");
-            child_key = key;
-        }
-        else {
-            parent_key = std::string(key.c_str(), pos);
-            child_key = std::string_view(key.c_str() + pos + slashes.length());
-        }
-        exists = false;
         auto rr = exec_.attr("EnumKey")(parent_key);
-        auto sn = rr.attr("sNames");
         try {
-            auto vec = to_std_vector<std::string>(sn);
-            exists = vec.end() != std::find_if(vec.begin(), vec.end(), [&child_key](const std::string& e) {
-                         return boost::iequals(child_key, e);
-                     });
-        }
-        catch(const boost::python::error_already_set&) {
-            PyErr_Print();
-            return true;
+            if(rr.contains("Error")) {
+                std::string as = bp::extract<std::string>(rr["Error"]);
+                return std::make_tuple(false, as);
+            }
         }
         catch(...) {
-            return false;
+            //log?
+        }
+        try {
+            std::cerr<<"kex 1 "<<key<<std::endl;
+            auto vec = to_std_vector<std::string>(rr);
+            std::cerr<<"kex 2"<<key<<std::endl;
+
+            exists = vec.end() != std::find_if(vec.begin(), vec.end(), [&child_key](const std::string& e) {
+                return boost::iequals(child_key, e);
+            });
+            std::cerr<<"kex 3 "<<key<<std::endl;
+
+        }
+        catch(const boost::python::error_already_set&) {
+            return handle_pyerror();
+        }
+        catch(...) {
+            return std::make_tuple(false,"");
         }
     }
     catch(const boost::python::error_already_set&) {
-        PyErr_Print();
-        return false;
+        return handle_pyerror();
     }
     catch(...) {
-        return false;
+        return std::make_tuple(false,"");
     }
-    return true;
+    return std::make_tuple(true,"");
 }
-bool wmi_registry_client::value_exists(const std::string& key, const std::string& value, bool& exists)
+wmi_registry_client::result wmi_registry_client::value_exists(const std::string& key, const std::string& value, bool& exists)
 {
     scoped_timer t("value_exists");
     try {
-        static constexpr std::string_view slashes("\\");
         exists = false;
         auto rr = exec_.attr("EnumValues")(key);
-        auto sn = rr.attr("sNames");
         try {
-            auto vec = to_std_vector<std::string>(sn);
+            if(rr.contains("Error")) {
+                std::string as = bp::extract<std::string>(rr["Error"]);
+                return std::make_tuple(false, as);
+            }
+        }
+        catch(const boost::python::error_already_set&) {
+            PyErr_Clear();
+        }
+        try {
+            auto vec = to_std_vector<std::string>(rr["sNames"]);
             exists = vec.end() != std::find_if(vec.begin(), vec.end(), [&value](const std::string& e) {
                          return boost::iequals(value, e);
                      });
         }
         catch(const boost::python::error_already_set&) {
-            PyErr_Print();
-            return true;
+            return handle_pyerror();
         }
         catch(...) {
-            return false;
+            return std::make_tuple(false,"");
         }
     }
     catch(const boost::python::error_already_set&) {
-        PyErr_Print();
-        return false;
+        return handle_pyerror();
     }
     catch(...) {
-        return false;
+        return std::make_tuple(false,"");
     }
-    return true;
+    return std::make_tuple(true,"");
 }
 
-bool wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
+wmi_registry_client::result wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
 {
     scoped_timer t("enumerate_key");
     try {
+        std::cerr<<"ek 1 "<<key<<std::endl;
         auto rr = exec_.attr("EnumKey")(key);
-        auto sn = rr.attr("sNames");
+        std::cerr<<"ek 2 "<<key<<std::endl;
         std::vector<std::string> vec;
         try {
-            vec = to_std_vector<std::string>(sn);
+
+        if(rr.contains("Error"))
+        {
+            std::cerr<<"ek 3 "<<key<<std::endl;
+
+            std::string as=bp::extract<std::string>(rr["Error"]);
+            return std::make_tuple(false,as);
+        }
+        std::cerr<<"ek 4 "<<key<<std::endl;
+
+
+        std::cerr<<"ek 5 "<<key<<std::endl;
+
+            std::cerr<<"ek 6 "<<key<<std::endl;
+
+            if(!rr.is_none())
+            vec = to_std_vector<std::string>(rr);
+            std::cerr<<"ek 7 "<<key<<std::endl;
+
         }
         catch(const boost::python::error_already_set&) {
-            PyErr_Print();
+            std::cerr<<"ek catch"<<std::endl;
+            PyErr_Clear();
+
             // no subkeys maybe values therefore will not return
         }
         catch(...) {
-            return false;
+            return std::make_tuple(false,"");
         }
+
         for(auto e: vec) { ek.sub_keys_.push_back(sub_key(e)); }
-        if(!enumerate_key_values(key, ek.registry_values_)) { return false; }
-        return true;
+        std::cerr<<"ek -> ekv "<<key<<std::endl;
+        auto ekv_res = enumerate_key_values(key, ek.registry_values_);
+        if(!std::get<0>(ekv_res))
+        {
+            std::cerr<<"ekv -> ekv failed: "<<key<<std::endl;
+            return ekv_res;
+        }
+        std::cerr<<"ek -> ekv done: "<<key<<std::endl;
+
+        return std::make_tuple(true,"");
     }
     catch(const boost::python::error_already_set&) {
-        PyErr_Print();
-        return false;
+        return handle_pyerror();
     }
     catch(...) {
-        return false;
+        std::cerr<<"ek catch 2"<<std::endl;
+        return std::make_tuple(false,"");
     }
-    return false;
+    return std::make_tuple(false,"");
 }
-bool wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_values& ev)
+wmi_registry_client::result wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_values& ev)
 {
     scoped_timer t("enumerate_key_values");
 
     try {
+        std::cerr<<"ekv 1 "<<key<<std::endl;
+
         auto rr = exec_.attr("EnumValues")(key);
-        auto sn = rr.attr("sNames");
-        auto ty = rr.attr("Types");
+        std::cerr<<"ekv 2 "<<key<<std::endl;
+try {
+            if(rr.contains("Error")) {
+                std::string as = bp::extract<std::string>(rr["Error"]);
+                return std::make_tuple(false, as);
+            }
+        }
+        catch(const boost::python::error_already_set&) {
+            std::cerr<<"ekv catch"<<std::endl;
+            PyErr_Clear();
+
+        }
+        std::cerr<<"ekv 3 "<<key<<std::endl;
+
         std::vector<std::string> vs;
         std::vector<uint32_t> vt;
         try {
-            vs = to_std_vector<std::string>(sn);
-            vt = to_std_vector<uint32_t>(ty);
+            std::cerr<<"ekv 3.5 "<<key<<std::endl;
+
+            vs = to_std_vector<std::string>(rr["sNames"]);
+            std::cerr<<"ekv 4 "<<key<<std::endl;
+
+            vt = to_std_vector<uint32_t>(rr["Types"]);
+            std::cerr<<"ekv 5 "<<key<<std::endl;
+
         }
         catch(const boost::python::error_already_set&) {
-            PyErr_Print();
-            return true;
-        }
-        catch(...) {
-            return false;
+            return handle_pyerror();
         }
         for(size_t i = 0; i < vs.size(); ++i) {
             registry_value rv(vt[i], "", vs[i]);
+            std::cerr <<"before ik "<<vs[i]<<":"<<vt[i]<<std::endl;
             internal_key_get_value_by_name(key, vs[i], rv);
             ev.push_back(rv);
         }
     }
     catch(const boost::python::error_already_set&) {
-        PyErr_Print();
-        return false;
+        return handle_pyerror();
     }
     catch(...) {
-        return false;
+        return std::make_tuple(false,"");
     }
-    return true;
+    std::cerr <<"realy done "<<std::endl;
+
+    return std::make_tuple(true,"");
 }
 
-bool wmi_registry_client::key_get_value_by_name(const std::string& key, const std::string& value, registry_value& rv)
+wmi_registry_client::result wmi_registry_client::key_get_value_by_name(const std::string& key, const std::string& value, registry_value& rv)
 {
     scoped_timer t("key_get_value_by_name");
-
+    std::cerr<<"kv 1 "<<key<<std::endl;
     enum_key_values ekv;
-    if(enumerate_key_values(key, ekv)) {
+    result ekv_res;
+    try {
+        std::cerr<<"kv 2 "<<key<<std::endl;
+
+        ekv_res = enumerate_key_values(key, ekv);
+        std::cerr<<"kv 3 "<<key<<std::endl;
+
+    }
+    catch(const boost::python::error_already_set&) {
+        std::cerr<<"kv 4 "<<key<<std::endl;
+
+        return handle_pyerror();
+    }
+    if(std::get<0>(ekv_res)) {
+        std::cerr<<"kv 5 "<<key<<std::endl;
+
         auto it = std::find_if(ekv.begin(), ekv.end(),
                                [&value](const registry_value& el) { return boost::iequals(el.name_, value); });
         if(it != ekv.end()) {
             rv.type(it->type());
             rv.name(it->name());
-            return internal_key_get_value_by_name(key, value, rv);
+            rv.value(it->value());
+            return std::make_tuple(true,"");
         }
         // value doesnt exist
-        return false;
+        return std::make_tuple(false,"");
     }
 
-    return false;
+    return ekv_res;
 }
-bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key, const std::string& value,
+wmi_registry_client::result wmi_registry_client::internal_key_get_value_by_name(const std::string& key, const std::string& value,
                                                          registry_value& rv)
 {
     scoped_timer t("internal_key_get_value_by_name");
@@ -245,6 +346,8 @@ bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key,
         = {{REG_SZ, "GetStringValue"},   {REG_EXPAND_SZ, "GetExpandedStringValue"}, {REG_BINARY, "GetBinaryValue"},
            {REG_DWORD, "GetDWORDValue"}, {REG_MULTI_SZ, "GetMultiStringValue"},     {REG_QWORD, "GetQWORDValue"}};
     try {
+        std::cerr <<" ik "<<key<<" "<<value<<" "<<rv.type()<<" "<<rv.name()<<std::endl;
+
         auto rr = exec_.attr(type_to_method.at(rv.type()).data())(key, value);
 
         switch(rv.type()) {
@@ -270,16 +373,16 @@ bool wmi_registry_client::internal_key_get_value_by_name(const std::string& key,
             } break;
             default: {
                 std::cerr << "in default";
-                return false;
+                return std::make_tuple(false,"");
             }
         }
-        return true;
+        return std::make_tuple(true,"");
     }
     catch(const boost::python::error_already_set&) {
-        PyErr_Print();
-        return false;
+        std::cerr<<"ik 1 "<<key<<std::endl;
+        return handle_pyerror();
     }
     catch(...) {
-        return false;
+        return std::make_tuple(false,"");
     }
 }

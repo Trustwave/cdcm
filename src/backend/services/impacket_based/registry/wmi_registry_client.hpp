@@ -17,25 +17,26 @@
 #define SRC_BACKEND_SERVICES_WMI_REGISTRY_CLIENT_HPP
 #include "client.hpp"
 #include <string>
+#include <tuple>
 #include <boost/python.hpp>
 #include "registry_value.hpp"
 namespace trustwave {
     class session;
     class wmi_registry_client final: public cdcm_client {
-
     public:
+        using result = std::tuple<bool,std::string>;
         static constexpr std::string_view protocol{"wmi_registry"};
         wmi_registry_client():cdcm_client(protocol){}
         ~wmi_registry_client() override = default;
-        bool connect(const session& sess);
-        bool key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
-        bool enumerate_key(const std::string&, enum_key&);
-        bool enumerate_key_values(const std::string&, enum_key_values&);
-        bool key_exists(const std::string&,bool&);
-        bool value_exists(const std::string&,const std::string&,bool&);
+        result connect(const session& sess);
+        result key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
+        result enumerate_key(const std::string&, enum_key&);
+        result enumerate_key_values(const std::string&, enum_key_values&);
+        result key_exists(const std::string&,bool&);
+        result value_exists(const std::string&,const std::string&,bool&);
 
     private:
-        bool internal_key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
+        result internal_key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
     using bpo = boost::python::object;
         bpo main_;
         bpo global_;

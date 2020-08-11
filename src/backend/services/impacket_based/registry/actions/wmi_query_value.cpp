@@ -47,16 +47,16 @@ action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
-    bool r = c.connect(*sess);
-    if(!r) {
+    auto r = c.connect(*sess);
+    if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s", sess->remote().c_str());
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
 
     trustwave::registry_value rv;
-
-    if(c.key_get_value_by_name(qvact->key_,qvact->value_, rv)) {
+    r = c.key_get_value_by_name(qvact->key_,qvact->value_, rv);
+    if(std::get<0>(r)) {
         if(rv.value().empty()) {
             res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
                                                                 "Value is empty");
@@ -68,7 +68,8 @@ action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::
         }
         return action_status::SUCCEEDED;
     }
-    res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
+    res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
+                                                        std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
     return action_status::FAILED;
 
 }
