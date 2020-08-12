@@ -31,6 +31,8 @@ extern "C" {
 #endif
 #include "registry_client2.hpp"
 #include "../utils/security_descriptor_utils.hpp"
+#include "../utils/registry_utils.hpp"
+
 #include <unordered_map>
 #undef Required
 #include "singleton_runner/authenticated_scan_server.hpp"
@@ -39,52 +41,6 @@ extern "C" {
 using trustwave::registry_client2;
 using trustwave::result;
 namespace {
-    bool split_hive_key(const std::string& path, std::string& hivename, std::string& subkeyname)
-    {
-
-        auto pos = path.find("\\");
-        if(std::string::npos != pos) {
-            subkeyname.assign(path.substr(pos + 1));
-            hivename.assign(path.substr(0, pos));
-        }
-        else {
-            subkeyname.assign(path);
-        }
-
-        return true;
-    }
-    bool reg_hive_key(const std::string& fullname, uint32_t& reg_type, std::string& subkeyname)
-    {
-        if(fullname.empty()) { return false; }
-        static const std::unordered_map<std::string, uint32_t> hives{
-            {"HKLM", HKEY_LOCAL_MACHINE},
-            {"HKEY_LOCAL_MACHINE", HKEY_LOCAL_MACHINE},
-            {"HKCR", HKEY_CLASSES_ROOT},
-            {"HKEY_CLASSES_ROOT", HKEY_CLASSES_ROOT},
-            {"HKU", HKEY_USERS},
-            {"HKEY_USERS", HKEY_USERS},
-            {"HKCU", HKEY_CURRENT_USER},
-            {"HKEY_CURRENT_USER", HKEY_CURRENT_USER},
-            {"HKPD", HKEY_PERFORMANCE_DATA},
-            {"HKEY_PERFORMANCE_DATA", HKEY_PERFORMANCE_DATA},
-        };
-
-        std::string hivename;
-        std::string tmp_keyname;
-        bool ret = split_hive_key(fullname, hivename, tmp_keyname);
-        auto it = hives.find(hivename);
-        if(it == hives.end())
-        {
-            reg_type = HKEY_LOCAL_MACHINE;
-            subkeyname = fullname;
-        }
-        else
-        {
-            reg_type = it->second;
-            subkeyname = tmp_keyname;
-        }
-        return true;
-    }
     static NTSTATUS dcerpc_winreg_Connect(struct dcerpc_binding_handle* b, TALLOC_CTX* mem_ctx, uint32_t reg_type,
                                           uint32_t access_mask, struct policy_handle* reg_hnd, WERROR* werr)
     {
@@ -125,7 +81,7 @@ namespace {
     {
         uint32_t hive;
         std::string keyname;
-        if(!reg_hive_key(name, hive, keyname)) { return NT_STATUS_INVALID_PARAMETER; }
+        if(!trustwave::reg_hive_key(name, hive, keyname)) { return NT_STATUS_INVALID_PARAMETER; }
         struct winreg_String key;
         ZERO_STRUCT(key);
         key.name = talloc_strdup(mem_ctx, keyname.c_str());
