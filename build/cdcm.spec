@@ -53,6 +53,7 @@ libtw-common.so \
 libtw-lsa-client.so \
 libtw-rpc-client.so \
 libtw-registry-client2.so \
+libtw-registry-utils.so \
 libtw-srvsvc-client.so \
 libtw-sd-utils.so"
 
