@@ -47,7 +47,7 @@ namespace trustwave{
         {  HKEY_PERFORMANCE_DATA  ,  "HKEY_PERFORMANCE_DATA"},
 
     };
-    bool split_hive_key(const std::string& path, std::string& hivename, std::string& subkeyname);
+    void split_hive_key(const std::string& path, std::string& hivename, std::string& subkeyname);
     bool reg_hive_key(const std::string& fullname, uint32_t& reg_type, std::string& subkeyname);
 }//namespace trustwave
 #endif // SRC_BACKEND_UTILS_REGISTRY_UTILS_HPP
