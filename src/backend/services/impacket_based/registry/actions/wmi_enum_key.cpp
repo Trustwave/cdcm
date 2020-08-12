@@ -28,7 +28,7 @@
 using trustwave::WMI_Enumerate_Key_Action;
 using action_status = trustwave::Action_Base::action_status;
 action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                        std::shared_ptr<result_msg> res)
+                                            std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
@@ -53,30 +53,16 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-    bool exists = false;
-    r = c.key_exists(ekact->key_, exists);
-    if(std::get<0>(r)) {
-        std::cerr<<"ek key is "<<ekact->key_<<std::endl;
-        if(exists) {
-            trustwave::enum_key ek{};
-            r = c.enumerate_key(ekact->key_, ek);
-            if(std::get<0>(r)) { res->set_response_for_success(ek); }
-            else {
-                res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                                    std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
-            }
-            return action_status::SUCCEEDED;
-        }
-        else {
-            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                                "Key Doesn't Exist");
-        }
-    }
-    else
-    {
+
+    trustwave::enum_key ek{};
+    r = c.enumerate_key(ekact->key_, ek);
+    if(std::get<0>(r)) { res->set_response_for_success(ek); }
+    else {
         res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                            std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
+                                                            std::get<1>(r).empty() ? "Unknown Error" : std::get<1>(r));
+        return action_status::FAILED;
     }
+    return action_status::SUCCEEDED;
 }
 
 // instance of the our plugin

@@ -53,10 +53,7 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
-    bool exists = false;
-    r = c.key_exists(ekact->key_, exists);
-    if(std::get<0>(r)) {
-        if(exists) {
+
             trustwave::enum_key_values ek{};
             r = c.enumerate_key_values(ekact->key_, ek);
 
@@ -67,19 +64,7 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
                 return action_status::FAILED;
             }
             return action_status::SUCCEEDED;
-        }
-        else {
-            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                                "Key Doesn't Exist");
-            return action_status::FAILED;
-        }
-    }
-    else
-    {
-        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                            std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
-        return action_status::FAILED;
-    }
+
 }
 
 // instance of the our plugin

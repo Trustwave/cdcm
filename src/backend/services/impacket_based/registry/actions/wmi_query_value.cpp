@@ -27,7 +27,7 @@ using trustwave::WMI_Query_Value_Action;
 using action_status = trustwave::Action_Base::action_status;
 
 action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
-                                      std::shared_ptr<result_msg> res)
+                                          std::shared_ptr<result_msg> res)
 {
     if(!sess || (sess && sess->id().is_nil())) {
         res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
@@ -42,8 +42,7 @@ action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::
         res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
         return action_status::FAILED;
     }
-    if( qvact->key_.empty())
-    {
+    if(qvact->key_.empty()) {
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
@@ -55,7 +54,7 @@ action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::
     }
 
     trustwave::registry_value rv;
-    r = c.key_get_value_by_name(qvact->key_,qvact->value_, rv);
+    r = c.key_get_value_by_name(qvact->key_, qvact->value_, rv);
     if(std::get<0>(r)) {
         if(rv.value().empty()) {
             res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
@@ -69,9 +68,8 @@ action_status WMI_Query_Value_Action::act(boost::shared_ptr<session> sess, std::
         return action_status::SUCCEEDED;
     }
     res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,
-                                                        std::get<1>(r).empty()?"Unknown error":std::get<1>(r));
+                                                        std::get<1>(r).empty() ? "Unknown error" : std::get<1>(r));
     return action_status::FAILED;
-
 }
 
 // instance of the our plugin
