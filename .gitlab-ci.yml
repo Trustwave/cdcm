@@ -169,6 +169,7 @@ build_rpms:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
     - if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then  export BRANCH=_MR_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME//\//_}  ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF="SNAPSHOT_$SNAPSHOT" ;else export RELEASE_DEF="$SNAPSHOT";fi
     - echo rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
@@ -250,6 +251,7 @@ deploy:
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - echo mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
@@ -283,6 +285,7 @@ functional_tests:
     - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - curl -v -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=$REPO&g=com.trustwave&a=cdcm&v=$VERSION&p=rpm" -o cdcm.rpm
@@ -292,7 +295,7 @@ functional_tests:
     - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" testsRunner_settings.json
     - source /etc/profile.d/rvm.sh
     - rvm reload
-    - export testFiles=(full.xml qa_4_permissions.xml qa_5_wmi_registry.xml)
+    - export testFiles=(full.xml qa_4_permissions.xml error_code_tests.xml qa_5_wmi_registry.xml)
     - for i in ${testFiles[@]};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ; mv log/cdcm_client1.log log/cdcm_client.$i.log ;done
     - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
     - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222  log/cdcm_client.$i.log root@10.88.240.20://opt/tests_results ;done
@@ -324,6 +327,7 @@ smoke_test:
     - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
     - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - curl -v -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=$REPO&g=com.trustwave&a=cdcm&v=$VERSION&p=rpm" -o cdcm.rpm
