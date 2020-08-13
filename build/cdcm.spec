@@ -17,6 +17,7 @@ Requires: openpgm
 Requires: libsodium
 Requires: boost169-filesystem
 Requires: boost169-log
+Requires: boost169-python3
 Requires: gnutls
 Requires: python36
 Requires: python36-pyasn1
