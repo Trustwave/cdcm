@@ -26,6 +26,7 @@
 #include <chrono>
 #include "session.hpp"
 #include "base64_encode.hpp"
+#include "registry_utils.hpp"
 using trustwave::wmi_registry_client;
 namespace bp = boost::python;
 namespace {
@@ -101,21 +102,25 @@ wmi_registry_client::result wmi_registry_client::connect(const session& sess)
 wmi_registry_client::result wmi_registry_client::key_exists(const std::string& key, bool& exists)
 {
 //    scoped_timer t("key_exists");
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(key, hive, keyname)) { return {false, "WERR_INVALID_PARAMETER"}; }
+
     static constexpr std::string_view slashes("\\");
-    auto pos = key.find_last_of(slashes);
+    auto pos = keyname.find_last_of(slashes);
     std::string parent_key;
     std::string child_key;
     if(pos == std::string::npos) {
         parent_key = std::string("");
-        child_key = key;
+        child_key = keyname;
     }
     else {
-        parent_key = std::string(key.c_str(), pos);
-        child_key = std::string_view(key.c_str() + pos + slashes.length());
+        parent_key = std::string(keyname.c_str(), pos);
+        child_key = std::string_view(keyname.c_str() + pos + slashes.length());
     }
     exists = false;
     try {
-        auto rr = exec_.attr("EnumKey")(parent_key);
+        auto rr = exec_.attr("EnumKey")(parent_key,hive);
         try {
             if(rr.contains("Error")) {
                 std::string as = bp::extract<std::string>(rr["Error"]);
@@ -142,6 +147,10 @@ wmi_registry_client::result
 wmi_registry_client::value_exists(const std::string& key, const std::string& value, bool& exists)
 {
 //    scoped_timer t("value_exists");
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(key, hive, keyname)) { return {false, "WERR_INVALID_PARAMETER"}; }
+
     bool ex;
     auto ke_res = key_exists(key,ex);
     if(!std::get<0>(ke_res))
@@ -154,7 +163,7 @@ wmi_registry_client::value_exists(const std::string& key, const std::string& val
     }
     try {
         exists = false;
-        auto rr = exec_.attr("EnumValues")(key);
+        auto rr = exec_.attr("EnumValues")(keyname,hive);
         try {
             if(rr.contains("Error")) {
                 std::string as = bp::extract<std::string>(rr["Error"]);
@@ -180,6 +189,10 @@ wmi_registry_client::value_exists(const std::string& key, const std::string& val
 wmi_registry_client::result wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
 {
 //    scoped_timer t("enumerate_key");
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(key, hive, keyname)) { return {false, "WERR_INVALID_PARAMETER"}; }
+
     bool ex;
     auto ke_res = key_exists(key,ex);
     if(!std::get<0>(ke_res))
@@ -191,7 +204,7 @@ wmi_registry_client::result wmi_registry_client::enumerate_key(const std::string
         return std::make_tuple(false, "Key Doesn't Exist");
     }
     try {
-        auto rr = exec_.attr("EnumKey")(key);
+        auto rr = exec_.attr("EnumKey")(keyname,hive);
         std::vector<std::string> vec;
         try {
             if(rr.contains("Error")) {
@@ -223,6 +236,10 @@ wmi_registry_client::result wmi_registry_client::enumerate_key(const std::string
 }
 wmi_registry_client::result wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_values& ev)
 {
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(key, hive, keyname)) { return {false, "WERR_INVALID_PARAMETER"}; }
+
 //    scoped_timer t("enumerate_key_values");
     bool ex;
     auto ke_res = key_exists(key,ex);
@@ -235,7 +252,7 @@ wmi_registry_client::result wmi_registry_client::enumerate_key_values(const std:
         return std::make_tuple(false, "Key Doesn't Exist");
     }
     try {
-        auto rr = exec_.attr("EnumValues")(key);
+        auto rr = exec_.attr("EnumValues")(keyname,hive);
         try {
             if(rr.contains("Error")) {
                 std::string as = bp::extract<std::string>(rr["Error"]);
@@ -269,6 +286,10 @@ wmi_registry_client::result wmi_registry_client::enumerate_key_values(const std:
 wmi_registry_client::result
 wmi_registry_client::key_get_value_by_name(const std::string& key, const std::string& value, registry_value& rv)
 {
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(key, hive, keyname)) { return {false, "WERR_INVALID_PARAMETER"}; }
+
 //    scoped_timer t("key_get_value_by_name");
     bool ex;
     auto ke_res = key_exists(key,ex);
@@ -307,12 +328,16 @@ wmi_registry_client::result
 wmi_registry_client::internal_key_get_value_by_name(const std::string& key, const std::string& value,
                                                     registry_value& rv)
 {
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(key, hive, keyname)) { return {false, "WERR_INVALID_PARAMETER"}; }
+
 //    scoped_timer t("internal_key_get_value_by_name");
     static const std::unordered_map<uint32_t, std::string_view> type_to_method
         = {{REG_SZ, "GetStringValue"},   {REG_EXPAND_SZ, "GetExpandedStringValue"}, {REG_BINARY, "GetBinaryValue"},
            {REG_DWORD, "GetDWORDValue"}, {REG_MULTI_SZ, "GetMultiStringValue"},     {REG_QWORD, "GetQWORDValue"}};
     try {
-        auto rr = exec_.attr(type_to_method.at(rv.type()).data())(key, value);
+        auto rr = exec_.attr(type_to_method.at(rv.type()).data())(keyname, value);
 
         switch(rv.type()) {
             case REG_BINARY: {

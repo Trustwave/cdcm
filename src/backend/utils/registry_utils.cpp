@@ -16,6 +16,43 @@
 #include "registry_utils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <numeric>
+
+static constexpr uint32_t    HKEY_CLASSES_ROOT       =      0x80000000                  ;
+static constexpr uint32_t    HKEY_CURRENT_USER       =      0x80000001                  ;
+static constexpr uint32_t    HKEY_LOCAL_MACHINE      =      0x80000002                  ;
+static constexpr uint32_t    HKEY_USERS              =      0x80000003                  ;
+static constexpr uint32_t    HKEY_PERFORMANCE_DATA   =      0x80000004                  ;
+static constexpr uint32_t    HKEY_CURRENT_CONFIG     =      0x80000005                  ;
+static constexpr uint32_t    HKEY_DYN_DATA           =      0x80000006                  ;
+static constexpr uint32_t    HKEY_PERFORMANCE_TEXT   =      0x80000050                  ;
+static constexpr uint32_t    HKEY_PERFORMANCE_NLSTEXT=      0x80000060                  ;
+static constexpr uint32_t    HKEY_FIRST              =      HKEY_CLASSES_ROOT           ;
+static constexpr uint32_t    HKEY_LAST               =      HKEY_PERFORMANCE_NLSTEXT    ;
+
+static const std::unordered_map<std::string, uint32_t> hives{
+    {"HKLM",                   HKEY_LOCAL_MACHINE},
+    {"HKEY_LOCAL_MACHINE",     HKEY_LOCAL_MACHINE},
+    {"HKCR",                   HKEY_CLASSES_ROOT},
+    {"HKEY_CLASSES_ROOT",      HKEY_CLASSES_ROOT},
+    {"HKU",                    HKEY_USERS},
+    {"HKEY_USERS",             HKEY_USERS},
+    {"HKCU",                   HKEY_CURRENT_USER},
+    {"HKEY_CURRENT_USER",      HKEY_CURRENT_USER},
+    {"HKPD",                   HKEY_PERFORMANCE_DATA},
+    {"HKEY_PERFORMANCE_DATA",  HKEY_PERFORMANCE_DATA},
+};
+static const std::unordered_map<uint32_t ,std::string> hive_long_names{
+    {  HKEY_LOCAL_MACHINE     ,  "HKEY_LOCAL_MACHINE"   },
+    {  HKEY_CLASSES_ROOT      ,  "HKEY_CLASSES_ROOT"    },
+    {  HKEY_USERS             ,  "HKEY_USERS"           },
+    {  HKEY_CURRENT_USER      ,  "HKEY_CURRENT_USER"    },
+    {  HKEY_PERFORMANCE_DATA  ,  "HKEY_PERFORMANCE_DATA"},
+
+};
+std::string_view trustwave::hive_long_name(const uint32_t hive)
+{
+    return hive_long_names.at(hive);
+}
 void trustwave::split_hive_key(const std::string& path, std::string& hivename, std::string& subkeyname)
 {
     static constexpr std::string_view slash("\\");
@@ -42,7 +79,7 @@ void trustwave::split_hive_key(const std::string& path, std::string& hivename, s
         subkeyname.assign(new_path);
     }
 }
-bool trustwave::reg_hive_key(const std::string& fullname, uint32_t& reg_type, std::string& subkeyname)
+bool trustwave::reg_hive_key(const std::string& fullname, uint32_t & reg_type, std::string& subkeyname)
 {
     if(fullname.empty()) { return false; }
     std::string hivename;

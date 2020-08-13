@@ -32,7 +32,7 @@ extern "C" {
 #include "session.hpp"
 #include "credentials.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-#include "../utils/registry_utils.hpp"
+#include "registry_utils.hpp"
 
 using trustwave::registry_client;
 using trustwave::result;
@@ -76,7 +76,7 @@ result registry_client::open_key(const char* full_path)
     if(!W_ERROR_IS_OK(error)) {
         return {false, error};
     }
-    ctx_->predef = talloc_strdup(ctx_, hive_long_names.at(hive).c_str());
+    ctx_->predef = talloc_strdup(ctx_, hive_long_name(hive).data());
     ctx_->path = talloc_strdup(ctx_, "");
     ctx_->root = ctx_->current;
     error = reg_open_key(ctx_->registry, ctx_->root, keyname.c_str(), &ctx_->current);

@@ -31,7 +31,7 @@ extern "C" {
 #endif
 #include "registry_client2.hpp"
 #include "../utils/security_descriptor_utils.hpp"
-#include "../utils/registry_utils.hpp"
+#include "registry_utils.hpp"
 
 #include <unordered_map>
 #undef Required
