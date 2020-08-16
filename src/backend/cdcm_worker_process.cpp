@@ -23,14 +23,16 @@
 #include "typedefs.hpp"
 #include "message_worker.hpp"
 #include "utils/action_manager.hpp"
+std::unique_ptr<trustwave::ILogger> logger_ptr_u;
 template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process_type::worker>(size_t id)
 {
     std::cout << "authenticated_scan_server running as worker id " << id << std::endl;
     LoggerSource::instance()->set_source(::trustwave::logger::worker, id);
-    if(!Initialize(logger_ptr_, conf_root)) {
+    if(!Initialize(logger_ptr_u, conf_root)) {
         std::cerr << "failed to initialize the logger!!!" << std::endl;
         abort();
     }
+    logger_ptr_ = logger_ptr_u.get();
     AU_LOG_INFO("%s",conf_->to_string().c_str());
     AU_LOG_INFO("Looking for plugins in  %s", conf_->plugins_dir_.c_str());
     auto sl_vec = action_manager::load(conf_->plugins_dir_, public_dispatcher_);
@@ -42,6 +44,8 @@ int main(int, char** argv)
 {
     trustwave::zmq_helpers::version_assert(4, 0);
     trustwave::zmq_helpers::catch_signals();
-    return trustwave::authenticated_scan_server::instance().run_as<::trustwave::process_type::worker>(
+    int rc =  trustwave::authenticated_scan_server::instance().run_as<::trustwave::process_type::worker>(
         std::stoull(argv[1]));
+    logger_ptr_u.reset();
+    return rc;
 }
