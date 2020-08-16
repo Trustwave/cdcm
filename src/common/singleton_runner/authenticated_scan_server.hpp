@@ -49,14 +49,14 @@ namespace trustwave {
             static authenticated_scan_server app;
             return app;
         }
-        ILogger* logger() { return logger_ptr_.get(); }
+        ILogger* logger() { return logger_ptr_; }
         template<typename T> int run_as(size_t instance_id = 0);
         boost::shared_ptr<session> get_session(const std::string& session_id);
 
     private:
 #undef uint_t
         authenticated_scan_server();
-        std::unique_ptr<ILogger> logger_ptr_;
+        ILogger* logger_ptr_;
         Dispatcher<Action_Base> public_dispatcher_;
     };
 
