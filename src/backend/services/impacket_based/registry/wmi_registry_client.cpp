@@ -37,7 +37,7 @@ namespace {
     {
         return std::vector<T>(bp::stl_input_iterator<T>(iterable), bp::stl_input_iterator<T>());
     }
-   
+
 
 } // namespace
 result wmi_registry_client::connect(const session& sess)
@@ -51,7 +51,7 @@ result wmi_registry_client::connect(const session& sess)
         PySys_SetObject("path", sysPath);
         main_ = boost::python::import("__main__");
         global_ = main_.attr("__dict__");
-        helper_ = boost::python::import("helper_module");
+        helper_ = boost::python::import("wmi_registry_helper");
         exec_ = helper_.attr("WMI_REG_EXEC_METHOD")(sess.remote(), sess.creds().username(), sess.creds().password());
         {
 //            scoped_timer t("real connect");

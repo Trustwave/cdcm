@@ -7,7 +7,7 @@ include_directories(/usr/include/python3.6m/)
 
 #add_executable(wmi_registry-tester tester.cpp)
 #target_link_libraries(wmi_registry-tester tw-wmi_registry-client)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helper_module.py ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/wmi_registry_helper.py ${CMAKE_CURRENT_BINARY_DIR}/wmi_registry_helper.py COPYONLY)
 
 add_subdirectory(actions)
 install(TARGETS tw-wmi_registry-client DESTINATION ${release_lib_dest})
@@ -18,10 +18,10 @@ install(TARGETS tw-wmi_registry-client ARCHIVE DESTINATION lib
 install(TARGETS tw-wmi_registry-client ARCHIVE DESTINATION lib
         DESTINATION ${release_lib_dest})
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wmi_registry_helper.py
         DESTINATION ${bin_dest})
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helper_module.py
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wmi_registry_helper.py
         DESTINATION ${release_bin_dest})
 
 #configure_file(registry.json ${release_lib_dest}/plugins/registry.json COPYONLY)
