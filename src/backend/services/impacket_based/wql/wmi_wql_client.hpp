@@ -15,11 +15,9 @@
 //=====================================================================================================================
 #ifndef SRC_BACKEND_SERVICES_IMPACKET_BASED_WQL_WMI_WQL_CLIENT_HPP
 #define SRC_BACKEND_SERVICES_IMPACKET_BASED_WQL_WMI_WQL_CLIENT_HPP
-#include "client.hpp"
-#include <string>
-#include <tuple>
 #include <boost/python.hpp>
-
+#include "client.hpp"
+#include "../common/typedefs.hpp"
 namespace trustwave {
 
     class session; //forward declaration
@@ -27,15 +25,14 @@ namespace trustwave {
     class wmi_wql_client final :public cdcm_client {
 
     public:
-        using result = std::tuple<bool,std::string>;
         static constexpr std::string_view protocol{"wmi_wql"};
 
         wmi_wql_client() :cdcm_client(protocol){}
         ~wmi_wql_client()= default;
 
-        result connect(const session& session, const std::string & wmi_namespace);
-        result query_remote_asset(const std::string & wql_query);
-        result close_connection();
+        impacket_based_common::result connect(const session& session, const std::string & wmi_namespace);
+        impacket_based_common::result query_remote_asset(const std::string & wql_query);
+        impacket_based_common::result close_connection();
 
     private:
         using bpo = boost::python::object;

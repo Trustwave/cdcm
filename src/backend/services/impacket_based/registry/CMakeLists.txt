@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
 
 add_library(tw-wmi_registry-client SHARED wmi_registry_client.cpp)
-target_link_libraries(tw-wmi_registry-client boost_python36 boost_system boost_filesystem python3.6m pthread dl  util m tw-common tw-singleton-runner)
+target_link_libraries(tw-wmi_registry-client tw-wmi-common boost_python36 boost_system boost_filesystem python3.6m pthread dl  util m tw-common tw-singleton-runner)
 include_directories(/usr/include/python3.6m/)
 
 #add_executable(wmi_registry-tester tester.cpp)

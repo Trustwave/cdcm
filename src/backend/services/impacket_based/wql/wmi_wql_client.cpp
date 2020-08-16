@@ -25,32 +25,12 @@
 #include <iostream>
 #include "session.hpp"
 #include "base64_encode.hpp"
-using trustwave::wmi_wql_client;
-namespace bp = boost::python;
-namespace {
-    wmi_wql_client::result handle_pyerror()
-    {
-        std::string msg;
-        if(PyErr_Occurred()) {
-            using namespace boost::python;
-            using namespace boost;
+#include "../common/pyerror_handler.hpp"
 
-            PyObject *exc, *val, *tb;
-            object formatted_list, formatted;
-            PyErr_Fetch(&exc, &val, &tb);
-            handle<> hexc(exc), hval(allow_null(val)), htb(allow_null(tb));
-            object traceback(import("traceback"));
-            object format_exception_only(traceback.attr("format_exception_only"));
-            formatted_list = format_exception_only(hexc, hval);
-            formatted = str("\n").join(formatted_list);
-            msg = extract<std::string>(formatted);
-        }
-        bp::handle_exception();
-        PyErr_Clear();
-        return std::make_tuple(false, msg);
-    }
-}
-wmi_wql_client::result wmi_wql_client::connect(const session& sess,const std::string & wmi_namespace)
+using trustwave::wmi_wql_client;
+using namespace trustwave::impacket_based_common;
+namespace bp = boost::python;
+result wmi_wql_client::connect(const session& sess,const std::string & wmi_namespace)
 {
     try {
         Py_Initialize();
@@ -78,7 +58,7 @@ wmi_wql_client::result wmi_wql_client::connect(const session& sess,const std::st
     }
     return std::make_tuple(true, "");
 }
-wmi_wql_client::result wmi_wql_client::query_remote_asset(const std::string & wql_query)
+result wmi_wql_client::query_remote_asset(const std::string & wql_query)
 {
 
     try {
@@ -105,7 +85,7 @@ wmi_wql_client::result wmi_wql_client::query_remote_asset(const std::string & wq
     }
     return std::make_tuple(true, "");
 }
-wmi_wql_client::result wmi_wql_client::close_connection()
+result wmi_wql_client::close_connection()
 {
     return std::make_tuple(false, "Key Doesn't Exist");
 }

@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
+add_subdirectory(common)
+include_directories(common)
+link_directories(common)
 add_subdirectory(registry)
 add_subdirectory(wql)

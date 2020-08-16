@@ -27,52 +27,20 @@
 #include "session.hpp"
 #include "base64_encode.hpp"
 #include "registry_utils.hpp"
+#include "../common/pyerror_handler.hpp"
+
 using trustwave::wmi_registry_client;
 namespace bp = boost::python;
+using namespace trustwave::impacket_based_common;
 namespace {
     template<typename T> inline std::vector<T> to_std_vector(const boost::python::object& iterable)
     {
         return std::vector<T>(bp::stl_input_iterator<T>(iterable), bp::stl_input_iterator<T>());
     }
-    struct scoped_timer {
-        explicit scoped_timer(const std::string_view name):
-            start_(std::chrono::high_resolution_clock::now()), name_(name)
-        {
-        }
-        ~scoped_timer()
-        {
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start_);
+   
 
-            std::cerr << "Time taken by " << name_ << ": " << duration.count() << " microseconds" << std::endl;
-        }
-        decltype(std::chrono::high_resolution_clock::now()) start_;
-        const std::string_view name_;
-    };
-
-    wmi_registry_client::result handle_pyerror()
-    {
-        std::string msg;
-        if(PyErr_Occurred()) {
-            using namespace boost::python;
-            using namespace boost;
-
-            PyObject *exc, *val, *tb;
-            object formatted_list, formatted;
-            PyErr_Fetch(&exc, &val, &tb);
-            handle<> hexc(exc), hval(allow_null(val)), htb(allow_null(tb));
-            object traceback(import("traceback"));
-            object format_exception_only(traceback.attr("format_exception_only"));
-            formatted_list = format_exception_only(hexc, hval);
-            formatted = str("\n").join(formatted_list);
-            msg = extract<std::string>(formatted);
-        }
-        bp::handle_exception();
-        PyErr_Clear();
-        return std::make_tuple(false, msg);
-    }
 } // namespace
-wmi_registry_client::result wmi_registry_client::connect(const session& sess)
+result wmi_registry_client::connect(const session& sess)
 {
 //    scoped_timer t("connect");
     try {
@@ -99,7 +67,7 @@ wmi_registry_client::result wmi_registry_client::connect(const session& sess)
     }
     return std::make_tuple(true, "");
 }
-wmi_registry_client::result wmi_registry_client::key_exists(const std::string& key, bool& exists)
+result wmi_registry_client::key_exists(const std::string& key, bool& exists)
 {
 //    scoped_timer t("key_exists");
     uint32_t hive;
@@ -143,7 +111,7 @@ wmi_registry_client::result wmi_registry_client::key_exists(const std::string& k
     }
     return std::make_tuple(true, "");
 }
-wmi_registry_client::result
+result
 wmi_registry_client::value_exists(const std::string& key, const std::string& value, bool& exists)
 {
 //    scoped_timer t("value_exists");
@@ -186,7 +154,7 @@ wmi_registry_client::value_exists(const std::string& key, const std::string& val
     return std::make_tuple(true, "");
 }
 
-wmi_registry_client::result wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
+result wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
 {
 //    scoped_timer t("enumerate_key");
     uint32_t hive;
@@ -234,7 +202,7 @@ wmi_registry_client::result wmi_registry_client::enumerate_key(const std::string
         return std::make_tuple(false, "Unknown Error");
     }
 }
-wmi_registry_client::result wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_values& ev)
+result wmi_registry_client::enumerate_key_values(const std::string& key, enum_key_values& ev)
 {
     uint32_t hive;
     std::string keyname;
@@ -283,7 +251,7 @@ wmi_registry_client::result wmi_registry_client::enumerate_key_values(const std:
     return std::make_tuple(true, "");
 }
 
-wmi_registry_client::result
+result
 wmi_registry_client::key_get_value_by_name(const std::string& key, const std::string& value, registry_value& rv)
 {
     uint32_t hive;
@@ -324,7 +292,7 @@ wmi_registry_client::key_get_value_by_name(const std::string& key, const std::st
 
     return ekv_res;
 }
-wmi_registry_client::result
+result
 wmi_registry_client::internal_key_get_value_by_name(const std::string& key, const std::string& value,
                                                     registry_value& rv)
 {

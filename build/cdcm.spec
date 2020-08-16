@@ -73,6 +73,7 @@ libtw-registry-client2.so \
 libtw-registry-utils.so \
 libtw-srvsvc-client.so \
 libtw-wmi_registry-client.so \
+libtw-wmi-common.so \
 libtw-sd-utils.so"
 
 # copy libs

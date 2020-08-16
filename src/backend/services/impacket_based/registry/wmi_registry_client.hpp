@@ -20,23 +20,24 @@
 #include <tuple>
 #include <boost/python.hpp>
 #include "registry_value.hpp"
+#include "../common/typedefs.hpp"
+
 namespace trustwave {
     class session;
     class wmi_registry_client final: public cdcm_client {
     public:
-        using result = std::tuple<bool,std::string>;
         static constexpr std::string_view protocol{"wmi_registry"};
         wmi_registry_client():cdcm_client(protocol){}
         ~wmi_registry_client() override = default;
-        result connect(const session& sess);
-        result key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
-        result enumerate_key(const std::string&, enum_key&);
-        result enumerate_key_values(const std::string&, enum_key_values&);
-        result key_exists(const std::string&,bool&);
-        result value_exists(const std::string&,const std::string&,bool&);
+        impacket_based_common::result connect(const session& sess);
+        impacket_based_common::result key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
+        impacket_based_common::result enumerate_key(const std::string&, enum_key&);
+        impacket_based_common::result enumerate_key_values(const std::string&, enum_key_values&);
+        impacket_based_common::result key_exists(const std::string&,bool&);
+        impacket_based_common::result value_exists(const std::string&,const std::string&,bool&);
 
     private:
-        result internal_key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
+        impacket_based_common::result internal_key_get_value_by_name(const std::string&,const std::string&, registry_value& rv);
     using bpo = boost::python::object;
         bpo main_;
         bpo global_;
