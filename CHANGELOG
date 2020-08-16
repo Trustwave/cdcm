@@ -1,3 +1,14 @@
+v1.0.8
+Improvment issues
+ - CDCM-108
+   Standardize Path formatting for CDCM Requests.
+ - CDCM-109
+   SMB P2 - querying inaccessible registry should return specific fail reason.
+
+Fixed issues
+ - CDCM-110
+   Fixed core when process goes down.
+
 v1.0.7
 Improvment issues
  - CDCM-93
