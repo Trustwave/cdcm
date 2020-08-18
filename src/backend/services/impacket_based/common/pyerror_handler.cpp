@@ -16,6 +16,8 @@
 #include "pyerror_handler.hpp"
 #include <Python.h>
 #include <boost/python.hpp>
+#include "singleton_runner/authenticated_scan_server.hpp"
+
 namespace bp = boost::python;
 using namespace trustwave::impacket_based_common;
 result handle_pyerror()
@@ -37,5 +39,6 @@ result handle_pyerror()
     }
     bp::handle_exception();
     PyErr_Clear();
+    AU_LOG_ERROR("python error occurred: %s",msg.c_str());
     return std::make_tuple(false, msg);
 }

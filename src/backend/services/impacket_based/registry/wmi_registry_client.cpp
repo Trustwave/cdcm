@@ -28,6 +28,7 @@
 #include "base64_encode.hpp"
 #include "registry_utils.hpp"
 #include "../common/pyerror_handler.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
 
 using trustwave::wmi_registry_client;
 namespace bp = boost::python;
@@ -45,7 +46,7 @@ result wmi_registry_client::connect(const session& sess)
 //    scoped_timer t("connect");
     try {
         Py_Initialize();
-        boost::filesystem::path workingDir = boost::filesystem::absolute("./").normalize();
+        boost::filesystem::path workingDir = boost::filesystem::absolute(".").normalize();
         PyObject* sysPath = PySys_GetObject("path");
         PyList_Insert(sysPath, 0, PyUnicode_FromString(workingDir.string().c_str()));
         PySys_SetObject("path", sysPath);
@@ -59,10 +60,11 @@ result wmi_registry_client::connect(const session& sess)
         }
     }
     catch(const boost::python::error_already_set&) {
-        PyErr_Print();
-        return std::make_tuple(false, "");
+
+        return handle_pyerror();
     }
     catch(...) {
+        AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "");
     }
     return std::make_tuple(true, "");
@@ -107,6 +109,7 @@ result wmi_registry_client::key_exists(const std::string& key, bool& exists)
         return handle_pyerror();
     }
     catch(...) {
+        AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "Unknown Error");
     }
     return std::make_tuple(true, "");
@@ -149,6 +152,7 @@ wmi_registry_client::value_exists(const std::string& key, const std::string& val
         return handle_pyerror();
     }
     catch(...) {
+        AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "Unknown Error");
     }
     return std::make_tuple(true, "");
@@ -199,6 +203,7 @@ result wmi_registry_client::enumerate_key(const std::string& key, enum_key& ek)
         return handle_pyerror();
     }
     catch(...) {
+        AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "Unknown Error");
     }
 }
@@ -246,6 +251,7 @@ result wmi_registry_client::enumerate_key_values(const std::string& key, enum_ke
         return handle_pyerror();
     }
     catch(...) {
+        AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "Unknown Error");
     }
     return std::make_tuple(true, "");
@@ -276,6 +282,10 @@ wmi_registry_client::key_get_value_by_name(const std::string& key, const std::st
     }
     catch(const boost::python::error_already_set&) {
         return handle_pyerror();
+    }
+    catch(...) {
+        AU_LOG_ERROR("non python error occurred");
+        return std::make_tuple(false, "Unknown Error");
     }
     if(std::get<0>(ekv_res)) {
         auto it = std::find_if(ekv.begin(), ekv.end(),
@@ -338,6 +348,7 @@ wmi_registry_client::internal_key_get_value_by_name(const std::string& key, cons
         return handle_pyerror();
     }
     catch(...) {
+        AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "Unknown Error");
     }
 }
