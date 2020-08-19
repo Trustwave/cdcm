@@ -26,6 +26,8 @@
 #include "session.hpp"
 #include "base64_encode.hpp"
 #include "../common/pyerror_handler.hpp"
+#include "singleton_runner/authenticated_scan_server.hpp"
+
 
 using trustwave::wmi_wql_client;
 using namespace trustwave::impacket_based_common;
@@ -34,7 +36,7 @@ result wmi_wql_client::connect(const session& sess,const std::string & wmi_names
 {
     try {
         Py_Initialize();
-        boost::filesystem::path workingDir = boost::filesystem::absolute("./").normalize();
+        boost::filesystem::path workingDir = authenticated_scan_server::instance().settings()->plugins_dir_;
         std::cerr << workingDir.string() << std::endl;
         PyObject* sysPath = PySys_GetObject("path");
         PyList_Insert(sysPath, 0, PyUnicode_FromString(workingDir.string().c_str()));

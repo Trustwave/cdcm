@@ -51,9 +51,7 @@ for dir in %{cdcm_lib} %{cdcm_lib}/plugins %{_bindir} %{cdcm_conf} /var/log/cdcm
 done
 executables="cdcm_broker \
 cdcm_supervisor \
-cdcm_worker \
-wmi_registry_helper.py \
-wmi_wql_helper.py"
+cdcm_worker"
 
 
 %define output_dir /opt/output/%{getenv:CI_COMMIT_REF_SLUG}/
@@ -139,8 +137,6 @@ fi
 %attr(755, root, root) %{_bindir}/cdcm_broker
 %attr(755, root, root) %{_bindir}/cdcm_supervisor
 %attr(755, root, root) %{_bindir}/cdcm_worker
-%attr(755, root, root) %{_bindir}/wmi_registry_helper.py
-%attr(755, root, root) %{_bindir}/wmi_wql_helper.py
 
 %{cdcm_lib}/*.so*
 %{cdcm_lib}/plugins/*

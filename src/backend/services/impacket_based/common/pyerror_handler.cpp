@@ -20,7 +20,7 @@
 
 namespace bp = boost::python;
 using namespace trustwave::impacket_based_common;
-result handle_pyerror()
+trustwave::impacket_based_common::result trustwave::impacket_based_common::handle_pyerror()
 {
     std::string msg;
     if(PyErr_Occurred()) {
