@@ -62,7 +62,7 @@ SMB_List_Dir::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> a
     trustwave::smb_client rc;
     std::vector<trustwave::dirent> dir_entries;
     if(!rc.list_dir(base.c_str(), dir_entries)) {
-        res->set_response_for_error(CDCM_ERROR::LIST_FAILED);
+        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET,errno,strerror(errno) );
         return action_status::FAILED;
     }
     AU_LOG_INFO("list returned");
