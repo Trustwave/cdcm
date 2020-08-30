@@ -60,6 +60,8 @@ namespace trustwave {
     };
     using result = std::tuple<bool, WERROR>;
     static constexpr auto werr_pipe_busy = 0xe7;
+    static constexpr auto werr_file_not_found = 0x2;
+
     class registry_client final: public cdcm_client, public configurable<registry_service_configuration> {
         struct key_info {
             const char* classname = nullptr;
