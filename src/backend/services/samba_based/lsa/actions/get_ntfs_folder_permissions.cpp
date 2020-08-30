@@ -53,7 +53,7 @@ Get_NTFS_Folder_Permissions_Action::act(boost::shared_ptr<session> sess, std::sh
         return action_status::FAILED;
     }
     if(gnpact->path_.empty()) {
-        res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
+        res->set_response_for_error(CDCM_ERROR::PATH_IS_MANDATORY);
         return action_status::FAILED;
     }
     std::string share, path;

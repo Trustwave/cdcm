@@ -58,15 +58,36 @@ action_status Value_Exists_Action::act(boost::shared_ptr<session> sess, std::sha
         res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
         return action_status::FAILED;
     }
-    if(!std::get<0>(c.open_key(veact->key_.c_str()))) {
+    r = c.open_key(veact->key_.c_str());
+    if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed opening  %s", veact->key_.c_str());
-        res->set_response_for_success("False");
-        return action_status::SUCCEEDED;
+        if(werr_file_not_found ==std::get<1>(r).w)
+        {
+            res->set_response_for_success("False");
+            return action_status::SUCCEEDED;
+        }
+        {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET,
+                                                                W_ERROR_V(std::get<1>(r)),
+                                                                std::string(win_errstr(std::get<1>(r))));
+        }
+        return action_status::FAILED;
     }
     trustwave::registry_value rv;
-    if(!std::get<0>(c.key_get_value_by_name(veact->value_.c_str(), rv))) {
-        AU_LOG_DEBUG("Failed getting value %s", veact->value_.c_str());
-        res->set_response_for_success("False");
+    r = c.key_get_value_by_name(veact->value_.c_str(), rv);
+    if(!std::get<0>(r)) {
+        AU_LOG_DEBUG("Failed getting value %s %s", veact->value_.c_str(),win_errstr(std::get<1>(r)));
+        if(werr_file_not_found ==std::get<1>(r).w)
+        {
+            res->set_response_for_success("False");
+            return action_status::SUCCEEDED;
+        }
+        {
+            res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET,
+                                                                W_ERROR_V(std::get<1>(r)),
+                                                                std::string(win_errstr(std::get<1>(r))));
+        }
+        return action_status::FAILED;
     }
     else {
         res->set_response_for_success("True");
