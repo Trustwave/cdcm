@@ -17,7 +17,6 @@ std::unique_ptr<trustwave::ILogger> logger_ptr_u;
 template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process_type::broker>(size_t)
 {
     zmq::context_t ctx(1);
-    boost::asio::io_service ios;
     LoggerSource::instance()->set_source(::trustwave::logger::broker);
     if(!Initialize(logger_ptr_u, conf_root)) {
         std::cerr << "failed to initialize the logger!!!" << std::endl;
@@ -25,9 +24,9 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
     }
     logger_ptr_ = logger_ptr_u.get();
     AU_LOG_INFO("%s",conf_->to_string().c_str());
-    std::thread broker_thread(message_broker::th_func, std::ref(ctx), std::ref(ios));
-    maintenance m(ios);
-    ios.run();
+    std::thread broker_thread(message_broker::th_func, std::ref(ctx), std::ref(ios_));
+    maintenance m(ios_);
+    ios_.run();
     broker_thread.join();
     return 0;
 }

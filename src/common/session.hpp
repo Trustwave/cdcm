@@ -20,7 +20,9 @@
 #include <boost/uuid/string_generator.hpp> // for uuid
 #include <boost/uuid/uuid.hpp> // for uuid
 #include <memory>
+#include <map>
 #include <string> // for string
+#include "client.hpp"
 
 namespace trustwave {
 
@@ -60,6 +62,7 @@ namespace trustwave {
         boost::uuids::uuid uuid_;
         std::string remote_;
         credentials creds_;
+//        clients_map* clients_;
     };
 } // namespace trustwave
 

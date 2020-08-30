@@ -19,10 +19,11 @@
 #include <string>
 #include <chrono> //rotem added to delete
 #include <boost/tokenizer.hpp>
-
 #include "../wmi_wql_client.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
+#include "scoped_client.hpp"
+
 namespace {
     static inline void ltrim(std::string &s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
@@ -75,20 +76,20 @@ tao::json::value wql_resp_to_json_value(std::string work_str) {
     }
 
 
-    std::cout << "vec.rows: " << tokenized_response.size() << std::endl;
-    for (auto row : tokenized_response)
-    {
-        std::cout << "num of elements: " << row.size() << std::endl;
-    }
-
-    for (auto row: tokenized_response)
-    {
-        for (auto column : row)
-        {
-            std::cout << column << " || ";
-        }
-        std::cout << std::endl;
-    }
+//    std::cout << "vec.rows: " << tokenized_response.size() << std::endl;
+//    for (auto row : tokenized_response)
+//    {
+//        std::cout << "num of elements: " << row.size() << std::endl;
+//    }
+//
+//    for (auto row: tokenized_response)
+//    {
+//        for (auto column : row)
+//        {
+//            std::cout << column << " || ";
+//        }
+//        std::cout << std::endl;
+//    }
 
 
 
@@ -101,8 +102,8 @@ tao::json::value wql_resp_to_json_value(std::string work_str) {
         {
             trim(tokenized_response[0][j]);
             if(!tokenized_response[0][j].empty()) {
-                std::cout << j << " inserting pair: " << tokenized_response[0][j] << " : " << tokenized_response[i][j]
-                          << std::endl;
+//                std::cout << j << " inserting pair: " << tokenized_response[0][j] << " : " << tokenized_response[i][j]
+//                          << std::endl;
                 consumer.key(tokenized_response[0][j]);
                 trim(tokenized_response[i][j]);
                 consumer.string(tokenized_response[i][j]);
@@ -127,6 +128,7 @@ tao::json::value wql_resp_to_json_value(std::string work_str) {
  *********************************************************/
 action_status WMI_WQL_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action, std::shared_ptr<result_msg> res)
 {
+    static const std::string default_namespace="root\\cimv2";
     if (!sess || (sess && sess->id().is_nil())){
         AU_LOG_ERROR("Session not found");
         res->res("Error: Session not found");
@@ -139,19 +141,30 @@ action_status WMI_WQL_Action::act(boost::shared_ptr<session> sess, std::shared_p
         res->res("Error: Internal error");
         return action_status::FAILED;
     }
-
-    trustwave::wmi_wql_client client;
-
+    scoped_client sc(nullptr, "") ;
+    std::shared_ptr<trustwave::wmi_wql_client> client;
+    if(wmi_wql_action->wmi_namespace.empty() || wmi_wql_action->wmi_namespace == default_namespace) {
+        auto c_base = authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_client<trustwave::wmi_wql_client>(sess->idstr());
+        client = std::dynamic_pointer_cast<trustwave::wmi_wql_client>(c_base);
+        sc.c_ = c_base;
+        sc.s_ = sess->idstr();
+    }
+    else
+    {
+        client = std::make_shared<trustwave::wmi_wql_client>();
+    }
     //rotem: TODO: think how to distingush between our error and legit error
-    auto connect_result = client.connect(*sess, wmi_wql_action->wmi_namespace);
+    std::string wmi_namespace=!wmi_wql_action->wmi_namespace.empty()?wmi_wql_action->wmi_namespace:default_namespace;
+    auto connect_result = client->connect(*sess, wmi_namespace);
     if (false == std::get<0>(connect_result) )
     {
         AU_LOG_ERROR("failed to connect to the asset");
+        client.reset();
         res->res(std::string("Error: Failed to connect to the asset"));
         return action_status::FAILED;
     }
 
-    auto query_result = client.query_remote_asset(wmi_wql_action->wql);
+    auto query_result = client->query_remote_asset(wmi_wql_action->wql);
     if (false == std::get<0>(query_result) )
     {
         AU_LOG_ERROR("failed to get wql response");

@@ -22,11 +22,13 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../wmi_registry_client.hpp"
 #include "registry_value.hpp"
+#include "scoped_client.hpp"
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
 using trustwave::WMI_Enumerate_Key_Action;
 using action_status = trustwave::Action_Base::action_status;
+
 action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,
                                             std::shared_ptr<result_msg> res)
 {
@@ -35,7 +37,6 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
         return action_status::FAILED;
     }
 
-    auto c = trustwave::wmi_registry_client();
 
     auto ekact = std::dynamic_pointer_cast<wmi_reg_action_enum_key_msg>(action);
     if(!ekact) {
@@ -47,7 +48,10 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
-    auto r = c.connect(*sess);
+    auto c_base = authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_client<trustwave::wmi_registry_client>(sess->idstr());
+    auto c = std::dynamic_pointer_cast<trustwave::wmi_registry_client>(c_base);
+    scoped_client sc(c_base,sess->idstr());
+    auto r = c->connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s ", sess->remote().c_str());
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
@@ -55,7 +59,7 @@ action_status WMI_Enumerate_Key_Action::act(boost::shared_ptr<session> sess, std
     }
 
     trustwave::enum_key ek{};
-    r = c.enumerate_key(ekact->key_, ek);
+    r = c->enumerate_key(ekact->key_, ek);
     if(std::get<0>(r)) { res->set_response_for_success(ek); }
     else {
         res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, 0,

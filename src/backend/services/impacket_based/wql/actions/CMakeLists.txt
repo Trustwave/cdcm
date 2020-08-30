@@ -3,7 +3,7 @@ project(cdcm)
 
 set(ACTION_NAMES wql)
 
-set(LD_ACTION_LIBS tw-wmi-wql-client)
+set(LD_ACTION_LIBS tw-wmi-wql-client tw-session-to-clients)
 
 foreach(X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")

@@ -29,7 +29,7 @@
 #include "registry_utils.hpp"
 #include "../common/pyerror_handler.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-
+#include "../../../utils/session_to_client_container.hpp"
 using trustwave::wmi_registry_client;
 namespace bp = boost::python;
 using namespace trustwave::impacket_based_common;
@@ -44,30 +44,31 @@ namespace {
 result wmi_registry_client::connect(const session& sess)
 {
 //    scoped_timer t("connect");
+if(!connected_) {
     try {
         Py_Initialize();
         boost::filesystem::path workingDir = authenticated_scan_server::instance().settings()->plugins_dir_;
-        std::cerr << workingDir.string()<<std::endl;
         PyObject* sysPath = PySys_GetObject("path");
         PyList_Insert(sysPath, 0, PyUnicode_FromString(workingDir.string().c_str()));
         PySys_SetObject("path", sysPath);
         main_ = boost::python::import("__main__");
-        global_ = main_.attr("__dict__");
+//        global_ = main_.attr("__dict__");
         helper_ = boost::python::import("wmi_registry_helper");
         exec_ = helper_.attr("WMI_REG_EXEC_METHOD")(sess.remote(), sess.creds().username(), sess.creds().password());
         {
-//            scoped_timer t("real connect");
+            //            scoped_timer t("real connect");
             exec_.attr("connect")();
         }
     }
     catch(const boost::python::error_already_set&) {
-
         return handle_pyerror();
     }
     catch(...) {
         AU_LOG_ERROR("non python error occurred");
         return std::make_tuple(false, "");
     }
+}
+    connected_ = true;
     return std::make_tuple(true, "");
 }
 result wmi_registry_client::key_exists(const std::string& key, bool& exists)
@@ -353,3 +354,6 @@ wmi_registry_client::internal_key_get_value_by_name(const std::string& key, cons
         return std::make_tuple(false, "Unknown Error");
     }
 }
+
+trustwave::Dispatcher<trustwave::cdcm_client>::Registrator
+    wmi_registry_client::m_registrator(new wmi_registry_client, authenticated_scan_server::instance().process_specific_repository().find_as<trustwave::sessions_to_clients>()->get_clients_dispatcher());

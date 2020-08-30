@@ -19,6 +19,8 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../wmi_registry_client.hpp"
 #include "registry_value.hpp"
+#include "scoped_client.hpp"
+
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
@@ -31,9 +33,6 @@ action_status WMI_Value_Exists_Action::act(boost::shared_ptr<session> sess, std:
         res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
-
-    auto c = trustwave::wmi_registry_client();
-
     AU_LOG_DEBUG("About to cast to %s", action->name().c_str());
     auto veact = std::dynamic_pointer_cast<wmi_reg_action_value_exists_msg>(action);
     if(!veact) {
@@ -45,13 +44,16 @@ action_status WMI_Value_Exists_Action::act(boost::shared_ptr<session> sess, std:
         res->set_response_for_error(CDCM_ERROR::KEY_AND_VALUE_ARE_MANDATORY);
         return action_status::FAILED;
     }
-    auto r = c.connect(*sess);
+    auto c_base = authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_client<trustwave::wmi_registry_client>(sess->idstr());
+    auto c = std::dynamic_pointer_cast<trustwave::wmi_registry_client>(c_base);
+    scoped_client sc(c_base,sess->idstr());
+    auto r = c->connect(*sess);
     if(!std::get<0>(r)) {
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
         return action_status::FAILED;
     }
     bool exists;
-    r = c.value_exists(veact->key_, veact->value_, exists);
+    r = c->value_exists(veact->key_, veact->value_, exists);
     if(std::get<0>(r)) {
         //        AU_LOG_DEBUG("Failed opening  %s", keact->key_.c_str());
         res->set_response_for_success(exists ? "True" : "False");

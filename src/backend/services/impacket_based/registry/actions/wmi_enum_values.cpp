@@ -23,6 +23,7 @@
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../wmi_registry_client.hpp"
 #include "registry_value.hpp"
+#include "scoped_client.hpp"
 
 //=====================================================================================================================
 //                                                  namespaces
@@ -36,7 +37,6 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
         res->set_response_for_error(CDCM_ERROR::SESSION_NOT_FOUND);
         return action_status::FAILED;
     }
-    auto c = trustwave::wmi_registry_client();
     auto ekact = std::dynamic_pointer_cast<wmi_reg_action_enumerate_registry_values_msg>(action);
     if(!ekact) {
         AU_LOG_ERROR("Failed dynamic cast");
@@ -47,7 +47,10 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
-    auto r = c.connect(*sess);
+    auto c_base = authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_client<trustwave::wmi_registry_client>(sess->idstr());
+    auto c = std::dynamic_pointer_cast<trustwave::wmi_registry_client>(c_base);
+    scoped_client sc(c_base,sess->idstr());
+    auto r = c->connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s ", sess->remote().c_str());
         res->set_response_for_error(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET);
@@ -55,7 +58,7 @@ action_status WMI_Enumerate_Registry_Values_Action::act(boost::shared_ptr<sessio
     }
 
             trustwave::enum_key_values ek{};
-            r = c.enumerate_key_values(ekact->key_, ek);
+            r = c->enumerate_key_values(ekact->key_, ek);
 
             if(std::get<0>(r)) { res->res(ek); }
             else {

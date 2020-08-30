@@ -23,9 +23,9 @@
 
 namespace trustwave {
     struct cdcm_settings: public configuration {
-        static constexpr std::string_view srv_name{"cdcm"};
+        static constexpr std::string_view name{"cdcm"};
 
-        cdcm_settings(): configuration(srv_name) {}
+        cdcm_settings(): configuration(name) {}
         uint32_t                    session_cache_size_         ;
         uint32_t                    session_idle_time_          ;
         uint32_t                    heartbeat_liveness_         ;
@@ -46,7 +46,7 @@ namespace trustwave {
         {
             std::stringstream ss;
             ss <<"\n"
-            <<"\t"<<srv_name << " Configuration\n"
+            <<"\t"<<name << " Configuration\n"
             <<"\t"<<"===============================\n"
             <<"\tsession_cache_size          :\t"<< session_cache_size_             <<" MB\n"
             <<"\tsession_idle_time           :\t"<< session_idle_time_              <<" seconds\n"
@@ -96,7 +96,7 @@ namespace tao::json {
         [[nodiscard]] static trustwave::cdcm_settings as(const tao::json::basic_value<Traits>& v)
         {
             trustwave::cdcm_settings c;
-            const auto o = v.at(trustwave::cdcm_settings::srv_name);
+            const auto o = v.at(trustwave::cdcm_settings::name);
             c.session_cache_size_ = o.template optional<uint32_t>("session_cache_size").value_or(c.session_cache_size_);
             c.session_idle_time_ = o.template optional<uint32_t>("session_idle_time").value_or(c.session_idle_time_);
             c.heartbeat_liveness_ = o.template optional<uint32_t>("heartbeat_liveness").value_or(c.heartbeat_liveness_);

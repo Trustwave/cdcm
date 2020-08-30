@@ -19,15 +19,15 @@
 #include "configuration.hpp"
 namespace trustwave {
     struct registry_service_configuration: public configuration {
-        static constexpr std::string_view srv_name{"registry"};
-        registry_service_configuration(): configuration(srv_name) { }
+        static constexpr std::string_view name{"registry"};
+        registry_service_configuration(): configuration(name) { }
         off_t data_blob_size = 1024 * 1024;
         size_t reconnect_attempt_on_pipe_busy = 1;
         std::string to_string() const override
         {
             std::stringstream ss;
             ss << "\n"
-               << "\t" << srv_name << " Configuration\n"
+               << "\t" << name << " Configuration\n"
                << "\t"
                << "===============================\n"
                << "\tdata_blob_size                          :\t" << data_blob_size << " bytes\n"
@@ -44,13 +44,13 @@ namespace tao::json {
         binding::object<binding::inherit<traits<trustwave::configuration>>,
                         TAO_JSON_BIND_OPTIONAL("data_blob_size",
                                                &trustwave::registry_service_configuration::data_blob_size)> {
-        // TAO_JSON_DEFAULT_KEY(trustwave::registry_service_configuration::srv_name.data());
+        // TAO_JSON_DEFAULT_KEY(trustwave::registry_service_configuration::name.data());
 
         template<template<typename...> class Traits>
         static trustwave::registry_service_configuration as(const tao::json::basic_value<Traits>& v)
         {
             trustwave::registry_service_configuration result;
-            const auto o = v.at(trustwave::registry_service_configuration::srv_name);
+            const auto o = v.at(trustwave::registry_service_configuration::name);
             result.data_blob_size = o.template optional<off_t>("data_blob_size").value_or(result.data_blob_size);
 
             return result;

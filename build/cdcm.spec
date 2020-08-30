@@ -74,6 +74,7 @@ libtw-srvsvc-client.so \
 libtw-wmi_registry-client.so \
 libtw-wmi-wql-client.so \
 libtw-wmi-common.so \
+libtw-session-to-clients.so \
 libtw-sd-utils.so"
 
 # copy libs

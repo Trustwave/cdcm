@@ -101,6 +101,7 @@ class WMIQUERY:
         iEnumWbemClassObject = self.__iWbemServices.ExecQuery(query.strip('\n'))
         ret = self.printReply(iEnumWbemClassObject)
         iEnumWbemClassObject.RemRelease()
+        # print(ret)
         return ret
 
     def close(self):
