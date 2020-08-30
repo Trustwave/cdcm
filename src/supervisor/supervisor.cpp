@@ -22,7 +22,6 @@ std::unique_ptr<trustwave::ILogger> logger_ptr_u;
 
 template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process_type::supervisor>(size_t)
 {
-    boost::asio::io_service ios;
     namespace bp = boost::process;
     LoggerSource::instance()->set_source(::trustwave::logger::supervisor);
     if(!Initialize(logger_ptr_u, conf_root)) {
@@ -30,10 +29,10 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
         abort();
     }
     logger_ptr_ = logger_ptr_u.get();
-    supervisor sv(ios);
+    supervisor sv(ios_);
     AU_LOG_INFO("%s",conf_->to_string().c_str());
     sv.run();
-    ios.run();
+    ios_.run();
 
     return 0;
 }

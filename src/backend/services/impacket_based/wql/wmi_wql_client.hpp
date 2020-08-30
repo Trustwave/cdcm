@@ -18,17 +18,20 @@
 #include <boost/python.hpp>
 #include "client.hpp"
 #include "../common/typedefs.hpp"
+#include "dispatcher.hpp"
+
 namespace trustwave {
 
     class session; //forward declaration
 
     class wmi_wql_client final :public cdcm_client {
+        static Dispatcher<cdcm_client>::Registrator m_registrator;
 
     public:
         static constexpr std::string_view protocol{"wmi_wql"};
 
         wmi_wql_client() :cdcm_client(protocol){}
-        ~wmi_wql_client()= default;
+        ~wmi_wql_client() = default;
 
         impacket_based_common::result connect(const session& session, const std::string & wmi_namespace);
         impacket_based_common::result query_remote_asset(const std::string & wql_query);

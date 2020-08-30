@@ -63,7 +63,7 @@ namespace trustwave {
         }
         template<typename AS> std::shared_ptr<AS> find_as() const
         {
-            auto it = map_.find(AS::srv_name);
+            auto it = map_.find(AS::name);
 
             if(it == map_.end()) {
                 return std::shared_ptr<AS>();
@@ -75,7 +75,7 @@ namespace trustwave {
         struct Registrator {
             Registrator(T* t, Dispatcher& d)
             {
-                std::cerr << t->name() << std::endl;
+//                std::cerr << t->name() << std::endl;
                 d.register1(t);
             }
             Registrator(T* t, Dispatcher* d) { d->register1(t); }

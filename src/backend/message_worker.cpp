@@ -29,7 +29,7 @@
 #include "zmq/mdp.hpp"
 #include "zmq/zmq_helpers.hpp"
 #include "zmq/zmq_message.hpp"
-
+#include "utils/session_to_client_container.hpp"
 using namespace trustwave;
 
 std::ostream& trustwave::operator<<(std::ostream& os, const trustwave::postponed_action& pa)
@@ -126,6 +126,7 @@ void message_worker::handle_postponed_actions()
             auto action_result = std::make_shared<result_msg>();
             action_result->id(act_m->id());
             auto sess = authenticated_scan_server::instance().get_session(top.get_hdr().session_id);
+            authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_clients_for_session(sess->idstr());
             auto act_status = action->act(sess, act_m, action_result);
             if(trustwave::Action_Base::action_status::POSTPONED == act_status && top.remaining_runs() > 0) {
                 AU_LOG_DEBUG("action %s returned with postponed status updating ", act_key.c_str());
@@ -168,6 +169,7 @@ zmsg* message_worker::recv(zmsg*& reply_p)
     }
     expect_reply_ = true;
     while(!zmq_helpers::interrupted) {
+        authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->delete_clients();
         zmq::pollitem_t items[] = {{worker_->operator void*(), 0, ZMQ_POLLIN, 0}};
         auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         auto timeout_ms = heartbeat_.count();
@@ -228,7 +230,7 @@ zmsg* message_worker::recv(zmsg*& reply_p)
     return nullptr;
 }
 
-int message_worker::worker_loop()
+int message_worker::worker_loop(boost::asio::io_context& ios)
 {
     AU_LOG_INFO("worker %s starting", LoggerSource::instance()->get_source_id().c_str());
     zmq_helpers::version_assert(4, 0);
@@ -267,6 +269,7 @@ int message_worker::worker_loop()
                     action_result->id(act_m->id());
 
                     auto sess = authenticated_scan_server::instance().get_session(result.hdr.session_id);
+                    authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_clients_for_session(sess->idstr());
                     auto act_status = action->act(sess, act_m, action_result);
 
                     if(trustwave::Action_Base::action_status::POSTPONED == act_status) {
@@ -325,5 +328,6 @@ int message_worker::worker_loop()
     if(zmq_helpers::interrupted) {
         AU_LOG_DEBUG("W: interrupt received, shutting down...\n");
     }
+    ios.stop();
     return 0;
 }

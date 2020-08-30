@@ -21,10 +21,11 @@
 #include <boost/python.hpp>
 #include "registry_value.hpp"
 #include "../common/typedefs.hpp"
-
+#include "dispatcher.hpp"
 namespace trustwave {
     class session;
     class wmi_registry_client final: public cdcm_client {
+        static Dispatcher<cdcm_client>::Registrator m_registrator;
     public:
         static constexpr std::string_view protocol{"wmi_registry"};
         wmi_registry_client():cdcm_client(protocol){}
@@ -43,7 +44,6 @@ namespace trustwave {
         bpo global_;
         bpo helper_;
         bpo exec_;
-
     };
 } // namespace trustwave
 

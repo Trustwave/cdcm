@@ -12,4 +12,4 @@ install(TARGETS tw-wmi-common ARCHIVE DESTINATION lib
 install(TARGETS tw-wmi-common ARCHIVE DESTINATION lib
         DESTINATION ${release_lib_dest})
 
-
+install(FILES impacket.json DESTINATION ${release_lib_dest}/plugins/)

@@ -32,6 +32,9 @@ extern "C" {
 #endif
 #undef uint_t
 #undef strcpy
+#undef sprintf
+#undef strcat
+
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "session.hpp"
 #include <taocpp-json/include/tao/json.hpp>

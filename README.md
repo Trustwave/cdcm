@@ -22,7 +22,7 @@ Third party libraries that we use with our source:
 
 * [CPPZMQ](https://github.com/zeromq/cppzmq) - MDP.
 * [samba](https://github.com/samba-team/samba) - RPC.
-* [JSON](https://github.com/taocpp/json) - Proprietari protocol.
+* [JSON](https://github.com/taocpp/json) - Proprietari name.
 * [libpe](https://github.com/merces/libpe) - File version.
 * [BOOST](https://www.boost.org) - Process, IPC(Shared memory), multi index, Testin framework  and some other trivial libs.
 

@@ -24,18 +24,23 @@ trustwave::impacket_based_common::result trustwave::impacket_based_common::handl
 {
     std::string msg;
     if(PyErr_Occurred()) {
-        using namespace boost::python;
-        using namespace boost;
+        try {
+            using namespace boost::python;
+            using namespace boost;
 
-        PyObject *exc, *val, *tb;
-        object formatted_list, formatted;
-        PyErr_Fetch(&exc, &val, &tb);
-        handle<> hexc(exc), hval(allow_null(val)), htb(allow_null(tb));
-        object traceback(import("traceback"));
-        object format_exception_only(traceback.attr("format_exception_only"));
-        formatted_list = format_exception_only(hexc, hval);
-        formatted = str("\n").join(formatted_list);
-        msg = extract<std::string>(formatted);
+            PyObject *exc, *val, *tb;
+            object formatted_list, formatted;
+            PyErr_Fetch(&exc, &val, &tb);
+            handle<> hexc(exc), hval(allow_null(val)), htb(allow_null(tb));
+            object traceback(import("traceback"));
+            object format_exception_only(traceback.attr("format_exception_only"));
+            formatted_list = format_exception_only(hexc, hval);
+            formatted = str("\n").join(formatted_list);
+            msg = extract<std::string>(formatted);
+        }
+        catch(const boost::python::error_already_set&) {
+            msg.assign("Unknown Error");
+        }
     }
     bp::handle_exception();
     PyErr_Clear();

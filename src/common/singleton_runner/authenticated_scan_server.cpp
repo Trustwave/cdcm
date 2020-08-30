@@ -35,8 +35,16 @@ boost::shared_ptr<trustwave::session> authenticated_scan_server::get_session(con
     }
     return sess;
 }
-
 trustwave::Dispatcher<trustwave::Action_Base>& authenticated_scan_server::public_dispatcher()
 {
     return public_dispatcher_;
+}
+trustwave::Dispatcher<trustwave::process_specific_object>& authenticated_scan_server::process_specific_repository()
+{
+    return process_specific_repository_;
+}
+
+boost::asio::io_service& authenticated_scan_server::io_context()
+{
+    return ios_;
 }
