@@ -32,6 +32,8 @@ extern "C" {
 #include "session.hpp"
 #include "credentials.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
+#include "../utils/registry_utils.hpp"
+
 using trustwave::registry_client;
 using trustwave::result;
 
@@ -61,21 +63,23 @@ result registry_client::connect(const session& sess)
                                    sess.remote().c_str(), ev_ctx_);
 
     if(!W_ERROR_IS_OK(error)) { return {false, error}; }
+    return {true, error};
 
-    error = reg_get_predefined_key(ctx_->registry, reg_predefined_keys[2].handle, &ctx_->current);
-    if(W_ERROR_IS_OK(error)) {
-        ctx_->predef = talloc_strdup(ctx_, reg_predefined_keys[2].name);
-        ctx_->path = talloc_strdup(ctx_, "");
-        ctx_->root = ctx_->current;
-
-        return {true, error};
-    }
-    return {false, error};
 }
 
 result registry_client::open_key(const char* full_path)
 {
-    WERROR error = reg_open_key(ctx_->registry, ctx_->root, full_path, &ctx_->current);
+    uint32_t hive;
+    std::string keyname;
+    if(!trustwave::reg_hive_key(full_path, hive, keyname)) { return {false, ntstatus_to_werror(NT_STATUS_INVALID_PARAMETER)}; }
+    WERROR error = reg_get_predefined_key(ctx_->registry,hive, &ctx_->current);
+    if(!W_ERROR_IS_OK(error)) {
+        return {false, error};
+    }
+    ctx_->predef = talloc_strdup(ctx_, hive_long_names.at(hive).c_str());
+    ctx_->path = talloc_strdup(ctx_, "");
+    ctx_->root = ctx_->current;
+    error = reg_open_key(ctx_->registry, ctx_->root, keyname.c_str(), &ctx_->current);
     if(!W_ERROR_IS_OK(error)) {
         //  AU_LOG_ERROR("open key failed '%s'", full_path);
         return {false, error};

@@ -41,7 +41,7 @@ action_status Get_Share_Permissions_Action::act(boost::shared_ptr<session> sess,
         return action_status::FAILED;
     }
     if(gnpact->share_name_.empty()) {
-        res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
+        res->set_response_for_error(CDCM_ERROR::SHARE_NAME_IS_MANDATORY);
         return action_status::FAILED;
     }
     struct my_frame {
