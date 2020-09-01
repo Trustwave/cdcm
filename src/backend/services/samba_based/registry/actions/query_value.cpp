@@ -72,7 +72,8 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     trustwave::registry_value rv;
     r = c.key_get_value_by_name(qvact->value_.c_str(), rv);
     if(!std::get<0>(r)) {
-        res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
+        res->set_response_for_error(CDCM_ERROR::VALUE_IS_EMPTY);
+      //  res->set_response_for_error_with_unique_code_or_msg(CDCM_ERROR::GENERAL_ERROR_WITH_ASSET, W_ERROR_V(std::get<1>(r)), std::string(win_errstr(std::get<1>(r))));
     }
     else
     {
