@@ -26,15 +26,20 @@
 
 using namespace trustwave;
 
-session::session(): uuid_(boost::uuids::nil_uuid()), creds_(std::string(), std::string(), std::string(), std::string())
+session::session(): uuid_(boost::uuids::nil_uuid())//, creds_(std::string(), std::string(), std::string(), std::string())
 {
 }
 
-session::session(std::string remote, const credentials& creds):
-    uuid_(boost::uuids::random_generator()()), remote_(std::move(remote)), creds_(creds)
+session::session(std::string remote):
+    uuid_(boost::uuids::random_generator()()), remote_(std::move(remote))//, creds_(creds)
 {
 }
 std::string session::idstr() const { return boost::uuids::to_string(uuid_); }
 const boost::uuids::uuid& session::id() const { return uuid_; }
 const std::string& session::remote() const { return remote_; }
-credentials session::creds() const { return creds_; }
+credentials session::creds(const std::string& protocol) const { return creds_.at(protocol); }
+std::map<std::string,credentials> session::creds() const
+{
+    return creds_;
+}
+

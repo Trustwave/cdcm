@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
 
 set(LD_ACTION_LIBS dl tw-wmi_registry-client tw-session-to-clients)
-set(ACTION_NAMES wmi_enum_key wmi_enum_values wmi_key_exists wmi_value_exists wmi_query_value)
+set(ACTION_NAMES wmi_authenticate wmi_enum_key wmi_enum_values wmi_key_exists wmi_value_exists wmi_query_value)
 foreach (X IN ITEMS ${ACTION_NAMES})
     message(STATUS "Building ${X} action")
     add_library(wmi_registry_${X} SHARED ${X}.cpp)

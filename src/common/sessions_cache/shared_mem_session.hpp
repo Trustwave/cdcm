@@ -21,6 +21,7 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/string.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/map.hpp>
 
 namespace trustwave {
 
@@ -46,7 +47,9 @@ namespace trustwave {
         // Avoid copy semantic
         shared_mem_credentials(const shared_mem_credentials&) = delete;
         shared_mem_credentials& operator=(const shared_mem_credentials&) = delete;
-
+        // Force move semantic
+        shared_mem_credentials(shared_mem_credentials&&) = default;
+        shared_mem_credentials& operator=(shared_mem_credentials&&) = default;
     private:
         friend class shared_mem_session;
         friend struct session_converter;
@@ -55,15 +58,15 @@ namespace trustwave {
         friend std::ostream& operator<<(std::ostream&, const shared_mem_session&);
         explicit shared_mem_credentials(const void_allocator& va);
 
-        // Force move semantic
-        shared_mem_credentials(shared_mem_credentials&&) = default;
-        shared_mem_credentials& operator=(shared_mem_credentials&&) = default;
-
         String domain_;
         String username_;
         String password_;
         String workstation_;
     };
+    using map_allocator = boost::interprocess::allocator<std::pair<const String ,shared_mem_credentials>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using creds_map = boost::interprocess::map<
+        String, shared_mem_credentials, std::less<String>,
+        map_allocator>;
 
     class shared_mem_session final {
     public:
@@ -87,7 +90,7 @@ namespace trustwave {
         friend std::ostream& operator<<(std::ostream&, const shared_mem_session&);
         String uuid_;
         String remote_;
-        shared_mem_credentials creds_;
+        creds_map creds_;
     };
     // class shared_mem_session
 

@@ -48,10 +48,14 @@ shared_mem_session_element::shared_mem_session_element(sp_session_t sp_session, 
 
 std::ostream& trustwave::operator<<(std::ostream& os, const shared_mem_session_element& e)
 {
-    return os << "ID           : " << e.s_id().c_str() << "\n"
+     os << "ID           : " << e.s_id().c_str() << "\n"
               << "IP           : " << e.s_remote().c_str() << "\n"
-              << "Expires at   : " << e.expiration_time_ << "\n"
-              << e.session().creds_;
+              << "Expires at   : " << e.expiration_time_ << "\n";
+    for(const auto& c:e.session().creds_)
+    {
+        os <<c.first<<":"<<c.second<<std::endl;
+    }
+    return os;
 }
 
 shared_mem_sessions_cache::shared_mem_sessions_cache(const std::string& name, const size_t size, size_t idle_timeout):

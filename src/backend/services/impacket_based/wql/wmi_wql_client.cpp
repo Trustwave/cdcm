@@ -44,7 +44,8 @@ result wmi_wql_client::connect(const session& sess,const std::string & wmi_names
             main_ = boost::python::import("__main__");
             global_ = main_.attr("__dict__");
             helper_ = boost::python::import("wmi_wql_helper");
-            exec_ = helper_.attr("WMIQUERY")(sess.remote(), sess.creds().username(), sess.creds().password());
+            auto wmi_creds = sess.creds("wmi");
+            exec_ = helper_.attr("WMIQUERY")(sess.remote(), wmi_creds.username(), wmi_creds.password());
             {
                 //            scoped_timer t("real connect");
                 exec_.attr("connect")(wmi_namespace);

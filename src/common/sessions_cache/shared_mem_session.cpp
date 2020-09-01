@@ -39,8 +39,10 @@ std::ostream& trustwave::operator<<(std::ostream& os, const shared_mem_session& 
 {
     static const char* indent = "           "; // can also be replaced with 2 tabs (\t)
     os << indent << "ID  : " << s.uuid_ << "\n"
-       << indent << "Remote  : " << s.remote_ << "\n"
-       << indent << "Credentials  : " << s.creds_ << "\n";
-
+       << indent << "Remote  : " << s.remote_ << "\n";
+    for(const auto& c:s.creds_) {
+        os << indent << "Credentials  : " << c.first<< ":\n";
+        os << indent << indent << c.second <<"\n";
+    }
     return os;
 }

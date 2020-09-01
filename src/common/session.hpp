@@ -26,17 +26,16 @@
 
 namespace trustwave {
 
-    class cdcm_client;
     class session final {
     public:
         session();
-        session(std::string remote, const credentials& creds);
+        session(std::string remote);
         const boost::uuids::uuid& id() const;
         std::string idstr() const;
 
         const std::string& remote() const;
-        credentials creds() const;
-
+        credentials creds(const std::string& protocol) const;
+        std::map<std::string,credentials> creds() const;
         explicit operator bool() const { return uuid_.is_nil(); }
 
         bool id(const std::string& ids) //rotem: assaf, can i move to cpp?
@@ -52,17 +51,16 @@ namespace trustwave {
 
         void remote(const std::string& dest) { remote_ = dest; }
 
-        void creds(const std::string& domain, const std::string& username, const std::string& password,
+        void creds(const std::string& protocol, const std::string& domain, const std::string& username, const std::string& password,
                    const std::string& workstation)
         {
-            creds_.creds(domain, username, password, workstation);
+            creds_[protocol].creds(domain, username, password, workstation);
         }
 
     private:
         boost::uuids::uuid uuid_;
         std::string remote_;
-        credentials creds_;
-//        clients_map* clients_;
+        std::map<std::string,credentials> creds_;
     };
 } // namespace trustwave
 

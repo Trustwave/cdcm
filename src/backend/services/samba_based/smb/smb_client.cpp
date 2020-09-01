@@ -86,14 +86,14 @@ namespace {
         const char* wg = "WORKGROUP";
         if(!sess->id().is_nil()) {
             AU_LOG_DEBUG("smbc_auth_fn session for %s found", pServer);
-
-            if(sess->creds().username().empty()) { strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1)); }
+            auto smb_creds = sess->creds("smb");
+            if(smb_creds.username().empty()) { strncpy(pWorkgroup, wg, static_cast<size_t>(maxLenWorkgroup - 1)); }
             else {
-                strncpy(pWorkgroup, sess->creds().domain().c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
+                strncpy(pWorkgroup, smb_creds.domain().c_str(), static_cast<size_t>(maxLenWorkgroup - 1));
             }
 
-            strncpy(pUsername, sess->creds().username().c_str(), static_cast<size_t>(maxLenUsername - 1));
-            strncpy(pPassword, sess->creds().password().c_str(), static_cast<size_t>(maxLenPassword - 1));
+            strncpy(pUsername, smb_creds.username().c_str(), static_cast<size_t>(maxLenUsername - 1));
+            strncpy(pPassword, smb_creds.password().c_str(), static_cast<size_t>(maxLenPassword - 1));
             AU_LOG_DEBUG("smbc_auth_fn session for %s found and set", pServer);
             return;
         }

@@ -37,8 +37,6 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
         return action_status::FAILED;
     }
 
-    auto c = trustwave::registry_client();
-
     auto qvact = std::dynamic_pointer_cast<reg_action_query_value_msg>(action);
     if(!qvact) {
         AU_LOG_ERROR("Failed dynamic cast");
@@ -50,6 +48,7 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
         res->set_response_for_error(CDCM_ERROR::KEY_IS_MANDATORY);
         return action_status::FAILED;
     }
+    auto c = trustwave::registry_client();
     result r = c.connect(*sess);
     if(!std::get<0>(r)) {
         AU_LOG_DEBUG("Failed connecting to %s err: ", sess->remote().c_str(), win_errstr(std::get<1>(r)));
