@@ -168,8 +168,7 @@ build_rpms:
   script:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
-    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
     - if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then  export BRANCH=_MR_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME//\//_}  ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF="SNAPSHOT_$SNAPSHOT" ;else export RELEASE_DEF="$SNAPSHOT";fi
     - echo rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
@@ -250,8 +249,7 @@ deploy:
     - cd build
     - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
-    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ] ; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - echo mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
