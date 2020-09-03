@@ -269,6 +269,7 @@ int message_worker::worker_loop(boost::asio::io_context& ios)
                     action_result->id(act_m->id());
 
                     auto sess = authenticated_scan_server::instance().get_session(result.hdr.session_id);
+                    if(sess)
                     authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_clients_for_session(sess->idstr());
                     auto act_status = action->act(sess, act_m, action_result);
 

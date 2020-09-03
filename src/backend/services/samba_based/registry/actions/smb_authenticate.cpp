@@ -35,14 +35,6 @@ action_status SMB_Authenticate_Action::act(boost::shared_ptr<session> sess, std:
         return action_status::FAILED;
     }
 
-
-    auto ekact = std::dynamic_pointer_cast<smb_authenticate_action_msg>(action);
-    if(!ekact) {
-        AU_LOG_ERROR("Failed dynamic cast");
-        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
-        return action_status::FAILED;
-    }
-
     auto c = trustwave::registry_client();
 
     auto r = c.connect(*sess);

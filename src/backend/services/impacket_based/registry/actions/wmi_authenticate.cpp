@@ -36,14 +36,6 @@ action_status WMI_Authenticate_Action::act(boost::shared_ptr<session> sess, std:
         return action_status::FAILED;
     }
 
-
-    auto ekact = std::dynamic_pointer_cast<wmi_authenticate_action_msg>(action);
-    if(!ekact) {
-        AU_LOG_ERROR("Failed dynamic cast");
-        res->set_response_for_error(CDCM_ERROR::INTERNAL_ERROR);
-        return action_status::FAILED;
-    }
-
     auto c_base = authenticated_scan_server::instance().process_specific_repository().find_as<sessions_to_clients>()->get_client<trustwave::wmi_registry_client>(sess->idstr());
     auto c = std::dynamic_pointer_cast<trustwave::wmi_registry_client>(c_base);
     scoped_client sc(c_base,sess->idstr());
