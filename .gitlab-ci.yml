@@ -282,10 +282,10 @@ functional_tests:
   script:
     - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
-    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
+    - echo $REPO
     - curl -v -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=$REPO&g=com.trustwave&a=cdcm&v=$VERSION&p=rpm" -o cdcm.rpm
     - sudo yum erase -y cdcm
     - sudo yum install -y cdcm.rpm
@@ -324,8 +324,7 @@ smoke_test:
     - sudo yum update -y --nogpgcheck
     - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
     - export REPO=releases
-    - if [ "$CI_COMMIT_BRANCH" = "master" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
-    - if [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
+    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
     - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
     - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
     - curl -v -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=$REPO&g=com.trustwave&a=cdcm&v=$VERSION&p=rpm" -o cdcm.rpm
