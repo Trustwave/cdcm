@@ -69,10 +69,8 @@ link_directories(${DEPS_DIR}/libpe-pev/build)
 
 set(bin_dest "bin")
 set(release_bin_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/bin")
-set(release_lib_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/libs")
-set(VERSION "1.0")
-set(include_dest "include/cdcm-${VERSION}")
-set(lib_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/libs")
+set(release_lib_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/lib")
+set(lib_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/lib")
 set(release_conf_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/conf")
 set(conf_dest "/opt/output/$ENV{CI_COMMIT_REF_SLUG}/conf")
 

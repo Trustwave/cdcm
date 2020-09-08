@@ -44,7 +44,7 @@ namespace trustwave {
                 return broker;
             }
             catch(std::exception& exception) {
-                AU_LOG_ERROR("got exception while trying to start worker. exception: %s", exception.what());
+                AU_LOG_ERROR("got exception while trying to start broker. exception: %s", exception.what());
                 return nullptr;
             }
         }

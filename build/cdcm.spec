@@ -59,11 +59,11 @@ libtw-sd-utils.so"
 
 # copy libs
 for f in $libs;do
-    cp %{output_dir}/libs/$f %{buildroot}%{cdcm_lib}
+    cp %{output_dir}/lib/$f %{buildroot}%{cdcm_lib}
 done
 
 # copy plugins
-cp -r %{output_dir}/libs/plugins/* %{buildroot}%{cdcm_lib}/plugins/
+cp -r %{output_dir}/lib/plugins/* %{buildroot}%{cdcm_lib}/plugins/
 
 # copy conf
 cp -r %{output_dir}/conf/*  %{buildroot}%{cdcm_conf}
