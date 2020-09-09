@@ -158,7 +158,7 @@ result trustwave::registry_client2::get_sd(trustwave::sd_utils::Security_Descrip
         return out();
     }
     status = NT_STATUS_OK;
-    display_sec_desc(&sec_desc);
+//    display_sec_desc(&sec_desc);
     outsd = sd_utils::get_sd_str(client_->cli(), &sec_desc, sd_utils::entity_type::REGISTRY);
     return out();
 }

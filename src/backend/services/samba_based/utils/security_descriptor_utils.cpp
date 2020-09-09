@@ -183,7 +183,7 @@ static const std::unordered_map<entity_type, std::map<uint32_t, std::string,std:
         new_mask &=0x00FFFFFF;// remove the generic
         flags_vector(perm_dir.at(et), orig_mask, out_vector);// extract special permissions
         for (const auto v:perm_dir.at(entity_type::STD)) {
-            if (v.first == (new_mask & v.first)) {
+            if (v.first == (orig_mask & v.first)) {
                 out_vector.emplace_back(v.second);
             }
         }
