@@ -1,3 +1,8 @@
+v1.0.10
+Fixed issues
+ - CDCM-117
+   get_permissions doesn't display std permissions
+
 v1.0.8
 Improvment issues
  - CDCM-108
