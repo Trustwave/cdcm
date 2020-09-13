@@ -46,12 +46,6 @@ class WMI_REG_EXEC_METHOD:
             self.__lmhash, self.__nthash = hashes.split(':')
 
     def connect(self):
-        self.__conn = SMBConnection(self.__addr, self.__addr)
-        if self.__doKerberos is False:
-            self.__conn.login(self.__username, self.__password, self.__domain, self.__lmhash, self.__nthash)
-        else:
-            self.__conn.kerberosLogin(self.__username, self.__password, self.__domain, self.__lmhash,
-                                      self.__nthash, self.__aesKey, kdcHost=self.__kdcHost)
         self.__dcom = DCOMConnection(self.__addr, self.__username, self.__password, self.__domain, self.__lmhash, self.__nthash,
                                      self.__aesKey, oxidResolver=True, doKerberos=self.__doKerberos, kdcHost=self.__kdcHost)
         try:
