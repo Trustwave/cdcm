@@ -103,6 +103,7 @@ systemctl start %{name}
 %systemd_preun %{name}.service
 %systemd_user_preun %{name}.service
 systemctl stop %{name}
+rm -fr /dev/shm/sessions_lock
 
 %postun
 %systemd_postun %{name}.service
