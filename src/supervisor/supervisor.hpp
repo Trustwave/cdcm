@@ -30,24 +30,7 @@ namespace trustwave {
         }
 
     private:
-        std::unique_ptr<boost::process::child> start_broker()
-        {
-            try {
-                auto broker = std::make_unique<boost::process::child>(
-                    boost::process::search_path("cdcm_broker"),
-                    boost::process::on_exit([&, this](int, const std::error_code&) {
-                        if(!trustwave::zmq_helpers::interrupted) {
-                            broker_ = start_broker();
-                        }
-                    }),
-                    ios_);
-                return broker;
-            }
-            catch(std::exception& exception) {
-                AU_LOG_ERROR("got exception while trying to start broker. exception: %s", exception.what());
-                return nullptr;
-            }
-        }
+        std::unique_ptr<boost::process::child> start_broker();
         boost::asio::io_service& ios_;
         workers_monitor worker_monitor_;
         std::unique_ptr<boost::process::child> broker_;
