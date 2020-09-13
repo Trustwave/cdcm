@@ -213,7 +213,6 @@ deploy:
         - .gitlab-ci.yml
     - exists:
         - build/RPMS/x86_64/*.rpm
-    - when: on_success
   tags:
     - cdcm
   dependencies:
