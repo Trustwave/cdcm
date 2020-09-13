@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <pluginGroups>
+        <pluginGroup>com.trustwave</pluginGroup>
+    </pluginGroups>
+    <proxies />
+    <servers>
+        <server>
+            <id>trustwave_deploy</id>
+            <username>%{username}</username>
+            <password>%{password}</password>
+        </server>
+    </servers>
+    <mirrors>
+        <mirror>
+            <id>Nexus</id>
+            <name>Nexus Public Mirror</name>
+            <url>https://%{hostname}/content/groups/public/</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+    </mirrors>
+    <profiles>
+        <profile>
+            <id>development</id>
+            <repositories>
+                <repository>
+                    <releases>
+                        <enabled>true</enabled>
+                        <checksumPolicy>fail</checksumPolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <checksumPolicy>fail</checksumPolicy>
+                    </snapshots>
+                    <id>trustwave</id>
+                    <name>trustwave</name>
+                    <url>https://%{hostname}/content/groups/public/</url>
+                    <layout>default</layout>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>development</activeProfile>
+    </activeProfiles>
+</settings>

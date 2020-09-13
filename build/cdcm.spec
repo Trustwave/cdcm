@@ -3,13 +3,13 @@
 %define __requires_exclude ^.*.so.*$
 %{!?pkg_version:%define pkg_version 1.0.0}
 %{!?release:%define release 1}
-Name:       cdcm
-Version:    %{pkg_version}
-Release:    %{release}
-License:    Various
+Name: cdcm
+Version: %{pkg_version}
+Release: %{release}
+License: Various
 Vendor: Trustwave Inc.
 URL: https://www.trustwave.com/
-Summary:    Credentialed Data Collection Module
+Summary: Credentialed Data Collection Module
 BuildRequires: systemd
 Requires: systemd
 Requires: zeromq
