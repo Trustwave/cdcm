@@ -231,7 +231,7 @@ deploy_release:
   script:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
-    - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
   #    - changes:
   #        - ci_scripts/deploy.bash
   #        - .gitlab-ci.yml
@@ -250,7 +250,7 @@ deploy_snapshot:
   script:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
-    - if: '$RELEASE == "SNAPSHOT" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_snapshot"'
   #    - changes:
   #        - ci_scripts/deploy.bash
   #        - .gitlab-ci.yml
