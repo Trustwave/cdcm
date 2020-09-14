@@ -3,7 +3,8 @@ project(cdcm)
 
 set(SOURCE_FILES
         start_session.cpp
-#        close_session.cpp
+        close_session.cpp
+        get_cdcm_info.cpp
         )
 
 add_library(tw-internal-actions OBJECT ${SOURCE_FILES})
