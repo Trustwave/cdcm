@@ -14,7 +14,7 @@ stages:
   - coverage
   - build_rpms
   - on_rpm_tests
-#  #  - pages_deploy
+  #  #  - pages_deploy
   - deploy_release
   - deploy_snapshot
   - service_update
@@ -71,6 +71,7 @@ build:
   artifacts:
     paths:
       - build_cdcm/
+    expire_in: 10 days
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -83,7 +84,6 @@ build:
 
 unittests:
   stage: unittests
-  allow_failure: true
   script:
     - scl enable devtoolset-8 'bash ci_scripts/unittests.bash'
   rules:
@@ -101,6 +101,8 @@ unittests:
       - build_cdcm/src/cdcm_testing/log/cdcm_client.log
     reports:
       junit: build_cdcm/src/tests/*.xml
+    expire_in: 10 days
+
   tags:
     - cdcm
   dependencies:
@@ -143,6 +145,8 @@ build_rpms:
   artifacts:
     paths:
       - build/RPMS/x86_64/
+    expire_in: 10 days
+
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -152,6 +156,49 @@ build_rpms:
     - cdcm
   dependencies:
     - build
+
+functional_tests:
+  stage: on_rpm_tests
+  script:
+    - bash ci_scripts/functional_tests.bash
+  rules:
+    - changes:
+        - ci_scripts/functional_tests.bash
+        - ci_scripts/common.bash
+        - .gitlab-ci.yml
+    - exists:
+        - build/RPMS/x86_64/*.rpm
+  artifacts:
+    expire_in: 10 days
+    when: always
+    paths:
+      - cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/log/*.log
+  tags:
+    - cdcm_tests
+  dependencies:
+    - build_rpms
+
+smoke_test:
+  stage: on_rpm_tests
+  script:
+    - bash ci_scripts/smoke_test.bash
+  rules:
+    - changes:
+        - ci_scripts/smoke_test.bash
+        - .gitlab-ci.yml
+        - ci_scripts/common.bash
+    - exists:
+        - build/RPMS/x86_64/*.rpm
+  artifacts:
+    expire_in: 10 days
+    when: always
+    paths:
+      - ./*.log
+  tags:
+    - cdcm_smoke
+  dependencies:
+    - build_rpms
 
 test_install:
   stage: on_rpm_tests
@@ -172,19 +219,18 @@ test_install:
         - build/RPMS/x86_64/*.rpm
   dependencies:
     - build_rpms
-  allow_failure: true
 
 deploy_release:
   stage: deploy_release
   script:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
-    - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
-#    - changes:
-#        - ci_scripts/deploy.bash
-#        - .gitlab-ci.yml
-#    - exists:
-#        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
+  #    - changes:
+  #        - ci_scripts/deploy.bash
+  #        - .gitlab-ci.yml
+  #    - exists:
+  #        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
@@ -195,12 +241,12 @@ deploy_snapshot:
   script:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
-    - if: '$RELEASE == "SNAPSHOT" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
-#    - changes:
-#        - ci_scripts/deploy.bash
-#        - .gitlab-ci.yml
-#    - exists:
-#        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_snapshot"'
+  #    - changes:
+  #        - ci_scripts/deploy.bash
+  #        - .gitlab-ci.yml
+  #    - exists:
+  #        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
@@ -217,45 +263,4 @@ service_update:
   dependencies:
     - deploy_release
 
-functional_tests:
-  stage: on_rpm_tests
-  allow_failure: true
-  script:
-    - bash ci_scripts/functional_tests.bash
-  rules:
-    - changes:
-        - ci_scripts/functional_tests.bash
-        - ci_scripts/common.bash
-        - .gitlab-ci.yml
-    - exists:
-        - build/RPMS/x86_64/*.rpm
-  artifacts:
-    when: always
-    paths:
-      - cdcm_testing/functional_tests/*.log
-      - cdcm_testing/functional_tests/log/*.log
-  tags:
-    - cdcm_tests
-  dependencies:
-    - build_rpms
 
-smoke_test:
-  stage: on_rpm_tests
-  allow_failure: true
-  script:
-    - bash ci_scripts/smoke_test.bash
-  rules:
-    - changes:
-        - ci_scripts/smoke_test.bash
-        - .gitlab-ci.yml
-        - ci_scripts/common.bash
-    - exists:
-        - build/RPMS/x86_64/*.rpm
-  artifacts:
-    when: always
-    paths:
-      - ./*.log
-  tags:
-    - cdcm_smoke
-  dependencies:
-    - build_rpms
