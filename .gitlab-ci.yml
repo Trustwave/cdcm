@@ -84,7 +84,6 @@ build:
 
 unittests:
   stage: unittests
-  allow_failure: true
   script:
     - scl enable devtoolset-8 'bash ci_scripts/unittests.bash'
   rules:
@@ -160,7 +159,6 @@ build_rpms:
 
 functional_tests:
   stage: on_rpm_tests
-  allow_failure: true
   script:
     - bash ci_scripts/functional_tests.bash
   rules:
@@ -183,7 +181,6 @@ functional_tests:
 
 smoke_test:
   stage: on_rpm_tests
-  allow_failure: true
   script:
     - bash ci_scripts/smoke_test.bash
   rules:
