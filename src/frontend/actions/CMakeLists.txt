@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.9.0)
 project(cdcm)
 
 set(SOURCE_FILES
-        start_session.cpp
-        close_session.cpp
+#        start_session.cpp
+#        close_session.cpp
         get_cdcm_info.cpp
         )
 
