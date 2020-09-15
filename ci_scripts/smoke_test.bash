@@ -20,5 +20,6 @@ IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST
     echo failed
   fi
 done
+echo $FAILED
 if [[ "$FAILED" -gt 0 ]]; then exit 1; fi
 
