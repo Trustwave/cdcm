@@ -1,3 +1,4 @@
+image: registry.gitlab.com/gitlab-org/release-cli:latest
 variables:
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_COMMIT_REF_SLUG
   GIT_SUBMODULE_STRATEGY: recursive
