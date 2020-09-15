@@ -1,4 +1,3 @@
-image: registry.gitlab.com/gitlab-org/release-cli:latest
 variables:
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_COMMIT_REF_SLUG
   GIT_SUBMODULE_STRATEGY: recursive
@@ -226,9 +225,6 @@ test_install:
 
 deploy_release:
   stage: deploy_release
-  release:
-    tag_name: $CI_COMMIT_TAG
-    description: $VERSION
   script:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
@@ -245,9 +241,6 @@ deploy_release:
 
 deploy_snapshot:
   stage: deploy_snapshot
-  release:
-    tag_name: $CI_COMMIT_TAG
-    description: $VERSION
   script:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
