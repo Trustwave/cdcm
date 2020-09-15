@@ -11,7 +11,7 @@ stages:
   - build_deps
   - build
   - unittests
-  - coverage
+#  - coverage
   - build_rpms
   - on_rpm_tests
   #  #  - pages_deploy
@@ -108,25 +108,25 @@ unittests:
   dependencies:
     - build
 
-html_coverage:
-  stage: coverage
-  script:
-    - scl enable devtoolset-8 "bash ci_scripts/html_coverage.bash"
-  artifacts:
-    name: pages
-    when: always
-    paths:
-      - build_cdcm/src/html_coverage
-    expire_in: 10 days
-  rules:
-    - changes:
-        - ci_scripts/html_coverage.bash
-        - src/**/*
-        - .gitlab-ci.yml
-  tags:
-    - cdcm
-  dependencies:
-    - build
+#html_coverage:
+#  stage: coverage
+#  script:
+#    - scl enable devtoolset-8 "bash ci_scripts/html_coverage.bash"
+#  artifacts:
+#    name: pages
+#    when: always
+#    paths:
+#      - build_cdcm/src/html_coverage
+#    expire_in: 10 days
+#  rules:
+#    - changes:
+#        - ci_scripts/html_coverage.bash
+#        - src/**/*
+#        - .gitlab-ci.yml
+#  tags:
+#    - cdcm
+#  dependencies:
+#    - build
 
 build_rpms:
   stage: build_rpms
@@ -226,11 +226,6 @@ deploy_release:
     - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
-  #    - changes:
-  #        - ci_scripts/deploy.bash
-  #        - .gitlab-ci.yml
-  #    - exists:
-  #        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
