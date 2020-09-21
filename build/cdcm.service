@@ -6,6 +6,7 @@ After=network.target
 [Service]
 Environment=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/share/cdcm/lib
 ExecStart= /usr/bin/cdcm_supervisor
+ExecStartPre = -/usr/bin/rm /dev/shm/sessions_lock
 Restart=always
 
 [Install]
