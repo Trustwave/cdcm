@@ -15,11 +15,7 @@
 //=====================================================================================================================
 
 #include "pe_context.hpp"
-#include <unordered_set>
-#include <string>
-#include <string_view>
 #include <locale>
-#include <memory>
 #include <codecvt>
 #include <boost/algorithm/string.hpp>
 #include <iostream>

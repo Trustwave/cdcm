@@ -17,8 +17,6 @@
 
 #include <csignal> // for sigaction, sigemptyset, SIGINT
 #include <cstdarg> // for va_end, va_list, va_start
-#include <cstdio> // for printf, vprintf
-#include <ctime> // for localtime, nanosleep, strftime
 #include <iomanip> // for operator<<, setfill, setw
 #include <iostream> // for basic_ostream::operator<<
 #include <zmq.h> // for zmq_version, ZMQ_IDENTITY

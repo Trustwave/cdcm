@@ -3,10 +3,7 @@
 //
 
 #include "workers_monitor.hpp"
-#include <utility> // std::pair, std::make_pair
 #include <boost/process/extend.hpp>
-#include <boost/system/error_code.hpp>
-#include <sys/types.h>
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "zmq/zmq_helpers.hpp"
 

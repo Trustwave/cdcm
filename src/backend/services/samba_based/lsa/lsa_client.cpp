@@ -31,19 +31,18 @@ extern "C" {
 #endif
 #include "lsa_client.hpp"
 #include "session.hpp"
-#include "credentials.hpp"
+
 #undef Required
 #include "singleton_runner/authenticated_scan_server.hpp"
 #define Required (3)
-#include <sstream>
-#include "../utils/security_descriptor_utils.hpp"
+
 using trustwave::lsa_client;
 using trustwave::session;
 using trustwave::result;
 
 result lsa_client::get_secdesc(const std::string& filename, security_descriptor*& sd)
 {
-    uint16_t fnum = (uint16_t)-1;
+    auto fnum = (uint16_t)-1;
     uint32_t desired_access = SEC_STD_READ_CONTROL | SEC_FLAG_SYSTEM_SECURITY;
     uint32_t sec_info = SECINFO_OWNER | SECINFO_GROUP | SECINFO_DACL;
     NTSTATUS status = cli_ntcreate(client_->cli(), filename.c_str(), 0, desired_access, 0,

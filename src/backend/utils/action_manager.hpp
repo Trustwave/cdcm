@@ -13,8 +13,8 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
-#ifndef _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
-#define _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
+#ifndef _CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
+#define _CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
 #include <boost/filesystem.hpp>
 
 namespace trustwave {
@@ -27,4 +27,4 @@ namespace trustwave {
         load(const boost::filesystem::path&, Dispatcher<Action_Base>&);
     };
 } // namespace trustwave
-#endif // _USERS_ASCOHEN_CLIONPROJECTS_CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP
+#endif // _CDCM_SRC_BACKEND_UTILS_ACTION_MANAGER_HPP

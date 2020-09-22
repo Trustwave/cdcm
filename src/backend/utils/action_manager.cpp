@@ -15,8 +15,6 @@
 //=====================================================================================================================
 #include "action_manager.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-//#include "dispatcher.hpp"
-//#include "action.hpp"
 #include "shared_library.hpp"
 using trustwave::action_manager;
 using trustwave::shared_library;

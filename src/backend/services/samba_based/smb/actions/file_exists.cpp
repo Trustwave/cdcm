@@ -17,14 +17,10 @@
 //                          						Include files
 //=====================================================================================================================
 #include "file_exists.hpp"
-//#include <string>
 #include <boost/algorithm/string/replace.hpp>
-#include "../smb_client.hpp"
-
-//#include "protocol/msg_types.hpp"
-#include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-//#include "pe_context.hpp"
+#include "session.hpp"
+#include "../smb_client.hpp"
 using trustwave::SMB_File_Exists;
 using action_status = trustwave::Action_Base::action_status;
 action_status SMB_File_Exists::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,

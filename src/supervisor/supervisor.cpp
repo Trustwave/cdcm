@@ -14,9 +14,6 @@
 //                          						Include files
 //=====================================================================================================================
 #include "supervisor.hpp"
-#include <zmq.hpp>
-#include <boost/asio.hpp>
-#include <boost/filesystem.hpp>
 #include "singleton_runner/authenticated_scan_server.hpp"
 
 std::unique_ptr<trustwave::ILogger> logger_ptr_u;
@@ -60,6 +57,7 @@ std::unique_ptr<boost::process::child> trustwave::supervisor::start_broker()
 int main(int, const char**)
 {
     std::cerr << "sessions_lock remove " <<(boost::filesystem::remove("/dev/shm/sessions_lock")?"SUCCEED":"FAILED")<<std::endl;
+    std::cerr << "sessions remove " <<(boost::filesystem::remove("/dev/shm/sessions")?"SUCCEED":"FAILED")<<std::endl;
     int rc =  trustwave::authenticated_scan_server::instance().run_as<::trustwave::process_type::supervisor>();
     logger_ptr_u.reset();
     return rc;
