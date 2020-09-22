@@ -85,7 +85,7 @@ build:
 unittests:
   stage: unittests
   script:
-    - scl enable devtoolset-8 'bash ci_scripts/unittests.bash'
+    - scl enable devtoolset-8 'bash -x ci_scripts/unittests.bash'
   rules:
     - changes:
         - build/version.txt
@@ -111,7 +111,7 @@ unittests:
 html_coverage:
   stage: coverage
   script:
-    - scl enable devtoolset-8 "bash ci_scripts/html_coverage.bash"
+    - scl enable devtoolset-8 "bash -x ci_scripts/html_coverage.bash"
   artifacts:
     name: pages
     when: always
@@ -131,7 +131,7 @@ html_coverage:
 build_rpms:
   stage: build_rpms
   script:
-    - scl enable devtoolset-8 "bash ci_scripts/build_rpm.bash"
+    - scl enable devtoolset-8 "bash -x ci_scripts/build_rpm.bash"
   rules:
     - changes:
         - cdcm_settings.json
@@ -160,7 +160,7 @@ build_rpms:
 functional_tests:
   stage: on_rpm_tests
   script:
-    - bash ci_scripts/functional_tests.bash
+    - bash -x ci_scripts/functional_tests.bash
   rules:
     - changes:
         - ci_scripts/functional_tests.bash
@@ -182,7 +182,7 @@ functional_tests:
 smoke_test:
   stage: on_rpm_tests
   script:
-    - bash ci_scripts/smoke_test.bash
+    - bash -x ci_scripts/smoke_test.bash
   rules:
     - changes:
         - ci_scripts/smoke_test.bash
@@ -205,7 +205,7 @@ test_install:
   tags:
     - cdcm_install
   script:
-    - bash ci_scripts/test_install.bash
+    - bash -x ci_scripts/test_install.bash
   rules:
     - changes:
         - build/version.txt
@@ -223,7 +223,7 @@ test_install:
 deploy_release:
   stage: deploy_release
   script:
-    - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
+    - scl enable devtoolset-8 "bash -x ci_scripts/deploy.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
   #    - changes:
@@ -239,7 +239,7 @@ deploy_release:
 deploy_snapshot:
   stage: deploy_snapshot
   script:
-    - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
+    - scl enable devtoolset-8 "bash -x ci_scripts/deploy.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_snapshot"'
   #    - changes:
@@ -255,7 +255,7 @@ deploy_snapshot:
 service_update:
   stage: service_update
   script:
-    - bash ci_scripts/service_update.bash
+    - bash -x ci_scripts/service_update.bash
   rules:
     - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
   tags:
