@@ -1,4 +1,4 @@
-set -e
+set -e -x
 mkdir -p build_cdcm
 cd build_cdcm || exit
 scl enable devtoolset-8 "cmake3 $CMAKE_FLAGS .."

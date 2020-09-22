@@ -1,4 +1,4 @@
-set -e
+set -e -x
 cd build || exit
 export RPM_RELEASE=$(grep -r 'Release:' cdcm.spec | cut -d':' -f3 | xargs)
 if [ "$RELEASE" = "SNAPSHOT" ]; then
