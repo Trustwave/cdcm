@@ -14,7 +14,7 @@
 //                          						Include files
 //=====================================================================================================================
 #include "file_mapper.hpp"
-#include "singleton_runner/authenticated_scan_server.hpp"
+//#include "singleton_runner/authenticated_scan_server.hpp"
 
 using trustwave::file_mapper;
 
