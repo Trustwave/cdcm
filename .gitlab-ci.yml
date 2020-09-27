@@ -160,7 +160,7 @@ build_rpms:
 functional_tests:
   stage: on_rpm_tests
   script:
-    - bash   ci_scripts/functional_tests.bash
+    - bash ci_scripts/functional_tests.bash
   rules:
     - changes:
         - ci_scripts/functional_tests.bash
@@ -182,7 +182,7 @@ functional_tests:
 smoke_test:
   stage: on_rpm_tests
   script:
-    - bash   ci_scripts/smoke_test.bash
+    - bash ci_scripts/smoke_test.bash
   rules:
     - changes:
         - ci_scripts/smoke_test.bash
@@ -205,7 +205,7 @@ test_install:
   tags:
     - cdcm_install
   script:
-    - bash   ci_scripts/test_install.bash
+    - bash ci_scripts/test_install.bash
   rules:
     - changes:
         - build/version.txt
