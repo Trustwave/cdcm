@@ -40,12 +40,7 @@ build_deps:
   script:
     - scl enable devtoolset-8 "bash ci_scripts/build_deps.bash"
   rules:
-    - changes:
-        - build/Makefile
-        - build/version.txt
-        - tars/*
-        - ci_scripts/build_deps.bash
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -61,13 +56,7 @@ build:
   script:
     - scl enable devtoolset-8 "bash ci_scripts/build.bash"
   rules:
-    - changes:
-        - build/version.txt
-        - src/**/*
-        - tars/**/*
-        - ci_scripts/build.bash
-        - ci_scripts/build_deps.bash
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     paths:
       - build_cdcm/
@@ -87,12 +76,7 @@ unittests:
   script:
     - scl enable devtoolset-8 'bash   ci_scripts/unittests.bash'
   rules:
-    - changes:
-        - build/version.txt
-        - src/**/*
-        - ci_scripts/unittests.bash
-        - ci_scripts/common.bash
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     when: always
     paths:
@@ -119,10 +103,7 @@ html_coverage:
       - build_cdcm/src/html_coverage
     expire_in: 10 days
   rules:
-    - changes:
-        - ci_scripts/html_coverage.bash
-        - src/**/*
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   tags:
     - cdcm
   dependencies:
@@ -133,15 +114,7 @@ build_rpms:
   script:
     - scl enable devtoolset-8 "bash   ci_scripts/build_rpm.bash"
   rules:
-    - changes:
-        - cdcm_settings.json
-        - src/**/*
-        - build/cdcm.spec
-        - build/version.txt
-        - build/cdcm.service
-        - build/50-cdcm.preset
-        - ci_scripts/build_rpm.bash
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     paths:
       - build/RPMS/x86_64/
@@ -162,12 +135,7 @@ functional_tests:
   script:
     - bash ci_scripts/functional_tests.bash
   rules:
-    - changes:
-        - ci_scripts/functional_tests.bash
-        - ci_scripts/common.bash
-        - .gitlab-ci.yml
-    - exists:
-        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     expire_in: 10 days
     when: always
@@ -184,12 +152,8 @@ smoke_test:
   script:
     - bash ci_scripts/smoke_test.bash
   rules:
-    - changes:
-        - ci_scripts/smoke_test.bash
-        - .gitlab-ci.yml
-        - ci_scripts/common.bash
-    - exists:
-        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
   artifacts:
     expire_in: 10 days
     when: always
@@ -207,30 +171,16 @@ test_install:
   script:
     - bash ci_scripts/test_install.bash
   rules:
-    - changes:
-        - build/version.txt
-        - cdcm_settings.json
-        - src/**/*
-        - build/cdcm.spec
-        - build/cdcm.service
-        - .gitlab-ci.yml
-        - ci_scripts/test_install.bash
-    - exists:
-        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   dependencies:
     - build_rpms
 
 deploy_release:
   stage: deploy_release
   script:
-    - scl enable devtoolset-8 "bash   ci_scripts/deploy.bash"
+    - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
-  #    - changes:
-  #        - ci_scripts/deploy.bash
-  #        - .gitlab-ci.yml
-  #    - exists:
-  #        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
@@ -239,14 +189,9 @@ deploy_release:
 deploy_snapshot:
   stage: deploy_snapshot
   script:
-    - scl enable devtoolset-8 "bash   ci_scripts/deploy.bash"
+    - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_snapshot"'
-  #    - changes:
-  #        - ci_scripts/deploy.bash
-  #        - .gitlab-ci.yml
-  #    - exists:
-  #        - build/RPMS/x86_64/*.rpm
   tags:
     - cdcm
   dependencies:
@@ -255,7 +200,7 @@ deploy_snapshot:
 service_update:
   stage: service_update
   script:
-    - bash   ci_scripts/service_update.bash
+    - bash ci_scripts/service_update.bash
   rules:
     - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
   tags:

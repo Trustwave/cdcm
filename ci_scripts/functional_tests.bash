@@ -5,7 +5,7 @@ cd cdcm_testing/functional_tests || exit
 sed -i "s@/var/log/cdcm/testsRunner/@""$PWD""/log/@g" testsRunner_settings.json
 source /etc/profile.d/rvm.sh
 rvm reload
-set -e -x
+set -e
 export FAILED=0
 export testFiles=(full.xml error_code_tests.xml qa_4_permissions.xml)
 for i in ${testFiles[@]}; do

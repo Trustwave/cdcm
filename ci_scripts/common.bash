@@ -1,4 +1,4 @@
-set -e -x
+set -e
 function upload_file {
     SERVER=10.88.240.20
     PORT=2222

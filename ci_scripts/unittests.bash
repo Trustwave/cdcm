@@ -1,5 +1,5 @@
 source ci_scripts/common.bash
-set -e -x
+set -e
 cd build_cdcm/ || exit
 make install
 cd ../cdcm_testing/tests || exit

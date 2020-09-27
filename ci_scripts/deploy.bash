@@ -1,4 +1,4 @@
-set -e -x
+set -e
 cd build || exit
 ARTIFACT_VERSION=${VERSION}.${ITERATION}${POM_SNAPSHOT}
 sed -e "s/%{version}/${ARTIFACT_VERSION}/" \

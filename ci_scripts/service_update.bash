@@ -1,4 +1,4 @@
-set -e -x
+set -e
 cd build || exit
 if [ "$RELEASE" = "RELEASE" ]; then
   curl -L "$NEXUS""service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm
