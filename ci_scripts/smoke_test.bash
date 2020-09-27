@@ -6,7 +6,7 @@ set -v
 export PATH=/opt/carrier/bin:$PATH
 export FAILED=0
 IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}"; do
-  sudo PATH=/opt/carrier/bin:"$PATH" /opt/carrier/bin/carrier -t full -p 445 -x /root/input_file_$i.xml --asset-meta-path output_meta.xml 2>&1 | tee "$REPORT_FNAME".$i.smoke.log
+  sudo PATH=/opt/carrier/bin:"$PATH" /opt/carrier/bin/carrier -t full -p 445 -x /root/input_file_$i.xml --asset-meta-path output_meta.xml 2>&1 | sudo tee "$REPORT_FNAME".$i.smoke.log
   upload_file "$REPORT_FNAME".$i.smoke.log
   if grep -q AUTHENTICATION_SUCCESS_EVENT "$REPORT_FNAME".$i.smoke.log; then
     echo success
