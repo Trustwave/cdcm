@@ -41,6 +41,7 @@ build_deps:
     - scl enable devtoolset-8 "bash ci_scripts/build_deps.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -57,6 +58,7 @@ build:
     - scl enable devtoolset-8 "bash ci_scripts/build.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   artifacts:
     paths:
       - build_cdcm/
@@ -77,6 +79,7 @@ unittests:
     - scl enable devtoolset-8 'bash   ci_scripts/unittests.bash'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   artifacts:
     when: always
     paths:
@@ -104,6 +107,7 @@ html_coverage:
     expire_in: 10 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   tags:
     - cdcm
   dependencies:
@@ -115,6 +119,7 @@ build_rpms:
     - scl enable devtoolset-8 "bash   ci_scripts/build_rpm.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   artifacts:
     paths:
       - build/RPMS/x86_64/
@@ -136,6 +141,7 @@ functional_tests:
     - bash ci_scripts/functional_tests.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   artifacts:
     expire_in: 10 days
     when: always
@@ -153,7 +159,7 @@ smoke_test:
     - bash ci_scripts/smoke_test.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   artifacts:
     expire_in: 10 days
     when: always
@@ -172,6 +178,7 @@ test_install:
     - bash ci_scripts/test_install.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
   dependencies:
     - build_rpms
 
