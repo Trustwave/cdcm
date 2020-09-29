@@ -20,7 +20,6 @@
 #include "../smb_client.hpp"
 #include "read_file.hpp"
 
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 using trustwave::SMB_Read_File;

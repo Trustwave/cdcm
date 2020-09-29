@@ -15,11 +15,9 @@
 //=====================================================================================================================
 #include "lib/talloc/talloc.h"
 #include "get_ntfs_folder_permissions.hpp"
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../lsa_client.hpp"
-#include "../../utils/security_descriptor_utils.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================

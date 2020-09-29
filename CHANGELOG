@@ -1,3 +1,14 @@
+v1.0.12
+Fixed issues
+- CDCM-118
+  Shared memory should be removed on supervisor start or cdcm package update
+
+Improvment issues
+- CDCM-116
+  Add support for getting static data from cdcm
+- CDCM-115
+  Nexus deployment of RPMs should be as carrier expect
+
 v1.0.11
 Fixed issues
  - CDCM-117

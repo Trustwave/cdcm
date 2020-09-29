@@ -14,14 +14,11 @@
 //                          						Include files
 //=====================================================================================================================
 #include "get_file_info.hpp"
-#include <string>
-#include <unordered_set>
 #include <codecvt>
+#include <regex>
 #include <boost/algorithm/string/replace.hpp>
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "../smb_client.hpp"
-#include <regex>
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "pe_context.hpp"

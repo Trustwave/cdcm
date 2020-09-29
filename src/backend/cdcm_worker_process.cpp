@@ -20,7 +20,6 @@
 #include <thread>
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "zmq/zmq_helpers.hpp"
-#include "typedefs.hpp"
 #include "message_worker.hpp"
 #include "utils/action_manager.hpp"
 std::unique_ptr<trustwave::ILogger> logger_ptr_u;

@@ -18,7 +18,6 @@
 //=====================================================================================================================
 #include "query_value.hpp"
 
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
@@ -72,7 +71,9 @@ action_status Query_Value_Action::act(boost::shared_ptr<session> sess, std::shar
     trustwave::registry_value rv;
     r = c.key_get_value_by_name(qvact->value_.c_str(), rv);
     if(!std::get<0>(r)) {
+        AU_LOG_DEBUG("Failed getting value  %s of key %s error: %s",qvact->value_.c_str(), qvact->key_.c_str(),win_errstr(std::get<1>(r)));
         res->set_response_for_error(CDCM_ERROR::VALUE_IS_EMPTY);
+        return action_status::FAILED;
     }
     else
     {

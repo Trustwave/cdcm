@@ -17,7 +17,6 @@
 //                                                  Include files
 //=====================================================================================================================
 #include "key_exists.hpp"
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
