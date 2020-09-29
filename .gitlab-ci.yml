@@ -22,7 +22,7 @@ stages:
 before_script:
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S)
   - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then export VERSION=${BASH_REMATCH[1]};export SNAPSHOT=${BASH_REMATCH[2]};export RELEASE=${BASH_REMATCH[3]}; fi
-  - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;export POM_SNAPSHOT='-SNAPSHOT'; else POM_SNAPSHOT= ;export REPO=releases; fi
+  - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;export POM_SNAPSHOT='-SNAPSHOT'; else export POM_SNAPSHOT= ;export REPO=releases; fi
   - export NEXUS='https://${NEXUS_HOSTNAME}/'
   - NEXUS_URL_PREFIX=$NEXUS/content/repositories/${REPO}
   - MAX_PRIOR_ITERATION=0; PRIOR_RPM_ITERATIONS=$(curl "${NEXUS_URL_PREFIX}/com/trustwave/cdcm/maven-metadata.xml" | sed -nE "s/<version>${VERSION}.([[:digit:]]+)${POM_SNAPSHOT}<\/version>/\1/p")
