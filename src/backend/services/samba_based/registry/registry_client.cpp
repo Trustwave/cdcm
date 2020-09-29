@@ -27,10 +27,8 @@ extern "C" {
 }
 
 #endif
-#include <ctime>
 
 #include "session.hpp"
-#include "credentials.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../utils/registry_utils.hpp"
 

@@ -41,6 +41,7 @@ namespace trustwave {
         std::string                 downloaded_files_path_      ;
         std::chrono::seconds        maintenance_interval_       ;
         std::string                 plugins_dir_                ;
+        std::string                 cdcm_version_               ;
 
         std::string to_string() const override
         {
@@ -63,6 +64,7 @@ namespace trustwave {
             <<"\tdownloaded_files_path       :\t"<< downloaded_files_path_          <<"\n"
             <<"\tmaintenance_interval        :\t"<< maintenance_interval_.count()   <<" seconds\n"
             <<"\tplugins_dir                 :\t"<< plugins_dir_                    <<"\n"
+            <<"\tcdcm_version                :\t"<< cdcm_version_                   <<"\n"
 
             ;
             return ss.str();
@@ -90,7 +92,8 @@ namespace tao::json {
             TAO_JSON_BIND_OPTIONAL("worker_connect_ep", &trustwave::cdcm_settings::worker_connect_ep_),
             TAO_JSON_BIND_OPTIONAL("downloaded_files_path", &trustwave::cdcm_settings::downloaded_files_path_),
             TAO_JSON_BIND_OPTIONAL("maintenance_interval", &trustwave::cdcm_settings::maintenance_interval_),
-            TAO_JSON_BIND_OPTIONAL("plugins_dir", &trustwave::cdcm_settings::plugins_dir_)> {
+            TAO_JSON_BIND_OPTIONAL("plugins_dir", &trustwave::cdcm_settings::plugins_dir_),
+    TAO_JSON_BIND_OPTIONAL("cdcm_version", &trustwave::cdcm_settings::cdcm_version_)> {
 
         template<template<typename...> class Traits>
         [[nodiscard]] static trustwave::cdcm_settings as(const tao::json::basic_value<Traits>& v)
@@ -129,6 +132,8 @@ namespace tao::json {
                 c.maintenance_interval_ = std::chrono::seconds(tv.value());
             }
             c.plugins_dir_ = o.template optional<std::string>("plugins_dir").value_or(c.plugins_dir_);
+            c.cdcm_version_ = o.template optional<std::string>("cdcm_version").value_or(c.cdcm_version_);
+
             return c;
         }
     };

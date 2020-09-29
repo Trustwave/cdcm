@@ -15,7 +15,6 @@
 //=====================================================================================================================
 #include "file_reader.hpp"
 #include <boost/filesystem.hpp>
-#include <system_error>
 #include <iostream>
 
 using trustwave::file_reader;

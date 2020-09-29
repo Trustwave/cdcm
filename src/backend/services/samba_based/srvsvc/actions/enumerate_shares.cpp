@@ -15,7 +15,6 @@
 //=====================================================================================================================
 #include "lib/talloc/talloc.h"
 #include "enumerate_shares.hpp"
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../srvsvc_client.hpp"
