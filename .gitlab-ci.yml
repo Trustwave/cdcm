@@ -13,16 +13,21 @@ stages:
   - unittests
   - coverage
   - build_rpms
-  - test_install
-  #  - pages_deploy
-  - deploy
+  - on_rpm_tests
+  #  #  - pages_deploy
+  - deploy_release
+  - deploy_snapshot
   - service_update
-  - functional_tests
-  - smoke_test
 
 before_script:
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S)
-  - echo $CI_PROJECT_DIR
+  - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then export VERSION=${BASH_REMATCH[1]};export SNAPSHOT=${BASH_REMATCH[2]};export RELEASE=${BASH_REMATCH[3]}; fi
+  - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;export POM_SNAPSHOT='-SNAPSHOT'; else POM_SNAPSHOT= ;export REPO=releases; fi
+  - export NEXUS='https://${NEXUS_HOSTNAME}/'
+  - NEXUS_URL_PREFIX=$NEXUS/content/repositories/${REPO}
+  - MAX_PRIOR_ITERATION=0; PRIOR_RPM_ITERATIONS=$(curl "${NEXUS_URL_PREFIX}/com/trustwave/cdcm/maven-metadata.xml" | sed -nE "s/<version>${VERSION}.([[:digit:]]+)${POM_SNAPSHOT}<\/version>/\1/p")
+  - for PRIOR_ITERATION in ${PRIOR_RPM_ITERATIONS}; do ((PRIOR_ITERATION > MAX_PRIOR_ITERATION)) && MAX_PRIOR_ITERATION=${PRIOR_ITERATION}; done
+  - export ITERATION=$((++MAX_PRIOR_ITERATION))
   - export CMAKE_FLAGS='-DBUILD_DEV=OFF'
   - if [ -z $CI_COMMIT_TAG ]; then export CMAKE_FLAGS='-DBUILD_DEV=ON' ; fi;
   - env
@@ -33,15 +38,9 @@ after_script:
 build_deps:
   stage: build_deps
   script:
-    - cd build
-    - scl enable devtoolset-8 'make deps'
+    - scl enable devtoolset-8 "bash ci_scripts/build_deps.bash"
   rules:
-    - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-      changes:
-        - build/Makefile
-        - build/version.txt
-        - tars/*
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -55,27 +54,13 @@ build:
   variables:
     DEPS_DIR: $CI_PROJECT_DIR/deps
   script:
-    - scl enable devtoolset-8 bash
-    - mkdir -p build_cdcm
-    - cd build_cdcm
-    - scl enable devtoolset-8 "cmake3 $CMAKE_FLAGS .."
-    - scl enable devtoolset-8 "make -j4"
-    - rm -fr /opt/output/$CI_COMMIT_REF_SLUG/libs/*
-    - rm -fr /opt/output/$CI_COMMIT_REF_SLUG/bin/*
-    - scl enable devtoolset-8 "make install"
+    - scl enable devtoolset-8 "bash ci_scripts/build.bash"
   rules:
-    - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-      changes:
-        - build/version.txt
-        - src/**/*
-        - tars/**/*
-        - .gitlab-ci.yml
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     paths:
       - build_cdcm/
+    expire_in: 10 days
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -88,25 +73,10 @@ build:
 
 unittests:
   stage: unittests
-  allow_failure: true
   script:
-    - cd build_cdcm/
-    - scl enable devtoolset-8 "make install"
-    - cd ../cdcm_testing/tests
-    - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" ../functional_tests/testsRunner_settings.json
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/output/libs/:/opt/output/libs/plugins/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared/private/:$GIT_CLONE_PATH/deps/samba-4.10.6/bin/shared
-    - cd ../../build_cdcm/src/cdcm_testing
-    - ./tests_run  --log_sink=$REPORT_FNAME.xml  --log_format=JUNIT  --log_level=all || code=$?; if [ $code -eq 0 ]; then echo "success"; else echo 'tests failure'; fi
-    - java -jar /opt/xunit-to-html/saxon9he.jar -o:$REPORT_FNAME.html -s:$REPORT_FNAME.xml -xsl:/opt/xunit-to-html/xunit_to_html.xsl
-    - sshpass -f /root/pf  scp -P 2222  $REPORT_FNAME.html root@10.88.240.20://opt/tests_results
+    - scl enable devtoolset-8 'bash   ci_scripts/unittests.bash'
   rules:
-    - if: ' $RunFast==null && $BumpTag == null'
-      changes:
-        - build/version.txt
-        - src/**/*
-        - .gitlab-ci.yml
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     when: always
     paths:
@@ -115,14 +85,17 @@ unittests:
       - build_cdcm/src/cdcm_testing/log/cdcm_client.log
     reports:
       junit: build_cdcm/src/tests/*.xml
+    expire_in: 10 days
+
   tags:
     - cdcm
+  dependencies:
+    - build
 
 html_coverage:
   stage: coverage
   script:
-    - cd build_cdcm
-    - scl enable devtoolset-8 "make html_coverage"
+    - scl enable devtoolset-8 "bash   ci_scripts/html_coverage.bash"
   artifacts:
     name: pages
     when: always
@@ -130,64 +103,23 @@ html_coverage:
       - build_cdcm/src/html_coverage
     expire_in: 10 days
   rules:
-    - if: '$RunFast==null &&  $CI_COMMIT_BRANCH=="master" && $BumpTag == null && $CI_COMMIT_TAG!=null'
-      changes:
-        - src/**/*
-        - .gitlab-ci.yml
-    - if: '$RunFast==null &&  $CI_COMMIT_BRANCH=="develop" && $BumpTag == null && $CI_COMMIT_TAG!=null'
-      changes:
-        - src/**/*
-        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   tags:
     - cdcm
   dependencies:
     - build
 
-#
-#pages:
-#  stage: pages_deploy
-#  dependencies:
-#    - html_coverage
-#  script:
-#    - mkdir -p public
-#    - rm -rf public/*
-#    - cp -r build_cdcm/src/html_coverage/* public/
-#  artifacts:
-#    name: pages
-#    paths:
-#      - public/
-#    expire_in: 15 days
-#  only:
-#    refs:
-#      - branches
-#  tags:
-#    - cdcm
-
 build_rpms:
   stage: build_rpms
   script:
-    - cd build
-    - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=_${CI_COMMIT_BRANCH//\//_}  ;fi
-    - if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then  export BRANCH=_MR_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME//\//_}  ;fi
-    - if [ "$RELEASE" = "SNAPSHOT" ];then export VERSION=${VERSION}${BRANCH}; export RELEASE_DEF="SNAPSHOT_$SNAPSHOT" ;else export RELEASE_DEF="$SNAPSHOT";fi
-    - echo rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
-    - rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}"  -bb cdcm.spec
+    - scl enable devtoolset-8 "bash   ci_scripts/build_rpm.bash"
   rules:
-    - if: '$BumpTag == null || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-      changes:
-        - cdcm_settings.json
-        - src/**/*
-        - build/cdcm.spec
-        - build/version.txt
-        - build/cdcm.service
-        - build/50-cdcm.preset
-        - .gitlab-ci.yml
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   artifacts:
     paths:
       - build/RPMS/x86_64/
+    expire_in: 10 days
+
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -195,69 +127,71 @@ build_rpms:
     policy: pull
   tags:
     - cdcm
+  dependencies:
+    - build
+
+functional_tests:
+  stage: on_rpm_tests
+  script:
+    - bash ci_scripts/functional_tests.bash
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  artifacts:
+    expire_in: 10 days
+    when: always
+    paths:
+      - cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/log/*.log
+  tags:
+    - cdcm_tests
+  dependencies:
+    - build_rpms
+
+smoke_test:
+  stage: on_rpm_tests
+  script:
+    - bash ci_scripts/smoke_test.bash
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+  artifacts:
+    expire_in: 10 days
+    when: always
+    paths:
+      - ./*.log
+  tags:
+    - cdcm_smoke
+  dependencies:
+    - build_rpms
 
 test_install:
-  stage: test_install
+  stage: on_rpm_tests
   tags:
     - cdcm_install
   script:
-    - cd build
-    - sudo yum install -y RPMS/x86_64/*.rpm
-    - sudo systemctl status cdcm
-    - sudo yum -y erase cdcm
+    - bash ci_scripts/test_install.bash
   rules:
-    - if: '$RunFast==null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
-      changes:
-        - build/version.txt
-        - cdcm_settings.json
-        - src/**/*
-        - build/cdcm.spec
-        - build/cdcm.service
-        - .gitlab-ci.yml
-    - if: '$RunFast==null && $BumpTag == null && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-      changes:
-        - cdcm_settings.json
-        - src/**/*
-        - build/cdcm.spec
-        - build/cdcm.service
-        - .gitlab-ci.yml
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-    - exists:
-        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "push"'
   dependencies:
     - build_rpms
-  allow_failure: true
 
-push_tag:
-  stage: deploy
+deploy_release:
+  stage: deploy_release
   script:
-    - cd build
-    - git remote set-url origin https://git_push_tag:${secret}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
-    - git config --global push.default simple
-    - bump2version $BumpTag --verbose --config-file ./bumpversion.cfg
-    - git status
-    - git push origin --tags
+    - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
-    - if: ' $BumpTag != null'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
   tags:
     - cdcm
+  dependencies:
+    - build_rpms
 
-deploy:
-  stage: deploy
+deploy_snapshot:
+  stage: deploy_snapshot
   script:
-    - cd build
-    - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - export REPO=releases
-    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ] ; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
-    - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
-    - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
-    - echo mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
-    - mvn deploy:deploy-file -s /etc/maven/settings.xml  -DgroupId=com.trustwave -DartifactId=cdcm -Dversion=$VERSION -DgeneratePom=true -DrepositoryId=nexus -Durl=https://${NEXUS_HOSTNAME}/content/repositories/$REPO -Dpackaging=rpm -Dfile=$(ls -d RPMS/x86_64/*)
+    - scl enable devtoolset-8 "bash ci_scripts/deploy.bash"
   rules:
-    - if: '$BumpTag == null '
-    - exists:
-        - build/RPMS/x86_64/*.rpm
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_snapshot"'
   tags:
     - cdcm
   dependencies:
@@ -266,89 +200,12 @@ deploy:
 service_update:
   stage: service_update
   script:
-    - cd build
-    - if [[ $(cat version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - if [ "$RELEASE" = "RELEASE" ] ; then curl -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm ; if [ $(rpm -qa | grep cdcm) = $(rpm -qp cdcm.rpm) ]; then export INST_ACTION='reinstall'; else export INST_ACTION='install' ; fi ;sudo yum $INST_ACTION -y cdcm.rpm ;sed -i 's/127.0.0.1:7613/0.0.0.0:7613/gm' /etc/cdcm/cdcm_settings.json; systemctl restart cdcm; fi
+    - bash ci_scripts/service_update.bash
   rules:
-    - if: '$RunFast == null && $BumpTag == null && $CI_COMMIT_BRANCH == "master"'
+    - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
   tags:
     - cdcm_service
   dependencies:
-    - deploy
+    - deploy_release
 
-functional_tests:
-  stage: functional_tests
-  allow_failure: true
-  script:
-    - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - export REPO=releases
-    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
-    - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
-    - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
-    - echo $REPO
-    - curl -v -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=$REPO&g=com.trustwave&a=cdcm&v=$VERSION&p=rpm" -o cdcm.rpm
-    - sudo yum erase -y cdcm
-    - sudo yum install -y cdcm.rpm
-    - cd cdcm_testing/functional_tests
-    - sed -i "s@/var/log/cdcm/testsRunner/@"$PWD"/log/@g" testsRunner_settings.json
-    - source /etc/profile.d/rvm.sh
-    - rvm reload
-    - export testFiles=(full.xml error_code_tests.xml qa_4_permissions.xml)
-    - for i in ${testFiles[@]};do ruby mdclient2.rb $i 2>&1 | tee $REPORT_FNAME.functional.$i.log ; mv log/cdcm_client1.log log/$REPORT_FNAME.cdcm_client.$i.log ;done
-    - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222 $REPORT_FNAME.functional.$i.log root@10.88.240.20://opt/tests_results ;done
-    - for i in ${testFiles[@]};do sshpass -f /root/pf  scp -P 2222  log/$REPORT_FNAME.cdcm_client.$i.log root@10.88.240.20://opt/tests_results ;done
-    - export FAILED=0
-    - for i in ${testFiles[@]};do if [ $(cat $REPORT_FNAME.functional.$i.log  | grep 'failed \[0'  | wc -l) = "1" ]; then echo success; else ((FAILED++)) ; echo failed; fi ;done
-    - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
 
-  rules:
-    - if: ' $RunFast==null && $BumpTag == null'
-      changes:
-        - build/version.txt
-        - src/**/*
-        - .gitlab-ci.yml
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-  artifacts:
-    when: always
-    paths:
-      - cdcm_testing/functional_tests/*.log
-      - cdcm_testing/functional_tests/log/*.log
-  tags:
-    - cdcm_tests
-
-smoke_test:
-  stage: smoke_test
-  allow_failure: true
-  script:
-    - sudo yum update -y --nogpgcheck
-    - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then VERSION=${BASH_REMATCH[1]};SNAPSHOT=${BASH_REMATCH[2]};RELEASE=${BASH_REMATCH[3]}; fi
-    - export REPO=releases
-    - if [ "$CI_COMMIT_BRANCH" = "master" ] || [ "$CI_COMMIT_BRANCH" = "develop" ]; then  export BRANCH=''; else export BRANCH=${CI_COMMIT_BRANCH//\//_}_ ; export REPO=snapshots ;fi
-    - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;fi
-    - if [ "$REPO" = "snapshots" ];then export VERSION=$BRANCH$VERSION.$SNAPSHOT-SNAPSHOT ; else export VERSION=$VERSION.$SNAPSHOT ;fi
-    - curl -v -L "https://${NEXUS_HOSTNAME}/service/local/artifact/maven/redirect?r=$REPO&g=com.trustwave&a=cdcm&v=$VERSION&p=rpm" -o cdcm.rpm
-    - sudo yum erase -y cdcm
-    - sudo yum install -y cdcm.rpm
-    - export PATH=/opt/carrier/bin:$PATH
-    - echo $PATH
-    - export FAILED=0
-    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  sudo PATH=/opt/carrier/bin:$PATH /opt/carrier/bin/carrier -t full -p 445 -x /root/input_file_$i.xml --asset-meta-path output_meta.xml  2>&1 | tee $REPORT_FNAME.$i.smoke.log ;done
-    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  sshpass -f /root/pf  scp -P 2222  $REPORT_FNAME.$i.smoke.log root@10.88.240.20://opt/tests_results ;done
-    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  if  grep -q AUTHENTICATION_SUCCESS_EVENT $REPORT_FNAME.$i.smoke.log; then echo success;else ((FAILED++)) ; echo failed; fi ;done
-    - IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}";do  if [ $(cat $REPORT_FNAME.$i.smoke.log  | grep ERROR  | wc -l) = "0" ]; then echo success;else ((FAILED++)) ; echo failed; fi ;done
-    - if [[ "$FAILED" -gt 0 ]]; then exit 1 ;fi
-  rules:
-    - if: ' $RunFast==null && $BumpTag == null'
-      changes:
-        - build/version.txt
-        - src/**/*
-        - .gitlab-ci.yml
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-  artifacts:
-    when: always
-    paths:
-      - ./*.log
-  tags:
-    - cdcm_smoke

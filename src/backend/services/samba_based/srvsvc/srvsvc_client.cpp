@@ -35,12 +35,10 @@ extern "C" {
 #include "srvsvc_client.hpp"
 #include "session.hpp"
 #include "../rpc/rpc_client.hpp"
-#include "credentials.hpp"
+
 #undef Required
 #include "singleton_runner/authenticated_scan_server.hpp"
 #define Required (3)
-#include <sstream>
-#include "../utils/security_descriptor_utils.hpp"
 using trustwave::srvsvc_client;
 using trustwave::session;
 using trustwave::result;

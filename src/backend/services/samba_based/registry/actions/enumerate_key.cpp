@@ -20,7 +20,6 @@
 
 #include "taocpp-json/include/tao/json.hpp"
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
-#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
