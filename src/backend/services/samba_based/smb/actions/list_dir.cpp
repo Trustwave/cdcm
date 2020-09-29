@@ -15,14 +15,10 @@
 //=====================================================================================================================
 #include "list_dir.hpp"
 #include <iomanip>
-#include <sstream>
-#include <string>
-#include <unistd.h>
 #include <boost/algorithm/string/replace.hpp>
 #include "taocpp-json/include/tao/json.hpp"
 #include "taocpp-json/include/tao/json/contrib/traits.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
-#include "protocol/msg_types.hpp"
 #include "../smb_client.hpp"
 #include "session.hpp"
 #include "wildcards.hpp"

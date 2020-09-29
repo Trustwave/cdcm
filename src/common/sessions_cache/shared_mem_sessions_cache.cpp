@@ -17,10 +17,7 @@
 #include "../session.hpp"
 #include "../singleton_runner/authenticated_scan_server.hpp"
 
-#include <boost/interprocess/managed_shared_memory.hpp> // for interpro...
 #include <boost/smart_ptr/make_shared.hpp>
-#include <boost/multi_index_container.hpp> // for interpro...
-#include <iostream>
 
 using namespace trustwave;
 boost::shared_ptr<shared_mem_sessions_cache>

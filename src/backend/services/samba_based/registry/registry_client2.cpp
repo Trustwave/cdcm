@@ -33,7 +33,6 @@ extern "C" {
 #include "../utils/security_descriptor_utils.hpp"
 #include "../utils/registry_utils.hpp"
 
-#include <unordered_map>
 #undef Required
 #include "singleton_runner/authenticated_scan_server.hpp"
 #define Required (3)

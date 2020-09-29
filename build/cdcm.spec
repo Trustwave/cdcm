@@ -3,13 +3,13 @@
 %define __requires_exclude ^.*.so.*$
 %{!?pkg_version:%define pkg_version 1.0.0}
 %{!?release:%define release 1}
-Name:       cdcm
-Version:    %{pkg_version}
-Release:    %{release}
-License:    Various
+Name: cdcm
+Version: %{pkg_version}
+Release: %{release}
+License: Various
 Vendor: Trustwave Inc.
 URL: https://www.trustwave.com/
-Summary:    Credentialed Data Collection Module
+Summary: Credentialed Data Collection Module
 BuildRequires: systemd
 Requires: systemd
 Requires: zeromq
@@ -59,11 +59,11 @@ libtw-sd-utils.so"
 
 # copy libs
 for f in $libs;do
-    cp %{output_dir}/libs/$f %{buildroot}%{cdcm_lib}
+    cp %{output_dir}/lib/$f %{buildroot}%{cdcm_lib}
 done
 
 # copy plugins
-cp -r %{output_dir}/libs/plugins/* %{buildroot}%{cdcm_lib}/plugins/
+cp -r %{output_dir}/lib/plugins/* %{buildroot}%{cdcm_lib}/plugins/
 
 # copy conf
 cp -r %{output_dir}/conf/*  %{buildroot}%{cdcm_conf}

@@ -22,7 +22,6 @@
 #pragma GCC diagnostic pop
 
 #include <boost/uuid/uuid_io.hpp> // for to_string
-#include <utility>
 
 using namespace trustwave;
 

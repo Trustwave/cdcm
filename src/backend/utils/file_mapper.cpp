@@ -14,8 +14,6 @@
 //                          						Include files
 //=====================================================================================================================
 #include "file_mapper.hpp"
-#include "singleton_runner/authenticated_scan_server.hpp"
-
 using trustwave::file_mapper;
 
 bool file_mapper::map_chunk(size_t offset, size_t size)
