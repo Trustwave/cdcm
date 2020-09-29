@@ -2,7 +2,7 @@
 %global __provides_exclude ^.*.so.*$
 %define __requires_exclude ^.*.so.*$
 %{!?pkg_version:%define pkg_version 1.0.0}
-%{!?release:%define release 1}
+%{!?release:%define release 1 }
 Name: cdcm
 Version: %{pkg_version}
 Release: %{release}
