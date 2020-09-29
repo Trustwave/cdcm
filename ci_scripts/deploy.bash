@@ -1,7 +1,7 @@
 set -e -x
 cd build || exit
 ARTIFACT_VERSION=${VERSION}.${ITERATION}${POM_SNAPSHOT}
-RPM_RELEASE=$(grep -r 'Release:' cdcm.spec | cut -d':' -f3 | xargs)
+RPM_RELEASE=$(grep -r 'Release:' ../build/cdcm.spec | cut -d':' -f3 | xargs)
 if [${POM_SNAPSHOT} = '']; then
   RPM_FILE=cdcm-${VERSION}-${RPM_RELEASE}.x86_64.rpm
   else
