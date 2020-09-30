@@ -209,7 +209,7 @@ service_update:
   script:
     - bash ci_scripts/service_update.bash
   rules:
-    - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
   tags:
     - cdcm_service
   dependencies:
