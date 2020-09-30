@@ -161,7 +161,7 @@ void message_broker::worker_process(const std::string& sender, std::unique_ptr<z
         if(command.compare(MDPW_REPLY) == 0) {
             if(worker_ready) {
                 //  Remove & save client return envelope and insert the
-                //  protocol header and service name, then rewrap envelope.
+                //  name header and service name, then rewrap envelope.
                 std::string client = msg->unwrap();
                 if(!client.empty()) {
                     msg->wrap(MDPC_CLIENT, "");
@@ -206,7 +206,7 @@ void message_broker::worker_send(trustwave::sp_worker_t worker_ptr, const char* 
 {
     std::unique_ptr<zmsg> msg(_msg ? new zmsg(*_msg) : new zmsg());
 
-    //  Stack protocol envelope to start of message
+    //  Stack name envelope to start of message
     if(!option.empty()) { //  Optional frame after command
         msg->push_front(option.c_str());
     }

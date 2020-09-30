@@ -1,4 +1,4 @@
 [submodule "cdcm_testing"]
 	path = cdcm_testing
 	url = ../../cdcm_dev/cdcm_testing.git
-	branch = master
+	branch = start_session_with_auth_reimp

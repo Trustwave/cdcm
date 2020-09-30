@@ -10,28 +10,11 @@
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
-#include "../registry_value.hpp"
+#include "registry_value.hpp"
 
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
-
-namespace tao ::json {
-
-    template<>
-    struct traits<trustwave::registry_value>:
-            binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
-                    TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_as_string_),
-                    TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
-    };
-
-    template<>
-    struct traits<trustwave::enum_key_values>:
-            binding::object<TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key_values::registry_values_)> {
-    };
-
-} // namespace tao::json
-
 using trustwave::Enumerate_Registry_Values_Action;
 using action_status = trustwave::Action_Base::action_status;
 action_status Enumerate_Registry_Values_Action::act(boost::shared_ptr<session> sess, std::shared_ptr<action_msg> action,

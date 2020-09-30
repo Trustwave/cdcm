@@ -45,6 +45,7 @@ namespace trustwave {
     using result = std::tuple<bool, WERROR>;
     class lsa_client final: public cdcm_client {
     public:
+        static constexpr std::string_view protocol{"smb_lsa"};
         lsa_client();
         ~lsa_client() override = default;
         lsa_client(lsa_client const& other) = delete;

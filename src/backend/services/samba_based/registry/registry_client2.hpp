@@ -39,7 +39,8 @@ namespace trustwave {
     static constexpr auto werr_pipe_busy = 0xe7;
     class registry_client2 final: public cdcm_client {
     public:
-        registry_client2(): client_(std::make_unique<rpc_client>()) { }
+        static constexpr std::string_view protocol{"smb_registry2"};
+        registry_client2():cdcm_client(protocol), client_(std::make_unique<rpc_client>()) { }
         ~registry_client2() override = default;
         registry_client2(registry_client2 const& other) = delete;
         registry_client2& operator=(registry_client2 other) noexcept {

@@ -18,6 +18,7 @@
 //=====================================================================================================================
 //                          						Include files
 //=====================================================================================================================
+#include <boost/asio.hpp>
 #include "settings.hpp"
 #include "action.hpp"
 #include "configurable.hpp"
@@ -26,16 +27,19 @@
 #include "dispatcher.hpp"
 #include "Logger/include/Logger.h"
 #include "sessions_cache/shared_mem_sessions_cache.hpp"
-
+#include "client.hpp"
+#include "process_specific_object.hpp"
 //=====================================================================================================================
 //                          						namespaces
 //=====================================================================================================================
 
 namespace trustwave {
-
-    class authenticated_scan_server final: public configurable<cdcm_settings> {
+    class authenticated_scan_server final: public configurable<cdcm_settings>{
     public:
         [[nodiscard]] Dispatcher<Action_Base>& public_dispatcher();
+        [[nodiscard]] Dispatcher<trustwave::cdcm_client>& get_clients_dispatcher();
+        [[nodiscard]] Dispatcher<trustwave::process_specific_object>& process_specific_repository();
+        boost::asio::io_service& io_context();
         Dispatcher<configuration> service_conf_repository;
         boost::shared_ptr<shared_mem_sessions_cache> sessions;
         virtual ~authenticated_scan_server() = default;
@@ -58,6 +62,9 @@ namespace trustwave {
         authenticated_scan_server();
         ILogger* logger_ptr_;
         Dispatcher<Action_Base> public_dispatcher_;
+        Dispatcher<process_specific_object> process_specific_repository_;
+//        std::map<std::string,std::unique_ptr<clients_map>> session_to_clients_;
+        boost::asio::io_service ios_;
     };
 
 } // namespace trustwave

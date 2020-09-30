@@ -16,6 +16,7 @@
 #ifndef MESSAGE_WORKER_HPP_
 #define MESSAGE_WORKER_HPP_
 #include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
 #include <memory>
 #include <chrono>
 #include <string>
@@ -39,7 +40,7 @@ namespace trustwave {
         //  Constructor
         explicit message_worker(zmq::context_t& ctx);
         ~message_worker();
-        static int worker_loop();
+        static int worker_loop(boost::asio::io_context&);
         //  ---------------------------------------------------------------------
         //  Connect or reconnect to broker
         void connect_to_broker();

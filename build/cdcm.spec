@@ -17,13 +17,28 @@ Requires: openpgm
 Requires: libsodium
 Requires: boost169-filesystem
 Requires: boost169-log
+Requires: boost169-python3
 Requires: gnutls
+Requires: python36
+Requires: python36-pyasn1
+Requires: python36-six
+Requires: python36-pycryptodomex
+Requires: python36-pyOpenSSL
+Requires: python36-ldap3
+Requires: python36-flask
+
 
 %description
 Credentialed Data Collection Module
 
 %clean
 rm -rf %{buildroot}
+
+%prep
+cp -rf  %{_specdir}/../deps/impacket %{_topdir}/BUILD/
+%build
+cd %{_topdir}/BUILD/impacket
+python3.6 setup.py build
 
 %install
 rm -rf %{buildroot}
@@ -37,6 +52,7 @@ done
 executables="cdcm_broker \
 cdcm_supervisor \
 cdcm_worker"
+
 
 %define output_dir /opt/output/%{getenv:CI_COMMIT_REF_SLUG}/
 
@@ -55,6 +71,10 @@ libtw-rpc-client.so \
 libtw-registry-client2.so \
 libtw-registry-utils.so \
 libtw-srvsvc-client.so \
+libtw-wmi_registry-client.so \
+libtw-wmi-wql-client.so \
+libtw-wmi-common.so \
+libtw-session-to-clients.so \
 libtw-sd-utils.so"
 
 # copy libs
@@ -91,6 +111,8 @@ set -e
 %{__install} -m644 %{_specdir}/50-%{name}.preset %{buildroot}/%{_presetdir}/50-%{name}.preset
 ln -sf %{_sbindir}/service %{buildroot}/%{_sbindir}/rc%{name}
 
+cd  %{_topdir}/BUILD/impacket
+python3.6 setup.py install --single-version-externally-managed -O1 --root=%{buildroot} --record=INSTALLED_FILES
 
 %post
 /sbin/ldconfig
@@ -111,11 +133,12 @@ if [ $1 -ge 1 ] ; then
         systemctl restart  %{name}.service >/dev/null 2>&1 || :
 fi
 
-%files
+%files -f %{_topdir}/BUILD/impacket/INSTALLED_FILES
 %defattr(-,root,root,-)
 %attr(755, root, root) %{_bindir}/cdcm_broker
 %attr(755, root, root) %{_bindir}/cdcm_supervisor
 %attr(755, root, root) %{_bindir}/cdcm_worker
+
 %{cdcm_lib}/*.so*
 %{cdcm_lib}/plugins/*
 /var/cdcm

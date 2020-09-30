@@ -55,6 +55,7 @@ namespace trustwave {
         public file_reader_interface,
         public configurable<smb_service_configuration> {
     public:
+        static constexpr std::string_view protocol{"smb"};
         smb_client();
         ~smb_client() override;
         bool list_dir(const std::string& path, std::vector<trustwave::dirent>& dirents);

@@ -25,27 +25,56 @@
 //                          						namespaces
 //=====================================================================================================================
 namespace trustwave {
-    struct local_start_session_msg: public action_msg {
-        static constexpr std::string_view act_name{"start_session"};
-        local_start_session_msg(): action_msg(act_name) {}
-        std::string remote;
+    struct protocol_creds{
+        std::string protocol;
+        bool authenticate;
         std::string domain;
         std::string username;
         std::string password;
         std::string workstation;
     };
+    struct local_start_session_msg: public action_msg {
+        static constexpr std::string_view act_name{"start_session"};
+        local_start_session_msg(): action_msg(act_name) {}
+        std::vector<protocol_creds> protocol_credentials;
+    };
 } // namespace trustwave
 namespace tao::json {
+    template<>
+    struct traits<trustwave::protocol_creds>:
+        binding::object<
+            TAO_JSON_BIND_REQUIRED("protocol", &trustwave::protocol_creds::protocol),
+            TAO_JSON_BIND_REQUIRED("authenticate", &trustwave::protocol_creds::authenticate),
+            TAO_JSON_BIND_REQUIRED("domain", &trustwave::protocol_creds::domain),
+            TAO_JSON_BIND_REQUIRED("username", &trustwave::protocol_creds::username),
+            TAO_JSON_BIND_REQUIRED("password", &trustwave::protocol_creds::password),
+            TAO_JSON_BIND_REQUIRED("workstation", &trustwave::protocol_creds::workstation)
+        > {
+
+        template<template<typename...> class Traits>
+        static trustwave::protocol_creds as(const tao::json::basic_value<Traits>& v)
+        {
+            trustwave::protocol_creds result;
+            const auto& object = v.get_object();
+            result.protocol = object.at("protocol").template as<std::string>();
+            result.authenticate = object.at("authenticate").template as<bool>();
+            result.domain = object.at("domain").template as<std::string>();
+            result.username = object.at("username").template as<std::string>();
+            result.password = object.at("password").template as<std::string>();
+            result.workstation = object.at("workstation").template as<std::string>();
+
+            return result;
+        }
+    };
 
     template<>
     struct traits<trustwave::local_start_session_msg>:
         binding::object<binding::inherit<traits<trustwave::action_msg>>,
-                        TAO_JSON_BIND_REQUIRED("remote", &trustwave::local_start_session_msg::remote),
-                        TAO_JSON_BIND_REQUIRED("domain", &trustwave::local_start_session_msg::domain),
-                        TAO_JSON_BIND_REQUIRED("username", &trustwave::local_start_session_msg::username),
-                        TAO_JSON_BIND_REQUIRED("password", &trustwave::local_start_session_msg::password),
-                        TAO_JSON_BIND_REQUIRED("workstation", &trustwave::local_start_session_msg::workstation)> {
+        TAO_JSON_BIND_REQUIRED("remote", &trustwave::local_start_session_msg::remote),
+        TAO_JSON_BIND_OPTIONAL("credentials", &trustwave::local_start_session_msg::protocol_credentials)> {
         TAO_JSON_DEFAULT_KEY(trustwave::local_start_session_msg::act_name.data());
+
+
         template<template<typename...> class Traits>
         static trustwave::local_start_session_msg as(const tao::json::basic_value<Traits>& v)
         {
@@ -53,10 +82,7 @@ namespace tao::json {
             const auto& object = v.at(trustwave::local_start_session_msg::act_name);
             result.id_ = object.at("id").template as<std::string>();
             result.remote = object.at("remote").template as<std::string>();
-            result.domain = object.at("domain").template as<std::string>();
-            result.username = object.at("username").template as<std::string>();
-            result.password = object.at("password").template as<std::string>();
-            result.workstation = object.at("workstation").template as<std::string>();
+            result.remote = object.at("credentials").template as<std::vector<protocol_creds>>();
             return result;
         }
     };
@@ -76,7 +102,6 @@ namespace trustwave {
             return v.as<std::shared_ptr<local_start_session_msg>>();
         }
     };
-
 } // namespace trustwave
 
 #endif /* TRUSTWAVE_SERVICES_LOCAL_ACTIONS_GET_SESSION_HPP_ */

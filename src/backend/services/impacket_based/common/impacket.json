@@ -1,0 +1,5 @@
+{
+  "impacket": {
+    "idle_client_timeout": 10
+  }
+}

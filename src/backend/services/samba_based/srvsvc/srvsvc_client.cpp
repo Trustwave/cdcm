@@ -43,7 +43,7 @@ using trustwave::srvsvc_client;
 using trustwave::session;
 using trustwave::result;
 
-srvsvc_client::srvsvc_client(): client_(std::make_unique<rpc_client>()) { }
+srvsvc_client::srvsvc_client():cdcm_client(protocol), client_(std::make_unique<rpc_client>()) { }
 srvsvc_client::~srvsvc_client() { }
 result srvsvc_client::connect(const session& sess)
 {

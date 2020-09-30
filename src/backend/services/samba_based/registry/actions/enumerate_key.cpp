@@ -17,37 +17,14 @@
 //                                                  Include files
 //=====================================================================================================================
 #include "enumerate_key.hpp"
-
-#include "taocpp-json/include/tao/json.hpp"
-#include "taocpp-json/include/tao/json/contrib/traits.hpp"
+#include "protocol/msg_types.hpp"
 #include "session.hpp"
 #include "singleton_runner/authenticated_scan_server.hpp"
 #include "../registry_client.hpp"
-#include "../registry_value.hpp"
+#include "registry_value.hpp"
 //=====================================================================================================================
 //                                                  namespaces
 //=====================================================================================================================
-namespace tao ::json {
-
-    template<>
-    struct traits<trustwave::registry_value>:
-        binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::registry_value::name_),
-                        TAO_JSON_BIND_REQUIRED("type", &trustwave::registry_value::type_as_string_),
-                        TAO_JSON_BIND_REQUIRED("value", &trustwave::registry_value::value_)> {
-    };
-    template<>
-    struct traits<trustwave::sub_key>:
-        binding::object<TAO_JSON_BIND_REQUIRED("name", &trustwave::sub_key::name_),
-                        TAO_JSON_BIND_REQUIRED("class_name", &trustwave::sub_key::class_name_),
-                        TAO_JSON_BIND_REQUIRED("last_modified", &trustwave::sub_key::last_modified_)> {
-    };
-
-    template<>
-    struct traits<trustwave::enum_key>:
-        binding::object<TAO_JSON_BIND_REQUIRED("sub_keys", &trustwave::enum_key::sub_keys_),
-                        TAO_JSON_BIND_REQUIRED("registry_values", &trustwave::enum_key::registry_values_)> {
-    };
-} // namespace tao::json
 
 using trustwave::Enumerate_Key_Action;
 using action_status = trustwave::Action_Base::action_status;

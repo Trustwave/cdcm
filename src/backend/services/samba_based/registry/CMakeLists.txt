@@ -28,5 +28,3 @@ install(TARGETS tw-registry-client s4_events registry_common ARCHIVE DESTINATION
         DESTINATION ${release_lib_dest})
 
 install(FILES registry.json DESTINATION ${release_lib_dest}/plugins/)
-
-#configure_file(registry.json ${release_lib_dest}/plugins/registry.json COPYONLY)

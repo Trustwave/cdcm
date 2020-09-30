@@ -35,7 +35,9 @@ template<> int trustwave::authenticated_scan_server::run_as<::trustwave::process
     AU_LOG_INFO("%s",conf_->to_string().c_str());
     AU_LOG_INFO("Looking for plugins in  %s", conf_->plugins_dir_.c_str());
     auto sl_vec = action_manager::load(conf_->plugins_dir_, public_dispatcher_);
-    std::thread worker_thread(message_worker::worker_loop);
+    std::thread worker_thread(message_worker::worker_loop,std::ref(ios_));
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> a= boost::asio::make_work_guard(ios_);
+    ios_.run();
     worker_thread.join();
     return 0;
 }

@@ -26,6 +26,7 @@
 namespace trustwave {
     class credentials {
     public:
+        credentials()=default;
         credentials(const std::string& domain, const std::string& username, const std::string& password,
                     const std::string& workstation);
 
@@ -36,12 +37,14 @@ namespace trustwave {
         std::string username() const;
         std::string password() const;
         std::string workstation() const;
+        bool authenticated() const;
 
     private:
         std::string domain_;
         std::string username_;
         std::string password_;
         std::string workstation_;
+        bool authenticated_=false;
     };
 } // namespace trustwave
 

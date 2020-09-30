@@ -7,7 +7,7 @@ set(SOURCE_FILES
         ../supervisor/workers_monitor.cpp
         maintenance.cpp)
 add_executable(cdcm_broker ${SOURCE_FILES})
-add_subdirectory(actions)
+#add_subdirectory(actions)
 target_link_libraries(cdcm_broker
         pthread
         zmq
@@ -16,7 +16,7 @@ target_link_libraries(cdcm_broker
         boost_log
         tw-logger
         tw-common
-        tw-internal-actions
+#        tw-internal-actions
         tw-sessions-cache
         tw-zmq
         tw-singleton-runner

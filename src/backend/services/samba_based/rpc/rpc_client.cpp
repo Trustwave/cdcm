@@ -50,10 +50,11 @@ rpc_client::~rpc_client()
 result rpc_client::connect(const session& sess, const std::string& share, const std::string& device)
 {
     creds_ = ::cli_credentials_init(talloc_tos());
-    cli_credentials_set_domain(creds_, sess.creds().domain().c_str(), CRED_SPECIFIED);
-    cli_credentials_set_username(creds_, sess.creds().username().c_str(), CRED_SPECIFIED);
-    cli_credentials_set_password(creds_, sess.creds().password().c_str(), CRED_SPECIFIED);
-    cli_credentials_set_workstation(creds_, sess.creds().workstation().c_str(), CRED_SPECIFIED);
+    auto smb_creds = sess.creds("smb");
+    cli_credentials_set_domain(creds_, smb_creds.domain().c_str(), CRED_SPECIFIED);
+    cli_credentials_set_username(creds_, smb_creds.username().c_str(), CRED_SPECIFIED);
+    cli_credentials_set_password(creds_, smb_creds.password().c_str(), CRED_SPECIFIED);
+    cli_credentials_set_workstation(creds_, smb_creds.workstation().c_str(), CRED_SPECIFIED);
 
     NTSTATUS nt_status = dcerpc_parse_binding(talloc_tos(), sess.remote().c_str(), &binding_);
 

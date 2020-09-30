@@ -15,13 +15,31 @@
 
 #ifndef TRUSTWAVE_COMMON_CLIENT_HPP_
 #define TRUSTWAVE_COMMON_CLIENT_HPP_
+#include <string_view>
+#include <memory>
 namespace trustwave {
+
     class cdcm_client {
     public:
         virtual ~cdcm_client() = default;
+        virtual std::shared_ptr<cdcm_client> clone()
+        {
+            return nullptr;
+        }
+        const std::string_view name() const
+        {
+            return protocol_;
+        }
+        bool connected()const
+        {
+            return connected_;
+        }
 
     protected:
-        cdcm_client() = default;
+        explicit cdcm_client(const std::string_view proto):protocol_(proto)
+        {}
+        const std::string_view protocol_;
+        bool connected_ = false;
     };
 
 } // namespace trustwave
