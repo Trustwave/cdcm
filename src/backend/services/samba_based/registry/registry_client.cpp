@@ -97,6 +97,7 @@ void registry_client::normalize(registry_value& rv)
         {
             if(data_blob_.data[i] == 0)
             {
+                AU_LOG_DEBUG(" ");
                 s.append("\n");
                 if(data_blob_.data[i+2] == 0)
                 {
@@ -105,12 +106,16 @@ void registry_client::normalize(registry_value& rv)
             }
             else
             {
+                AU_LOG_DEBUG(" ");
                 s.push_back(data_blob_.data[i]);
             }
         }
+        AU_LOG_DEBUG(" ");
+
         rv.value(s);
     }
     else {
+        AU_LOG_DEBUG(" ");
         rv.value(reg_val_data_string(ctx_, rv.type(), data_blob_));
     }
 }
