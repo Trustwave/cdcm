@@ -52,6 +52,7 @@ registry_client::~registry_client() { talloc_free(mem_ctx_); }
 
 result registry_client::connect(const session& sess)
 {
+    AU_LOG_DEBUG(" ");
     auto creds = ::cli_credentials_init(mem_ctx_);
     cli_credentials_set_domain(creds, sess.creds().domain().c_str(), CRED_SPECIFIED);
     cli_credentials_set_username(creds, sess.creds().username().c_str(), CRED_SPECIFIED);
@@ -67,6 +68,7 @@ result registry_client::connect(const session& sess)
 
 result registry_client::open_key(const char* full_path)
 {
+    AU_LOG_DEBUG(" ");
     uint32_t hive;
     std::string keyname;
     if(!trustwave::reg_hive_key(full_path, hive, keyname)) { return {false, ntstatus_to_werror(NT_STATUS_INVALID_PARAMETER)}; }
@@ -79,13 +81,14 @@ result registry_client::open_key(const char* full_path)
     ctx_->root = ctx_->current;
     error = reg_open_key(ctx_->registry, ctx_->root, keyname.c_str(), &ctx_->current);
     if(!W_ERROR_IS_OK(error)) {
-        //  AU_LOG_ERROR("open key failed '%s'", full_path);
+          AU_LOG_ERROR("open key failed '%s'", full_path);
         return {false, error};
     }
     return {true, error};
 }
 void registry_client::normalize(registry_value& rv)
 {
+    AU_LOG_DEBUG(" ");
     if(REG_MULTI_SZ == rv.type()) {
         AU_LOG_DEBUG("Type is REG_MULTI_SZ");
         const char** a = nullptr;
@@ -113,6 +116,7 @@ void registry_client::normalize(registry_value& rv)
 }
 result registry_client::key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv)
 {
+    AU_LOG_DEBUG(" ");
     uint32_t type;
     data_blob_clear(&data_blob_);
     WERROR error = reg_key_get_value_by_index(ctx_, ctx_->current, idx, name, &type, &data_blob_);
@@ -127,6 +131,7 @@ result registry_client::key_get_value_by_index(uint32_t idx, const char** name, 
 
 result registry_client::key_get_value_by_name(const char* name, registry_value& rv)
 {
+    AU_LOG_DEBUG(" ");
     uint32_t type;
     data_blob_clear(&data_blob_);
     WERROR error = reg_key_get_value_by_name(ctx_, ctx_->current, name, &type, &data_blob_);
@@ -141,6 +146,7 @@ result registry_client::key_get_value_by_name(const char* name, registry_value& 
 
 result registry_client::key_get_info(key_info& ki)
 {
+    AU_LOG_DEBUG(" ");
     WERROR error = reg_key_get_info(ctx_, ctx_->current, std::addressof(ki.classname), std::addressof(ki.num_subkeys),
                                     std::addressof(ki.num_values), std::addressof(ki.last_changed_time),
                                     std::addressof(ki.max_subkeylen), std::addressof(ki.max_valnamelen),
@@ -155,6 +161,7 @@ result registry_client::key_get_info(key_info& ki)
 
 result registry_client::enumerate_key(const std::string& key, enum_key& ek)
 {
+    AU_LOG_DEBUG(" ");
     const char* nm = nullptr;
     const char* cnm = nullptr;
     NTTIME lm;
@@ -184,6 +191,7 @@ result registry_client::enumerate_key(const std::string& key, enum_key& ek)
 
 result registry_client::enumerate_key_values(const std::string& key, enum_key_values& ek)
 {
+    AU_LOG_DEBUG(" ");
     auto status = open_key(key.c_str());
     key_info ki;
 
