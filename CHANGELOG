@@ -1,3 +1,8 @@
+v1.0.13
+Fixed issues
+- CDCM-119
+  Added internal handling of REG_EXPAND_SZ and REG_SZ
+
 v1.0.12
 Fixed issues
 - CDCM-118
