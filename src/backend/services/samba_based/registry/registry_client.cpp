@@ -115,7 +115,8 @@ void registry_client::normalize(registry_value& rv)
         rv.value(s);
     }
     else {
-        AU_LOG_DEBUG(" ");
+        AU_LOG_DEBUG("%s %zu ",data_blob_.data, data_blob_.length);
+
         auto char_ptr_value = reg_val_data_string(ctx_, rv.type(), data_blob_);
         if(nullptr == char_ptr_value)
         {
