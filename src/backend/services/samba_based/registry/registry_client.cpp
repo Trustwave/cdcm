@@ -88,7 +88,7 @@ result registry_client::open_key(const char* full_path)
 }
 void registry_client::normalize(registry_value& rv)
 {
-    AU_LOG_DEBUG(" ");
+    AU_LOG_DEBUG("Type is: %d",rv.type());
     if(REG_MULTI_SZ == rv.type()) {
         AU_LOG_DEBUG("Type is REG_MULTI_SZ");
         const char** a = nullptr;
