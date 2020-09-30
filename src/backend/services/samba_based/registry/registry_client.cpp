@@ -116,7 +116,16 @@ void registry_client::normalize(registry_value& rv)
     }
     else {
         AU_LOG_DEBUG(" ");
-        rv.value(reg_val_data_string(ctx_, rv.type(), data_blob_));
+        auto char_ptr_value = reg_val_data_string(ctx_, rv.type(), data_blob_);
+        if(nullptr == char_ptr_value)
+        {
+            AU_LOG_DEBUG("Value is null");
+            rv.value(std::string());
+        }
+        else
+            {
+            rv.value(char_ptr_value);
+        }
     }
 }
 result registry_client::key_get_value_by_index(uint32_t idx, const char** name, registry_value& rv)
