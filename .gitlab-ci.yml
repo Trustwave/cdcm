@@ -160,6 +160,7 @@ smoke_test:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
+  allow_failure: true
   artifacts:
     expire_in: 10 days
     when: always
