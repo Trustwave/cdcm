@@ -41,7 +41,7 @@ build_deps:
     - scl enable devtoolset-8 "bash ci_scripts/build_deps.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -58,7 +58,7 @@ build:
     - scl enable devtoolset-8 "bash ci_scripts/build.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   artifacts:
     paths:
       - build_cdcm/
@@ -79,7 +79,7 @@ unittests:
     - scl enable devtoolset-8 'bash   ci_scripts/unittests.bash'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   artifacts:
     when: always
     paths:
@@ -107,7 +107,7 @@ html_coverage:
     expire_in: 10 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   tags:
     - cdcm
   dependencies:
@@ -119,7 +119,7 @@ build_rpms:
     - scl enable devtoolset-8 "bash   ci_scripts/build_rpm.bash"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   artifacts:
     paths:
       - build/RPMS/x86_64/
@@ -141,7 +141,7 @@ functional_tests:
     - bash ci_scripts/functional_tests.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   artifacts:
     expire_in: 10 days
     when: always
@@ -159,7 +159,7 @@ smoke_test:
     - bash ci_scripts/smoke_test.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   artifacts:
     expire_in: 10 days
     when: always
@@ -178,7 +178,7 @@ test_install:
     - bash ci_scripts/test_install.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   dependencies:
     - build_rpms
 
@@ -209,7 +209,8 @@ service_update:
   script:
     - bash ci_scripts/service_update.bash
   rules:
-    - if: '$RELEASE == "RELEASE" && $CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "update_service"'
   tags:
     - cdcm_service
   dependencies:

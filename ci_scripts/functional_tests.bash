@@ -7,7 +7,7 @@ source /etc/profile.d/rvm.sh
 rvm reload
 set -e
 export FAILED=0
-export testFiles=(full.xml error_code_tests.xml qa_4_permissions.xml)
+export testFiles=(full.xml error_code_tests.xml qa_4_permissions.xml impacket_tests.xml qa_5_wmi_registry.xml)
 for i in ${testFiles[@]}; do
   ruby mdclient2.rb "$i" 2>&1 | tee "$REPORT_FNAME".functional."$i".log
   mv log/cdcm_client1.log log/"$REPORT_FNAME".cdcm_client."$i".log

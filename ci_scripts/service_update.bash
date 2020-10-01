@@ -1,7 +1,7 @@
 set -e
 cd build || exit
 if [ "$RELEASE" = "RELEASE" ]; then
-  curl -L "$NEXUS""service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=LATEST&p=rpm" -o cdcm.rpm
+  curl -L "$NEXUS""service/local/artifact/maven/redirect?r=releases&g=com.trustwave&a=cdcm&v=RELEASE&p=rpm" -o cdcm.rpm
   if [ $(rpm -qa | grep cdcm) = $(rpm -qp cdcm.rpm) ]; then
     export INST_ACTION='reinstall'
   else
