@@ -1,3 +1,10 @@
+v1.0.14
+Fixed issues
+- CDCM-121
+  changed log configuration to:
+  file size rotation at 8MB , 8 file count, and min free space at 200MB.
+
+
 v1.0.13
 Fixed issues
 - CDCM-119
