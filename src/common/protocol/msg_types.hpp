@@ -75,7 +75,6 @@ namespace trustwave {
             {CDCM_ERROR::SESSION_NOT_FOUND , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 301, "Session not found"} },
             {CDCM_ERROR::INTERNAL_ERROR , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 302, "Internal error"} },
             {CDCM_ERROR::MEMORY_ALLOCATION_FAILED , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 303, "Memory allocation failed"} },
-            {CDCM_ERROR::PARSE_FILE_FAILED , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 304, "Parse file failed"}},
             {CDCM_ERROR::READ_FILE_FAILED , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 305, "Read file failed"}},
             {CDCM_ERROR::OPEN_KEY_FAILED , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 306, "Open key failed"}},
             {CDCM_ERROR::FAILED_ADDING_NEW_SESSION , {RESP_GROUP_CODE::CDCM_INTERNAL_ERROR, 307, "Failed adding new session"}},
