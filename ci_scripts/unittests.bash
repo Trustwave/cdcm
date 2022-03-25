@@ -9,5 +9,5 @@ cd ../../build_cdcm/src/cdcm_testing || exit
 rm -f /dev/shm/*
 ./tests_run --log_sink="$REPORT_FNAME".xml --log_format=JUNIT --log_level=all || code=$?
 if [ $((code)) -eq 0 ]; then echo "success"; else echo 'tests failure'; fi
-java -jar /opt/xunit-to-html/saxon9he.jar -o:"$REPORT_FNAME".html -s:"$REPORT_FNAME".xml -xsl:/opt/xunit-to-html/xunit_to_html.xsl
+java -jar /usr/share/java/saxon.jar -o:"$REPORT_FNAME".html -s:"$REPORT_FNAME".xml -xsl:/opt/xunit-to-html/xunit_to_html.xsl
 upload_file "$REPORT_FNAME".html
