@@ -6,6 +6,5 @@ if [ "$RELEASE" = "SNAPSHOT" ]; then
 else
   export RELEASE_DEF="$RPM_RELEASE"
 fi
-export RPMBUILD_CMD="rpmbuild --define \"pkg_version ${VERSION}\" --define \"release $RELEASE_DEF\"  -bb cdcm.spec"
-echo rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}" -bb cdcm.spec
-rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}" -bb cdcm.spec
+rpmbuild --define "_specdir $( dirname "$0" )" --define "pkg_version ${VERSION}" \
+  --define "release ${RELEASE_DEF}" -bb cdcm.spec

@@ -30,7 +30,8 @@ RUN yum install -y \
     sshpass \
     gitlab-runner \
     sudo \
-    tw-carrier
+    tw-carrier \
+    rpm-build
 RUN yum install -y devtoolset-8
 RUN pip3 install gcovr
 RUN mkdir -p /opt/xunit-to-html
