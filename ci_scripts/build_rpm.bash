@@ -6,5 +6,5 @@ if [ "$RELEASE" = "SNAPSHOT" ]; then
 else
   export RELEASE_DEF="$RPM_RELEASE"
 fi
-rpmbuild --define "_specdir $( dirname "$(readlink -f "$0")" )" --define "pkg_version ${VERSION}" \
+rpmbuild --define "_specdir $(readlink -f "$(dirname "$0")" )" --define "pkg_version ${VERSION}" \
   --define "release ${RELEASE_DEF}" -bb cdcm.spec
