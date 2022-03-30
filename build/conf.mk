@@ -1,8 +1,8 @@
-PRJ			:= cdcm
-BUILD_ROOT 	:= /opt/dst
-TMP			:= /opt/tmp
-OUT			:= /out
-REPO_DIR	:= /opt/repo
+PRJ            := cdcm
+BUILD_ROOT     := /opt/build/dst
+TMP            := /opt/build/tmp
+OUT            := /opt/build/out
+REPO_DIR       := /opt/build/repo
 
-USETMPFS	:= 1
+USETMPFS       := 1
 #(cd $(TOP); svn info > $(BUILD_ROOT)/.build-$(DATE))

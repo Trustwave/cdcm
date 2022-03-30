@@ -38,7 +38,9 @@ RUN mkdir -p /opt/xunit-to-html
 RUN curl -L -o /opt/xunit-to-html/xunit_to_html.xsl https://github.com/Zir0-93/xunit-to-html/releases/download/v1.0.0/xunit_to_html.xsl
 RUN mkdir -p /opt/tests_results
 RUN echo "gitlab-runner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN mkdir -p /opt/build
+RUN chmod a+rwx /opt/build
 CMD gitlab-runner register --non-interactive -r XXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
     -u https://GITLAB.EXAMPLE.COM/ --custom_build_dir-enabled --executor=shell \
-    --tag-list=cdcm_install,cdcm_service,cdcm_smoke,cdcm_tests,cdcm -name joelTest; \
-    gitlab-runner run
+    --tag-list=cdcm_install,cdcm_service,cdcm_smoke,cdcm_tests,cdcm -name joelTest && \
+    exec /usr/sbin/init
