@@ -55,6 +55,7 @@ build:
   variables:
     DEPS_DIR: $CI_PROJECT_DIR/deps
   script:
+    - echo Joel: Did we get here?
     - sudo /bin/bash ci_scripts/build.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
