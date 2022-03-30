@@ -5,7 +5,7 @@ export FAILED=0
 IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}"; do
   sed -i -e "s/%{username}/${SMOKE_TEST_USERNAME}/" build/$i_CDCM.xml
   sed -i -e "s/%{password}/${SMOKE_TEST_PASSWORD}/" build/$i_CDCM.xml
-  sudo /opt/carrier/bin/carrier -t full -p 445 -x build/$i_CDCM.xml --asset-meta-path /dev/null 2>&1 | \
+  sudo /opt/carrier/bin/carrier -t full -p 445 -x "build/${i}_CDCM.xml" --asset-meta-path /dev/null 2>&1 | \
     tee "/opt/tests_results/$REPORT_FNAME".$i.smoke.log
   if grep -q AUTHENTICATION_SUCCESS_EVENT "/opt/tests_results/$REPORT_FNAME".$i.smoke.log; then
     echo success
