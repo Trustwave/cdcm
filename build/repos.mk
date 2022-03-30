@@ -45,7 +45,7 @@ endef
 define REPO_LOCAL
 [swg-app-local]
 name=SWG app local
-baseurl=file:///opt/build/repo
+baseurl=file:///opt/repo
 gpgcheck=0
 endef
 
