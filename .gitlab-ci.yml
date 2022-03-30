@@ -38,6 +38,7 @@ after_script:
 build_deps:
   stage: build_deps
   script:
+    - 'echo "Joel: in build deps"'
     - sudo /bin/bash ci_scripts/build_deps.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
