@@ -122,7 +122,7 @@ build_rpms:
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
   artifacts:
     paths:
-      - build/RPMS/x86_64/
+      - ~/rpmbuild/RPMS/x86_64/
     expire_in: 10 days
 
   cache:
