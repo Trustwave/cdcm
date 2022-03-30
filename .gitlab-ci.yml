@@ -38,8 +38,7 @@ after_script:
 build_deps:
   stage: build_deps
   script:
-    - 'echo "Joel: in build deps"'
-    - sudo /bin/bash ci_scripts/build_deps.bash
+    - /bin/bash ci_scripts/build_deps.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
@@ -56,8 +55,7 @@ build:
   variables:
     DEPS_DIR: $CI_PROJECT_DIR/deps
   script:
-    - 'echo "Joel: Did we get here?"'
-    - sudo /bin/bash ci_scripts/build.bash
+    - /bin/bash ci_scripts/build.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
