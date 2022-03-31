@@ -41,5 +41,6 @@ RUN echo "gitlab-runner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 CMD gitlab-runner register --non-interactive -r XXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
     -u https://GITLAB.EXAMPLE.COM/ --custom_build_dir-enabled --executor=shell \
     --tag-list=cdcm_install,cdcm_service,cdcm_smoke,cdcm_tests,cdcm -name joelTest && \
-    gitlab-runner run & && \
+    rm /etc/rc.d/init.d/gitlab-runner && \
+    gitlab-runner run & \
     exec /usr/sbin/init
