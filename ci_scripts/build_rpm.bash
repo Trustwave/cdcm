@@ -8,3 +8,4 @@ else
 fi
 rpmbuild --define "_specdir $(readlink -f "$(dirname "$0")" )" --define "pkg_version ${VERSION}" \
   --define "release ${RELEASE_DEF}" -bb cdcm.spec
+ln -s "${HOME}/RPMS"
