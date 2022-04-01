@@ -1,6 +1,6 @@
 sudo yum update -y
 sudo yum erase -y cdcm
-sudo yum install -y ~/rpmbuild/RPMS/x86_64/*.rpm
+sudo yum install -y build/RPMS/x86_64/*.rpm
 export FAILED=0
 IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST_SERVERS_ARRAY[@]}"; do
   sed -i -e "s/%{username}/${SMOKE_TEST_USERNAME}/" build/${i}_CDCM.xml

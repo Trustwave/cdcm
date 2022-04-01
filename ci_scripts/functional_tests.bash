@@ -1,5 +1,5 @@
 sudo yum -y erase cdcm
-sudo yum install -y ~/rpmbuild/RPMS/x86_64/*.rpm
+sudo yum install -y build/RPMS/x86_64/*.rpm
 cd cdcm_testing/functional_tests || exit
 sed -i "s@/var/log/cdcm/testsRunner/@""$PWD""/log/@g" testsRunner_settings.json
 set -e
