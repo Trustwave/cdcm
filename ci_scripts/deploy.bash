@@ -9,7 +9,7 @@ if [${POM_SNAPSHOT} = '']; then
 fi
 # This replacement doesn't handle the case where there is a bar '|' in the pathname.
 sed -e "s/%{version}/${ARTIFACT_VERSION}/" \
- -e "s|%{rpm_file}|$(readlink -f ~/rpmbuild/RPMS/x86_64)/${RPM_FILE}|" pom-template.xml >pom.xml
+ -e "s|%{rpm_file}|$(readlink -f build/RPMS/x86_64)/${RPM_FILE}|" pom-template.xml >pom.xml
 export MVN_CMD="mvn -B -s maven-settings.xml deploy"
 echo "$MVN_CMD"
 $MVN_CMD
