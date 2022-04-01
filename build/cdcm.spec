@@ -125,5 +125,5 @@ fi
 %{_sbindir}/rc%{name}
 
 %changelog
-* Sun Sep 23 2019 <ychislov@trustwave.com> - 1.0-1
+* Mon Sep 23 2019 <ychislov@trustwave.com> - 1.0-1
 - Initial package
