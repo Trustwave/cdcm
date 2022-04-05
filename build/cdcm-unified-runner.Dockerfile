@@ -1,7 +1,4 @@
 FROM centos/systemd
-SHELL ["/bin/bash", "-c"]
-ENV container docker
-ENV PYTHON_VERSION "3.6.3"
 COPY scanner-dna-centos7-production.repo /etc/yum.repos.d
 COPY scanner-signing-key-production.asc /
 RUN rpm --import /scanner-signing-key-production.asc
@@ -40,7 +37,7 @@ RUN mkdir -p /opt/tests_results
 RUN echo "gitlab-runner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 CMD gitlab-runner register --non-interactive -r XXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
     -u https://GITLAB.EXAMPLE.COM/ --custom_build_dir-enabled --executor=shell \
-    --tag-list=cdcm_install,cdcm_service,cdcm_smoke,cdcm_tests,cdcm -name joelTest && \
+    --tag-list=cdcm_install,cdcm_smoke,cdcm_tests,cdcm -name cdcm-unified-runner && \
     rm /etc/rc.d/init.d/gitlab-runner && \
     gitlab-runner run & \
     exec /usr/sbin/init
