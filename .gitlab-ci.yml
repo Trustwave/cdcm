@@ -14,7 +14,6 @@ stages:
   - coverage
   - build_rpms
   - on_rpm_tests
-  #  #  - pages_deploy
   - deploy_release
   - deploy_snapshot
   - service_update
@@ -211,9 +210,9 @@ service_update:
   stage: service_update
   script:
     - bash ci_scripts/service_update.bash
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "update_service"'
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "deploy_release"'
+#    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION == "update_service"'
   tags:
     - cdcm_service
   dependencies:
