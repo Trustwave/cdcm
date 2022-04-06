@@ -14,9 +14,5 @@ sed -i -e "s/%{username}/${NEXUS_USERNAME}/" maven-settings.xml
 sed -i -e "s/%{password}/${NEXUS_PASSWORD}/" maven-settings.xml
 export MVN_CMD="mvn -B -s maven-settings.xml deploy"
 echo "$MVN_CMD"
-# $MVN_CMD
-echo Joel: maven-settings.xml:
-cat maven-settings.xml
-echo Joel: pom.xml:
-cat pom.xml
+$MVN_CMD
 rm pom.xml
