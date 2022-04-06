@@ -82,10 +82,6 @@ cd  /usr/share/cdcm/lib/
 ln -sf  /opt/output/libs/plugins
 ```
 
-## Running the tests
-
-Please refere to the [Test README file](src/tests/functional_tests/README.md)
-
 ## Support
 
 If you found a problem with the software, please [create an

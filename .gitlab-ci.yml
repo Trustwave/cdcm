@@ -134,24 +134,6 @@ build_rpms:
   dependencies:
     - build
 
-functional_tests:
-  stage: on_rpm_tests
-  script:
-    - bash ci_scripts/functional_tests.bash
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
-  artifacts:
-    expire_in: 10 days
-    when: always
-    paths:
-      - cdcm_testing/functional_tests/*.log
-      - cdcm_testing/functional_tests/log/*.log
-  tags:
-    - cdcm_tests
-  dependencies:
-    - build_rpms
-
 smoke_test:
   stage: on_rpm_tests
   script:
