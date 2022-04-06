@@ -13,12 +13,6 @@ IFS="," SMOKE_TEST_SERVERS_ARRAY=(${SMOKE_TEST_SERVERS}); for i in "${SMOKE_TEST
     ((FAILED++))
     echo failed
   fi
-  if [ $(cat "/opt/test_results/$REPORT_FNAME".${i}.smoke.log | grep -c ERROR ) = "0" ]; then
-    echo success
-    else
-    ((FAILED++))
-    echo failed
-  fi
 done
 echo $FAILED
 if [[ "$FAILED" -gt 0 ]]; then exit 1; fi
