@@ -134,26 +134,23 @@ build_rpms:
   dependencies:
     - build
 
-# The functional tests require the existance of specially configured Windows servers. Unfortunately,
-#   these servers were lost when Trustwave closed the Israel office. (See CRFW-1763.)
-#
-#functional_tests:
-#  stage: on_rpm_tests
-#  script:
-#    - bash ci_scripts/functional_tests.bash
-#  rules:
-#    - if: '$CI_PIPELINE_SOURCE == "push"'
-#    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
-#  artifacts:
-#    expire_in: 10 days
-#    when: always
-#    paths:
-#      - cdcm_testing/functional_tests/*.log
-#      - cdcm_testing/functional_tests/log/*.log
-#  tags:
-#    - cdcm_tests
-#  dependencies:
-#    - build_rpms
+functional_tests:
+  stage: on_rpm_tests
+  script:
+    - bash ci_scripts/functional_tests.bash
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
+  artifacts:
+    expire_in: 10 days
+    when: always
+    paths:
+      - cdcm_testing/functional_tests/*.log
+      - cdcm_testing/functional_tests/log/*.log
+  tags:
+    - cdcm_tests
+  dependencies:
+    - build_rpms
 
 smoke_test:
   stage: on_rpm_tests
@@ -217,5 +214,3 @@ service_update:
     - cdcm_service
   dependencies:
     - deploy_release
-
-
