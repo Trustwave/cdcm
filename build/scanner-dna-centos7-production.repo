@@ -1,6 +1,0 @@
-[trustwave-dna-scanner]
-name=Trustwave DNA Scanner Repo
-baseurl=%{baseurl}
-gpgcheck=1
-enabled=1
-sslverify=true
