@@ -1,5 +1,5 @@
 sudo yum update -y
-yum -y install "$(CARRIER_REPO_BASE_URL)/$(curl --silent "$(CARRIER_REPO_BASE_URL)/" | \
+yum -y install "${CARRIER_REPO_BASE_URL}/$(curl --silent "${CARRIER_REPO_BASE_URL}/" | \
   grep --only-matching -e 'tw-carrier-\([0-9\.-]*\).rpm' | tail --lines=1)"
 sudo yum erase -y cdcm
 sudo yum install -y build/RPMS/x86_64/*.rpm
