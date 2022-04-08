@@ -13,7 +13,7 @@ sed -e "s/%{hostname}/${NEXUS_HOSTNAME}/" -e "s/%{version}/${ARTIFACT_VERSION}/"
 sed -i -e "s/%{hostname}/${NEXUS_HOSTNAME}/" maven-settings.xml
 sed -i -e "s/%{username}/${NEXUS_USERNAME}/" maven-settings.xml
 sed -i -e "s/%{password}/${NEXUS_PASSWORD}/" maven-settings.xml
-export MVN_CMD="mvn -B -s maven-settings.xml deploy"
-echo "$MVN_CMD"
-$MVN_CMD
+cat pom.xml
+cat maven-settings.xml
+#mvn -B -s maven-settings.xml deploy
 rm pom.xml
