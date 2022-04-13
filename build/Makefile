@@ -20,7 +20,7 @@ APPS		:= $(PRJ) build
 MOUNT_DIR 	:= /opt/
 
 
-REQ_RPMS	:= createrepo rsync wget yum-utils
+REQ_RPMS	:= rsync yum-utils
 
 TAR_CMD		:= tar --numeric-owner -zcf
 
