@@ -212,7 +212,7 @@ class WMI_REG_EXEC_METHOD:
 if __name__ == '__main__':
     try:
         CODEC = 'utf-8'
-        executer = WMI_REG_EXEC_METHOD("%{host}", "%{username}", "%{password}")
+        executer = WMI_REG_EXEC_METHOD("192.168.0.1", "administrator", "password")
         executer.connect()
         executer.EnumKey("SOFTWARE\\cdcm")
         # time.sleep(600)

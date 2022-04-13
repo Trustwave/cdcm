@@ -111,7 +111,7 @@ class WMIQUERY:
 if __name__ == '__main__':
     try:
         CODEC = 'utf-8'
-        executer = WMIQUERY("%{host}", "%{username}", "%{password}")
+        executer = WMIQUERY("192.168.0.1", "administrator", "password")
         executer.connect()
         executer.do_query("select hotfixid, description, installedby, installdate from win32_quickfixengineering")
         print ("3")
