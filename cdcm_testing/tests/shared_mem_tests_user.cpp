@@ -37,7 +37,7 @@ static void f1()
     std::unique_ptr<trustwave::credentials> creds1
         = std::make_unique<trustwave::credentials>("WORKGROUP", "%{username}", "%{password}", "SSS");
     for(int i = 0; i < 10; ++i) {
-        sessions->add(boost::make_shared<session>(std::string("%{host}") + std::to_string(i), *creds1));
+        sessions->add(boost::make_shared<session>(std::string("192.168.0.1") + std::to_string(i), *creds1));
         sleep(2);
     }
 }
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
         std::cerr << "F2 alloc sessios" << std::endl;
     }
     for(int i = 0; i < 20; i = i + 3) {
-        sessions->get_session_by<shared_mem_sessions_cache::remote>(std::string("%{host}")
+        sessions->get_session_by<shared_mem_sessions_cache::remote>(std::string("192.168.0.1")
                                                                     + std::to_string(i % 10));
         sleep(2);
     }
