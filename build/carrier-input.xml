@@ -8,7 +8,6 @@
       <value>smb://%{host}</value>
       <credentials>
         <credential type="username_password" service_proto="smb">
-          <credentialItem type="domain">%{domain}</credentialItem>
           <credentialItem type="username">%{username}</credentialItem>
           <credentialItem type="password">%{password}</credentialItem>
         </credential>
