@@ -11,7 +11,6 @@ define REPO_VER
 [$(PRJ)-$(MAJOR).$(MINOR)]
 name=$(PRJ) $(MAJOR).$(MINOR)
 baseurl=$(BASE_URI)/$(PRJ)/$(MAJOR).$(MINOR)
-gpgcheck=0
 
 endef
 

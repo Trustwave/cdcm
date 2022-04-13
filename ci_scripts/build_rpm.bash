@@ -1,4 +1,5 @@
 set -e
+TOPDIR="$(pwd)/build"
 cd build || exit
 export RPM_RELEASE=$(grep -r 'Release:' cdcm.spec | cut -d':' -f3 | xargs)
 if [ "$RELEASE" = "SNAPSHOT" ]; then
@@ -6,6 +7,5 @@ if [ "$RELEASE" = "SNAPSHOT" ]; then
 else
   export RELEASE_DEF="$RPM_RELEASE"
 fi
-export RPMBUILD_CMD="rpmbuild --define \"pkg_version ${VERSION}\" --define \"release $RELEASE_DEF\"  -bb cdcm.spec"
-echo rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}" -bb cdcm.spec
-rpmbuild --define "pkg_version ${VERSION}" --define "release ${RELEASE_DEF}" -bb cdcm.spec
+rpmbuild --define "_topdir ${TOPDIR}" --define "pkg_version ${VERSION}" \
+  --define "release ${RELEASE_DEF}" -bb cdcm.spec

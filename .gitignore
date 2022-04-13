@@ -36,6 +36,3 @@ _deps
 /backend/cdcm_worker
 /frontend/cdcm_broker
 /tests/components/test_client
-/cdcm_testing/functional_tests/108.xml
-/cdcm_testing/functional_tests/108-1.xml
-/cdcm_testing/functional_tests/impacket_client.xml

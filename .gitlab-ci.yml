@@ -14,7 +14,6 @@ stages:
   - coverage
   - build_rpms
   - on_rpm_tests
-  #  #  - pages_deploy
   - deploy_release
   - deploy_snapshot
   - service_update
@@ -23,8 +22,7 @@ before_script:
   - export REPORT_FNAME=results.$(date +%d-%m-%Y-%H_%M_%S)
   - if [[ $(cat build/version.txt) =~ ([0-9]+\.[0-9]+\.[0-9]+)\.([0-9]+)_([A-Z]+) ]] ; then export VERSION=${BASH_REMATCH[1]};export SNAPSHOT=${BASH_REMATCH[2]};export RELEASE=${BASH_REMATCH[3]}; fi
   - if [ "$RELEASE" = "SNAPSHOT" ]; then export REPO=snapshots ;export POM_SNAPSHOT='-SNAPSHOT'; else export POM_SNAPSHOT= ;export REPO=releases; fi
-  - export NEXUS='https://${NEXUS_HOSTNAME}/'
-  - NEXUS_URL_PREFIX=$NEXUS/content/repositories/${REPO}
+  - NEXUS_URL_PREFIX="https://${NEXUS_HOSTNAME}/content/repositories/${REPO}"
   - MAX_PRIOR_ITERATION=0; PRIOR_RPM_ITERATIONS=$(curl "${NEXUS_URL_PREFIX}/com/trustwave/cdcm/maven-metadata.xml" | sed -nE "s/<version>${VERSION}.([[:digit:]]+)${POM_SNAPSHOT}<\/version>/\1/p")
   - for PRIOR_ITERATION in ${PRIOR_RPM_ITERATIONS}; do ((PRIOR_ITERATION > MAX_PRIOR_ITERATION)) && MAX_PRIOR_ITERATION=${PRIOR_ITERATION}; done
   - export ITERATION=$((++MAX_PRIOR_ITERATION))
@@ -38,7 +36,7 @@ after_script:
 build_deps:
   stage: build_deps
   script:
-    - scl enable devtoolset-8 "bash ci_scripts/build_deps.bash"
+    - /bin/bash ci_scripts/build_deps.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
@@ -55,7 +53,7 @@ build:
   variables:
     DEPS_DIR: $CI_PROJECT_DIR/deps
   script:
-    - scl enable devtoolset-8 "bash ci_scripts/build.bash"
+    - /bin/bash ci_scripts/build.bash
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
@@ -135,24 +133,6 @@ build_rpms:
   dependencies:
     - build
 
-functional_tests:
-  stage: on_rpm_tests
-  script:
-    - bash ci_scripts/functional_tests.bash
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ACTION != "update_service"'
-  artifacts:
-    expire_in: 10 days
-    when: always
-    paths:
-      - cdcm_testing/functional_tests/*.log
-      - cdcm_testing/functional_tests/log/*.log
-  tags:
-    - cdcm_tests
-  dependencies:
-    - build_rpms
-
 smoke_test:
   stage: on_rpm_tests
   script:
@@ -216,5 +196,3 @@ service_update:
     - cdcm_service
   dependencies:
     - deploy_release
-
-
