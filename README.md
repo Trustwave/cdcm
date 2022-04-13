@@ -24,7 +24,7 @@ Third party libraries that we use with our source:
 * [JSON](https://github.com/taocpp/json) - C++ Type Library.
 * [libpe](https://github.com/merces/libpe) - File version.
 * [BOOST](https://www.boost.org) - Process, IPC(Shared memory), multi index, Testin framework  and some other trivial libs.
-* [impacket](https://github.com/SecureAuthCorp/impacket) - WMI - registry,wql.
+
 ```
 yum install -y \
         boost169.x86_64 \
