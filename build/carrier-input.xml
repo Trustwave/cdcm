@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<scan xmlns="http://www.trustwave.com/scan/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.trustwave.com/scan/1.0/scan.xsd"
+      version="1">
+  <targets>
+    <target ref_id="some-asset-id" type="service">
+      <value>smb://%{host}</value>
+      <credentials>
+        <credential type="username_password" service_proto="smb">
+          <credentialItem type="domain">%{domain}</credentialItem>
+          <credentialItem type="username">%{username}</credentialItem>
+          <credentialItem type="password">%{password}</credentialItem>
+        </credential>
+      </credentials>
+    </target>
+  </targets>
+  <options>
+    <option name="scan_type">full</option>
+    <option name="port_whitelist">445</option>
+    <option name="service_protocols">smb</option>
+    <option name="cdcm_domain">127.0.0.1</option>
+    <option name="cdcm_port">7613</option>
+    <option name="test_white_list">1544540509</option>
+  </options>
+</scan>
