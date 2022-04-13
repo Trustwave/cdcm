@@ -35,7 +35,7 @@ Credentialed Data Collection Module
 rm -rf %{buildroot}
 
 %prep
-cp -rf  %{_specdir}/../deps/impacket %{_topdir}/BUILD/
+cp -rf  %{_topdir}/../deps/impacket %{_topdir}/BUILD/
 %build
 cd %{_topdir}/BUILD/impacket
 python3.6 setup.py build
