@@ -38,7 +38,7 @@ int main(int argc, char** argv)
         = std::make_unique<trustwave::credentials>("WORKGROUP", "%{username}", "%{password}", "SSS");
     std::vector<boost::shared_ptr<session>> v;
     for(int i = 0; i < 10; ++i) {
-        auto e = boost::make_shared<session>(std::string("%{host}") + std::to_string(i), *creds1);
+        auto e = boost::make_shared<session>(std::string("192.168.0.1") + std::to_string(i), *creds1);
         v.push_back(e);
         sessions->add(e);
         sleep(2);
