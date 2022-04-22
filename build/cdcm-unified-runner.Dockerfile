@@ -32,6 +32,9 @@ RUN mkdir -p /opt/test_results
 RUN echo "gitlab-runner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 # To avoid leaking Trustwave internal information, you have to manually supply correct values
 #   for --registration-token and --url. (This project is publicly available on GitHub.)
+# Note that sometimes a second instance of gitlab-runner starts which causes jobs to fail. To
+#   permanently fix this issue, please run 'systemctl disable gitlab-runner' and 'systemctl stop
+#   gitlab-runner' from within the container.
 CMD gitlab-runner register --registration-token XXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
     --url https://GITLAB.EXAMPLE.COM/ --non-interactive --custom_build_dir-enabled \
     --executor=shell --tag-list=cdcm_install,cdcm_smoke,cdcm_tests,cdcm \
