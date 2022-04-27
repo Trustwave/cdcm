@@ -40,7 +40,6 @@ yum install -y \
         libarchive-devel.x86_64 \
         openldap-devel.x86_64 \
         popt-devel.x86_64 \
-        libtevent-devel.x86_64 \
         pam-devel.x86_64 \
         python3-devel.x86_64
 yum install -y devtoolset-8

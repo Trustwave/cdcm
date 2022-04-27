@@ -18,6 +18,7 @@ set(SMB_INCLUDES
         ${SAMBA_SRC}/bin/default/include
         ${SAMBA_SRC}/bin/default/include/public
         ${SAMBA_SRC}/bin/default/source4
+        ${SAMBA_SRC}/lib/tevent
         )
 set(SMB_LINKS
         ${SAMBA_SRC}/bin/shared/
